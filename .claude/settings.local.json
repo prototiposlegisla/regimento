@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m http.server:*)",
+      "Bash(npx --version:*)",
+      "Bash(npx serve:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)"
+    ]
+  }
+}

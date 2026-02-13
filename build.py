@@ -45,8 +45,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--output",
-        default=str(BASE_DIR / "dist" / "index.html"),
-        help="Caminho de saída (padrão: dist/index.html)",
+        default=str(BASE_DIR / "docs" / "index.html"),
+        help="Caminho de saída (padrão: docs/index.html)",
     )
     args = parser.parse_args()
 

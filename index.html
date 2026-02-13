@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RegimentoReader — Câmara Municipal de São Paulo</title>
+<style>
+:root {
+  --zoom-scale: 1;
+  --mark-red: #ffcccc;
+  --mark-blue: #cce0ff;
+  --mark-green: #ccffcc;
+  --mark-yellow: #ffffcc;
+  --mark-red-solid: #e74c3c;
+  --mark-blue-solid: #3498db;
+  --mark-green-solid: #2ecc71;
+  --mark-yellow-solid: #f1c40f;
+  --selected-border: #3498db;
+  --bg: #f0f0f0;
+  --card-bg: #fff;
+  --header-h: 56px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: #222;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+/* ===== HEADER ===== */
+#header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  height: var(--header-h);
+}
+
+#btn-index {
+  width: 36px; height: 36px;
+  border: none; background: #eee; border-radius: 8px;
+  font-weight: 700; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+#btn-index:hover { background: #ddd; }
+
+#search-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#search-input {
+  width: 100%;
+  padding: 8px 36px 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 15px;
+  outline: none;
+}
+#search-input:focus { border-color: var(--selected-border); }
+
+#btn-filter {
+  position: absolute;
+  right: 4px;
+  width: 28px; height: 28px;
+  border: none; background: none; cursor: pointer;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+#btn-filter.active { background: var(--selected-border); color: #fff; }
+
+#btn-clear-search {
+  position: absolute;
+  right: 34px;
+  width: 24px; height: 24px;
+  border: none; background: none; cursor: pointer;
+  font-size: 16px; color: #999;
+  display: none;
+  align-items: center; justify-content: center;
+}
+
+/* ===== UNIT IDENTIFIERS (clickable markers) ===== */
+.unit-id {
+  font-weight: 700;
+  cursor: pointer;
+  padding: 1px 5px;
+  border-radius: 4px;
+  transition: background-color .2s, color .2s;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+}
+.unit-id:hover {
+  outline: 2px solid rgba(52,152,219,.4);
+  outline-offset: 1px;
+}
+
+/* ===== CARDS ===== */
+#cards-container {
+  padding: 12px;
+  padding-top: calc(12px);
+  padding-bottom: 120px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: calc(16px * var(--zoom-scale));
+  margin-bottom: calc(10px * var(--zoom-scale));
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  border-left: 4px solid transparent;
+  transition: border-color .2s, box-shadow .2s, background-color .3s;
+  font-size: calc(1rem * var(--zoom-scale));
+  line-height: 1.6;
+  cursor: pointer;
+  position: relative;
+}
+
+.card.selected {
+  border-left-color: var(--selected-border);
+  box-shadow: 0 2px 12px rgba(52,152,219,.2);
+}
+
+.card.filtered-out { display: none; }
+
+.card-titulo {
+  font-weight: 700;
+  text-align: center;
+  font-size: calc(1.1rem * var(--zoom-scale));
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: calc(12px * var(--zoom-scale));
+}
+
+.card-artigo .art-para {
+  margin-top: calc(6px * var(--zoom-scale));
+  padding-left: calc(16px * var(--zoom-scale));
+}
+
+/* Search highlight */
+mark {
+  background: #ffe066;
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* ===== FOOTNOTES ===== */
+.footnote-ref {
+  color: var(--selected-border);
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.footnote-box {
+  display: none;
+  background: #fff8dc;
+  border-left: 3px solid #f1c40f;
+  padding: calc(10px * var(--zoom-scale));
+  margin-top: calc(6px * var(--zoom-scale));
+  border-radius: 4px;
+  font-size: calc(.9rem * var(--zoom-scale));
+  position: relative;
+}
+.footnote-box.open { display: block; }
+
+.footnote-close {
+  position: absolute;
+  top: 4px; right: 8px;
+  background: none; border: none;
+  font-size: 16px; cursor: pointer;
+  color: #999;
+}
+
+/* ===== FLOATING MARKER BUTTONS ===== */
+#marker-nav {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 150;
+}
+
+.marker-btn {
+  min-width: 36px; height: 36px;
+  border-radius: 18px;
+  border: 2px solid rgba(0,0,0,.12);
+  color: #fff;
+  font-weight: 700;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: transform .15s;
+  padding: 0 8px;
+  white-space: nowrap;
+  line-height: 1.1;
+  text-align: center;
+}
+.marker-btn:hover { transform: scale(1.1); }
+
+#marker-clear-all {
+  min-width: 36px; height: 36px;
+  border-radius: 18px;
+  border: 2px solid rgba(0,0,0,.12);
+  background: #666;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: transform .15s;
+}
+#marker-clear-all:hover { transform: scale(1.1); background: #e74c3c; }
+#marker-clear-all.visible { display: flex; }
+
+/* ===== READING LINE INDICATOR ===== */
+#reading-line {
+  position: fixed;
+  top: 25%;
+  left: 0; right: 0;
+  height: 2px;
+  background: rgba(52,152,219,.15);
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ===== INDEX PANEL ===== */
+#index-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 400;
+}
+#index-overlay.open { display: block; }
+
+#index-panel {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: min(320px, 85vw);
+  background: #fff;
+  z-index: 500;
+  transform: translateX(-100%);
+  transition: transform .25s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#index-panel.open { transform: translateX(0); }
+
+#index-header {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+#index-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 8px;
+}
+
+.index-tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.index-tab:first-child { border-radius: 6px 0 0 6px; }
+.index-tab:last-child { border-radius: 0 6px 6px 0; }
+.index-tab.active { background: var(--selected-border); color: #fff; }
+
+#index-search {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+#index-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+/* Systematic index */
+.sys-group { margin-bottom: 12px; }
+.sys-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #777;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sys-item {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.sys-item:hover { background: #f0f0f0; }
+
+/* Subject index */
+.subj-entry { margin-bottom: 10px; }
+.subj-title {
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.subj-title:hover { color: var(--selected-border); }
+.subj-refs {
+  font-size: 13px;
+  color: #666;
+  padding-left: 12px;
+}
+
+/* ===== SUBJECT PILL (bottom) ===== */
+#subject-pill {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  padding: 8px 16px;
+  z-index: 180;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  max-width: calc(100vw - 32px);
+}
+#subject-pill.open { display: flex; flex-wrap: wrap; }
+
+#pill-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#pill-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+#pill-current {
+  padding: 4px 10px;
+  background: var(--selected-border);
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
+
+#pill-dropdown {
+  display: none;
+  position: absolute;
+  bottom: 36px;
+  left: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  max-height: 200px;
+  overflow-y: auto;
+  min-width: 120px;
+  z-index: 190;
+}
+#pill-dropdown.open { display: block; }
+
+.pill-dd-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.pill-dd-item:hover { background: #f0f0f0; }
+.pill-dd-item.current { font-weight: 700; color: var(--selected-border); }
+
+.pill-arrow {
+  width: 28px; height: 28px;
+  border: none; background: #eee; border-radius: 50%;
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pill-arrow:hover { background: #ddd; }
+
+#pill-filter {
+  width: 28px; height: 28px;
+  border: none; background: #eee; border-radius: 50%;
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+#pill-filter.active { background: var(--selected-border); color: #fff; }
+
+#pill-close {
+  width: 28px; height: 28px;
+  border: none; background: #eee; border-radius: 50%;
+  cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+#pill-close:hover { background: #ddd; }
+
+/* ===== ZOOM INDICATOR ===== */
+#zoom-indicator {
+  display: none;
+  position: fixed;
+  top: calc(var(--header-h) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.7);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  z-index: 190;
+  pointer-events: none;
+}
+#zoom-indicator.show { display: block; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  #cards-container { padding: 8px; }
+  .card { border-radius: 6px; }
+  #header { padding: 8px; gap: 6px; }
+  #marker-nav { right: 6px; }
+  .marker-btn { width: 34px; height: 34px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <button id="btn-index" title="Índice">i</button>
+  <div id="search-wrapper">
+    <input id="search-input" type="text" placeholder="Buscar... (ex: a43 para ir ao Art. 43)" autocomplete="off">
+    <button id="btn-clear-search" title="Limpar busca">&times;</button>
+    <button id="btn-filter" class="active" title="Filtrar resultados">&#9698;</button>
+  </div>
+</div>
+
+<!-- READING LINE -->
+<div id="reading-line"></div>
+
+<!-- CARDS -->
+<div id="cards-container">
+  <!-- TÍTULO -->
+  <div class="card card-titulo" data-section="cap3">CAPÍTULO III<br>DAS COMISSÕES PERMANENTES</div>
+
+  <!-- ART 43 -->
+  <div class="card card-artigo" data-art="43">
+    <p><span class="unit-id" data-uid="art43">Art. 43</span> — Constituídas as Comissões Permanentes, cada uma delas se reunirá para, sob a presidência do mais idoso de seus membros presentes, proceder à eleição dos respectivos Presidentes e Vice-Presidentes, respeitando, tanto quanto possível, a proporcionalidade partidária.<sup class="footnote-ref" data-note="1">[1]</sup></p>
+    <div class="footnote-box" data-note="1">
+      <button class="footnote-close">&times;</button>
+      <strong>Nota 1:</strong> A proporcionalidade partidária é calculada com base no número de cadeiras de cada partido na Câmara no início da legislatura.
+    </div>
+    <p class="art-para"><span class="unit-id" data-uid="art43p1">§ 1º</span> — Ocorrendo empate para qualquer dos cargos, a decisão será por sorteio.</p>
+    <p class="art-para"><span class="unit-id" data-uid="art43p2">§ 2º</span> — Após a comunicação do resultado em Plenário, o Presidente enviará à publicação, na Imprensa Oficial, a composição nominal de cada Comissão, com a designação dos locais, dias e horários das reuniões.</p>
+    <p class="art-para"><span class="unit-id" data-uid="art43p3">§ 3º</span> — As modificações numéricas que venham a ocorrer nas bancadas dos partidos, que importem alterações da proporcionalidade partidária na composição das Comissões, só prevalecerão a partir da sessão legislativa subsequente.</p>
+  </div>
+
+  <!-- ART 44 -->
+  <div class="card card-artigo" data-art="44">
+    <p><span class="unit-id" data-uid="art44">Art. 44</span> — Os membros das Comissões Permanentes serão destituídos caso não compareçam a 5 (cinco) reuniões ordinárias consecutivas ou a 10 (dez) intercaladas, sem motivo justificado.<sup class="footnote-ref" data-note="2">[2]</sup></p>
+    <div class="footnote-box" data-note="2">
+      <button class="footnote-close">&times;</button>
+      <strong>Nota 2:</strong> Vide Ato nº 654/99 da Mesa Diretora.
+    </div>
+    <p class="art-para"><span class="unit-id" data-uid="art44p1">§ 1º</span> — A destituição dar-se-á por simples petição de qualquer Vereador dirigida ao Presidente da Câmara que, após comprovar a veracidade das faltas, declarará vago o cargo na Comissão.</p>
+    <p class="art-para"><span class="unit-id" data-uid="art44p2">§ 2º</span> — Não se aplicará o disposto neste artigo ao Vereador que comunicar ao Presidente da Comissão as razões de sua ausência para posterior justificação das faltas perante o Presidente da Câmara, nos termos do inciso IV do artigo 18, desde que deferido o pedido de justificação.</p>
+    <p class="art-para"><span class="unit-id" data-uid="art44p3">§ 3º</span> — O Vereador destituído nos termos do presente artigo não poderá ser designado para integrar nenhuma outra Comissão Permanente até o final da sessão legislativa.</p>
+  </div>
+
+  <!-- ART 45 -->
+  <div class="card card-artigo" data-art="45">
+    <p><span class="unit-id" data-uid="art45">Art. 45</span> — No caso de vaga, licença ou impedimento de qualquer membro das Comissões Permanentes, caberá ao Presidente da Câmara a designação de substituto, mediante indicação do Líder do Partido a que pertença a vaga.</p>
+    <p class="art-para"><span class="unit-id" data-uid="art45pu">Parágrafo único</span> — A substituição perdurará enquanto persistir a licença ou o impedimento.</p>
+  </div>
+</div>
+
+<!-- FLOATING MARKER NAV (dynamically populated) -->
+<div id="marker-nav"></div>
+
+<!-- INDEX OVERLAY -->
+<div id="index-overlay"></div>
+
+<!-- INDEX PANEL -->
+<div id="index-panel">
+  <div id="index-header">
+    <div id="index-tabs">
+      <button class="index-tab active" data-tab="systematic">Sistemático</button>
+      <button class="index-tab" data-tab="subject">Remissivo</button>
+    </div>
+    <input id="index-search" type="text" placeholder="Pesquisar no índice...">
+  </div>
+  <div id="index-content"></div>
+</div>
+
+<!-- SUBJECT PILL -->
+<div id="subject-pill">
+  <span id="pill-label"></span>
+  <div id="pill-nav">
+    <button class="pill-arrow" id="pill-prev">&#8249;</button>
+    <span id="pill-current"></span>
+    <div id="pill-dropdown"></div>
+    <button class="pill-arrow" id="pill-next">&#8250;</button>
+  </div>
+  <button id="pill-filter" class="active" title="Filtrar artigos">&#9698;</button>
+  <button id="pill-close" title="Fechar">&times;</button>
+</div>
+
+<!-- ZOOM INDICATOR -->
+<div id="zoom-indicator"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===== DATA =====
+  const SYSTEMATIC_INDEX = [
+    {
+      title: 'TÍTULO II — DO FUNCIONAMENTO',
+      children: [
+        {
+          title: 'CAPÍTULO III — DAS COMISSÕES PERMANENTES',
+          children: [
+            { label: 'Art. 43 — Eleição das Presidências', art: '43' },
+            { label: 'Art. 44 — Destituição por faltas', art: '44' },
+            { label: 'Art. 45 — Substituição de membros', art: '45' }
+          ]
+        }
+      ]
+    }
+  ];
+
+  const SUBJECT_INDEX = [
+    { subject: 'Comissões Permanentes', refs: [
+      { art: '43', detail: '' },
+      { art: '44', detail: '' },
+      { art: '45', detail: '' }
+    ]},
+    { subject: 'Destituição', refs: [
+      { art: '44', detail: '' },
+      { art: '44', detail: '§ 1º' },
+      { art: '44', detail: '§ 3º' }
+    ]},
+    { subject: 'Eleição', refs: [
+      { art: '43', detail: '' }
+    ]},
+    { subject: 'Empate', refs: [
+      { art: '43', detail: '§ 1º' }
+    ]},
+    { subject: 'Faltas', refs: [
+      { art: '44', detail: '' },
+      { art: '44', detail: '§ 2º' }
+    ]},
+    { subject: 'Imprensa Oficial', refs: [
+      { art: '43', detail: '§ 2º' }
+    ]},
+    { subject: 'Proporcionalidade partidária', refs: [
+      { art: '43', detail: '' },
+      { art: '43', detail: '§ 3º' }
+    ]},
+    { subject: 'Substituição', refs: [
+      { art: '45', detail: '' },
+      { art: '45', detail: 'Parágrafo único' }
+    ]}
+  ].sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'));
+
+  // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
+  const MARKER_PALETTE = [
+    { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
+    { name: 'sky',      bg: '#4dabf7', bgLight: '#d0ebff', text: '#fff' },
+    { name: 'lime',     bg: '#51cf66', bgLight: '#d3f9d8', text: '#fff' },
+    { name: 'amber',    bg: '#fcc419', bgLight: '#fff3bf', text: '#333' },
+    { name: 'violet',   bg: '#9775fa', bgLight: '#e5dbff', text: '#fff' },
+    { name: 'pink',     bg: '#f06595', bgLight: '#ffdeeb', text: '#fff' },
+    { name: 'teal',     bg: '#20c997', bgLight: '#c3fae8', text: '#fff' },
+    { name: 'orange',   bg: '#ff922b', bgLight: '#ffe8cc', text: '#fff' },
+  ];
+
+  // ===== STATE =====
+  let selectedCard = null;
+  let manualSelect = false;
+  // markers: ordered array of { uid, colorIdx }
+  // uid = data-uid value of the .unit-id element
+  let markersList = [];
+  let searchFilter = true;
+  let currentSearch = '';
+  let activeSubject = null;
+  let subjectIdx = 0;
+  let subjectFilter = true;
+  let zoomScale = 1;
+  let zoomTimeout = null;
+
+  // ===== DOM REFS =====
+  const $cards = document.getElementById('cards-container');
+  const $searchInput = document.getElementById('search-input');
+  const $btnFilter = document.getElementById('btn-filter');
+  const $btnClearSearch = document.getElementById('btn-clear-search');
+  const $btnIndex = document.getElementById('btn-index');
+  const $markerNav = document.getElementById('marker-nav');
+  const $indexOverlay = document.getElementById('index-overlay');
+  const $indexPanel = document.getElementById('index-panel');
+  const $indexContent = document.getElementById('index-content');
+  const $indexSearch = document.getElementById('index-search');
+  const $subjectPill = document.getElementById('subject-pill');
+  const $pillLabel = document.getElementById('pill-label');
+  const $pillCurrent = document.getElementById('pill-current');
+  const $pillDropdown = document.getElementById('pill-dropdown');
+  const $pillFilter = document.getElementById('pill-filter');
+  const $zoomIndicator = document.getElementById('zoom-indicator');
+
+  function getAllCards() {
+    return Array.from($cards.querySelectorAll('.card'));
+  }
+  function getArticleCards() {
+    return Array.from($cards.querySelectorAll('.card-artigo'));
+  }
+
+  // ===== SCROLL SELECTION =====
+  function getReadingLineY() {
+    return window.innerHeight * 0.25;
+  }
+
+  function updateSelection() {
+    if (manualSelect) return;
+    const lineY = getReadingLineY();
+    const cards = getAllCards().filter(c => !c.classList.contains('filtered-out'));
+    let best = null;
+    let bestDist = Infinity;
+    for (const card of cards) {
+      const rect = card.getBoundingClientRect();
+      if (rect.top <= lineY && rect.bottom >= lineY) {
+        best = card;
+        break;
+      }
+      const dist = Math.min(Math.abs(rect.top - lineY), Math.abs(rect.bottom - lineY));
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = card;
+      }
+    }
+    if (best && best !== selectedCard) {
+      selectCard(best, false);
+    }
+  }
+
+  function selectCard(card, manual) {
+    if (selectedCard) selectedCard.classList.remove('selected');
+    selectedCard = card;
+    if (card) card.classList.add('selected');
+    if (manual) {
+      manualSelect = true;
+      setTimeout(() => { manualSelect = false; }, 50);
+    }
+  }
+
+  let scrollTick = false;
+  window.addEventListener('scroll', () => {
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(() => {
+      manualSelect = false;
+      updateSelection();
+      scrollTick = false;
+    });
+  });
+
+  $cards.addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    // Ignore footnote clicks and unit-id marker clicks
+    if (e.target.closest('.footnote-ref') || e.target.closest('.footnote-box') || e.target.closest('.unit-id')) return;
+    selectCard(card, true);
+  });
+
+  // ===== SEARCH =====
+  function clearHighlights() {
+    $cards.querySelectorAll('mark').forEach(m => {
+      const parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  }
+
+  function highlightText(node, term) {
+    if (!term) return;
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
+    const textNodes = [];
+    while (walker.nextNode()) {
+      if (walker.currentNode.parentElement.closest('.footnote-box, .art-head')) continue;
+      textNodes.push(walker.currentNode);
+    }
+    const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    for (const tn of textNodes) {
+      if (!regex.test(tn.textContent)) continue;
+      const span = document.createElement('span');
+      span.innerHTML = tn.textContent.replace(regex, '<mark>$1</mark>');
+      tn.parentNode.replaceChild(span, tn);
+    }
+  }
+
+  function doSearch(term) {
+    currentSearch = term;
+    clearHighlights();
+    const cards = getAllCards();
+
+    // Remove all filtered-out
+    cards.forEach(c => c.classList.remove('filtered-out'));
+
+    if (!term) {
+      $btnClearSearch.style.display = 'none';
+      return;
+    }
+
+    $btnClearSearch.style.display = 'flex';
+
+    // Article navigation: a43, a44, etc
+    const artMatch = term.match(/^a(\d+)$/i);
+    if (artMatch) {
+      const artNum = artMatch[1];
+      const target = $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectCard(target, true);
+      }
+      return;
+    }
+
+    // Term search
+    const articleCards = getArticleCards();
+    const matchedCards = new Set();
+
+    for (const card of articleCards) {
+      const text = card.textContent.toLowerCase();
+      if (text.includes(term.toLowerCase())) {
+        matchedCards.add(card);
+        highlightText(card, term);
+      }
+    }
+
+    if (searchFilter) {
+      for (const card of cards) {
+        if (card.classList.contains('card-titulo')) {
+          card.classList.add('filtered-out');
+          continue;
+        }
+        if (!matchedCards.has(card)) {
+          card.classList.add('filtered-out');
+        }
+      }
+    }
+
+    // Scroll to first match
+    const firstMatch = articleCards.find(c => matchedCards.has(c));
+    if (firstMatch) {
+      firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      selectCard(firstMatch, true);
+    }
+  }
+
+  $searchInput.addEventListener('input', (e) => {
+    doSearch(e.target.value.trim());
+  });
+
+  $btnClearSearch.addEventListener('click', () => {
+    $searchInput.value = '';
+    doSearch('');
+  });
+
+  $btnFilter.addEventListener('click', () => {
+    searchFilter = !searchFilter;
+    $btnFilter.classList.toggle('active', searchFilter);
+    doSearch($searchInput.value.trim());
+  });
+
+  // ===== MARKERS (click-on-identifier system) =====
+  function loadMarkers() {
+    try {
+      const saved = localStorage.getItem('regimento-markers-v2');
+      if (saved) markersList = JSON.parse(saved);
+    } catch (e) {}
+  }
+
+  function saveMarkers() {
+    localStorage.setItem('regimento-markers-v2', JSON.stringify(markersList));
+  }
+
+  function getNextColorIdx() {
+    // Find the lowest color index not currently in use
+    const used = new Set(markersList.map(m => m.colorIdx));
+    for (let i = 0; i < MARKER_PALETTE.length; i++) {
+      if (!used.has(i)) return i;
+    }
+    // All colors used, wrap around
+    return markersList.length % MARKER_PALETTE.length;
+  }
+
+  function findMarker(uid) {
+    return markersList.find(m => m.uid === uid);
+  }
+
+  function toggleMarker(uid) {
+    const existing = findMarker(uid);
+    if (existing) {
+      // Remove
+      markersList = markersList.filter(m => m.uid !== uid);
+    } else {
+      // Add with next color
+      markersList.push({ uid, colorIdx: getNextColorIdx() });
+    }
+    saveMarkers();
+    applyMarkers();
+    renderMarkerNav();
+  }
+
+  function clearAllMarkers() {
+    markersList = [];
+    saveMarkers();
+    applyMarkers();
+    renderMarkerNav();
+  }
+
+  function applyMarkers() {
+    // Clear all unit-id highlights
+    $cards.querySelectorAll('.unit-id').forEach(el => {
+      el.style.backgroundColor = '';
+      el.style.color = '';
+    });
+
+    // Apply current markers
+    for (const marker of markersList) {
+      const el = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
+      if (!el) continue;
+      const palette = MARKER_PALETTE[marker.colorIdx];
+      el.style.backgroundColor = palette.bg;
+      el.style.color = palette.text;
+    }
+  }
+
+  function renderMarkerNav() {
+    $markerNav.innerHTML = '';
+
+    for (const marker of markersList) {
+      const palette = MARKER_PALETTE[marker.colorIdx];
+      const el = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
+      const label = el ? el.textContent : marker.uid;
+
+      const btn = document.createElement('button');
+      btn.className = 'marker-btn';
+      btn.style.background = palette.bg;
+      btn.style.color = palette.text;
+      btn.textContent = label;
+      btn.title = 'Ir para ' + label;
+      btn.addEventListener('click', () => {
+        const target = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
+        if (target) {
+          const card = target.closest('.card');
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            selectCard(card, true);
+          }
+        }
+      });
+      $markerNav.appendChild(btn);
+    }
+
+    // Clear-all button
+    if (markersList.length > 0) {
+      const clearBtn = document.createElement('button');
+      clearBtn.id = 'marker-clear-all';
+      clearBtn.className = 'visible';
+      clearBtn.innerHTML = '&times;';
+      clearBtn.title = 'Remover todos os marcadores';
+      clearBtn.addEventListener('click', clearAllMarkers);
+      $markerNav.appendChild(clearBtn);
+    }
+  }
+
+  // Click on unit-id to toggle marker
+  $cards.addEventListener('click', (e) => {
+    const unitId = e.target.closest('.unit-id');
+    if (unitId) {
+      e.stopPropagation();
+      toggleMarker(unitId.dataset.uid);
+      return;
+    }
+  });
+
+  // ===== FOOTNOTES =====
+  $cards.addEventListener('click', (e) => {
+    const ref = e.target.closest('.footnote-ref');
+    if (ref) {
+      e.stopPropagation();
+      const noteId = ref.dataset.note;
+      const card = ref.closest('.card');
+      const box = card.querySelector(`.footnote-box[data-note="${noteId}"]`);
+      if (box) box.classList.toggle('open');
+      return;
+    }
+    const closeBtn = e.target.closest('.footnote-close');
+    if (closeBtn) {
+      e.stopPropagation();
+      closeBtn.closest('.footnote-box').classList.remove('open');
+    }
+  });
+
+  // ===== INDEX PANEL =====
+  let currentIndexTab = 'systematic';
+
+  function openIndex() {
+    $indexOverlay.classList.add('open');
+    $indexPanel.classList.add('open');
+    renderIndex();
+  }
+
+  function closeIndex() {
+    $indexOverlay.classList.remove('open');
+    $indexPanel.classList.remove('open');
+  }
+
+  $btnIndex.addEventListener('click', openIndex);
+  $indexOverlay.addEventListener('click', closeIndex);
+
+  document.querySelectorAll('.index-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentIndexTab = tab.dataset.tab;
+      renderIndex();
+    });
+  });
+
+  $indexSearch.addEventListener('input', () => renderIndex());
+
+  function renderIndex() {
+    const filter = $indexSearch.value.trim().toLowerCase();
+    $indexContent.innerHTML = '';
+
+    if (currentIndexTab === 'systematic') {
+      renderSystematicIndex(filter);
+    } else {
+      renderSubjectIndex(filter);
+    }
+  }
+
+  function renderSystematicIndex(filter) {
+    for (const group of SYSTEMATIC_INDEX) {
+      if (filter && !group.title.toLowerCase().includes(filter)) {
+        const hasChild = group.children && group.children.some(ch =>
+          ch.title.toLowerCase().includes(filter) ||
+          (ch.children && ch.children.some(it => it.label.toLowerCase().includes(filter)))
+        );
+        if (!hasChild) continue;
+      }
+
+      const div = document.createElement('div');
+      div.className = 'sys-group';
+      const title = document.createElement('div');
+      title.className = 'sys-title';
+      title.textContent = group.title;
+      div.appendChild(title);
+
+      if (group.children) {
+        for (const ch of group.children) {
+          if (filter && !ch.title.toLowerCase().includes(filter) &&
+              !(ch.children && ch.children.some(it => it.label.toLowerCase().includes(filter)))) continue;
+
+          const subTitle = document.createElement('div');
+          subTitle.className = 'sys-title';
+          subTitle.style.paddingLeft = '12px';
+          subTitle.style.fontSize = '12px';
+          subTitle.textContent = ch.title;
+          div.appendChild(subTitle);
+
+          if (ch.children) {
+            for (const item of ch.children) {
+              if (filter && !item.label.toLowerCase().includes(filter)) continue;
+              const el = document.createElement('div');
+              el.className = 'sys-item';
+              el.style.paddingLeft = '24px';
+              el.textContent = item.label;
+              el.addEventListener('click', () => {
+                closeIndex();
+                navigateToArt(item.art);
+              });
+              div.appendChild(el);
+            }
+          }
+        }
+      }
+
+      $indexContent.appendChild(div);
+    }
+  }
+
+  function renderSubjectIndex(filter) {
+    for (const entry of SUBJECT_INDEX) {
+      if (filter && !entry.subject.toLowerCase().includes(filter)) continue;
+
+      const div = document.createElement('div');
+      div.className = 'subj-entry';
+      const title = document.createElement('div');
+      title.className = 'subj-title';
+      title.textContent = entry.subject;
+      title.addEventListener('click', () => {
+        closeIndex();
+        openSubjectPill(entry);
+      });
+      div.appendChild(title);
+
+      const refs = document.createElement('div');
+      refs.className = 'subj-refs';
+      refs.textContent = entry.refs.map(r => 'Art. ' + r.art + (r.detail ? ', ' + r.detail : '')).join('; ');
+      div.appendChild(refs);
+
+      $indexContent.appendChild(div);
+    }
+  }
+
+  function navigateToArt(artNum) {
+    const card = $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      selectCard(card, true);
+    }
+  }
+
+  // ===== SUBJECT PILL =====
+  function openSubjectPill(entry) {
+    activeSubject = entry;
+    subjectIdx = 0;
+    subjectFilter = true;
+    $pillFilter.classList.add('active');
+    $subjectPill.classList.add('open');
+    $pillLabel.textContent = entry.subject;
+    updatePill();
+    applySubjectFilter();
+    navigateToSubjectRef(0);
+  }
+
+  function closeSubjectPill() {
+    activeSubject = null;
+    $subjectPill.classList.remove('open');
+    $pillDropdown.classList.remove('open');
+    // Remove filter
+    getAllCards().forEach(c => c.classList.remove('filtered-out'));
+  }
+
+  function updatePill() {
+    if (!activeSubject) return;
+    const ref = activeSubject.refs[subjectIdx];
+    $pillCurrent.textContent = 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+  }
+
+  function navigateToSubjectRef(idx) {
+    if (!activeSubject) return;
+    subjectIdx = idx;
+    updatePill();
+    const ref = activeSubject.refs[idx];
+    navigateToArt(ref.art);
+  }
+
+  function applySubjectFilter() {
+    if (!activeSubject) return;
+    const cards = getAllCards();
+    if (subjectFilter) {
+      const artNums = new Set(activeSubject.refs.map(r => r.art));
+      for (const card of cards) {
+        if (card.classList.contains('card-titulo')) {
+          card.classList.add('filtered-out');
+        } else if (card.dataset.art && !artNums.has(card.dataset.art)) {
+          card.classList.add('filtered-out');
+        } else {
+          card.classList.remove('filtered-out');
+        }
+      }
+    } else {
+      cards.forEach(c => c.classList.remove('filtered-out'));
+    }
+  }
+
+  document.getElementById('pill-prev').addEventListener('click', () => {
+    if (!activeSubject) return;
+    subjectIdx = (subjectIdx - 1 + activeSubject.refs.length) % activeSubject.refs.length;
+    navigateToSubjectRef(subjectIdx);
+  });
+
+  document.getElementById('pill-next').addEventListener('click', () => {
+    if (!activeSubject) return;
+    subjectIdx = (subjectIdx + 1) % activeSubject.refs.length;
+    navigateToSubjectRef(subjectIdx);
+  });
+
+  $pillCurrent.addEventListener('click', (e) => {
+    e.stopPropagation();
+    $pillDropdown.classList.toggle('open');
+    renderPillDropdown();
+  });
+
+  function renderPillDropdown() {
+    if (!activeSubject) return;
+    $pillDropdown.innerHTML = '';
+    activeSubject.refs.forEach((ref, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'pill-dd-item' + (idx === subjectIdx ? ' current' : '');
+      btn.textContent = 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+      btn.addEventListener('click', () => {
+        $pillDropdown.classList.remove('open');
+        navigateToSubjectRef(idx);
+      });
+      $pillDropdown.appendChild(btn);
+    });
+  }
+
+  $pillFilter.addEventListener('click', () => {
+    subjectFilter = !subjectFilter;
+    $pillFilter.classList.toggle('active', subjectFilter);
+    applySubjectFilter();
+  });
+
+  document.getElementById('pill-close').addEventListener('click', closeSubjectPill);
+
+  document.addEventListener('click', (e) => {
+    if (!$pillDropdown.contains(e.target) && e.target !== $pillCurrent) {
+      $pillDropdown.classList.remove('open');
+    }
+  });
+
+  // ===== PINCH-TO-ZOOM =====
+  let initialPinchDist = null;
+  let initialZoom = 1;
+
+  function setZoom(scale) {
+    zoomScale = Math.max(0.4, Math.min(2.5, scale));
+    document.documentElement.style.setProperty('--zoom-scale', zoomScale);
+
+    // Show indicator
+    $zoomIndicator.textContent = Math.round(zoomScale * 100) + '%';
+    $zoomIndicator.classList.add('show');
+    clearTimeout(zoomTimeout);
+    zoomTimeout = setTimeout(() => $zoomIndicator.classList.remove('show'), 800);
+
+    // Keep selected card centered
+    if (selectedCard) {
+      selectedCard.scrollIntoView({ block: 'center', behavior: 'instant' });
+    }
+  }
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      initialPinchDist = Math.hypot(dx, dy);
+      initialZoom = zoomScale;
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && initialPinchDist !== null) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const ratio = dist / initialPinchDist;
+      setZoom(initialZoom * ratio);
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    initialPinchDist = null;
+  });
+
+  // Safari gesture events
+  document.addEventListener('gesturestart', (e) => {
+    e.preventDefault();
+    initialZoom = zoomScale;
+  });
+
+  document.addEventListener('gesturechange', (e) => {
+    e.preventDefault();
+    setZoom(initialZoom * e.scale);
+  });
+
+  document.addEventListener('gestureend', (e) => {
+    e.preventDefault();
+  });
+
+  // Desktop: Ctrl + wheel for zoom
+  document.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.05 : 0.05;
+      setZoom(zoomScale + delta);
+    }
+  }, { passive: false });
+
+  // ===== INIT =====
+  loadMarkers();
+  applyMarkers();
+  renderMarkerNav();
+  updateSelection();
+
+})();
+</script>
+</body>
+</html>

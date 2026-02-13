@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RegimentoReader — Câmara Municipal de São Paulo</title>
+<style>
+{{CSS}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <button id="btn-index" title="Índice">i</button>
+  <div id="search-wrapper">
+    <input id="search-input" type="text" placeholder="Buscar... (ex: a43 para ir ao Art. 43)" autocomplete="off">
+    <button id="btn-clear-search" title="Limpar busca">&times;</button>
+    <button id="btn-filter" class="active" title="Filtrar resultados">&#9698;</button>
+  </div>
+</div>
+
+<!-- READING LINE -->
+<div id="reading-line"></div>
+
+<!-- CARDS -->
+<div id="cards-container">
+{{CARDS}}
+</div>
+
+<!-- FLOATING MARKER NAV (dynamically populated) -->
+<div id="marker-nav"></div>
+
+<!-- INDEX OVERLAY -->
+<div id="index-overlay"></div>
+
+<!-- INDEX PANEL -->
+<div id="index-panel">
+  <div id="index-header">
+    <div id="index-tabs">
+      <button class="index-tab active" data-tab="systematic">Sistemático</button>
+      <button class="index-tab" data-tab="subject">Remissivo</button>
+    </div>
+    <input id="index-search" type="text" placeholder="Pesquisar no índice...">
+  </div>
+  <div id="index-content"></div>
+</div>
+
+<!-- SUBJECT PILL -->
+<div id="subject-pill">
+  <span id="pill-label"></span>
+  <div id="pill-nav">
+    <button class="pill-arrow" id="pill-prev">&#8249;</button>
+    <span id="pill-current"></span>
+    <div id="pill-dropdown"></div>
+    <button class="pill-arrow" id="pill-next">&#8250;</button>
+  </div>
+  <button id="pill-filter" class="active" title="Filtrar artigos">&#9698;</button>
+  <button id="pill-close" title="Fechar">&times;</button>
+</div>
+
+<!-- ZOOM INDICATOR -->
+<div id="zoom-indicator"></div>
+
+<script>
+{{JS}}
+</script>
+</body>
+</html>

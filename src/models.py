@@ -1,0 +1,203 @@
+"""Representação intermediária do Regimento Interno."""
+
+from __future__ import annotations
+
+import json
+from dataclasses import dataclass, field, asdict
+from enum import Enum
+from typing import Optional
+
+
+class UnitType(str, Enum):
+    TITULO = "TITULO"
+    CAPITULO = "CAPITULO"
+    SECAO = "SECAO"
+    SUBSECAO = "SUBSECAO"
+    SUBTITLE = "SUBTITLE"
+    ARTIGO = "ARTIGO"
+    PARAGRAFO_UNICO = "PARAGRAFO_UNICO"
+    PARAGRAFO_NUM = "PARAGRAFO_NUM"
+    INCISO = "INCISO"
+    ALINEA = "ALINEA"
+    SUB_ALINEA = "SUB_ALINEA"
+    ITEM_NUM = "ITEM_NUM"
+    EMPTY = "EMPTY"
+    OTHER = "OTHER"
+
+
+@dataclass
+class TextRun:
+    """Fragmento de texto com formatação inline."""
+    text: str
+    bold: bool = False
+    italic: bool = False
+    strike: bool = False
+    hyperlink_url: Optional[str] = None
+    hyperlink_anchor: Optional[str] = None
+
+
+@dataclass
+class Footnote:
+    """Nota de rodapé associada a um parágrafo."""
+    number: int
+    content: list[TextRun] = field(default_factory=list)
+
+
+@dataclass
+class DocumentUnit:
+    """Unidade genérica do documento (parágrafo, inciso, etc.)."""
+    unit_type: UnitType
+    identifier: str  # ex: "Art. 43", "§ 1º", "I", "a)", "Parágrafo único"
+    uid: str  # ex: "art43", "art43p1", "art43I", "art43Ia"
+    runs: list[TextRun] = field(default_factory=list)
+    footnotes: list[Footnote] = field(default_factory=list)
+    is_revoked: bool = False
+    is_old_version: bool = False
+    amendment_note: str = ""  # ex: "(Redação dada pela Resolução nº 21/2017)"
+    children: list[DocumentUnit] = field(default_factory=list)
+
+    @property
+    def full_text(self) -> str:
+        return "".join(r.text for r in self.runs)
+
+
+@dataclass
+class SectionHeading:
+    """Título de seção (TÍTULO, CAPÍTULO, SEÇÃO, subtítulo)."""
+    level: UnitType  # TITULO, CAPITULO, SECAO, SUBTITLE
+    text: str  # ex: "TÍTULO I", "CAPÍTULO II"
+    subtitle: str = ""  # ex: "DA CÂMARA MUNICIPAL"
+    data_section: str = ""  # id para data-section no HTML
+
+
+@dataclass
+class ArticleBlock:
+    """Bloco de um artigo com seus sub-dispositivos."""
+    art_number: str  # ex: "43", "4-A", "ADT1"
+    is_adt: bool = False  # Ato das Disposições Transitórias
+    caput: DocumentUnit | None = None
+    children: list[DocumentUnit] = field(default_factory=list)
+    all_versions: list[DocumentUnit] = field(default_factory=list)
+    is_revoked: bool = False
+
+
+@dataclass
+class ParsedDocument:
+    """Documento parseado completo."""
+    elements: list[SectionHeading | ArticleBlock] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        """Serializa para JSON-friendly dict."""
+        result = []
+        for el in self.elements:
+            if isinstance(el, SectionHeading):
+                result.append({
+                    "type": "heading",
+                    "level": el.level.value,
+                    "text": el.text,
+                    "subtitle": el.subtitle,
+                    "data_section": el.data_section,
+                })
+            elif isinstance(el, ArticleBlock):
+                result.append({
+                    "type": "article",
+                    "art_number": el.art_number,
+                    "is_adt": el.is_adt,
+                    "is_revoked": el.is_revoked,
+                    "caput": _unit_to_dict(el.caput) if el.caput else None,
+                    "children": [_unit_to_dict(c) for c in el.children],
+                    "all_versions": [_unit_to_dict(v) for v in el.all_versions],
+                })
+        return {"elements": result}
+
+
+def _unit_to_dict(u: DocumentUnit) -> dict:
+    return {
+        "unit_type": u.unit_type.value,
+        "identifier": u.identifier,
+        "uid": u.uid,
+        "text": u.full_text,
+        "runs": [_run_to_dict(r) for r in u.runs],
+        "is_revoked": u.is_revoked,
+        "is_old_version": u.is_old_version,
+        "amendment_note": u.amendment_note,
+        "children": [_unit_to_dict(c) for c in u.children],
+    }
+
+
+def _run_to_dict(r: TextRun) -> dict:
+    d: dict = {"text": r.text}
+    if r.bold:
+        d["bold"] = True
+    if r.italic:
+        d["italic"] = True
+    if r.strike:
+        d["strike"] = True
+    if r.hyperlink_url:
+        d["url"] = r.hyperlink_url
+    if r.hyperlink_anchor:
+        d["anchor"] = r.hyperlink_anchor
+    return d
+
+
+@dataclass
+class SubjectRef:
+    """Referência de dispositivo no índice remissivo."""
+    art: str  # número do artigo
+    detail: str = ""  # ex: "§ 1º", "II", "Parágrafo único"
+
+
+@dataclass
+class SubjectEntry:
+    """Entrada do índice remissivo."""
+    subject: str
+    sub_subject: str = ""
+    refs: list[SubjectRef] = field(default_factory=list)
+    vides: list[str] = field(default_factory=list)
+
+    def display_name(self) -> str:
+        if self.sub_subject:
+            return f"{self.subject} — {self.sub_subject}"
+        return self.subject
+
+
+@dataclass
+class SubjectIndex:
+    """Índice remissivo completo."""
+    entries: list[SubjectEntry] = field(default_factory=list)
+
+    def to_list(self) -> list[dict]:
+        result = []
+        for e in self.entries:
+            result.append({
+                "subject": e.display_name(),
+                "refs": [{"art": r.art, "detail": r.detail} for r in e.refs],
+            })
+        return sorted(result, key=lambda x: x["subject"].lower())
+
+
+@dataclass
+class SysIndexNode:
+    """Nó do índice sistemático."""
+    title: str
+    children: list[SysIndexNode | SysIndexLeaf] = field(default_factory=list)
+
+
+@dataclass
+class SysIndexLeaf:
+    """Folha do índice sistemático (artigo)."""
+    label: str  # "Art. 43 — Eleição das Presidências"
+    art: str  # "43"
+
+
+def sys_index_to_list(nodes: list[SysIndexNode | SysIndexLeaf]) -> list[dict]:
+    result = []
+    for n in nodes:
+        if isinstance(n, SysIndexLeaf):
+            result.append({"label": n.label, "art": n.art})
+        else:
+            result.append({
+                "title": n.title,
+                "children": sys_index_to_list(n.children),
+            })
+    return result

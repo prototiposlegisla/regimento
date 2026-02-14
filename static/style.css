@@ -140,6 +140,7 @@ body {
   text-transform: uppercase;
   letter-spacing: .5px;
   padding: calc(12px * var(--zoom-scale));
+  background: #e8e8e8;
 }
 
 .card-artigo .art-para {

@@ -730,7 +730,8 @@
         if (prev.classList.contains('card-titulo')) {
           const sec = prev.dataset.section || '';
           let level = '';
-          if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+          if (sec.startsWith('norma')) level = 'norma';
+          else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
           else if (sec.startsWith('cap')) level = 'cap';
           else if (sec.startsWith('subsec')) level = 'subsec';
           else if (sec.startsWith('sec')) level = 'sec';
@@ -738,7 +739,7 @@
             found[level] = true;
             prev.classList.remove('filtered-out');
           }
-          if (level === 'tit') break;
+          if (level === 'norma') break;
         }
         prev = prev.previousElementSibling;
       }

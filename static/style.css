@@ -509,6 +509,19 @@ mark {
 }
 #pill-close:hover { background: #ddd; }
 
+/* ===== DETAIL HIGHLIGHT (subject index → specific paragraph) ===== */
+@keyframes detail-flash {
+  from { background-color: #ffe066; }
+  to   { background-color: #fff3bf; }
+}
+.detail-highlight {
+  animation: detail-flash .4s ease-out;
+  background-color: #fff3bf;
+  border-radius: 4px;
+  margin-left: calc(-4px * var(--zoom-scale));
+  padding-left: calc(4px * var(--zoom-scale));
+}
+
 /* ===== ZOOM INDICATOR ===== */
 #zoom-indicator {
   display: none;

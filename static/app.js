@@ -758,6 +758,42 @@
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       selectCard(card, true);
     }
+    return card;
+  }
+
+  // ===== DETAIL HIGHLIGHT =====
+  function clearDetailHighlight() {
+    $cards.querySelectorAll('.detail-highlight').forEach(el => {
+      el.classList.remove('detail-highlight');
+    });
+  }
+
+  function highlightAllSubjectDetails() {
+    clearDetailHighlight();
+    if (!activeSubject) return;
+    for (const ref of activeSubject.refs) {
+      let card;
+      if (ref.law_prefix) {
+        card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"][data-law="${ref.law_prefix}"]`);
+      } else {
+        card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"]:not([data-law])`)
+            || $cards.querySelector(`.card-artigo[data-art="${ref.art}"]`);
+      }
+      if (!card) continue;
+      if (!ref.detail) {
+        // Caput: first <p> that isn't .art-para
+        const caput = card.querySelector('p:not(.art-para):not(.old-version)');
+        if (caput) caput.classList.add('detail-highlight');
+      } else {
+        for (const uid of card.querySelectorAll('.unit-id')) {
+          if (uid.textContent.trim() === ref.detail.trim()) {
+            const p = uid.closest('p');
+            if (p) p.classList.add('detail-highlight');
+            break;
+          }
+        }
+      }
+    }
   }
 
   // ===== SUBJECT PILL =====
@@ -770,6 +806,7 @@
     $pillLabel.textContent = entry.subject;
     updatePill();
     applySubjectFilter();
+    highlightAllSubjectDetails();
     navigateToSubjectRef(0);
   }
 
@@ -777,6 +814,7 @@
     activeSubject = null;
     $subjectPill.classList.remove('open');
     $pillDropdown.classList.remove('open');
+    clearDetailHighlight();
     getAllCards().forEach(c => c.classList.remove('filtered-out'));
   }
 
@@ -859,6 +897,7 @@
     subjectFilter = !subjectFilter;
     $pillFilter.classList.toggle('active', subjectFilter);
     applySubjectFilter();
+    highlightAllSubjectDetails();
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);

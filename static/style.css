@@ -400,6 +400,23 @@ mark {
   color: #666;
   padding-left: 12px;
 }
+.subj-vides {
+  font-size: 12px;
+  color: #888;
+  padding-left: 12px;
+  margin-top: 2px;
+}
+.vide-label {
+  font-style: italic;
+}
+.vide-link {
+  color: var(--selected-border);
+  text-decoration: none;
+  cursor: pointer;
+}
+.vide-link:hover {
+  text-decoration: underline;
+}
 
 /* ===== SUBJECT PILL (bottom) ===== */
 #subject-pill {

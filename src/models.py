@@ -182,7 +182,7 @@ class SubjectIndex:
         for e in self.entries:
             key = e.subject
             if key not in groups:
-                groups[key] = {"subject": key, "refs": [], "children": []}
+                groups[key] = {"subject": key, "refs": [], "children": [], "vides": []}
 
             refs_dicts = []
             for r in e.refs:
@@ -191,20 +191,27 @@ class SubjectIndex:
                     rd["law_prefix"] = r.law_prefix
                 refs_dicts.append(rd)
             if e.sub_subject:
-                groups[key]["children"].append({
+                child: dict = {
                     "sub_subject": e.sub_subject,
                     "refs": refs_dicts,
-                })
+                }
+                if e.vides:
+                    child["vides"] = e.vides
+                groups[key]["children"].append(child)
             else:
                 groups[key]["refs"].extend(refs_dicts)
+                if e.vides:
+                    groups[key]["vides"].extend(e.vides)
 
         result = list(groups.values())
-        # Remove empty children/refs lists for cleaner JSON
+        # Remove empty children/refs/vides lists for cleaner JSON
         for item in result:
             if not item["children"]:
                 del item["children"]
             if not item["refs"]:
                 del item["refs"]
+            if not item["vides"]:
+                del item["vides"]
         return sorted(result, key=lambda x: x["subject"].lower())
 
 

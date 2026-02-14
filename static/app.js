@@ -561,6 +561,45 @@
     return all;
   }
 
+  function renderVides(vides) {
+    const container = document.createElement('div');
+    container.className = 'subj-vides';
+    const label = document.createElement('span');
+    label.className = 'vide-label';
+    label.textContent = 'Vide: ';
+    container.appendChild(label);
+    vides.forEach((v, i) => {
+      const link = document.createElement('a');
+      link.className = 'vide-link';
+      link.textContent = v;
+      link.href = '#';
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Find the referenced subject in the index and open it
+        const target = SUBJECT_INDEX.find(
+          s => s.subject.toLowerCase() === v.toLowerCase()
+        );
+        if (target) {
+          closeIndex();
+          const pillEntry = { subject: target.subject, refs: collectAllRefs(target) };
+          openSubjectPill(pillEntry);
+        } else {
+          // Try to filter the index to show the term
+          const $indexSearch = document.getElementById('index-search');
+          if ($indexSearch) {
+            $indexSearch.value = v;
+            $indexSearch.dispatchEvent(new Event('input'));
+          }
+        }
+      });
+      container.appendChild(link);
+      if (i < vides.length - 1) {
+        container.appendChild(document.createTextNode(', '));
+      }
+    });
+    return container;
+  }
+
   function renderSubjectIndex(filter) {
     const sorted = SUBJECT_INDEX.slice().sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'));
     for (const entry of sorted) {
@@ -590,6 +629,11 @@
         div.appendChild(refs);
       }
 
+      // Vides (cross-references)
+      if (entry.vides && entry.vides.length > 0) {
+        div.appendChild(renderVides(entry.vides));
+      }
+
       // Sub-subjects
       if (entry.children) {
         for (const ch of entry.children) {
@@ -612,6 +656,12 @@
           subRefs.className = 'subj-refs';
           subRefs.textContent = formatRefsCompact(ch.refs);
           subDiv.appendChild(subRefs);
+
+          // Vides on sub-subject
+          if (ch.vides && ch.vides.length > 0) {
+            subDiv.appendChild(renderVides(ch.vides));
+          }
+
           div.appendChild(subDiv);
         }
       }

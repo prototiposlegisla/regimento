@@ -29,6 +29,8 @@
   let subjectFilter = true;
   let zoomScale = 1;
   let zoomTimeout = null;
+  let searchMatches = [];
+  let searchIdx = 0;
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -47,6 +49,8 @@
   const $pillDropdown = document.getElementById('pill-dropdown');
   const $pillFilter = document.getElementById('pill-filter');
   const $zoomIndicator = document.getElementById('zoom-indicator');
+  const $searchNav = document.getElementById('search-nav');
+  const $searchCounter = document.getElementById('search-counter');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -168,6 +172,10 @@
 
     if (!term) {
       $btnClearSearch.style.display = 'none';
+      searchMatches = [];
+      searchIdx = 0;
+      $searchNav.classList.remove('open');
+      $searchInput.classList.remove('has-nav');
       return;
     }
 
@@ -232,10 +240,18 @@
       showContextHeadings();
     }
 
-    const firstMatch = articleCards.find(c => matchedCards.has(c));
-    if (firstMatch) {
-      firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      selectCard(firstMatch, true);
+    searchMatches = articleCards.filter(c => matchedCards.has(c));
+    searchIdx = 0;
+
+    if (searchMatches.length > 0) {
+      $searchNav.classList.add('open');
+      $searchInput.classList.add('has-nav');
+      updateSearchCounter();
+      searchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      selectCard(searchMatches[0], true);
+    } else {
+      $searchNav.classList.remove('open');
+      $searchInput.classList.remove('has-nav');
     }
   }
 
@@ -253,6 +269,21 @@
     $btnFilter.classList.toggle('active', searchFilter);
     doSearch($searchInput.value.trim());
   });
+
+  function updateSearchCounter() {
+    $searchCounter.textContent = (searchIdx + 1) + ' / ' + searchMatches.length;
+  }
+
+  function navigateSearch(delta) {
+    if (!searchMatches.length) return;
+    searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
+    updateSearchCounter();
+    searchMatches[searchIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    selectCard(searchMatches[searchIdx], true);
+  }
+
+  document.getElementById('search-prev').addEventListener('click', () => navigateSearch(-1));
+  document.getElementById('search-next').addEventListener('click', () => navigateSearch(1));
 
   // ===== MARKERS (click-on-identifier system) =====
   function loadMarkers() {
@@ -318,7 +349,20 @@
     for (const marker of markersList) {
       const palette = MARKER_PALETTE[marker.colorIdx];
       const el = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
-      const label = el ? el.textContent : marker.uid;
+      let label = el ? el.textContent.trim() : marker.uid;
+      // Always show article number for sub-units (§, incisos, alíneas, etc.)
+      if (el && !label.startsWith('Art.')) {
+        const card = el.closest('.card-artigo');
+        if (card) {
+          const artNum = card.dataset.art;
+          const lawPrefix = card.dataset.law;
+          const pre = lawPrefix ? lawPrefix + ':' : '';
+          label = pre + 'Art.' + artNum + ',' + label;
+        }
+      }
+      // Compact label: remove º, spaces, abbreviate Parágrafo único → §ú
+      label = label.replace(/Parágrafo único/gi, '§ú');
+      label = label.replace(/\u00ba/g, '').replace(/\s+/g, '');
 
       const btn = document.createElement('button');
       btn.className = 'marker-btn';

@@ -168,7 +168,11 @@
     clearHighlights();
     const cards = getAllCards();
 
-    cards.forEach(c => c.classList.remove('filtered-out'));
+    if (activeSubject && subjectFilter) {
+      applySubjectFilter();
+    } else {
+      cards.forEach(c => c.classList.remove('filtered-out'));
+    }
 
     if (!term) {
       $btnClearSearch.style.display = 'none';
@@ -210,7 +214,7 @@
     }
 
     const terms = stripAccents(term.toLowerCase()).split(/\s+/).filter(Boolean);
-    const articleCards = getArticleCards();
+    const articleCards = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
     const matchedCards = new Set();
 
     for (const card of articleCards) {
@@ -229,6 +233,7 @@
 
     if (searchFilter) {
       for (const card of cards) {
+        if (card.classList.contains('filtered-out')) continue;
         if (card.classList.contains('card-titulo')) {
           card.classList.add('filtered-out');
           continue;
@@ -709,11 +714,15 @@
       const title = document.createElement('div');
       title.className = 'subj-title';
       title.textContent = entry.subject;
-      title.addEventListener('click', () => {
-        closeIndex();
-        const pillEntry = { subject: entry.subject, refs: collectAllRefs(entry) };
-        openSubjectPill(pillEntry);
-      });
+      if (entry.refs && entry.refs.length > 0) {
+        title.addEventListener('click', () => {
+          closeIndex();
+          const pillEntry = { subject: entry.subject, refs: collectAllRefs(entry) };
+          openSubjectPill(pillEntry);
+        });
+      } else {
+        title.classList.add('no-refs');
+      }
       div.appendChild(title);
 
       // Direct refs
@@ -864,6 +873,7 @@
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
     getAllCards().forEach(c => c.classList.remove('filtered-out'));
+    if (currentSearch) doSearch(currentSearch);
   }
 
   function updatePill() {
@@ -946,6 +956,7 @@
     $pillFilter.classList.toggle('active', subjectFilter);
     applySubjectFilter();
     highlightAllSubjectDetails();
+    if (currentSearch) doSearch(currentSearch);
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);

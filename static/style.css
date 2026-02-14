@@ -427,6 +427,8 @@ mark {
   padding: 4px 0;
 }
 .subj-title:hover { color: var(--selected-border); }
+.subj-title.no-refs { cursor: default; color: #888; font-weight: 400; }
+.subj-title.no-refs:hover { color: #888; }
 .subj-refs {
   font-size: 13px;
   color: #666;

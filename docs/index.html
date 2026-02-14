@@ -434,6 +434,8 @@ mark {
   padding: 4px 0;
 }
 .subj-title:hover { color: var(--selected-border); }
+.subj-title.no-refs { cursor: default; color: #888; font-weight: 400; }
+.subj-title.no-refs:hover { color: #888; }
 .subj-refs {
   font-size: 13px;
   color: #666;
@@ -5602,7 +5604,11 @@ mark {
     clearHighlights();
     const cards = getAllCards();
 
-    cards.forEach(c => c.classList.remove('filtered-out'));
+    if (activeSubject && subjectFilter) {
+      applySubjectFilter();
+    } else {
+      cards.forEach(c => c.classList.remove('filtered-out'));
+    }
 
     if (!term) {
       $btnClearSearch.style.display = 'none';
@@ -5644,7 +5650,7 @@ mark {
     }
 
     const terms = stripAccents(term.toLowerCase()).split(/\s+/).filter(Boolean);
-    const articleCards = getArticleCards();
+    const articleCards = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
     const matchedCards = new Set();
 
     for (const card of articleCards) {
@@ -5663,6 +5669,7 @@ mark {
 
     if (searchFilter) {
       for (const card of cards) {
+        if (card.classList.contains('filtered-out')) continue;
         if (card.classList.contains('card-titulo')) {
           card.classList.add('filtered-out');
           continue;
@@ -6143,11 +6150,15 @@ mark {
       const title = document.createElement('div');
       title.className = 'subj-title';
       title.textContent = entry.subject;
-      title.addEventListener('click', () => {
-        closeIndex();
-        const pillEntry = { subject: entry.subject, refs: collectAllRefs(entry) };
-        openSubjectPill(pillEntry);
-      });
+      if (entry.refs && entry.refs.length > 0) {
+        title.addEventListener('click', () => {
+          closeIndex();
+          const pillEntry = { subject: entry.subject, refs: collectAllRefs(entry) };
+          openSubjectPill(pillEntry);
+        });
+      } else {
+        title.classList.add('no-refs');
+      }
       div.appendChild(title);
 
       // Direct refs
@@ -6298,6 +6309,7 @@ mark {
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
     getAllCards().forEach(c => c.classList.remove('filtered-out'));
+    if (currentSearch) doSearch(currentSearch);
   }
 
   function updatePill() {
@@ -6380,6 +6392,7 @@ mark {
     $pillFilter.classList.toggle('active', subjectFilter);
     applySubjectFilter();
     highlightAllSubjectDetails();
+    if (currentSearch) doSearch(currentSearch);
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);

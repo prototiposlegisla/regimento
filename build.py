@@ -94,6 +94,14 @@ def main() -> None:
         for el in doc.elements:
             if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping:
                 el.law_prefix = law_mapping[el.law_name]
+                # Prefix uids with law abbreviation to avoid collisions
+                lp = el.law_prefix
+                if el.caput:
+                    el.caput.uid = el.caput.uid.replace("art", f"art{lp}", 1)
+                for child in el.children:
+                    child.uid = child.uid.replace("art", f"art{lp}", 1)
+                for v in el.all_versions:
+                    v.uid = v.uid.replace("art", f"art{lp}", 1)
 
     # ── 4. Build systematic index ──────────────────────────────────────
     print("[4/6] Gerando índice sistemático...")

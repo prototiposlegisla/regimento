@@ -350,14 +350,18 @@
       const palette = MARKER_PALETTE[marker.colorIdx];
       const el = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
       let label = el ? el.textContent.trim() : marker.uid;
-      // Always show article number for sub-units (§, incisos, alíneas, etc.)
-      if (el && !label.startsWith('Art.')) {
+      if (el) {
         const card = el.closest('.card-artigo');
         if (card) {
-          const artNum = card.dataset.art;
           const lawPrefix = card.dataset.law;
-          const pre = lawPrefix ? lawPrefix + ':' : '';
-          label = pre + 'Art.' + artNum + ',' + label;
+          if (!label.startsWith('Art.')) {
+            // Sub-units: prepend article number
+            const pre = lawPrefix ? lawPrefix + ':' : '';
+            label = pre + 'Art.' + card.dataset.art + ',' + label;
+          } else if (lawPrefix) {
+            // Caput of other laws: prepend law prefix
+            label = lawPrefix + ':' + label;
+          }
         }
       }
       // Compact label: remove º, spaces, abbreviate Parágrafo único → §ú

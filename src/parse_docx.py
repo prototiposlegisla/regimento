@@ -408,6 +408,8 @@ def _build_document(
     in_adt = False  # Ato das Disposições Transitórias
     current_article: ArticleBlock | None = None
     current_law_name: str = ""  # Set by NORMA: markers
+    uid_ctx: list[str] = ["", "", "", ""]  # [para, inciso, alinea, sub_alinea]
+    seen_uids: set[str] = set()  # global dedup for collision detection
 
     # Section ID counters (globally unique)
     titulo_count = 0
@@ -597,6 +599,10 @@ def _build_document(
                 )
                 current_article.caput = caput
 
+            # Reset hierarchical uid context for each new/merged article
+            uid_ctx = ["", "", "", ""]
+            seen_uids.add(uid_prefix)
+
             i += 1
             continue
 
@@ -613,7 +619,14 @@ def _build_document(
 
             art_num = current_article.art_number
             uid_prefix = f"art{art_num}" if not current_article.is_adt else f"artADT{art_num.replace('ADT', '')}"
-            uid = _make_uid(uid_prefix, cp)
+            uid = _make_hierarchical_uid(uid_prefix, cp, uid_ctx)
+            # Deduplicate: append counter if collision
+            base_uid = uid
+            n = 2
+            while uid in seen_uids:
+                uid = f"{base_uid}_{n}"
+                n += 1
+            seen_uids.add(uid)
 
             amendment = _extract_amendment_note(cp.runs)
 
@@ -662,32 +675,63 @@ def _build_footnotes(
     return result
 
 
-def _make_uid(prefix: str, cp: _ClassifiedParagraph) -> str:
-    """Gera UID para sub-dispositivos."""
+def _uid_suffix(cp: _ClassifiedParagraph) -> str:
+    """Retorna o sufixo de UID para o sub-dispositivo."""
     if cp.unit_type == UnitType.PARAGRAFO_UNICO:
-        return f"{prefix}pu"
+        return "pu"
     elif cp.unit_type == UnitType.PARAGRAFO_NUM:
         m = RE_PARAGRAFO_NUM.match(cp.text)
         num = m.group(1) if m else "0"
-        return f"{prefix}p{num}"
+        return f"p{num}"
     elif cp.unit_type == UnitType.INCISO:
         m = re.match(r"^(l?[IVXLC]+)", cp.text)
         raw = m.group(1) if m else ""
         if raw.startswith("l"):
             raw = "I" + raw[1:]
-        return f"{prefix}{raw}"
+        return raw
     elif cp.unit_type == UnitType.ALINEA:
-        return f"{prefix}{cp.text[0]}"
+        return cp.text[0]
     elif cp.unit_type == UnitType.SUB_ALINEA:
         m = re.match(r"^(\d+)\)", cp.text)
         num = m.group(1) if m else "0"
-        return f"{prefix}sub{num}"
+        return f"sub{num}"
     elif cp.unit_type == UnitType.ITEM_NUM:
         m = re.match(r"^(\d+)", cp.text)
         num = m.group(1) if m else "0"
-        return f"{prefix}item{num}"
+        return f"item{num}"
+    return ""
+
+
+def _make_hierarchical_uid(
+    art_prefix: str,
+    cp: _ClassifiedParagraph,
+    ctx: list[str],
+) -> str:
+    """Gera UID hierárquico para sub-dispositivos.
+
+    ctx = [para_suffix, inciso_suffix, alinea_suffix, sub_alinea_suffix]
+    É atualizado in-place conforme o nível do dispositivo.
+    """
+    suffix = _uid_suffix(cp)
+
+    if cp.unit_type in (UnitType.PARAGRAFO_UNICO, UnitType.PARAGRAFO_NUM):
+        ctx[0] = suffix
+        ctx[1] = ctx[2] = ctx[3] = ""
+    elif cp.unit_type == UnitType.INCISO:
+        ctx[1] = suffix
+        ctx[2] = ctx[3] = ""
+    elif cp.unit_type == UnitType.ALINEA:
+        ctx[2] = suffix
+        ctx[3] = ""
+    elif cp.unit_type == UnitType.SUB_ALINEA:
+        ctx[3] = suffix
+    elif cp.unit_type == UnitType.ITEM_NUM:
+        # item appends to current context without resetting
+        return art_prefix + ctx[0] + ctx[1] + ctx[2] + ctx[3] + suffix
     else:
-        return prefix
+        return art_prefix + suffix
+
+    return art_prefix + ctx[0] + ctx[1] + ctx[2] + ctx[3]
 
 
 def _extract_amendment_note(runs: list[TextRun]) -> str:

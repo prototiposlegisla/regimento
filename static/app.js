@@ -112,6 +112,18 @@
   });
 
   // ===== SEARCH =====
+  function stripAccents(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function accentInsensitivePattern(str) {
+    const map = {
+      'a': '[aáàâãä]', 'e': '[eéèêë]', 'i': '[iíìîï]',
+      'o': '[oóòôõö]', 'u': '[uúùûü]', 'c': '[cç]', 'n': '[nñ]',
+    };
+    return str.replace(/[a-z]/gi, ch => map[ch.toLowerCase()] || ch);
+  }
+
   function clearHighlights() {
     $cards.querySelectorAll('mark').forEach(m => {
       const parent = m.parentNode;
@@ -120,15 +132,24 @@
     });
   }
 
-  function highlightText(node, terms) {
+  function getCardText(card, includeFootnotes) {
+    const clone = card.cloneNode(true);
+    if (!includeFootnotes) {
+      clone.querySelectorAll('.footnote-box').forEach(el => el.remove());
+    }
+    return stripAccents(clone.textContent.toLowerCase());
+  }
+
+  function highlightText(node, terms, includeFootnotes) {
     if (!terms.length) return;
     const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
     const textNodes = [];
     while (walker.nextNode()) {
-      if (walker.currentNode.parentElement.closest('.footnote-box, .art-head')) continue;
+      const skip = includeFootnotes ? '.art-head' : '.footnote-box, .art-head';
+      if (walker.currentNode.parentElement.closest(skip)) continue;
       textNodes.push(walker.currentNode);
     }
-    const regex = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+    const regex = new RegExp('(' + terms.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('|') + ')', 'gi');
     for (const tn of textNodes) {
       if (!regex.test(tn.textContent)) continue;
       regex.lastIndex = 0;
@@ -152,6 +173,14 @@
 
     $btnClearSearch.style.display = 'flex';
 
+    // Prefix "r " → include footnotes in search
+    let includeFootnotes = false;
+    const footnoteMatch = term.match(/^r\s+(.+)$/i);
+    if (footnoteMatch) {
+      includeFootnotes = true;
+      term = footnoteMatch[1];
+    }
+
     // Article navigation: a43, a44, aADT1, aLO23, etc
     const artMatch = term.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i);
     if (artMatch) {
@@ -172,15 +201,21 @@
       return;
     }
 
-    const terms = term.toLowerCase().split(/\s+/).filter(Boolean);
+    const terms = stripAccents(term.toLowerCase()).split(/\s+/).filter(Boolean);
     const articleCards = getArticleCards();
     const matchedCards = new Set();
 
     for (const card of articleCards) {
-      const text = card.textContent.toLowerCase();
+      const text = getCardText(card, includeFootnotes);
       if (terms.every(t => text.includes(t))) {
         matchedCards.add(card);
-        highlightText(card, terms);
+        highlightText(card, terms, includeFootnotes);
+        // Open footnote boxes that contain highlights
+        if (includeFootnotes) {
+          card.querySelectorAll('.footnote-box').forEach(box => {
+            if (box.querySelector('mark')) box.classList.add('open');
+          });
+        }
       }
     }
 
@@ -383,8 +418,8 @@
   });
 
   function textMatchesFilter(text, filter) {
-    const lower = text.toLowerCase();
-    return filter.split(/\s+/).every(term => lower.includes(term));
+    const lower = stripAccents(text.toLowerCase());
+    return stripAccents(filter).split(/\s+/).every(term => lower.includes(term));
   }
 
   function renderIndex() {
@@ -495,58 +530,70 @@
   }
 
   function formatRefsCompact(refs) {
-    // Separate refs with detail from those without
-    const plain = [];
-    const detailed = [];
+    // Group refs by law_prefix first
+    const byLaw = {};
     for (const r of refs) {
-      if (r.detail) {
-        detailed.push(r);
-      } else {
-        plain.push(r);
-      }
+      const key = r.law_prefix || '';
+      if (!byLaw[key]) byLaw[key] = [];
+      byLaw[key].push(r);
     }
-    // Sort plain refs by numeric value
-    plain.sort((a, b) => {
-      const na = parseInt(a.art, 10) || 0;
-      const nb = parseInt(b.art, 10) || 0;
-      return na - nb;
-    });
-    // Group consecutive plain refs into ranges
-    const parts = [];
-    let i = 0;
-    while (i < plain.length) {
-      const start = parseInt(plain[i].art, 10);
-      if (isNaN(start)) {
-        parts.push('art. ' + plain[i].art);
-        i++;
-        continue;
-      }
-      let end = start;
-      let j = i + 1;
-      while (j < plain.length) {
-        const next = parseInt(plain[j].art, 10);
-        if (!isNaN(next) && next === end + 1) {
-          end = next;
-          j++;
+
+    const allParts = [];
+    for (const [lawPrefix, lawRefs] of Object.entries(byLaw)) {
+      const prefix = lawPrefix ? lawPrefix + ' ' : '';
+
+      // Separate refs with detail from those without
+      const plain = [];
+      const detailed = [];
+      for (const r of lawRefs) {
+        if (r.detail) {
+          detailed.push(r);
         } else {
-          break;
+          plain.push(r);
         }
       }
-      if (end - start >= 2) {
-        parts.push('arts. ' + start + ' – ' + end);
-      } else if (end - start === 1) {
-        parts.push('art. ' + start);
-        parts.push('art. ' + end);
-      } else {
-        parts.push('art. ' + start);
+      // Sort plain refs by numeric value
+      plain.sort((a, b) => {
+        const na = parseInt(a.art, 10) || 0;
+        const nb = parseInt(b.art, 10) || 0;
+        return na - nb;
+      });
+      // Group consecutive plain refs into ranges
+      let i = 0;
+      while (i < plain.length) {
+        const start = parseInt(plain[i].art, 10);
+        if (isNaN(start)) {
+          allParts.push(prefix + 'art. ' + plain[i].art);
+          i++;
+          continue;
+        }
+        let end = start;
+        let j = i + 1;
+        while (j < plain.length) {
+          const next = parseInt(plain[j].art, 10);
+          if (!isNaN(next) && next === end + 1) {
+            end = next;
+            j++;
+          } else {
+            break;
+          }
+        }
+        if (end - start >= 2) {
+          allParts.push(prefix + 'arts. ' + start + ' – ' + end);
+        } else if (end - start === 1) {
+          allParts.push(prefix + 'art. ' + start);
+          allParts.push(prefix + 'art. ' + end);
+        } else {
+          allParts.push(prefix + 'art. ' + start);
+        }
+        i = j;
       }
-      i = j;
+      // Add detailed refs
+      for (const r of detailed) {
+        allParts.push(prefix + 'art. ' + r.art + ', ' + r.detail);
+      }
     }
-    // Add detailed refs
-    for (const r of detailed) {
-      parts.push('art. ' + r.art + ', ' + r.detail);
-    }
-    return parts.join('; ');
+    return allParts.join('; ');
   }
 
   function collectAllRefs(entry) {
@@ -577,7 +624,7 @@
         e.preventDefault();
         // Find the referenced subject in the index and open it
         const target = SUBJECT_INDEX.find(
-          s => s.subject.toLowerCase() === v.toLowerCase()
+          s => stripAccents(s.subject.toLowerCase()) === stripAccents(v.toLowerCase())
         );
         if (target) {
           closeIndex();
@@ -751,12 +798,18 @@
     if (!activeSubject) return;
     const cards = getAllCards();
     if (subjectFilter) {
-      const artNums = new Set(activeSubject.refs.map(r => r.art));
+      // Build set of "lawPrefix:art" keys for precise matching
+      const refKeys = new Set(activeSubject.refs.map(r => (r.law_prefix || '') + ':' + r.art));
       for (const card of cards) {
         if (card.classList.contains('card-titulo')) {
           card.classList.add('filtered-out');
-        } else if (card.dataset.art && !artNums.has(card.dataset.art)) {
-          card.classList.add('filtered-out');
+        } else if (card.dataset.art) {
+          const cardKey = (card.dataset.law || '') + ':' + card.dataset.art;
+          if (!refKeys.has(cardKey)) {
+            card.classList.add('filtered-out');
+          } else {
+            card.classList.remove('filtered-out');
+          }
         } else {
           card.classList.remove('filtered-out');
         }

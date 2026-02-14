@@ -38,7 +38,15 @@ def parse_xlsx(path: str | Path) -> SubjectIndex:
 
     path = Path(path)
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-    ws = wb.active
+    # Use first sheet that isn't "Normas" (avoid depending on active sheet)
+    ws = None
+    for name in wb.sheetnames:
+        if name != "Normas":
+            ws = wb[name]
+            break
+    if ws is None:
+        wb.close()
+        return SubjectIndex(entries=[])
 
     rows = list(ws.iter_rows(min_row=2, values_only=True))
     wb.close()

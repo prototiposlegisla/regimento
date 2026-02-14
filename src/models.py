@@ -79,6 +79,8 @@ class ArticleBlock:
     children: list[DocumentUnit] = field(default_factory=list)
     all_versions: list[DocumentUnit] = field(default_factory=list)
     is_revoked: bool = False
+    law_name: str = ""  # ex: "Lei Orgânica do Município de São Paulo"
+    law_prefix: str = ""  # ex: "LO" (empty = Regimento, the default)
 
 
 @dataclass
@@ -99,7 +101,7 @@ class ParsedDocument:
                     "data_section": el.data_section,
                 })
             elif isinstance(el, ArticleBlock):
-                result.append({
+                d = {
                     "type": "article",
                     "art_number": el.art_number,
                     "is_adt": el.is_adt,
@@ -107,7 +109,12 @@ class ParsedDocument:
                     "caput": _unit_to_dict(el.caput) if el.caput else None,
                     "children": [_unit_to_dict(c) for c in el.children],
                     "all_versions": [_unit_to_dict(v) for v in el.all_versions],
-                })
+                }
+                if el.law_name:
+                    d["law_name"] = el.law_name
+                if el.law_prefix:
+                    d["law_prefix"] = el.law_prefix
+                result.append(d)
         return {"elements": result}
 
 
@@ -145,6 +152,7 @@ class SubjectRef:
     """Referência de dispositivo no índice remissivo."""
     art: str  # número do artigo
     detail: str = ""  # ex: "§ 1º", "II", "Parágrafo único"
+    law_prefix: str = ""  # ex: "LO" (empty = Regimento)
 
 
 @dataclass
@@ -167,12 +175,36 @@ class SubjectIndex:
     entries: list[SubjectEntry] = field(default_factory=list)
 
     def to_list(self) -> list[dict]:
-        result = []
+        """Agrupa entries pelo campo subject, com sub-assuntos aninhados."""
+        from collections import OrderedDict
+
+        groups: OrderedDict[str, dict] = OrderedDict()
         for e in self.entries:
-            result.append({
-                "subject": e.display_name(),
-                "refs": [{"art": r.art, "detail": r.detail} for r in e.refs],
-            })
+            key = e.subject
+            if key not in groups:
+                groups[key] = {"subject": key, "refs": [], "children": []}
+
+            refs_dicts = []
+            for r in e.refs:
+                rd: dict = {"art": r.art, "detail": r.detail}
+                if r.law_prefix:
+                    rd["law_prefix"] = r.law_prefix
+                refs_dicts.append(rd)
+            if e.sub_subject:
+                groups[key]["children"].append({
+                    "sub_subject": e.sub_subject,
+                    "refs": refs_dicts,
+                })
+            else:
+                groups[key]["refs"].extend(refs_dicts)
+
+        result = list(groups.values())
+        # Remove empty children/refs lists for cleaner JSON
+        for item in result:
+            if not item["children"]:
+                del item["children"]
+            if not item["refs"]:
+                del item["refs"]
         return sorted(result, key=lambda x: x["subject"].lower())
 
 
@@ -180,6 +212,7 @@ class SubjectIndex:
 class SysIndexNode:
     """Nó do índice sistemático."""
     title: str
+    section_id: str = ""
     children: list[SysIndexNode | SysIndexLeaf] = field(default_factory=list)
 
 
@@ -196,8 +229,8 @@ def sys_index_to_list(nodes: list[SysIndexNode | SysIndexLeaf]) -> list[dict]:
         if isinstance(n, SysIndexLeaf):
             result.append({"label": n.label, "art": n.art})
         else:
-            result.append({
-                "title": n.title,
-                "children": sys_index_to_list(n.children),
-            })
+            d: dict = {"title": n.title, "children": sys_index_to_list(n.children)}
+            if n.section_id:
+                d["section_id"] = n.section_id
+            result.append(d)
     return result

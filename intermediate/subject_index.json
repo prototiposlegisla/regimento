@@ -262,39 +262,41 @@
         "art": "275",
         "detail": ""
       }
-    ]
-  },
-  {
-    "subject": "Proposições — Adiamento de discussão ou votação",
-    "refs": [
+    ],
+    "children": [
       {
-        "art": "175",
-        "detail": "II"
+        "sub_subject": "Adiamento de discussão ou votação",
+        "refs": [
+          {
+            "art": "175",
+            "detail": "II"
+          },
+          {
+            "art": "176",
+            "detail": ""
+          },
+          {
+            "art": "192",
+            "detail": "II"
+          },
+          {
+            "art": "225",
+            "detail": "II"
+          },
+          {
+            "art": "285",
+            "detail": ""
+          }
+        ]
       },
       {
-        "art": "176",
-        "detail": ""
-      },
-      {
-        "art": "192",
-        "detail": "II"
-      },
-      {
-        "art": "225",
-        "detail": "II"
-      },
-      {
-        "art": "285",
-        "detail": ""
-      }
-    ]
-  },
-  {
-    "subject": "Proposições — Adiamento em bloco",
-    "refs": [
-      {
-        "art": "176",
-        "detail": "§ 10º"
+        "sub_subject": "Adiamento em bloco",
+        "refs": [
+          {
+            "art": "176",
+            "detail": "§ 10º"
+          }
+        ]
       }
     ]
   }

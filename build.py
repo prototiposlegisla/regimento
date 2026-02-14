@@ -29,11 +29,6 @@ def main() -> None:
         help="Salva JSONs intermediários em intermediate/",
     )
     parser.add_argument(
-        "--all-versions",
-        action="store_true",
-        help="Inclui botão de toggle para redações anteriores",
-    )
-    parser.add_argument(
         "--docx",
         default=str(BASE_DIR / "regimentoInterno.docx"),
         help="Caminho do DOCX (padrão: regimentoInterno.docx)",
@@ -70,23 +65,22 @@ def main() -> None:
     doc = resolve_amendments(doc)
 
     version_count = sum(
-        len(a.all_versions) for a in articles  # type: ignore
+        len(a.all_versions)  # type: ignore
+        + sum(1 for c in a.children if c.is_old_version)  # type: ignore
+        for a in articles
     )
     print(f"      → {version_count} versões anteriores detectadas")
 
-    # ── 3. Build systematic index ──────────────────────────────────────
-    print("[3/6] Gerando índice sistemático...")
-    from src.build_index import build_systematic_index
-
-    systematic_index = build_systematic_index(doc)
-    print(f"      → {len(systematic_index)} nós raiz")
-
-    # ── 4. Parse XLSX ──────────────────────────────────────────────────
-    print("[4/6] Parseando XLSX...")
-    from src.parse_xlsx import parse_xlsx
+    # ── 3. Parse XLSX ──────────────────────────────────────────────────
+    print("[3/6] Parseando XLSX...")
+    from src.parse_xlsx import parse_xlsx, parse_law_mapping
 
     xlsx_path = Path(args.xlsx)
+    law_mapping: dict[str, str] = {}
     if xlsx_path.exists():
+        law_mapping = parse_law_mapping(xlsx_path)
+        if law_mapping:
+            print(f"      → {len(law_mapping)} normas mapeadas")
         subject_index = parse_xlsx(xlsx_path)
         subject_list = subject_index.to_list()
         print(f"      → {len(subject_list)} assuntos")
@@ -94,11 +88,25 @@ def main() -> None:
         print("      → XLSX não encontrado, índice remissivo vazio")
         subject_list = []
 
+    # Apply law prefixes to articles based on law_name ↔ mapping
+    if law_mapping:
+        from src.models import ArticleBlock as _AB
+        for el in doc.elements:
+            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping:
+                el.law_prefix = law_mapping[el.law_name]
+
+    # ── 4. Build systematic index ──────────────────────────────────────
+    print("[4/6] Gerando índice sistemático...")
+    from src.build_index import build_systematic_index
+
+    systematic_index = build_systematic_index(doc)
+    print(f"      → {len(systematic_index)} nós raiz")
+
     # ── 5. Render HTML cards ───────────────────────────────────────────
     print("[5/6] Renderizando cards HTML...")
     from src.render_html import render_cards
 
-    cards_html = render_cards(doc, include_all_versions=args.all_versions)
+    cards_html = render_cards(doc)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
     # ── 6. Assemble ────────────────────────────────────────────────────

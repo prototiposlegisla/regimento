@@ -107,7 +107,7 @@
   $cards.addEventListener('click', (e) => {
     const card = e.target.closest('.card');
     if (!card) return;
-    if (e.target.closest('.footnote-ref') || e.target.closest('.footnote-box') || e.target.closest('.unit-id') || e.target.closest('.btn-toggle-versions')) return;
+    if (e.target.closest('.footnote-ref') || e.target.closest('.footnote-box') || e.target.closest('.unit-id')) return;
     selectCard(card, true);
   });
 
@@ -120,17 +120,18 @@
     });
   }
 
-  function highlightText(node, term) {
-    if (!term) return;
+  function highlightText(node, terms) {
+    if (!terms.length) return;
     const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
     const textNodes = [];
     while (walker.nextNode()) {
       if (walker.currentNode.parentElement.closest('.footnote-box, .art-head')) continue;
       textNodes.push(walker.currentNode);
     }
-    const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const regex = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
     for (const tn of textNodes) {
       if (!regex.test(tn.textContent)) continue;
+      regex.lastIndex = 0;
       const span = document.createElement('span');
       span.innerHTML = tn.textContent.replace(regex, '<mark>$1</mark>');
       tn.parentNode.replaceChild(span, tn);
@@ -151,11 +152,19 @@
 
     $btnClearSearch.style.display = 'flex';
 
-    // Article navigation: a43, a44, aADT1, etc
-    const artMatch = term.match(/^a(\d+[-A-Za-z]*)$/i);
+    // Article navigation: a43, a44, aADT1, aLO23, etc
+    const artMatch = term.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i);
     if (artMatch) {
-      const artNum = artMatch[1];
-      const target = $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
+      const lawPrefix = artMatch[1] ? artMatch[1].toUpperCase() : '';
+      const artNum = artMatch[2];
+      let target;
+      if (lawPrefix) {
+        target = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
+      } else {
+        // Search default (no data-law) first, then any
+        target = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
+              || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
+      }
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         selectCard(target, true);
@@ -163,14 +172,15 @@
       return;
     }
 
+    const terms = term.toLowerCase().split(/\s+/).filter(Boolean);
     const articleCards = getArticleCards();
     const matchedCards = new Set();
 
     for (const card of articleCards) {
       const text = card.textContent.toLowerCase();
-      if (text.includes(term.toLowerCase())) {
+      if (terms.every(t => text.includes(t))) {
         matchedCards.add(card);
-        highlightText(card, term);
+        highlightText(card, terms);
       }
     }
 
@@ -184,6 +194,7 @@
           card.classList.add('filtered-out');
         }
       }
+      showContextHeadings();
     }
 
     const firstMatch = articleCards.find(c => matchedCards.has(c));
@@ -331,22 +342,6 @@
     }
   });
 
-  // ===== VERSION TOGGLE =====
-  $cards.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-toggle-versions');
-    if (btn) {
-      e.stopPropagation();
-      const card = btn.closest('.card');
-      const box = card.querySelector('.old-versions');
-      if (box) {
-        box.classList.toggle('open');
-        btn.textContent = box.classList.contains('open')
-          ? 'Ocultar redações anteriores'
-          : 'Ver redações anteriores';
-      }
-    }
-  });
-
   // ===== INDEX PANEL =====
   let currentIndexTab = 'systematic';
 
@@ -373,7 +368,24 @@
     });
   });
 
-  $indexSearch.addEventListener('input', () => renderIndex());
+  const $btnClearIndexSearch = document.getElementById('btn-clear-index-search');
+
+  $indexSearch.addEventListener('input', () => {
+    $btnClearIndexSearch.style.display = $indexSearch.value.trim() ? 'flex' : 'none';
+    renderIndex();
+  });
+
+  $btnClearIndexSearch.addEventListener('click', () => {
+    $indexSearch.value = '';
+    $btnClearIndexSearch.style.display = 'none';
+    renderIndex();
+    $indexSearch.focus();
+  });
+
+  function textMatchesFilter(text, filter) {
+    const lower = text.toLowerCase();
+    return filter.split(/\s+/).every(term => lower.includes(term));
+  }
 
   function renderIndex() {
     const filter = $indexSearch.value.trim().toLowerCase();
@@ -384,27 +396,49 @@
     } else {
       renderSubjectIndex(filter);
     }
+
+    if (filter) {
+      highlightIndexContent(filter);
+    }
+  }
+
+  function highlightIndexContent(filter) {
+    const terms = filter.split(/\s+/).filter(Boolean);
+    const regex = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+    const walker = document.createTreeWalker($indexContent, NodeFilter.SHOW_TEXT, null);
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    for (const tn of textNodes) {
+      if (!regex.test(tn.textContent)) continue;
+      regex.lastIndex = 0;
+      const span = document.createElement('span');
+      span.innerHTML = tn.textContent.replace(regex, '<mark>$1</mark>');
+      tn.parentNode.replaceChild(span, tn);
+    }
   }
 
   function renderSystematicIndex(filter) {
     for (const group of SYSTEMATIC_INDEX) {
-      if (filter && !group.title.toLowerCase().includes(filter)) {
-        const hasChild = group.children && group.children.some(ch =>
-          ch.title && ch.title.toLowerCase().includes(filter) ||
-          (ch.children && ch.children.some(it =>
-            (it.label && it.label.toLowerCase().includes(filter)) ||
-            (it.title && it.title.toLowerCase().includes(filter)) ||
-            (it.children && it.children.some(sub => sub.label && sub.label.toLowerCase().includes(filter)))
-          ))
-        );
+      const isLaw = group.section_id && group.section_id.startsWith('norma');
+
+      if (filter && !textMatchesFilter(group.title, filter)) {
+        if (isLaw) continue;
+        const hasChild = group.children && group.children.some(ch => sysNodeMatches(ch, filter));
         if (!hasChild) continue;
       }
 
       const div = document.createElement('div');
       div.className = 'sys-group';
       const title = document.createElement('div');
-      title.className = 'sys-title';
-      title.textContent = group.title;
+      title.className = isLaw ? 'sys-title sys-law' : 'sys-title';
+      title.textContent = isLaw ? '— ' + group.title : group.title;
+      if (group.section_id) {
+        title.style.cursor = 'pointer';
+        title.addEventListener('click', () => {
+          closeIndex();
+          navigateToSection(group.section_id);
+        });
+      }
       div.appendChild(title);
 
       if (group.children) {
@@ -417,47 +451,124 @@
     }
   }
 
-  function renderSysNode(node, parent, indent, filter) {
-    if (node.label) {
-      // Leaf node (article)
-      if (filter && !node.label.toLowerCase().includes(filter)) return;
-      const el = document.createElement('div');
-      el.className = 'sys-item';
-      el.style.paddingLeft = indent + 'px';
-      el.textContent = node.label;
-      el.addEventListener('click', () => {
-        closeIndex();
-        navigateToArt(node.art);
-      });
-      parent.appendChild(el);
-    } else if (node.title) {
-      // Branch node (chapter/section)
-      if (filter && !node.title.toLowerCase().includes(filter) &&
-          !(node.children && node.children.some(it =>
-            (it.label && it.label.toLowerCase().includes(filter)) ||
-            (it.title && it.title.toLowerCase().includes(filter)) ||
-            (it.children && it.children.some(sub => sub.label && sub.label.toLowerCase().includes(filter)))
-          ))) return;
-
-      const subTitle = document.createElement('div');
-      subTitle.className = 'sys-title';
-      subTitle.style.paddingLeft = indent + 'px';
-      subTitle.style.fontSize = '12px';
-      subTitle.textContent = node.title;
-      parent.appendChild(subTitle);
-
-      if (node.children) {
-        for (const child of node.children) {
-          renderSysNode(child, parent, indent + 12, filter);
-        }
+  function sysNodeMatches(node, filter) {
+    if (!node.title) return false;
+    if (textMatchesFilter(node.title, filter)) return true;
+    if (node.children) {
+      for (const ch of node.children) {
+        if (sysNodeMatches(ch, filter)) return true;
       }
     }
+    return false;
+  }
+
+  function renderSysNode(node, parent, indent, filter) {
+    if (!node.title) return;
+    if (filter && !sysNodeMatches(node, filter)) return;
+
+    const el = document.createElement('div');
+    el.className = 'sys-item';
+    el.style.paddingLeft = indent + 'px';
+    el.textContent = node.title;
+
+    if (node.section_id) {
+      el.addEventListener('click', () => {
+        closeIndex();
+        navigateToSection(node.section_id);
+      });
+    }
+    parent.appendChild(el);
+
+    if (node.children) {
+      for (const child of node.children) {
+        renderSysNode(child, parent, indent + 12, filter);
+      }
+    }
+  }
+
+  function navigateToSection(sectionId) {
+    const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      selectCard(card, true);
+    }
+  }
+
+  function formatRefsCompact(refs) {
+    // Separate refs with detail from those without
+    const plain = [];
+    const detailed = [];
+    for (const r of refs) {
+      if (r.detail) {
+        detailed.push(r);
+      } else {
+        plain.push(r);
+      }
+    }
+    // Sort plain refs by numeric value
+    plain.sort((a, b) => {
+      const na = parseInt(a.art, 10) || 0;
+      const nb = parseInt(b.art, 10) || 0;
+      return na - nb;
+    });
+    // Group consecutive plain refs into ranges
+    const parts = [];
+    let i = 0;
+    while (i < plain.length) {
+      const start = parseInt(plain[i].art, 10);
+      if (isNaN(start)) {
+        parts.push('art. ' + plain[i].art);
+        i++;
+        continue;
+      }
+      let end = start;
+      let j = i + 1;
+      while (j < plain.length) {
+        const next = parseInt(plain[j].art, 10);
+        if (!isNaN(next) && next === end + 1) {
+          end = next;
+          j++;
+        } else {
+          break;
+        }
+      }
+      if (end - start >= 2) {
+        parts.push('arts. ' + start + ' – ' + end);
+      } else if (end - start === 1) {
+        parts.push('art. ' + start);
+        parts.push('art. ' + end);
+      } else {
+        parts.push('art. ' + start);
+      }
+      i = j;
+    }
+    // Add detailed refs
+    for (const r of detailed) {
+      parts.push('art. ' + r.art + ', ' + r.detail);
+    }
+    return parts.join('; ');
+  }
+
+  function collectAllRefs(entry) {
+    // Collect all refs from entry (direct + children) for the pill
+    const all = [];
+    if (entry.refs) all.push(...entry.refs);
+    if (entry.children) {
+      for (const ch of entry.children) {
+        all.push(...ch.refs);
+      }
+    }
+    return all;
   }
 
   function renderSubjectIndex(filter) {
     const sorted = SUBJECT_INDEX.slice().sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'));
     for (const entry of sorted) {
-      if (filter && !entry.subject.toLowerCase().includes(filter)) continue;
+      const matchSelf = !filter || textMatchesFilter(entry.subject, filter);
+      const matchChild = !matchSelf && entry.children && entry.children.some(
+        ch => textMatchesFilter(ch.sub_subject, filter)
+      );
+      if (!matchSelf && !matchChild) continue;
 
       const div = document.createElement('div');
       div.className = 'subj-entry';
@@ -466,21 +577,85 @@
       title.textContent = entry.subject;
       title.addEventListener('click', () => {
         closeIndex();
-        openSubjectPill(entry);
+        const pillEntry = { subject: entry.subject, refs: collectAllRefs(entry) };
+        openSubjectPill(pillEntry);
       });
       div.appendChild(title);
 
-      const refs = document.createElement('div');
-      refs.className = 'subj-refs';
-      refs.textContent = entry.refs.map(r => 'Art. ' + r.art + (r.detail ? ', ' + r.detail : '')).join('; ');
-      div.appendChild(refs);
+      // Direct refs
+      if (entry.refs && entry.refs.length > 0) {
+        const refs = document.createElement('div');
+        refs.className = 'subj-refs';
+        refs.textContent = formatRefsCompact(entry.refs);
+        div.appendChild(refs);
+      }
+
+      // Sub-subjects
+      if (entry.children) {
+        for (const ch of entry.children) {
+          if (filter && !matchSelf && !textMatchesFilter(ch.sub_subject, filter)) continue;
+          const subDiv = document.createElement('div');
+          subDiv.className = 'subj-entry';
+          subDiv.style.paddingLeft = '16px';
+          const subTitle = document.createElement('div');
+          subTitle.className = 'subj-title';
+          subTitle.style.fontSize = '13px';
+          subTitle.textContent = '— ' + ch.sub_subject;
+          subTitle.addEventListener('click', ((child) => () => {
+            closeIndex();
+            const pillEntry = { subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs };
+            openSubjectPill(pillEntry);
+          })(ch));
+          subDiv.appendChild(subTitle);
+
+          const subRefs = document.createElement('div');
+          subRefs.className = 'subj-refs';
+          subRefs.textContent = formatRefsCompact(ch.refs);
+          subDiv.appendChild(subRefs);
+          div.appendChild(subDiv);
+        }
+      }
 
       $indexContent.appendChild(div);
     }
   }
 
-  function navigateToArt(artNum) {
-    const card = $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
+  function showContextHeadings() {
+    // For each visible article, show its ancestor heading cards for context
+    const cards = getAllCards();
+    const visibleArts = cards.filter(c =>
+      c.classList.contains('card-artigo') && !c.classList.contains('filtered-out')
+    );
+    for (const art of visibleArts) {
+      const found = {}; // level → true
+      let prev = art.previousElementSibling;
+      while (prev) {
+        if (prev.classList.contains('card-titulo')) {
+          const sec = prev.dataset.section || '';
+          let level = '';
+          if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+          else if (sec.startsWith('cap')) level = 'cap';
+          else if (sec.startsWith('subsec')) level = 'subsec';
+          else if (sec.startsWith('sec')) level = 'sec';
+          if (level && !found[level]) {
+            found[level] = true;
+            prev.classList.remove('filtered-out');
+          }
+          if (level === 'tit') break;
+        }
+        prev = prev.previousElementSibling;
+      }
+    }
+  }
+
+  function navigateToArt(artNum, lawPrefix) {
+    let card;
+    if (lawPrefix) {
+      card = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
+    } else {
+      card = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
+          || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
+    }
     if (card) {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       selectCard(card, true);
@@ -510,7 +685,8 @@
   function updatePill() {
     if (!activeSubject) return;
     const ref = activeSubject.refs[subjectIdx];
-    $pillCurrent.textContent = 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+    const prefix = ref.law_prefix ? ref.law_prefix + ':' : '';
+    $pillCurrent.textContent = prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
   }
 
   function navigateToSubjectRef(idx) {
@@ -518,7 +694,7 @@
     subjectIdx = idx;
     updatePill();
     const ref = activeSubject.refs[idx];
-    navigateToArt(ref.art);
+    navigateToArt(ref.art, ref.law_prefix || '');
   }
 
   function applySubjectFilter() {
@@ -535,6 +711,7 @@
           card.classList.remove('filtered-out');
         }
       }
+      showContextHeadings();
     } else {
       cards.forEach(c => c.classList.remove('filtered-out'));
     }
@@ -564,7 +741,8 @@
     activeSubject.refs.forEach((ref, idx) => {
       const btn = document.createElement('button');
       btn.className = 'pill-dd-item' + (idx === subjectIdx ? ' current' : '');
-      btn.textContent = 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+      const prefix = ref.law_prefix ? ref.law_prefix + ':' : '';
+      btn.textContent = prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
       btn.addEventListener('click', () => {
         $pillDropdown.classList.remove('open');
         navigateToSubjectRef(idx);

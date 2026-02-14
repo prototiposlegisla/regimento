@@ -4,695 +4,181 @@
     "children": [
       {
         "title": "CAPÍTULO I — DISPOSIÇÕES PRELIMINARES",
-        "children": [
-          {
-            "label": "Art. 1 — A Câmara Municipal de São Paulo tem sua sede no Palácio...",
-            "art": "1"
-          },
-          {
-            "label": "Art. 2 — Para os efeitos regimentais, a legislatura é dividida em...",
-            "art": "2"
-          }
-        ]
+        "children": [],
+        "section_id": "cap1"
       },
       {
         "title": "CAPÍTULO II — DA INSTALAÇÃO",
-        "children": [
-          {
-            "label": "Art. 3 — A Câmara Municipal de São Paulo instalar-se-á, no...",
-            "art": "3"
-          },
-          {
-            "label": "Art. 4 — Ainda com o Vereador mais idoso na direção dos trabalhos...",
-            "art": "4"
-          }
-        ]
+        "children": [],
+        "section_id": "cap2"
       }
-    ]
+    ],
+    "section_id": "tit1"
   },
   {
     "title": "TÍTULO II — DA MESA DA CÂMARA",
     "children": [
       {
         "title": "CAPÍTULO I — DISPOSIÇÕES PRELIMINARES",
-        "children": [
-          {
-            "label": "Art. 5 — A Mesa eleita, com mandato de 1 (um) ano, será composta...",
-            "art": "5"
-          },
-          {
-            "label": "Art. 6 — As funções dos membros da Mesa somente cessarão:",
-            "art": "6"
-          },
-          {
-            "label": "Art. 7 — Vago qualquer cargo da Mesa, a eleição respectiva deverá...",
-            "art": "7"
-          },
-          {
-            "label": "Art. 8 — O Presidente e o 1º Vice-Presidente não poderão fazer...",
-            "art": "8"
-          }
-        ]
+        "children": [],
+        "section_id": "cap3"
       },
       {
         "title": "CAPÍTULO II — DA ELEIÇÃO DA MESA",
-        "children": [
-          {
-            "label": "Art. 9 — A eleição para renovação da Mesa será realizada no dia...",
-            "art": "9"
-          },
-          {
-            "label": "Art. 10 — A eleição da Mesa será feita em primeiro escrutínio, por...",
-            "art": "10"
-          },
-          {
-            "label": "Art. 11 — Para a eleição da Mesa, a votação será feita mediante...",
-            "art": "11"
-          }
-        ]
+        "children": [],
+        "section_id": "cap4"
       },
       {
         "title": "CAPÍTULO III — DAS ATRIBUIÇÕES DA MESA",
-        "children": [
-          {
-            "label": "Art. 12 — A Mesa eleita, em ato que deverá ser publicado dentro de...",
-            "art": "12"
-          },
-          {
-            "label": "Art. 13 — À Mesa compete, dentre outras atribuições estabelecidas...",
-            "art": "13"
-          },
-          {
-            "label": "Art. 14 — Os membros da Mesa reunir-se-ão, pelo menos...",
-            "art": "14"
-          },
-          {
-            "label": "Art. 15 — Os contratos de qualquer natureza, que a Câmara...",
-            "art": "15"
-          }
-        ]
+        "children": [],
+        "section_id": "cap5"
       },
       {
         "title": "CAPÍTULO IV — DO PRESIDENTE",
-        "children": [
-          {
-            "label": "Art. 16 — O Presidente é o representante da Câmara, em juízo ou...",
-            "art": "16"
-          },
-          {
-            "label": "Art. 17 — São atribuições do Presidente, além das que estão...",
-            "art": "17"
-          },
-          {
-            "label": "Art. 18 — Compete, ainda, ao Presidente",
-            "art": "18"
-          },
-          {
-            "label": "Art. 19 — Para ausentar-se do Município por mais de 15 (quinze)...",
-            "art": "19"
-          },
-          {
-            "label": "Art. 20 — Para tomar parte em qualquer discussão, o Presidente dos...",
-            "art": "20"
-          },
-          {
-            "label": "Art. 21 — Nenhum membro da Mesa ou Vereador poderá presidir a...",
-            "art": "21"
-          },
-          {
-            "label": "Art. 22 — Será sempre computada, para efeito de “quorum”, a...",
-            "art": "22"
-          },
-          {
-            "label": "Art. 23 — Quando o Presidente estiver com a palavra, no exercício...",
-            "art": "23"
-          }
-        ]
+        "children": [],
+        "section_id": "cap6"
       },
       {
         "title": "CAPÍTULO V — DOS VICE-PRESIDENTES",
-        "children": [
-          {
-            "label": "Art. 24 — Sempre que o Presidente não se achar no recinto à hora...",
-            "art": "24"
-          },
-          {
-            "label": "Art. 25 — Obedecida a ordem estabelecida no artigo anterior, os...",
-            "art": "25"
-          }
-        ]
+        "children": [],
+        "section_id": "cap7"
       },
       {
         "title": "CAPÍTULO VI — DOS SECRETÁRIOS",
-        "children": [
-          {
-            "label": "Art. 26 — São atribuições do 1º Secretário:",
-            "art": "26"
-          },
-          {
-            "label": "Art. 27 — O primeiro Suplente da Mesa e, na sua falta, o segundo,...",
-            "art": "27"
-          }
-        ]
+        "children": [],
+        "section_id": "cap8"
       },
       {
         "title": "CAPÍTULO VII — DAS CONTAS DA MESA",
-        "children": [
-          {
-            "label": "Art. 28 — As contas da Mesa da Câmara compõem-se de:",
-            "art": "28"
-          },
-          {
-            "label": "Art. 29 — Os balancetes mensais, assinados pelo Presidente, e o...",
-            "art": "29"
-          }
-        ]
+        "children": [],
+        "section_id": "cap9"
       },
       {
         "title": "CAPÍTULO VIII — DA RENÚNCIA E DESTITUIÇÃO DA MESA",
-        "children": [
-          {
-            "label": "Art. 30 — A renúncia do Vereador ao cargo que ocupa na Mesa...",
-            "art": "30"
-          },
-          {
-            "label": "Art. 31 — É passível de destituição o membro da Mesa que exorbite...",
-            "art": "31"
-          },
-          {
-            "label": "Art. 32 — O processo de destituição lerá início por representação...",
-            "art": "32"
-          },
-          {
-            "label": "Art. 33 — O parecer da Comissão Processante será apreciado, em...",
-            "art": "33"
-          },
-          {
-            "label": "Art. 34 — O parecer da Comissão Processante que concluir pela...",
-            "art": "34"
-          },
-          {
-            "label": "Art. 35 — A aprovação de parecer que concluir por projeto de...",
-            "art": "35"
-          },
-          {
-            "label": "Art. 36 — O membro da Mesa envolvido nas acusações não poderá...",
-            "art": "36"
-          },
-          {
-            "label": "Art. 37 — Para discutir o parecer da Comissão Processante e da...",
-            "art": "37"
-          }
-        ]
+        "children": [],
+        "section_id": "cap10"
       }
-    ]
+    ],
+    "section_id": "tit2"
   },
   {
     "title": "TÍTULO III — DAS COMISSÕES",
     "children": [
       {
         "title": "CAPÍTULO I — DISPOSIÇÕES PRELIMINARES",
-        "children": [
-          {
-            "label": "Art. 38 — As Comissões serão: (Redação dada pela Resolução nº 1 de...",
-            "art": "38"
-          }
-        ]
+        "children": [],
+        "section_id": "cap11"
       },
       {
         "title": "CAPÍTULO II — DAS COMISSÕES PERMANENTES",
         "children": [
           {
             "title": "SEÇÃO I — DISPOSIÇÕES PRELIMINARES",
-            "children": [
-              {
-                "label": "Art. 39 — As Comissões Permanentes, em número de 7 (sete), têm as...",
-                "art": "39"
-              }
-            ]
+            "children": [],
+            "section_id": "sec1"
           },
           {
             "title": "SEÇÃO II — Da Composição das Comissões Permanentes",
-            "children": [
-              {
-                "label": "Art. 40 — A representação numérica das bancadas nas Comissões será...",
-                "art": "40"
-              },
-              {
-                "label": "Art. 41 — Dentro da mesma legislatura, os mandatos dos membros de...",
-                "art": "41"
-              },
-              {
-                "label": "Art. 42 — O Presidente da Câmara fará publicar na Imprensa...",
-                "art": "42"
-              },
-              {
-                "label": "Art. 43 — Constituídas as Comissões Permanentes, cada uma delas se...",
-                "art": "43"
-              },
-              {
-                "label": "Art. 44 — Os membros das Comissões Permanentes serão destituídos...",
-                "art": "44"
-              },
-              {
-                "label": "Art. 45 — No caso de vaga, licença ou impedimento de qualquer...",
-                "art": "45"
-              }
-            ]
+            "children": [],
+            "section_id": "sec2"
           },
           {
             "title": "SEÇÃO III — DA COMPETÊNCIA DAS COMISSÕES PERMANENTES",
-            "children": [
-              {
-                "label": "Art. 46 — Às Comissões Permanentes, em razão da matéria de sua...",
-                "art": "46"
-              },
-              {
-                "label": "Art. 47 — É da competência específica:  (Redação dada pela...",
-                "art": "47"
-              },
-              {
-                "label": "Art. 48 — E vedado às Comissões Permanentes, ao apreciarem...",
-                "art": "48"
-              }
-            ]
+            "children": [],
+            "section_id": "sec3"
           },
           {
             "title": "SEÇÃO IV — Dos Presidentes e Vice-Presidentes das Comissões Permanentes",
-            "children": [
-              {
-                "label": "Art. 49 — Os Presidentes e Vice-Presidentes das Comissões...",
-                "art": "49"
-              },
-              {
-                "label": "Art. 50 — Ao Presidente da Comissão Permanente...",
-                "art": "50"
-              },
-              {
-                "label": "Art. 51 — Dos atos e deliberações do Presidente da Comissão caberá...",
-                "art": "51"
-              },
-              {
-                "label": "Art. 52 — Ao Vice-Presidente compete:",
-                "art": "52"
-              },
-              {
-                "label": "Art. 53 — Nas ausências simultâneas do Presidente e do...",
-                "art": "53"
-              },
-              {
-                "label": "Art. 54 — Se, por qualquer razão, o Presidente deixar de fazer...",
-                "art": "54"
-              }
-            ]
+            "children": [],
+            "section_id": "sec4"
           },
           {
             "title": "SEÇÃO V — Das Subcomissões",
-            "children": [
-              {
-                "label": "Art. 55 — As Comissões Permanentes poderão constituir, dentre seus...",
-                "art": "55"
-              },
-              {
-                "label": "Art. 56 — A matéria apreciada em Subcomissão Permanente ou...",
-                "art": "56"
-              }
-            ]
+            "children": [],
+            "section_id": "sec5"
           },
           {
             "title": "SEÇÃO VI — As Reuniões",
-            "children": [
-              {
-                "label": "Art. 57 — As Comissões Permanentes reunir-se-ão: (Precedente...",
-                "art": "57"
-              },
-              {
-                "label": "Art. 58 — As Comissões Permanentes devem reunir-se nas salas...",
-                "art": "58"
-              },
-              {
-                "label": "Art. 59 — As reuniões das Comissões Permanentes serão públicas,...",
-                "art": "59"
-              },
-              {
-                "label": "Art. 60 — Poderão, ainda, participar das reuniões das Comissões...",
-                "art": "60"
-              },
-              {
-                "label": "Art. 61 — Das reuniões das Comissões serão lavradas atas, com o...",
-                "art": "61"
-              }
-            ]
+            "children": [],
+            "section_id": "sec6"
           },
           {
             "title": "SEÇÃO VII — Dos Trabalhos",
-            "children": [
-              {
-                "label": "Art. 62 — As deliberações das Comissões serão tomadas por maioria...",
-                "art": "62"
-              },
-              {
-                "label": "Art. 63 — Para emitir parecer sobre qualquer matéria, cada...",
-                "art": "63"
-              },
-              {
-                "label": "Art. 64 — Decorridos os prazos previstos no artigo anterior,...",
-                "art": "64"
-              },
-              {
-                "label": "Art. 65 — Dependendo o parecer de exame de qualquer outro processo...",
-                "art": "65"
-              },
-              {
-                "label": "Art. 66 — Dependendo o parecer de audiências públicas quando...",
-                "art": "66"
-              },
-              {
-                "label": "Art. 67 — Decorridos os prazos de todas as Comissões a que tenham...",
-                "art": "67"
-              },
-              {
-                "label": "Art. 68 — As Comissões Permanentes deverão solicitar do Executivo,...",
-                "art": "68"
-              },
-              {
-                "label": "Art. 69 — O recesso da Câmara sobresta todos os prazos consignados...",
-                "art": "69"
-              },
-              {
-                "label": "Art. 70 — Quando qualquer processo for distribuído a mais de uma...",
-                "art": "70"
-              },
-              {
-                "label": "Art. 71 — Mediante comum acordo de seus Presidentes, em caso de...",
-                "art": "71"
-              },
-              {
-                "label": "Art. 72 — A manifestação de uma Comissão sobre determinada matéria...",
-                "art": "72"
-              },
-              {
-                "label": "Art. 73 — As disposições e prazos estabelecidos na presente Seção...",
-                "art": "73"
-              }
-            ]
+            "children": [],
+            "section_id": "sec7"
           },
           {
             "title": "SEÇÃO VIII — Dos Pareceres",
-            "children": [
-              {
-                "label": "Art. 74 — Parecer é o pronunciamento oficial da Comissão sobre...",
-                "art": "74"
-              },
-              {
-                "label": "Art. 75 — Os membros das Comissões poderão emitir seu juízo sobre...",
-                "art": "75"
-              },
-              {
-                "label": "Art. 76 — Para efeito de contagem de votos emitidos, serão ainda...",
-                "art": "76"
-              },
-              {
-                "label": "Art. 77 — Poderá o membro da Comissão exarar “voto em separado”,...",
-                "art": "77"
-              },
-              {
-                "label": "Art. 78 — Para emitir parecer verbal, nos casos expressamente...",
-                "art": "78"
-              },
-              {
-                "label": "Art. 79 — Concluído o parecer da Comissão de Constituição e...",
-                "art": "79"
-              },
-              {
-                "label": "Art. 80 — O projeto de lei que receber parecer contrário, quanto...",
-                "art": "80"
-              }
-            ]
+            "children": [],
+            "section_id": "sec8"
           },
           {
             "title": "SEÇÃO IX — Da Deliberação Sobre Proposições",
-            "children": [
-              {
-                "label": "Art. 81 — As Comissões Permanentes poderão discutir e votar...",
-                "art": "81"
-              },
-              {
-                "label": "Art. 82 — Não se dispensará a competência do Plenário para...",
-                "art": "82"
-              },
-              {
-                "label": "Art. 83 — A proposição que tenha recebido pareceres divergentes...",
-                "art": "83"
-              },
-              {
-                "label": "Art. 84 — Considera-se aprovada a propositura pela Comissão,...",
-                "art": "84"
-              }
-            ]
+            "children": [],
+            "section_id": "sec9"
           },
           {
             "title": "SEÇÃO X — Das Audiências Públicas",
-            "children": [
-              {
-                "label": "Art. 85 — As Comissões Permanentes, isoladamente ou em conjunto,...",
-                "art": "85"
-              },
-              {
-                "label": "Art. 86 — Nos casos previstos no artigo 41 da Lei Orgânica do...",
-                "art": "86"
-              },
-              {
-                "label": "Art. 87 — No caso de audiências requeridas por entidades ou...",
-                "art": "87"
-              },
-              {
-                "label": "Art. 88 — Das reuniões de audiência pública serão lavradas atas,...",
-                "art": "88"
-              }
-            ]
+            "children": [],
+            "section_id": "sec10"
           }
-        ]
+        ],
+        "section_id": "cap12"
       },
       {
         "title": "CAPÍTULO III — DAS COMISSÕES TEMPORÁRIAS",
-        "children": [
-          {
-            "label": "Art. 89 — As Comissões Temporárias são:",
-            "art": "89"
-          },
-          {
-            "label": "Art. 90 — As Comissões Parlamentares de Inquérito são as que se...",
-            "art": "90"
-          },
-          {
-            "label": "Art. 91 — As Comissões Parlamentares de Inquérito serão criadas...",
-            "art": "91"
-          },
-          {
-            "label": "Art. 92 — No interesse da investigação, as Comissões Parlamentares...",
-            "art": "92"
-          },
-          {
-            "label": "Art. 93 — O requerimento de formação de Comissão Parlamentar de...",
-            "art": "93"
-          },
-          {
-            "label": "Art. 94 — A designação dos membros das Comissões Parlamentares de...",
-            "art": "94"
-          },
-          {
-            "label": "Art. 95 — A Comissão Parlamentar de Inquérito elaborará relatório...",
-            "art": "95"
-          },
-          {
-            "label": "Art. 96 — Sempre que a Comissão Parlamentar de Inquérito julgar...",
-            "art": "96"
-          },
-          {
-            "label": "Art. 97 — Se a Comissão deixar de concluir seus trabalhos dentro...",
-            "art": "97"
-          },
-          {
-            "label": "Art. 98 — As Comissões de Representação têm por finalidade...",
-            "art": "98"
-          },
-          {
-            "label": "Art. 99 — A Comissão de Estudos será constituída, mediante...",
-            "art": "99"
-          },
-          {
-            "label": "Art. 100 — Só será admitida a formação de Comissões Especiais nos...",
-            "art": "100"
-          }
-        ]
+        "children": [],
+        "section_id": "cap13"
       }
-    ]
+    ],
+    "section_id": "tit3"
   },
   {
     "title": "TÍTULO IV — DO PLENÁRIO",
-    "children": [
-      {
-        "label": "Art. 102 — As deliberações do Plenário serão tomadas por:",
-        "art": "102"
-      },
-      {
-        "label": "Art. 103 — O Plenário deliberará:",
-        "art": "103"
-      },
-      {
-        "label": "Art. 104 — As deliberações do Plenário dar-se-ão sempre por voto...",
-        "art": "104"
-      },
-      {
-        "label": "Art. 105 — São atribuições do Plenário:",
-        "art": "105"
-      }
-    ]
+    "children": [],
+    "section_id": "tit4"
   },
   {
     "title": "TÍTULO V — DOS VEREADORES",
     "children": [
       {
         "title": "CAPÍTULO I — DA POSSE",
-        "children": [
-          {
-            "label": "Art. 106 — Os Vereadores serão empossados pela sua presença à...",
-            "art": "106"
-          }
-        ]
+        "children": [],
+        "section_id": "cap14"
       },
       {
         "title": "CAPÍTULO II — DOS DIREITOS E DEVERES",
         "children": [
           {
             "title": "DOS VEREADORES",
-            "children": [
-              {
-                "label": "Art. 107 — Os Vereadores gozam de inviolabilidade por suas...",
-                "art": "107"
-              },
-              {
-                "label": "Art. 108 — O servidor público investido no mandato de Vereador...",
-                "art": "108"
-              },
-              {
-                "label": "Art. 109 — São deveres do Vereador: (Vide Ato nº 654/99)",
-                "art": "109"
-              },
-              {
-                "label": "Art. 110 — Não será subvencionada viagem de Vereador ao exterior,...",
-                "art": "110"
-              }
-            ]
+            "children": [],
+            "section_id": "sec11"
           }
-        ]
+        ],
+        "section_id": "cap15"
       },
       {
         "title": "CAPÍTULO III — DAS FALTAS E LICENÇAS",
-        "children": [
-          {
-            "label": "Art. 111 — Será atribuída falta ao Vereador que não comparecer às...",
-            "art": "111"
-          },
-          {
-            "label": "Art. 112 — O Vereador poderá licenciar-se somente:",
-            "art": "112"
-          },
-          {
-            "label": "Art. 113 — Encontrando-se o Vereador impossibilitado física ou...",
-            "art": "113"
-          },
-          {
-            "label": "Art. 114 — É facultado ao Vereador prorrogar o seu tempo de licença...",
-            "art": "114"
-          },
-          {
-            "label": "Art. 115 — Será considerado automaticamente licenciado o Vereador...",
-            "art": "115"
-          },
-          {
-            "label": "Art. 116 — Para fins de remuneração, será considerado como em...",
-            "art": "116"
-          },
-          {
-            "label": "Art. 117 — Dar-se-á a convocação do Suplente no caso de vaga em...",
-            "art": "117"
-          },
-          {
-            "label": "Art. 118 — Efetivada a licença, e nos casos previstos no artigo...",
-            "art": "118"
-          }
-        ]
+        "children": [],
+        "section_id": "cap16"
       },
       {
         "title": "CAPÍTULO IV — DOS LÍDERES E VICE-LÍDERES",
-        "children": [
-          {
-            "label": "Art. 119 — Os Vereadores são agrupados por representações...",
-            "art": "119"
-          },
-          {
-            "label": "Art. 120 — O Líder, além de outras atribuições regimentais, tem as...",
-            "art": "120"
-          },
-          {
-            "label": "Art. 121 — O Prefeito, mediante ofício à Mesa, poderá indicar um...",
-            "art": "121"
-          }
-        ]
+        "children": [],
+        "section_id": "cap17"
       },
       {
         "title": "CAPÍTULO V — DA REMUNERAÇÃO",
-        "children": [
-          {
-            "label": "Art. 122 — À Mesa da Câmara incumbe elaborar projetos destinados a...",
-            "art": "122"
-          },
-          {
-            "label": "Art. 123 — O Presidente da Câmara terá direito à verba de...",
-            "art": "123"
-          },
-          {
-            "label": "Art. 124 — A remuneração dos Vereadores sofrerá desconto de 1/20...",
-            "art": "124"
-          }
-        ]
+        "children": [],
+        "section_id": "cap18"
       },
       {
         "title": "CAPÍTULO VI — DA EXTINÇÃO E PERDA DO MANDATO",
-        "children": [
-          {
-            "label": "Art. 125 — Perderá o mandato o Vereador:",
-            "art": "125"
-          },
-          {
-            "label": "Art. 126 — Extingue-se ou dar-se-á a perda do mandato do Vereador,...",
-            "art": "126"
-          },
-          {
-            "label": "Art. 127 — Ocorrido e comprovado o ato ou fato que dê margem à...",
-            "art": "127"
-          },
-          {
-            "label": "Art. 128 — A renúncia torna-se irretratável após a comunicação ao...",
-            "art": "128"
-          },
-          {
-            "label": "Art. 129 — O processo de cassação será iniciado:",
-            "art": "129"
-          },
-          {
-            "label": "Art. 130 — A Câmara, acolhida a denúncia pela maioria absoluta de...",
-            "art": "130"
-          },
-          {
-            "label": "Art. 131 — Cassado o mandato do Vereador, a Mesa expedirá a...",
-            "art": "131"
-          }
-        ]
+        "children": [],
+        "section_id": "cap19"
       }
-    ]
+    ],
+    "section_id": "tit5"
   },
   {
     "title": "TÍTULO VI — DAS SESSÕES",
@@ -702,748 +188,178 @@
         "children": [
           {
             "title": "SEÇÃO I — Das Espécies de Sessão e de Sua Abertura",
-            "children": [
-              {
-                "label": "Art. 132 — As sessões da Câmara serão:",
-                "art": "132"
-              },
-              {
-                "label": "Art. 133 — Se, à hora regimental, não estiverem presentes os...",
-                "art": "133"
-              },
-              {
-                "label": "Art. 134 — As sessões ordinárias e extraordinárias serão abertas...",
-                "art": "134"
-              },
-              {
-                "label": "Art. 135 — Em sessão plenária, cuja abertura e prosseguimento...",
-                "art": "135"
-              },
-              {
-                "label": "Art. 136 — Concluída a primeira chamada a que se referem os artigos...",
-                "art": "136"
-              },
-              {
-                "label": "Art. 137 — Declarada aberta a sessão, o Presidente proferirá as...",
-                "art": "137"
-              },
-              {
-                "label": "Art. 138 — Durante as sessões, somente os Vereadores poderão...",
-                "art": "138"
-              }
-            ]
+            "children": [],
+            "section_id": "sec12"
           },
           {
             "title": "SEÇÃO II — Do Uso da Palavra",
-            "children": [
-              {
-                "label": "Art. 139 — Durante as sessões, o Vereador só poderá falar para:",
-                "art": "139"
-              },
-              {
-                "label": "Art. 140 — O uso da palavra será regulado pelas normas seguintes:",
-                "art": "140"
-              }
-            ]
+            "children": [],
+            "section_id": "sec13"
           },
           {
             "title": "SEÇÃO III — Da Suspensão e do Encerramento da Sessão",
-            "children": [
-              {
-                "label": "Art. 141 — A sessão poderá ser suspensa:",
-                "art": "141"
-              },
-              {
-                "label": "Art. 142 — A sessão será encerrada antes da hora regimental, nos...",
-                "art": "142"
-              }
-            ]
+            "children": [],
+            "section_id": "sec14"
           },
           {
             "title": "SEÇÃO IV — Da Prorrogação das Sessões",
-            "children": [
-              {
-                "label": "Art. 143 — As sessões, cuja abertura exija prévia constatação de...",
-                "art": "143"
-              },
-              {
-                "label": "Art. 144 — Os requerimentos de prorrogração serão escritos e...",
-                "art": "144"
-              },
-              {
-                "label": "Art. 145 — Nenhuma sessão plenária poderá ir além das 24 (vinte e...",
-                "art": "145"
-              }
-            ]
+            "children": [],
+            "section_id": "sec15"
           },
           {
             "title": "SEÇÃO V — Da Ata e da Imprensa Oficial",
-            "children": [
-              {
-                "label": "Art. 146 — A ata das sessões da Câmara será constituída pela...",
-                "art": "146"
-              },
-              {
-                "label": "Art. 147 — A ata será considerada aprovada independentemente de...",
-                "art": "147"
-              },
-              {
-                "label": "Art. 148 — Toda matéria que for publicada com erros, omissões,...",
-                "art": "148"
-              },
-              {
-                "label": "Art. 149 — Se o orador não solicitar seu discurso para revisão,...",
-                "art": "149"
-              },
-              {
-                "label": "Art. 150 — Os discursos entregues ao orador para revisão serão...",
-                "art": "150"
-              }
-            ]
+            "children": [],
+            "section_id": "sec16"
           }
-        ]
+        ],
+        "section_id": "cap20"
       },
       {
         "title": "CAPÍTULO II — DAS SESSÕES ORDINÁRIAS",
         "children": [
           {
             "title": "SEÇÃO I — Disposições Preliminares",
-            "children": [
-              {
-                "label": "Art. 151 — As sessões ordinárias, que terão a duração de 4 (quatro)...",
-                "art": "151"
-              },
-              {
-                "label": "Art. 152 — As sessões ordinárias, ressalvado o disposto no artigo...",
-                "art": "152"
-              },
-              {
-                "label": "Art. 153 — Salvo caso de convocação da Câmara para a fase especial...",
-                "art": "153"
-              },
-              {
-                "label": "Art. 154 — Mesmo não havendo sessão por falta de “quorum”, os...",
-                "art": "154"
-              },
-              {
-                "label": "Art. 155 — A requerimento da maioria absoluta dos Vereadores,...",
-                "art": "155"
-              },
-              {
-                "label": "Art. 156 — Fica limitado em até 5 (cinco) o número de cópias,...",
-                "art": "156"
-              }
-            ]
+            "children": [],
+            "section_id": "sec17"
           },
           {
             "title": "SEÇÃO II — Do Pequeno Expediente",
-            "children": [
-              {
-                "label": "Art. 157 — No Pequeno Expediente, que terá a duração máxima de 45...",
-                "art": "157"
-              },
-              {
-                "label": "Art. 158 — O Vereador chamado para falar no Pequeno Expediente...",
-                "art": "158"
-              }
-            ]
+            "children": [],
+            "section_id": "sec18"
           },
           {
             "title": "SEÇÃO III — Do Grande Expediente",
-            "children": [
-              {
-                "label": "Art. 159 — Concluído o Pequeno Expediente, passar-se-á ao Grande...",
-                "art": "159"
-              },
-              {
-                "label": "Art. 160 — No Grande Expediente, o Presidente dará a palavra aos...",
-                "art": "160"
-              },
-              {
-                "label": "Art. 161 — O Vereador chamado a falar no Grande Expediente poderá,...",
-                "art": "161"
-              },
-              {
-                "label": "Art. 162 — Se o Vereador chamado estiver ausente e não tiver cedido...",
-                "art": "162"
-              }
-            ]
+            "children": [],
+            "section_id": "sec19"
           },
           {
             "title": "SEÇÃO IV — Do Prolongamento do Expediente",
-            "children": [
-              {
-                "label": "Art. 163 — Concluído o Grande Expediente, passar-se-á ao...",
-                "art": "163"
-              },
-              {
-                "label": "Art. 164 — O Prolongamento do Expediente se destinará a:",
-                "art": "164"
-              },
-              {
-                "label": "Art. 165 — A ordem estabelecida nos incisos do artigo anterior é...",
-                "art": "165"
-              },
-              {
-                "label": "Art. 166 — Todas as proposições a serem apreciadas pelo Plenário,...",
-                "art": "166"
-              },
-              {
-                "label": "Art. 167 — Os requerimentos que solicitem inclusão de projeto em...",
-                "art": "167"
-              },
-              {
-                "label": "Art. 168 — Para discutir os requerimentos enumerados no inciso III...",
-                "art": "168"
-              },
-              {
-                "label": "Art. 169 — Constatando-se, no Prolongamento do Expediente, a...",
-                "art": "169"
-              }
-            ]
+            "children": [],
+            "section_id": "sec20"
           },
           {
             "title": "SEÇÃO V — Da Ordem do Dia",
-            "children": [
-              {
-                "label": "Art. 170 — Concluído o Prolongamento do Expediente, passar-se-á à...",
-                "art": "170"
-              },
-              {
-                "label": "Art. 171 — A Ordem do Dia será organizada pelo Presidente da...",
-                "art": "171"
-              },
-              {
-                "label": "Art. 172 — A Ordem do Dia, estabelecida nos termos do artigo...",
-                "art": "172"
-              },
-              {
-                "label": "Art. 174 — A inversão da pauta da Ordem do Dia somente se dará...",
-                "art": "174"
-              },
-              {
-                "label": "Art. 175 — As proposições constantes da Ordem do Dia poderão ser...",
-                "art": "175"
-              },
-              {
-                "label": "Art. 176 — O adiamento da discussão ou votação de proposição...",
-                "art": "176"
-              },
-              {
-                "label": "Art. 177 — A retirada de proposição constante na Ordem do Dia dar-se-á:",
-                "art": "177"
-              },
-              {
-                "label": "Art. 178 — Esgotada a pauta da Ordem do Dia e se nenhum Vereador...",
-                "art": "178"
-              }
-            ]
+            "children": [],
+            "section_id": "sec21"
           },
           {
             "title": "SEÇÃO VI — Da Explicação Pessoal",
-            "children": [
-              {
-                "label": "Art. 179 — Esgotada a pauta da Ordem do Dia, desde que presente 1/3...",
-                "art": "179"
-              },
-              {
-                "label": "Art. 180 — A Explicação Pessoal é destinada à manifestação de...",
-                "art": "180"
-              },
-              {
-                "label": "Art. 181 — A inscrição para explicação pessoal será solicitada pelo...",
-                "art": "181"
-              },
-              {
-                "label": "Art. 182 — As sessões ordinárias não serão prorrogadas para a...",
-                "art": "182"
-              }
-            ]
+            "children": [],
+            "section_id": "sec22"
           }
-        ]
+        ],
+        "section_id": "cap21"
       },
       {
         "title": "CAPÍTULO III — DAS SESSÕES EXTRAORDINÁRIAS",
-        "children": [
-          {
-            "label": "Art. 183 — As sessões extraordinárias poderão ser...",
-            "art": "183"
-          },
-          {
-            "label": "Art. 183-A — Poderão ser convocadas sessões para deliberação de...",
-            "art": "183-A"
-          },
-          {
-            "label": "Art. 184 — As sessões extraordinárias serão convocadas com...",
-            "art": "184"
-          },
-          {
-            "label": "Art. 185 — A convocação de sessão extraordinária, tanto de ofício...",
-            "art": "185"
-          },
-          {
-            "label": "Art. 186 — Sempre que houver convocação de sessão extraordinária, o...",
-            "art": "186"
-          },
-          {
-            "label": "Art. 187 — As sessões extraordinárias só serão iniciadas com a...",
-            "art": "187"
-          },
-          {
-            "label": "Art. 188 — Na sessão extraordinária, haverá apenas Ordem do Dia e...",
-            "art": "188"
-          },
-          {
-            "label": "Art. 189 — Havendo número apenas para discussão, no decorrer das...",
-            "art": "189"
-          },
-          {
-            "label": "Art. 190 — Para a organização da pauta da Ordem do Dia de sessão...",
-            "art": "190"
-          },
-          {
-            "label": "Art. 191 — Nas sessões extraordinárias, a Ordem do Dia só poderá...",
-            "art": "191"
-          },
-          {
-            "label": "Art. 192 — Nas sessões extraordinárias será aplicado, no que couber:",
-            "art": "192"
-          }
-        ]
+        "children": [],
+        "section_id": "cap22"
       },
       {
         "title": "CAPÍTULO IV — DAS SESSÕES SOLENES",
-        "children": [
-          {
-            "label": "Art. 193 — As sessões solenes destinam-se à realização de...",
-            "art": "193"
-          },
-          {
-            "label": "Art. 194 — As sessões solenes previstas pelo artigo anterior serão...",
-            "art": "194"
-          }
-        ]
+        "children": [],
+        "section_id": "cap23"
       },
       {
         "title": "CAPÍTULO V — DAS SESSÕES SECRETAS",
-        "children": [
-          {
-            "label": "Art. 195 — Excepcionalmcnte, a Câmara poderá realizar sessões...",
-            "art": "195"
-          },
-          {
-            "label": "Art. 196 — A instalação de sessão secreta, durante o transcorrer de...",
-            "art": "196"
-          },
-          {
-            "label": "Art. 197 — Antes de se inicar a sessão secreta, todas as portas de...",
-            "art": "197"
-          },
-          {
-            "label": "Art. 198 — As sessões secretas só serão iniciadas com a presença,...",
-            "art": "198"
-          },
-          {
-            "label": "Art. 199 — A ata da sessão secreta, lida ao seu final, será...",
-            "art": "199"
-          },
-          {
-            "label": "Art. 200 — Ao Vereador que houver participado dos debates será...",
-            "art": "200"
-          },
-          {
-            "label": "Art. 201 — Antes de se encerrar a sessão secreta, a Câmara...",
-            "art": "201"
-          }
-        ]
+        "children": [],
+        "section_id": "cap24"
       },
       {
         "title": "CAPÍTULO VI — DAS SESSÕES PERMANENTES",
-        "children": [
-          {
-            "label": "Art. 202 — Excepcionalmente, poderá a Câmara declarar-se em sessão...",
-            "art": "202"
-          },
-          {
-            "label": "Art. 203 — A sessão permanente, cuja instalação depende de prévia...",
-            "art": "203"
-          },
-          {
-            "label": "Art. 204 — Em sessão permanente, a Câmara permanecerá em constante...",
-            "art": "204"
-          },
-          {
-            "label": "Art. 205 — Não se realizará qualquer outra sessão, já convocada ou...",
-            "art": "205"
-          }
-        ]
+        "children": [],
+        "section_id": "cap25"
       },
       {
         "title": "CAPÍTULO VII — DA TRIBUNA POPULAR",
-        "children": [
-          {
-            "label": "Art. 207 — Fica assegurada, conforme previsto no artigo 27, inciso...",
-            "art": "207"
-          },
-          {
-            "label": "Art. 208 — Ressalvado o disposto no artigo anterior, será obedecida...",
-            "art": "208"
-          },
-          {
-            "label": "Art. 209 — O orador inscrito para falar na Tribuna Popular disporá...",
-            "art": "209"
-          },
-          {
-            "label": "Art. 210 — A Secretaria da Mesa fará publicar, na Imprensa Oficial,...",
-            "art": "210"
-          }
-        ]
+        "children": [],
+        "section_id": "cap26"
       }
-    ]
+    ],
+    "section_id": "tit6"
   },
   {
     "title": "TÍTULO VII — DAS PROPOSIÇÕES",
     "children": [
       {
         "title": "CAPÍTULO I — DISPOSIÇÕES PRELIMINARES",
-        "children": [
-          {
-            "label": "Art. 211 — As proposições consistirão em:",
-            "art": "211"
-          },
-          {
-            "label": "Art. 212 — Serão restituídas ao autor as proposições: (Precedente...",
-            "art": "212"
-          },
-          {
-            "label": "Art. 212-A — A proposição idêntica, ou que verse sobre matéria...",
-            "art": "212-A"
-          },
-          {
-            "label": "Art. 213 — Proposições subscritas pela Comissão de Constituição e...",
-            "art": "213"
-          },
-          {
-            "label": "Art. 214 — Considera-se autor da proposição seu primeiro...",
-            "art": "214"
-          },
-          {
-            "label": "Art. 215 — Os projetos de lei de iniciativa da Câmara, quando...",
-            "art": "215"
-          },
-          {
-            "label": "Art. 216 — Os projetos serão publicados, na íntegra, na Imprensa...",
-            "art": "216"
-          },
-          {
-            "label": "Art. 217 — A proposição de autoria de Vereador licenciado,...",
-            "art": "217"
-          },
-          {
-            "label": "Art. 218 — As proposições deverão ser encaminhadas à Mesa no...",
-            "art": "218"
-          }
-        ]
+        "children": [],
+        "section_id": "cap27"
       },
       {
         "title": "CAPÍTULO II — DAS INDICAÇÕES",
-        "children": [
-          {
-            "label": "Art. 219 — Indicação é a proposição em que o Vereador sugere aos...",
-            "art": "219"
-          }
-        ]
+        "children": [],
+        "section_id": "cap28"
       },
       {
         "title": "CAPÍTULO III — DOS REQUERIMENTOS",
         "children": [
           {
             "title": "Disposições Preliminares",
-            "children": [
-              {
-                "label": "Art. 220 — Requerimento é a proposição dirigida por qualquer...",
-                "art": "220"
-              },
-              {
-                "label": "Art. 221 — Os requerimentos assim se classificam:",
-                "art": "221"
-              },
-              {
-                "label": "Art. 222 — Não se admitirão emendas a requerimentos, facultando-se,...",
-                "art": "222"
-              }
-            ]
+            "children": [],
+            "section_id": "sec23"
           },
           {
             "title": "SEÇÃO II — Dos Requerimentos Sujeitos a Despacho de Plano pelo Presidente.",
-            "children": [
-              {
-                "label": "Art. 223 — Será despachado de plano pelo Presidente o requerimento...",
-                "art": "223"
-              },
-              {
-                "label": "Art. 224 — Os requerimentos de informação versarão sobre fato...",
-                "art": "224"
-              }
-            ]
+            "children": [],
+            "section_id": "sec24"
           },
           {
             "title": "SEÇÃO III — Dos Requerimentos Sujeitos à Deliberação do Plenário",
-            "children": [
-              {
-                "label": "Art. 225 — Dependerá de deliberação do Plenário, mas não sofrerá...",
-                "art": "225"
-              },
-              {
-                "label": "Art. 226 — Será necessariamente escrito, dependerá de deliberação...",
-                "art": "226"
-              },
-              {
-                "label": "Art. 227 — Sempre que um requerimento comporte discussão, cada...",
-                "art": "227"
-              }
-            ]
+            "children": [],
+            "section_id": "sec25"
           }
-        ]
+        ],
+        "section_id": "cap29"
       },
       {
         "title": "CAPÍTULO IV DAS MOÇÕES",
-        "children": [
-          {
-            "label": "Art. 228 — Moção é a proposição em que é sugerida a manifestação da...",
-            "art": "228"
-          },
-          {
-            "label": "Art. 229 — Apresentada até a fase do Grande Expediente, a moção...",
-            "art": "229"
-          },
-          {
-            "label": "Art. 230 — Não se admitirão emendas a moções, facultando-se,...",
-            "art": "230"
-          },
-          {
-            "label": "Art. 231 — Cada Vereador disporá de 5 (cinco) minutos para...",
-            "art": "231"
-          }
-        ]
+        "children": [],
+        "section_id": "cap30"
       },
       {
         "title": "CAPÍTULO V — DOS PROJETOS",
         "children": [
           {
             "title": "SEÇÃO I — Disposições Preliminares",
-            "children": [
-              {
-                "label": "Art. 232 — A Câmara exerce sua função legislativa por meio de:",
-                "art": "232"
-              },
-              {
-                "label": "Art. 233 — O projeto de emenda à Lei Orgânica é a proposição que...",
-                "art": "233"
-              },
-              {
-                "label": "Art. 234 — Projeto de lei é a proposição que tem por fim regular...",
-                "art": "234"
-              },
-              {
-                "label": "Art. 235 — Será privativa do Prefeito a iniciativa dos projetos de...",
-                "art": "235"
-              },
-              {
-                "label": "Art. 236 — Projeto de decreto legislativo é a proposição destinada...",
-                "art": "236"
-              },
-              {
-                "label": "Art. 237 — Projeto de resolução é a proposição destinada a regular...",
-                "art": "237"
-              },
-              {
-                "label": "Art. 238 — São requisitos dos projetos:",
-                "art": "238"
-              }
-            ]
+            "children": [],
+            "section_id": "sec26"
           },
           {
             "title": "SEÇÃO II — Da Tramitação dos Projetos",
-            "children": [
-              {
-                "label": "Art. 239 — Os projetos apresentados até o início do Prolongamento...",
-                "art": "239"
-              },
-              {
-                "label": "Art. 240 — Os projetos devem ser obrigatoriamente publicados na...",
-                "art": "240"
-              },
-              {
-                "label": "Art. 241 — Todos os projetos e respectivos pareceres serão...",
-                "art": "241"
-              },
-              {
-                "label": "Art. 242 — Nenhum projeto será dado por definitivamente aprovado...",
-                "art": "242"
-              },
-              {
-                "label": "Art. 243 — Os projetos serão discutidos em bloco, juntamente com os...",
-                "art": "243"
-              },
-              {
-                "label": "Art. 244 — Os projetos rejeitados em qualquer fase de discussão...",
-                "art": "244"
-              },
-              {
-                "label": "Art. 245 — O Prefeito poderá solicitar que os projetos de sua...",
-                "art": "245"
-              },
-              {
-                "label": "Art. 246 — Aprovado ou rejeitado o projeto de autoria do Executivo,...",
-                "art": "246"
-              },
-              {
-                "label": "Art. 247 — A aprovação de projeto de resolução que crie cargos na...",
-                "art": "247"
-              }
-            ]
+            "children": [],
+            "section_id": "sec27"
           },
           {
             "title": "SEÇÃO III — Da Primeira Discussão",
-            "children": [
-              {
-                "label": "Art. 248 — Instruído o projeto com, os pareceres de todas as...",
-                "art": "248"
-              },
-              {
-                "label": "Art. 249 — Para discutir o projeto em fase de primeira discussão,...",
-                "art": "249"
-              },
-              {
-                "label": "Art. 250 — Encerrada a discussão, passar-se-á à votação, que se...",
-                "art": "250"
-              },
-              {
-                "label": "Art. 251 — Se houver substitutivos,estes serão votados com...",
-                "art": "251"
-              },
-              {
-                "label": "Art. 252 — Aprovado o projeto inicial ou o substitutivo,...",
-                "art": "252"
-              },
-              {
-                "label": "Art. 253 — Aprovado o projeto inicial ou o substitutivo com...",
-                "art": "253"
-              }
-            ]
+            "children": [],
+            "section_id": "sec28"
           },
           {
             "title": "SEÇÃO IV — Da Segunda Discussão",
-            "children": [
-              {
-                "label": "Art. 254 — O tempo para discutir projeto em fase de segunda...",
-                "art": "254"
-              },
-              {
-                "label": "Art. 255 — Encerrada a discussão, passar-se-á à votação, que se...",
-                "art": "255"
-              },
-              {
-                "label": "Art. 256 — Aprovado o projeto ou o substitutivo, passar-se-á à...",
-                "art": "256"
-              },
-              {
-                "label": "Art. 257 — Se o projeto ou o substitutivo for aprovado sem emendas,...",
-                "art": "257"
-              },
-              {
-                "label": "Art. 258 — Aprovado o projeto ou o substitutivo com emendas, será o...",
-                "art": "258"
-              }
-            ]
+            "children": [],
+            "section_id": "sec29"
           },
           {
             "title": "SEÇÃO V — Da Redação Final",
-            "children": [
-              {
-                "label": "Art. 259 — A redação final, observadas as exceções regimentais,...",
-                "art": "259"
-              },
-              {
-                "label": "Art. 260 — Se, todavia, existir qualquer dúvida quanto à vontade...",
-                "art": "260"
-              },
-              {
-                "label": "Art. 261 — O parecer propondo redação final permanecerá sobre a...",
-                "art": "261"
-              },
-              {
-                "label": "Art. 262 — O parecer previsto pelo parágrafo segundo do artigo...",
-                "art": "262"
-              },
-              {
-                "label": "Art. 263 — Cada Vereador disporá de 5 (cinco) minutos para discutir...",
-                "art": "263"
-              },
-              {
-                "label": "Art. 264 — Se o parecer que concluir pela reabertura da discussão...",
-                "art": "264"
-              },
-              {
-                "label": "Art. 265 — Aprovado o parecer que propõe a reabertura da discussão,...",
-                "art": "265"
-              },
-              {
-                "label": "Art. 266 — Faculta-se a apresentação de emendas, desde que...",
-                "art": "266"
-              },
-              {
-                "label": "Art. 267 — Só será admitida a apresentação de emendas a parecer...",
-                "art": "267"
-              },
-              {
-                "label": "Art. 268 — Aprovado o parecer com redação final do projeto, será...",
-                "art": "268"
-              }
-            ]
+            "children": [],
+            "section_id": "sec30"
           }
-        ]
+        ],
+        "section_id": "cap31"
       },
       {
         "title": "CAPÍTULO VI — DOS SUBSTITUTIVOS E DAS EMENDAS",
-        "children": [
-          {
-            "label": "Art. 269 — Substitutivo é a proposição apresentada por Vereadores,...",
-            "art": "269"
-          },
-          {
-            "label": "Art. 270 — Os substitutivos apresentados em Plenário deverão ser...",
-            "art": "270"
-          },
-          {
-            "label": "Art. 271 — Emenda é a proposição apresentada por Vereadores, por...",
-            "art": "271"
-          },
-          {
-            "label": "Art. 272 — As emendas, depois de aprovado o projeto ou o...",
-            "art": "272"
-          },
-          {
-            "label": "Art. 273 — Não serão aceitos, por impertinentes, substitutivos ou...",
-            "art": "273"
-          }
-        ]
+        "children": [],
+        "section_id": "cap32"
       },
       {
         "title": "CAPÍTULO VII — DA RETIRADA E ARQUIVAMENTO DE PROPOSIÇÕES",
-        "children": [
-          {
-            "label": "Art. 274 — A retirada de proposição dar-se-á:",
-            "art": "274"
-          },
-          {
-            "label": "Art. 275 — No início de cada legislatura, serão arquivados os...",
-            "art": "275"
-          }
-        ]
+        "children": [],
+        "section_id": "cap33"
       }
-    ]
+    ],
+    "section_id": "tit7"
   },
   {
     "title": "TÍTULO VIII — DOS DEBATES E DELIBERAÇÕES",
@@ -1453,299 +369,91 @@
         "children": [
           {
             "title": "SEÇÃO I — Disposições Preliminares",
-            "children": [
-              {
-                "label": "Art. 276 — Discussão é a fase dos trabalhos destinada aos debates...",
-                "art": "276"
-              },
-              {
-                "label": "Art. 277 — A discussão de proposição em Ordem do Dia exigirá...",
-                "art": "277"
-              },
-              {
-                "label": "Art. 278 — Respeitada sempre a alternância, a palavra será dada,...",
-                "art": "278"
-              },
-              {
-                "label": "Art. 279 — O autor e os relatores dos projetos, além do tempo...",
-                "art": "279"
-              },
-              {
-                "label": "Art. 280 — O Vereador que estiver ausente ao ser chamado para falar...",
-                "art": "280"
-              },
-              {
-                "label": "Art. 281 — O Presidente dos trabalhos não interromperá o orador que...",
-                "art": "281"
-              }
-            ]
+            "children": [],
+            "section_id": "sec31"
           },
           {
             "title": "SEÇÃO II — Dos Apartes",
-            "children": [
-              {
-                "label": "Art. 282 — Aparte é a interrupção consentida, breve e oportuna do...",
-                "art": "282"
-              },
-              {
-                "label": "Art. 283 — Não serão permitidos apartes:",
-                "art": "283"
-              }
-            ]
+            "children": [],
+            "section_id": "sec32"
           },
           {
             "title": "SEÇÃO III — Do Encerramento da Discussão",
-            "children": [
-              {
-                "label": "Art. 284 — O encerramento da discussão dar-se-á: (Vide Precedente...",
-                "art": "284"
-              },
-              {
-                "label": "Art. 285 — A discussão de qualquer matéria não será encerrada,...",
-                "art": "285"
-              },
-              {
-                "label": "Art. 286 — Se o requerimento de encerramento de discussão for...",
-                "art": "286"
-              }
-            ]
+            "children": [],
+            "section_id": "sec33"
           }
-        ]
+        ],
+        "section_id": "cap34"
       },
       {
         "title": "CAPÍTULO II — DA VOTAÇÃO",
         "children": [
           {
             "title": "SEÇÃO I — Disposições Preliminares",
-            "children": [
-              {
-                "label": "Art. 287 — Votação é o ato complementar da discussão, através do...",
-                "art": "287"
-              },
-              {
-                "label": "Art. 288 — O Vereador presente à sessão poderá votar a favor,...",
-                "art": "288"
-              },
-              {
-                "label": "Art. 289 — O Presidente da Câmara terá voto na eleição da Mesa, nas...",
-                "art": "289"
-              }
-            ]
+            "children": [],
+            "section_id": "sec34"
           },
           {
             "title": "SEÇÃO II — Do Encaminhamento da Votação",
-            "children": [
-              {
-                "label": "Art. 290 — A partir do instante em que o Presidente declarar a...",
-                "art": "290"
-              },
-              {
-                "label": "Art. 291 — Para encaminhar a votação, terão preferência o Líder ou...",
-                "art": "291"
-              },
-              {
-                "label": "Art. 292 — Ainda que haja, no processo, substitutivos e emendas,...",
-                "art": "292"
-              }
-            ]
+            "children": [],
+            "section_id": "sec35"
           },
           {
             "title": "SEÇÃO III — Dos Processos de Votação",
-            "children": [
-              {
-                "label": "Art. 293 — São 3 (três) os processos de votação:",
-                "art": "293"
-              },
-              {
-                "label": "Art. 294 — O processo simbólico de votação consiste na simples...",
-                "art": "294"
-              },
-              {
-                "label": "Art. 295 — O processo nominal de votação consiste na contagem dos...",
-                "art": "295"
-              },
-              {
-                "label": "Art. 296 — Ao submeter qualquer matéria à votação nominal, o...",
-                "art": "296"
-              },
-              {
-                "label": "Art. 297 — Será procedida, obrigatoriamente, a votação secreta para...",
-                "art": "297"
-              },
-              {
-                "label": "Art. 298 — Para a votação secreta com uso de cédula, será feita a...",
-                "art": "298"
-              },
-              {
-                "label": "Art. 299 — As dúvidas quanto ao resultado proclamado só poderão ser...",
-                "art": "299"
-              },
-              {
-                "label": "Art. 300 — Será obrigatoriamente publicado, na Imprensa Oficial, o...",
-                "art": "300"
-              }
-            ]
+            "children": [],
+            "section_id": "sec36"
           },
           {
             "title": "SEÇÃO IV — Da Verificação Nominal de Votação",
-            "children": [
-              {
-                "label": "Art. 301 — A verificação de votação mediante processo nominal será...",
-                "art": "301"
-              }
-            ]
+            "children": [],
+            "section_id": "sec37"
           },
           {
             "title": "SEÇÃO V — Da Declaração de Voto",
-            "children": [
-              {
-                "label": "Art. 302 — Declaração de voto é o pronunciamento do Vereador sobre...",
-                "art": "302"
-              },
-              {
-                "label": "Art. 303 — A declaração de voto a qualquer matéria se fará de uma...",
-                "art": "303"
-              },
-              {
-                "label": "Art. 304 — Em declaração de voto, cada Vereador disporá de 5...",
-                "art": "304"
-              }
-            ]
+            "children": [],
+            "section_id": "sec38"
           }
-        ]
+        ],
+        "section_id": "cap35"
       },
       {
         "title": "CAPÍTULO III — DO TEMPO DE USO DA PALAVRA",
-        "children": [
-          {
-            "label": "Art. 305 — O tempo de que dispõe o Vereador, sempre que ocupar a...",
-            "art": "305"
-          },
-          {
-            "label": "Art. 306 — Salvo disposição expressa em contrário, o tempo de que...",
-            "art": "306"
-          }
-        ]
+        "children": [],
+        "section_id": "cap36"
       },
       {
         "title": "CAPÍTULO IV — DAS QUESTÕES DE ORDEM E DOS PRECEDENTES REGIMENTAIS",
         "children": [
           {
             "title": "SEÇÃO I — Das Questões de Ordem",
-            "children": [
-              {
-                "label": "Art. 307 — Pela ordem, o Vereador só poderá falar, declarando o...",
-                "art": "307"
-              },
-              {
-                "label": "Art. 308 — A questão de ordem formulada nos termos do inciso VI do...",
-                "art": "308"
-              },
-              {
-                "label": "Art. 309 — Para falar pela ordem, cada Vereador disporá de 5...",
-                "art": "309"
-              },
-              {
-                "label": "Art. 310 — Se a questão de ordem comportar resposta, esta deverá...",
-                "art": "310"
-              }
-            ]
+            "children": [],
+            "section_id": "sec39"
           },
           {
             "title": "SEÇÃO II — Do Recurso às Decisões do Presidente",
-            "children": [
-              {
-                "label": "Art. 311 — Da decisão ou omissão do Presidente em questão de ordem,...",
-                "art": "311"
-              },
-              {
-                "label": "Art. 312 — O recurso formulado por escrito deverá ser proposto,...",
-                "art": "312"
-              }
-            ]
+            "children": [],
+            "section_id": "sec40"
           },
           {
             "title": "SEÇÃO III — Dos Precedentes Regimentais",
-            "children": [
-              {
-                "label": "Art. 313 — Os casos não previstos neste Regimento serão decididos...",
-                "art": "313"
-              },
-              {
-                "label": "Art. 314 — Ao final de cada sessão legislativa, a Mesa fará,...",
-                "art": "314"
-              }
-            ]
+            "children": [],
+            "section_id": "sec41"
           }
-        ]
+        ],
+        "section_id": "cap37"
       }
-    ]
+    ],
+    "section_id": "tit8"
   },
   {
     "title": "TÍTULO IX — DA TRAMITAÇÃO ESPECIAL E URGENTE DE PROPOSITURAS DE INICIATIVA DOS CIDADÃOS",
-    "children": [
-      {
-        "label": "Art. 315 — Será assegurada tramitação especial e urgente às...",
-        "art": "315"
-      },
-      {
-        "label": "Art. 316 — Ressalvadas as competências privativas previstas nos...",
-        "art": "316"
-      },
-      {
-        "label": "Art. 317 — Considera-se exercida a iniciativa popular quando:",
-        "art": "317"
-      },
-      {
-        "label": "Art. 318 — Terminada a subscrição, a propositura será protocolada...",
-        "art": "318"
-      },
-      {
-        "label": "Art. 319 — Lida a propositura no Prolongamento do Expediente, será...",
-        "art": "319"
-      },
-      {
-        "label": "Art. 320 — Para defesa oral da propositura, será convocada, em 7...",
-        "art": "320"
-      },
-      {
-        "label": "Art. 321 — As Comissões designadas para emitir parecer conjunto,...",
-        "art": "321"
-      },
-      {
-        "label": "Art. 322 — Instruída a propositura, seu parecer será dado a...",
-        "art": "322"
-      },
-      {
-        "label": "Art. 323 — Do resultado da deliberação em Plenário será dado...",
-        "art": "323"
-      }
-    ]
+    "children": [],
+    "section_id": "tit9"
   },
   {
     "title": "TÍTULO X — DA FASE ESPECIAL DA SESSÃO LEGISLATIVA",
-    "children": [
-      {
-        "label": "Art. 324 — No período de recesso, a Câmara poderá ser...",
-        "art": "324"
-      },
-      {
-        "label": "Art. 325 — A convocação será feita, por escrito, com a indicação da...",
-        "art": "325"
-      },
-      {
-        "label": "Art. 326 — Recebido o ofício, o Presidente ou o seu substituto...",
-        "art": "326"
-      },
-      {
-        "label": "Art. 327 — Durante a convocação, a Câmara se reunirá em sessões...",
-        "art": "327"
-      },
-      {
-        "label": "Art. 328 — Aplicam-se, nos períodos extraordinários, as disposições...",
-        "art": "328"
-      }
-    ]
+    "children": [],
+    "section_id": "tit10"
   },
   {
     "title": "TÍTULO XI — DA ELABORAÇÃO LEGISLATIVA ESPECIAL",
@@ -1755,392 +463,89 @@
         "children": [
           {
             "title": "SEÇÃO I — Disposições Preliminares",
-            "children": [
-              {
-                "label": "Art. 329 — Os projetos de leis orçamentárias de iniciativa do Poder...",
-                "art": "329"
-              },
-              {
-                "label": "Art. 330 — Recebidos do Executivo até as datas citadas, os projetos...",
-                "art": "330"
-              },
-              {
-                "label": "Art. 332 — O Prefeito poderá enviar mensagem propondo modificações...",
-                "art": "332"
-              },
-              {
-                "label": "Art. 333 — Se o projeto de lei orçamentária for incluído na pauta...",
-                "art": "333"
-              },
-              {
-                "label": "Art. 334 — Em nenhuma fase da tramitação desses projetos de lei...",
-                "art": "334"
-              }
-            ]
+            "children": [],
+            "section_id": "sec42"
           },
           {
             "title": "SEÇÃO II — Da Tramitação dos Projetos de Leis Orçamentárias",
-            "children": [
-              {
-                "label": "Art. 335 — A Comissão de Finanças e Orçamento, para apreciação dos...",
-                "art": "335"
-              },
-              {
-                "label": "Art. 336 — Publicado o parecer, será o projeto, dentro do prazo...",
-                "art": "336"
-              },
-              {
-                "label": "Art. 337 — Aprovado em primeira discussão, permanecerá o projeto...",
-                "art": "337"
-              },
-              {
-                "label": "Art. 338 — Para elaborar o parecer sobre as emendas, a Comissão de...",
-                "art": "338"
-              },
-              {
-                "label": "Art. 339 — Publicado o parecer sobre as emendas, o projeto será...",
-                "art": "339"
-              },
-              {
-                "label": "Art. 340 — Aprovado o projeto, a votação das emendas será feita em...",
-                "art": "340"
-              },
-              {
-                "label": "Art. 341 — Se aprovado, em fase de segunda discussão, sem emendas,...",
-                "art": "341"
-              },
-              {
-                "label": "Art. 342 — Publicado o parecer, o projeto em fase de redação final...",
-                "art": "342"
-              },
-              {
-                "label": "Art. 343 — Aprovada a redação final, será o projeto encaminhado à...",
-                "art": "343"
-              },
-              {
-                "label": "Art. 344 — Caso a Câmara não tenha votado a proposta orçamentária...",
-                "art": "344"
-              },
-              {
-                "label": "Art. 345 — Ocorrendo veto, emenda ou rejeição do projeto de lei...",
-                "art": "345"
-              }
-            ]
+            "children": [],
+            "section_id": "sec43"
           }
-        ]
+        ],
+        "section_id": "cap38"
       },
       {
         "title": "CAPÍTULO II — Da Concessão de Títulos Honoríficos",
-        "children": [
-          {
-            "label": "Art. 347 — Por via de projeto de decreto legislativo, aprovado em...",
-            "art": "347"
-          },
-          {
-            "label": "Art. 348 — O projeto de concessão de título honorífico deverá ser...",
-            "art": "348"
-          },
-          {
-            "label": "Art. 349 — Os signatários serão considerados fiadores das...",
-            "art": "349"
-          },
-          {
-            "label": "Art. 350 — Para discutir projeto de concessão de título honorífico,...",
-            "art": "350"
-          },
-          {
-            "label": "Art. 351 — A entrega dos títulos será feita em sessão solene para...",
-            "art": "351"
-          }
-        ]
+        "children": [],
+        "section_id": "cap39"
       },
       {
         "title": "CAPÍTULO III — DOS MEMBROS DO TRIBUNAL DE CONTAS DO MUNICÍPIO",
-        "children": [
-          {
-            "label": "Art. 352 — A indicação de membros do Tribunal de Contas do...",
-            "art": "352"
-          },
-          {
-            "label": "Art. 353 — A mensagem do Executivo submetendo à apreciação da...",
-            "art": "353"
-          },
-          {
-            "label": "Art. 354 — Mediante projeto de decreto legislativo, devidamente...",
-            "art": "354"
-          },
-          {
-            "label": "Art. 355 — A Comissão de Constituição e Justiça terá 5 (cinco) dias...",
-            "art": "355"
-          },
-          {
-            "label": "Art. 356 — Publicado o parecer, no prazo de 5 (cinco) dias, será...",
-            "art": "356"
-          },
-          {
-            "label": "Art. 357 — Realizada a sessão pública, a matéria será incluída na...",
-            "art": "357"
-          },
-          {
-            "label": "Art. 358 — Encerrada a discussão, passar-se-á à votação secreta,...",
-            "art": "358"
-          },
-          {
-            "label": "Art. 359 — Na discussão do parecer e na votação dos nomes serão...",
-            "art": "359"
-          }
-        ]
+        "children": [],
+        "section_id": "cap40"
       }
-    ]
+    ],
+    "section_id": "tit11"
   },
   {
     "title": "TÍTULO XII — DA SANÇÃO, DO VETO, DA PROMULGAÇÃO E REGISTROS DE LEIS, DECRETOS LEGISLATIVOS E RESOLUÇÕES",
-    "children": [
-      {
-        "label": "Art. 360 — O projeto aprovado pela Câmara será enviado, dentro de...",
-        "art": "360"
-      },
-      {
-        "label": "Art. 361 — Se o Prefeito julgar o projeto, no todo ou em parte,...",
-        "art": "361"
-      },
-      {
-        "label": "Art. 362 — A Câmara Municipal deliberará sobre o veto no prazo de...",
-        "art": "362"
-      },
-      {
-        "label": "Art. 363 — O veto será despachado:",
-        "art": "363"
-      },
-      {
-        "label": "Art. 364 — Se as razões do veto tiverem implicação concomitante com...",
-        "art": "364"
-      },
-      {
-        "label": "Art. 365 — Esgotado o prazo das Comissões, o veto será incluído na...",
-        "art": "365"
-      },
-      {
-        "label": "Art. 366 — Incluído na Ordem do Dia, o veto será submetido a...",
-        "art": "366"
-      },
-      {
-        "label": "Art. 367 — No veto parcial ou total, a votação será necessariamente...",
-        "art": "367"
-      },
-      {
-        "label": "Art. 368 — A rejeição do veto dependerá do voto favorável da...",
-        "art": "368"
-      },
-      {
-        "label": "Art. 369 — Se a lei não for promulgada pelo Prefeito, nos casos do...",
-        "art": "369"
-      },
-      {
-        "label": "Art. 370 — Serão promulgados e enviados à publicação, dentro do...",
-        "art": "370"
-      },
-      {
-        "label": "Art. 371 — Os originais de Emendas à Lei Orgânica, de Leis, de...",
-        "art": "371"
-      }
-    ]
+    "children": [],
+    "section_id": "tit12"
   },
   {
     "title": "TÍTULO XIII — DA SECRETARIA DA CÂMARA",
-    "children": [
-      {
-        "label": "Art. 372 — Os serviços administrativos da Câmara serão feitos...",
-        "art": "372"
-      },
-      {
-        "label": "Art. 373 — Qualquer interpelação de Vereador sobre os serviços da...",
-        "art": "373"
-      }
-    ]
+    "children": [],
+    "section_id": "tit13"
   },
   {
     "title": "TÍTULO XIV — DA POLÍCIA INTERNA",
-    "children": [
-      {
-        "label": "Art. 374 — O policiamento do edifício da Câmara, externa e...",
-        "art": "374"
-      },
-      {
-        "label": "Art. 375 — O corpo de policiamento cuidará, também, para que as...",
-        "art": "375"
-      },
-      {
-        "label": "Art. 376 — No recinto do Plenário e em outras dependências da...",
-        "art": "376"
-      },
-      {
-        "label": "Art. 377 — No edifício da Câmara é proibido o porte de armas por...",
-        "art": "377"
-      },
-      {
-        "label": "Art. 378 — É vedado aos espectadores manifestarem-se sobre o que se...",
-        "art": "378"
-      }
-    ]
+    "children": [],
+    "section_id": "tit14"
   },
   {
     "title": "TÍTULO XV — DO PREFEITO E DOS SECRETÁRIOS MUNICIPAIS",
     "children": [
       {
         "title": "CAPÍTULO I — DO COMPARECIMENTO DO PREFEITO À CÂMARA",
-        "children": [
-          {
-            "label": "Art. 379 — Poderá o Prefeito comparecer à Câmara, em dia e hora...",
-            "art": "379"
-          },
-          {
-            "label": "Art. 380 — Sempre que comparecer à Câmara, o Prefeito terá assento...",
-            "art": "380"
-          }
-        ]
+        "children": [],
+        "section_id": "cap41"
       },
       {
         "title": "CAPÍTULO II — DA CONVOCAÇÃO DOS SECRETÁRIOS MUNICIPAIS",
-        "children": [
-          {
-            "label": "Art. 381 — Os Secretários Municipais poderão ser convocados, a...",
-            "art": "381"
-          },
-          {
-            "label": "Art. 382 — O Secretário Municipal deverá atender à convocação da...",
-            "art": "382"
-          },
-          {
-            "label": "Art. 383 — A Câmara se reunirá em sessão extraordinária, em dia e...",
-            "art": "383"
-          },
-          {
-            "label": "Art. 384 — Não havendo mais Vereadores inscritos para indagações...",
-            "art": "384"
-          }
-        ]
+        "children": [],
+        "section_id": "cap42"
       },
       {
         "title": "CAPÍTULO III — DAS CONTAS",
-        "children": [
-          {
-            "label": "Art. 385 — As contas do Prefeito, da Mesa da Câmara e do Tribunal...",
-            "art": "385"
-          },
-          {
-            "label": "Art. 386 — Recebido o parecer prévio do Tribunal de Contas do...",
-            "art": "386"
-          },
-          {
-            "label": "Art. 387 — Para apreciação das contas, a Câmara terá o prazo de 60...",
-            "art": "387"
-          },
-          {
-            "label": "Art. 388 — Rejeitadas, as contas serão imediatamente remetidas ao...",
-            "art": "388"
-          }
-        ]
+        "children": [],
+        "section_id": "cap43"
       },
       {
         "title": "CAPÍTULO IV — DA RESPONSABILIDADE DO PREFEITO",
-        "children": [
-          {
-            "label": "Art. 389 — Nos crimes comuns e nos de responsabilidade, o Prefeito...",
-            "art": "389"
-          },
-          {
-            "label": "Art. 390 — O Prefeito e o Vice-Prefeito serão processados e...",
-            "art": "390"
-          },
-          {
-            "label": "Art. 391 — O Prefeito perderá o mandato, por extinção declarada...",
-            "art": "391"
-          }
-        ]
+        "children": [],
+        "section_id": "cap44"
       }
-    ]
+    ],
+    "section_id": "tit15"
   },
   {
     "title": "TÍTULO XVI — DA REFORMA DO REGIMENTO INTERNO",
-    "children": [
-      {
-        "label": "Art. 392 — O Regimento Interno da Câmara somente poderá ser...",
-        "art": "392"
-      },
-      {
-        "label": "Art. 393 — O projeto de resolução que vise a alterar, reformar ou...",
-        "art": "393"
-      },
-      {
-        "label": "Art. 394 — Sempre que se proceder à reforma ou substituição do...",
-        "art": "394"
-      },
-      {
-        "label": "Art. 395 — Esta Resolução entrará em vigor na data de sua...",
-        "art": "395"
-      }
-    ]
+    "children": [],
+    "section_id": "tit16"
   },
   {
     "title": "ATO DAS DISPOSIÇÕES TRANSITÓRIAS",
-    "children": [
-      {
-        "label": "Art. ADT1 — Ao entrar em vigência o Regimento Interno a que se...",
-        "art": "ADT1"
-      },
-      {
-        "label": "Art. ADT2 — Todas as proposituras apresentadas em obediência às...",
-        "art": "ADT2"
-      },
-      {
-        "label": "Art. ADT3 — As matérias previstas no artigo 46, inciso X, e artigo...",
-        "art": "ADT3"
-      },
-      {
-        "label": "Art. ADT4 — Os requerimentos de transcrição de artigos e documentos...",
-        "art": "ADT4"
-      },
-      {
-        "label": "Art. ADT4-A — As sessões ordinárias, da Câmara Municipal de São Paulo,...",
-        "art": "ADT4-A"
-      },
-      {
-        "label": "Art. ADT4-B — As sessões solenes, realizadas nos termos dos...",
-        "art": "ADT4-B"
-      },
-      {
-        "label": "Art. ADT4-C — As Comissões Parlamentares de Inquérito já em...",
-        "art": "ADT4-C"
-      },
-      {
-        "label": "Art. ADT4-D — Enquanto perdurar a situação emergencial de saúde...",
-        "art": "ADT4-D"
-      },
-      {
-        "label": "Art. ADT4-E — Inclui-se, como hipótese de motivo justo previsto...",
-        "art": "ADT4-E"
-      },
-      {
-        "label": "Art. ADT4-F — Ficam suspensas as Sessões Ordinárias e as Reuniões...",
-        "art": "ADT4-F"
-      },
-      {
-        "label": "Art. ADT4-G — Ficam suspensos os prazos de funcionamento das Comissões...",
-        "art": "ADT4-G"
-      },
-      {
-        "label": "Art. ADT4-H — O prazo destinado à votação nominal previsto no art. 2º,...",
-        "art": "ADT4-H"
-      },
-      {
-        "label": "Art. ADT5 — O presente Ato das Disposições Transitórias é promulgado...",
-        "art": "ADT5"
-      },
-      {
-        "label": "Art. ADT6 — Revogam-se as disposições em contrário.",
-        "art": "ADT6"
-      }
-    ]
+    "children": [],
+    "section_id": "adt"
+  },
+  {
+    "title": "Lei Orgânica",
+    "children": [],
+    "section_id": "norma2"
+  },
+  {
+    "title": "Constituição Federal",
+    "children": [],
+    "section_id": "norma3"
   }
 ]

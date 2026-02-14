@@ -152,39 +152,37 @@ body {
   opacity: 0.5;
 }
 
-.old-versions {
-  display: none;
-  border-top: 1px dashed #ccc;
-  margin-top: calc(10px * var(--zoom-scale));
-  padding-top: calc(8px * var(--zoom-scale));
-}
-.old-versions.open { display: block; }
-
-.old-versions .old-version {
+.old-version {
   opacity: 0.55;
   text-decoration: line-through;
+  margin-top: calc(4px * var(--zoom-scale));
   margin-bottom: calc(4px * var(--zoom-scale));
   font-size: calc(.9rem * var(--zoom-scale));
+  border-top: 1px dashed #eee;
+  padding-top: calc(4px * var(--zoom-scale));
 }
 
-.old-versions .amendment-note {
+.old-version .amendment-note {
   font-style: italic;
   color: #888;
   font-size: calc(.85rem * var(--zoom-scale));
   text-decoration: none;
 }
 
-.btn-toggle-versions {
-  background: none;
-  border: 1px solid #ccc;
+/* Law badge */
+.law-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: calc(.7rem * var(--zoom-scale));
+  font-weight: 700;
+  background: #6c5ce7;
+  color: #fff;
+  padding: 2px 6px;
   border-radius: 4px;
-  padding: 2px 8px;
-  font-size: calc(.8rem * var(--zoom-scale));
-  cursor: pointer;
-  color: #666;
-  margin-top: calc(6px * var(--zoom-scale));
+  letter-spacing: .5px;
+  line-height: 1;
 }
-.btn-toggle-versions:hover { background: #f0f0f0; }
 
 /* Search highlight */
 mark {
@@ -331,13 +329,30 @@ mark {
 .index-tab:last-child { border-radius: 0 6px 6px 0; }
 .index-tab.active { background: var(--selected-border); color: #fff; }
 
+#index-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 #index-search {
   width: 100%;
-  padding: 8px 12px;
+  padding: 8px 30px 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
   outline: none;
+}
+
+#btn-clear-index-search {
+  position: absolute;
+  right: 6px;
+  width: 22px; height: 22px;
+  border: none; background: none; cursor: pointer;
+  font-size: 16px; color: #999;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 0;
 }
 
 #index-content {
@@ -362,6 +377,14 @@ mark {
   font-size: 14px;
 }
 .sys-item:hover { background: #f0f0f0; }
+
+.sys-law {
+  background: #e8f4fd;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-top: 8px;
+  color: #1a73e8;
+}
 
 /* Subject index */
 .subj-entry { margin-bottom: 10px; }

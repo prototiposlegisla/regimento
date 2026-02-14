@@ -14,8 +14,7 @@ from .models import (
 class HTMLRenderer:
     """Gera HTML dos cards com a mesma estrutura do index.html original."""
 
-    def __init__(self, include_all_versions: bool = False):
-        self.include_all_versions = include_all_versions
+    def __init__(self):
         self.footnote_counter = 0
 
     def render(self, doc: ParsedDocument) -> str:
@@ -41,29 +40,33 @@ class HTMLRenderer:
     def _render_article(self, art: ArticleBlock) -> str:
         art_num = html.escape(art.art_number)
         revoked_cls = " revoked" if art.is_revoked else ""
+        law_attr = ""
+        if art.law_prefix:
+            law_attr = f' data-law="{html.escape(art.law_prefix)}"'
         parts: list[str] = []
         parts.append(
-            f'  <div class="card card-artigo{revoked_cls}" data-art="{art_num}">'
+            f'  <div class="card card-artigo{revoked_cls}" data-art="{art_num}"{law_attr}>'
         )
 
-        # Caput
+        # Law badge (for non-default laws)
+        if art.law_prefix:
+            badge = html.escape(art.law_prefix)
+            parts.append(f'    <span class="law-badge">{badge}</span>')
+
+        # Old caputs from full-article rewrites (in DOCX order)
+        for v in art.all_versions:
+            parts.append(self._render_old_version(v))
+
+        # Current caput
         if art.caput:
             parts.append(self._render_unit_as_p(art.caput, is_caput=True))
 
-        # Children (sub-dispositivos)
+        # Children in document order (old versions interleaved)
         for child in art.children:
-            parts.append(self._render_unit_as_p(child, is_caput=False))
-
-        # Version toggle (if there are old versions)
-        if self.include_all_versions and art.all_versions:
-            parts.append(
-                '    <button class="btn-toggle-versions">'
-                "Ver redações anteriores</button>"
-            )
-            parts.append('    <div class="old-versions">')
-            for v in art.all_versions:
-                parts.append(self._render_old_version(v))
-            parts.append("    </div>")
+            if child.is_old_version:
+                parts.append(self._render_old_version(child))
+            else:
+                parts.append(self._render_unit_as_p(child, is_caput=False))
 
         parts.append("  </div>")
         return "\n".join(parts)
@@ -193,11 +196,9 @@ class HTMLRenderer:
         note = ""
         if unit.amendment_note:
             note = f' <span class="amendment-note">{html.escape(unit.amendment_note)}</span>'
-        return f'      <p class="old-version">{text}{note}</p>'
+        return f'    <p class="old-version">{text}{note}</p>'
 
 
-def render_cards(
-    doc: ParsedDocument, include_all_versions: bool = False
-) -> str:
-    renderer = HTMLRenderer(include_all_versions=include_all_versions)
+def render_cards(doc: ParsedDocument) -> str:
+    renderer = HTMLRenderer()
     return renderer.render(doc)

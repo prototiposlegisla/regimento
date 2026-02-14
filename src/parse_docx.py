@@ -53,6 +53,7 @@ RE_AMENDMENT = re.compile(
     r"Acrescentad[oa]|Renumerad[oa]|Inclu[ií]d[oa])",
     re.IGNORECASE,
 )
+RE_NORMA = re.compile(r"^NORMA:\s*(.+)", re.IGNORECASE)
 
 
 def parse_docx(path: str | Path) -> ParsedDocument:
@@ -94,7 +95,11 @@ def _parse_rels(zf: zipfile.ZipFile) -> dict[str, tuple[str, str]]:
 
 
 def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[TextRun]]:
-    """Parseia word/footnotes.xml → {id: [TextRun]}."""
+    """Parseia word/footnotes.xml → {id: [TextRun]}.
+
+    Footnotes whose content starts with "b " or "B " (build notes)
+    are excluded from the result.
+    """
     w = NS["w"]
     footnotes: dict[int, list[TextRun]] = {}
     try:
@@ -123,6 +128,12 @@ def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[TextRun]]:
                 tr = _parse_run(r_el, w)
                 if tr.text:
                     runs.append(tr)
+
+        # Exclude build notes (content starts with "b " or "B ")
+        full_text = "".join(r.text for r in runs).lstrip()
+        if full_text.startswith("b ") or full_text.startswith("B "):
+            continue
+
         footnotes[fn_id] = runs
     return footnotes
 
@@ -226,9 +237,12 @@ def _parse_paragraph(
 
     full_text = "".join(r.text for r in runs).strip()
 
-    # Check if ALL runs are strikethrough
-    non_empty_runs = [r for r in runs if r.text.strip()]
-    all_strike = bool(non_empty_runs) and all(r.strike for r in non_empty_runs)
+    # Check if paragraph is predominantly strikethrough.
+    # Word often leaves the identifier prefix un-struck, so we use a
+    # character-count majority: >50% of non-whitespace chars are struck.
+    strike_chars = sum(len(r.text.strip()) for r in runs if r.strike)
+    total_chars = sum(len(r.text.strip()) for r in runs)
+    all_strike = total_chars > 0 and strike_chars > total_chars * 0.5
 
     return _RawParagraph(
         text=full_text,
@@ -393,12 +407,14 @@ def _build_document(
     doc = ParsedDocument()
     in_adt = False  # Ato das Disposições Transitórias
     current_article: ArticleBlock | None = None
-    pending_heading: SectionHeading | None = None
+    current_law_name: str = ""  # Set by NORMA: markers
 
-    # Section ID counters
+    # Section ID counters (globally unique)
     titulo_count = 0
     capitulo_count = 0
     secao_count = 0
+    subsecao_count = 0
+    norma_count = 0
 
     i = 0
     while i < len(classified):
@@ -407,6 +423,24 @@ def _build_document(
         if cp.unit_type == UnitType.EMPTY:
             i += 1
             continue
+
+        # Detect NORMA: marker (sets current law for subsequent articles)
+        if cp.is_centered:
+            norma_m = RE_NORMA.match(cp.text)
+            if norma_m:
+                current_law_name = norma_m.group(1).strip()
+                if current_article:
+                    doc.elements.append(current_article)
+                    current_article = None
+                norma_count += 1
+                heading = SectionHeading(
+                    level=UnitType.TITULO,
+                    text=current_law_name,
+                    data_section=f"norma{norma_count}",
+                )
+                doc.elements.append(heading)
+                i += 1
+                continue
 
         # Detect ADT marker
         if cp.is_centered and RE_ADT_MARKER.search(cp.text):
@@ -436,8 +470,6 @@ def _build_document(
 
             if cp.unit_type == UnitType.TITULO:
                 titulo_count += 1
-                capitulo_count = 0
-                secao_count = 0
                 section_id = f"tit{titulo_count}"
                 # Check if next line is subtitle
                 subtitle = ""
@@ -454,7 +486,6 @@ def _build_document(
 
             elif cp.unit_type == UnitType.CAPITULO:
                 capitulo_count += 1
-                secao_count = 0
                 section_id = f"cap{capitulo_count}"
                 # Check for combined heading (CAPÍTULO IV\nDAS MOÇÕES)
                 subtitle = ""
@@ -489,7 +520,8 @@ def _build_document(
                 doc.elements.append(heading)
 
             elif cp.unit_type == UnitType.SUBSECAO:
-                section_id = f"subsec{secao_count}"
+                subsecao_count += 1
+                section_id = f"subsec{subsecao_count}"
                 subtitle = ""
                 if i + 1 < len(classified) and classified[i + 1].unit_type == UnitType.SUBTITLE:
                     subtitle = classified[i + 1].text
@@ -552,8 +584,6 @@ def _build_document(
                     current_article.all_versions.append(child)
                 current_article.children = []
                 current_article.caput = caput
-                if cp.has_strike:
-                    current_article.all_versions.append(caput)
             else:
                 # Flush previous article and start new one
                 if current_article:
@@ -562,10 +592,9 @@ def _build_document(
                 current_article = ArticleBlock(
                     art_number=effective_num,
                     is_adt=in_adt,
+                    law_name=current_law_name,
                 )
                 current_article.caput = caput
-                if cp.has_strike:
-                    current_article.all_versions.append(caput)
 
             i += 1
             continue
@@ -598,10 +627,9 @@ def _build_document(
                 footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter),
             )
 
-            if cp.has_strike:
-                current_article.all_versions.append(unit)
-            else:
-                current_article.children.append(unit)
+            # Always keep children in document order (old versions
+            # are distinguished by is_old_version flag)
+            current_article.children.append(unit)
 
             i += 1
             continue

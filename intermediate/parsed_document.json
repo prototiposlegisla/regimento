@@ -39581,13 +39581,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT12",
-      "is_adt": true,
+      "art_number": "12",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 12",
-        "uid": "artADT12",
+        "uid": "art12",
         "text": "Art. 12 — O Poder Legislativo é exercido pela Câmara Municipal, composta de 55 (cinqüenta e cinco) Vereadores eleitos dentre os cidadãos maiores de 18 (dezoito) anos e no exercício dos direitos políticos.",
         "runs": [
           {
@@ -39610,17 +39610,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT13",
-      "is_adt": true,
+      "art_number": "13",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 13",
-        "uid": "artADT13",
+        "uid": "art13",
         "text": "Art. 13 - Cabe à Câmara, com sanção do Prefeito, não exigida esta para o especificado no artigo 14, dispor sobre as matérias de competência do Município, especialmente: (Redação dada pela Emenda à Lei Orgânica nº 5 de 1991)",
         "runs": [
           {
@@ -39649,7 +39650,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT13I",
+          "uid": "art13I",
           "text": "I — legislar sobre assuntos de interesse local;",
           "runs": [
             {
@@ -39673,7 +39674,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT13II",
+          "uid": "art13II",
           "text": "II — suplementar a legislação federal e estadual, no que couber;",
           "runs": [
             {
@@ -39697,7 +39698,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT13III",
+          "uid": "art13III",
           "text": "III — legislar sobre tributos municipais, bem como autorizar isenções, anistias fiscais e remissão de dívidas;",
           "runs": [
             {
@@ -39715,7 +39716,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT13IV",
+          "uid": "art13IV",
           "text": "IV — votar o plano plurianual, as diretrizes orçamentárias e o orçamento anual, bem como autorizar a abertura de créditos suplementares e especiais;",
           "runs": [
             {
@@ -39739,7 +39740,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT13V",
+          "uid": "art13V",
           "text": "V — deliberar sobre obtenção e concessão de empréstimos e operações de crédito, bem como sobre a forma e os meios de pagamento;",
           "runs": [
             {
@@ -39763,7 +39764,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT13VI",
+          "uid": "art13VI",
           "text": "VI — autorizar a concessão de auxílios e subvenções;",
           "runs": [
             {
@@ -39787,7 +39788,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT13VII",
+          "uid": "art13VII",
           "text": "VII — autorizar a concessão de serviços públicos;",
           "runs": [
             {
@@ -39805,7 +39806,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT13VIII",
+          "uid": "art13VIII",
           "text": "VIII — autorizar a concessão do direito real de uso de bens municipais;",
           "runs": [
             {
@@ -39823,7 +39824,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT13IX",
+          "uid": "art13IX",
           "text": "IX — autorizar a concessão administrativa de uso de bens municipais;",
           "runs": [
             {
@@ -39847,7 +39848,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT13X",
+          "uid": "art13X",
           "text": "X — autorizar a alienação de bens imóveis municipais;",
           "runs": [
             {
@@ -39871,7 +39872,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT13X",
+          "uid": "art13X",
           "text": "X – autorizar a alienação de bens imóveis municipais, exceptuando-se as hipóteses previstas nesta Lei Orgânica; (Redação dada pela Emenda à Lei Orgânica nº 26 de 2005)",
           "runs": [
             {
@@ -39894,7 +39895,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT13XI",
+          "uid": "art13XI",
           "text": "XI — autorizar a aquisição de bens imóveis, salvo quando se tratar de doação sem encargos;",
           "runs": [
             {
@@ -39912,7 +39913,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XII",
-          "uid": "artADT13XII",
+          "uid": "art13XII",
           "text": "XII — criar, organizar e suprimir distritos e subdistritos, observadas as legislações estadual e municipal;",
           "runs": [
             {
@@ -39930,7 +39931,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIII",
-          "uid": "artADT13XIII",
+          "uid": "art13XIII",
           "text": "XIII — criar, alterar, e extingüir cargos, funções e empregos públicos e fixar a remuneração da administração direta, autárquica e fundacional;",
           "runs": [
             {
@@ -39954,7 +39955,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIV",
-          "uid": "artADT13XIV",
+          "uid": "art13XIV",
           "text": "XIV — aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
           "runs": [
             {
@@ -39972,7 +39973,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XV",
-          "uid": "artADT13XV",
+          "uid": "art13XV",
           "text": "XV — dispor sobre convênios com entidades públicas, particulares e autorizar consórcios com outros municípios;",
           "runs": [
             {
@@ -39996,7 +39997,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVI",
-          "uid": "artADT13XVI",
+          "uid": "art13XVI",
           "text": "XVI — criar, estruturar e atribuir funções às Secretarias e aos órgãos da administração pública;",
           "runs": [
             {
@@ -40014,7 +40015,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVII",
-          "uid": "artADT13XVII",
+          "uid": "art13XVII",
           "text": "XVII — autorizar a alteração de denominação de próprios, vias e logradouros públicos;",
           "runs": [
             {
@@ -40030,7 +40031,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVII",
-          "uid": "artADT13XVII",
+          "uid": "art13XVII",
           "text": "XVII – autorizar, nos termos da lei, a alteração de denominação de próprios, vias e logradouros públicos. (Redação dada pela Emenda à Lei Orgânica nº 10 de 1991)",
           "runs": [
             {
@@ -40052,7 +40053,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVIII",
-          "uid": "artADT13XVIII",
+          "uid": "art13XVIII",
           "text": "XVIII — legislar sobre a criação, organização e funcionamento de Conselhos e Comissões;",
           "runs": [
             {
@@ -40070,7 +40071,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIX",
-          "uid": "artADT13XIX",
+          "uid": "art13XIX",
           "text": "XIX — delimitar o perímetro urbano e o de expansão urbana;",
           "runs": [
             {
@@ -40088,7 +40089,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XX",
-          "uid": "artADT13XX",
+          "uid": "art13XX",
           "text": "XX — aprovar o Código de Obras e Edificações.",
           "runs": [
             {
@@ -40112,7 +40113,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XXI",
-          "uid": "artADT13XXI",
+          "uid": "art13XXI",
           "text": "XXI - denominar as vias e logradouros públicos, obedecidas as normas urbanísticas aplicáveis. (Incluído pela Emenda à Lei Orgânica nº 3 de 1990)",
           "runs": [
             {
@@ -40136,7 +40137,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 13",
-          "uid": "artADT13",
+          "uid": "art13",
           "text": "Art. 13 — Cabe à Câmara, com sanção do Prefeito, dispor sobre as matérias de competência do Município, especialmente:",
           "runs": [
             {
@@ -40150,17 +40151,18 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT14",
-      "is_adt": true,
+      "art_number": "14",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 14",
-        "uid": "artADT14",
+        "uid": "art14",
         "text": "Art. 14 — Compete privativamente à Câmara Municipal:",
         "runs": [
           {
@@ -40179,7 +40181,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT14I",
+          "uid": "art14I",
           "text": "I — eleger sua Mesa, bem como destituí-la, na forma regimental;",
           "runs": [
             {
@@ -40203,7 +40205,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT14II",
+          "uid": "art14II",
           "text": "II — elaborar o seu Regimento Interno;",
           "runs": [
             {
@@ -40228,7 +40230,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT14III",
+          "uid": "art14III",
           "text": "III — dispor sobre sua organização, funcionamento, polícia, criação, transformação ou extinção dos cargos, empregos e funções de seus serviços e fixação da respectiva remuneração, observados os parâmetros estabelecidos na lei de Diretrizes Orçamentárias; (Incluído pela Emenda à Lei Orgânica nº 1 de 1990 e alterado pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990) (Alterado pela Republicação no Diário Oficial do Município de São Paulo em 18 de abril de 1990)",
           "runs": [
             {
@@ -40268,7 +40270,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT14IV",
+          "uid": "art14IV",
           "text": "IV — dar posse ao Prefeito e ao Vice Prefeito, conhecer de sua renúncia e afastá-los, definitivamente, do exercício do cargo, nos termos desta Lei. (Incluído pela Emenda à Lei Orgânica nº 1 de 1990)",
           "runs": [
             {
@@ -40297,7 +40299,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT14V",
+          "uid": "art14V",
           "text": "V — conceder licença, para afastamento, ao Prefeito, ao Vice-Prefeito e aos Vereadores;",
           "runs": [
             {
@@ -40321,7 +40323,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT14VI",
+          "uid": "art14VI",
           "text": "VI — fixar, para vigir na legislatura subseqüente, a remuneração dos Vereadores, bem como a do Prefeito e do Vice-Prefeito, até 30 (trinta) dias antes das eleições para a Câmara Municipal, considerando-se mantida a remuneração vigente, na hipótese de não se proceder a respectiva fixação na época própria, atualizado o valor monetario com base em índice federal pertinente;",
           "runs": [
             {
@@ -40369,7 +40371,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT14VI",
+          "uid": "art14VI",
           "text": "VI - fixar, por lei de sua iniciativa para viger na legislatura subseqüente até 30 (trinta) dias antes das eleições municipais, os subsídios do Prefeito, Vice-prefeito, Secretários municipais e Vereadores, observado para estes, a razão de no máximo, 75% (setenta e cinco por cento) daquele estabelecido, em espécie, para os Deputados Estaduais e respeitadas as disposições dos artigos 37, X e XI, 39, § 4º e 57, § 7º, da Constituição Federal, considerando-se mantido o subsídio vigente, na hipótese de não se proceder à respectiva fixação na época própria, atualizado o valor monetário conforme estabelecido em lei municipal específica; (Redação dada pela Emenda à Lei Orgânica nº 24 de 2001)",
           "runs": [
             {
@@ -40449,7 +40451,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT14VI",
+          "uid": "art14VI",
           "text": "VI - fixar, por lei de sua iniciativa, para cada exercício financeiro, os subsídios do Prefeito, Vice-Prefeito e Secretários Municipais, limitados a 90,25% (noventa inteiros e vinte e cinco centésimos por cento) do subsídio mensal dos Ministros do Supremo Tribunal Federal, bem como, para viger na legislatura subseqüente, o subsídio dos Vereadores, observado para estes, a razão de, no máximo, 75% (setenta e cinco por cento) daquele estabelecido, em espécie, para os Deputados Estaduais, respeitadas as disposições dos arts. 37, incisos X e XI e § 12, 39, § 4º e 57, § 7º, da Constituição Federal, considerando-se mantido o subsídio vigente, na hipótese de não se proceder à respectiva fixação na época própria, atualizado o valor monetário conforme estabelecido em lei municipal específica; (Redação dada pela Emenda à Lei Orgânica nº 32 de 2009)",
           "runs": [
             {
@@ -40570,7 +40572,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT14VI",
+          "uid": "art14VI",
           "text": "VI - fixar, por lei de sua iniciativa, para cada exercício financeiro, os subsídios do Prefeito, Vice-Prefeito e Secretários Municipais, limitados a 90,25% (noventa inteiros e vinte e cinco centésimos por cento) do subsídio mensal dos Ministros do Supremo Tribunal Federal, bem como, para viger na legislatura subsequente, o subsídio dos Vereadores, observada para estes a razão de no máximo 75% (setenta e cinco por cento) daquele estabelecido, em espécie, para os Deputados Estaduais, respeitadas as disposições dos arts. 37, incisos X e XI e § 12, 39, § 4º e 57, § 7º, da Constituição Federal, assegurados, independentemente de lei específica, os direitos previstos nos incisos VIII e XVII do art. 7º da Constituição Federal, considerando-se mantido o subsídio vigente, na hipótese de não se proceder à respectiva fixação na época própria, atualizado o valor monetário conforme estabelecido em lei municipal específica; (Redação dada pela Emenda à Lei Orgânica nº 40 de 2017) (Vide Ato nº 1.400 de 2018) (vide RE 1149014 do STF)",
           "runs": [
             {
@@ -40681,7 +40683,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT14VII",
+          "uid": "art14VII",
           "text": "VII — autorizar o Prefeito a ausentar-se do Município por mais de 15 (quinze) dias consecutivos; (Incluído pela Emenda à Lei Orgânica nº 1 de 1990 e renumerado pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -40711,7 +40713,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT14VIII",
+          "uid": "art14VIII",
           "text": "VIII — criar Comissões Parlamentares de Inquérito, nos termos do artigo 33;",
           "runs": [
             {
@@ -40737,7 +40739,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT14IX",
+          "uid": "art14IX",
           "text": "IX — convocar os Secretários Municipais ou responsáveis pela administração direta e indireta para prestar informações sobre matéria de sua competência, sem prejuízo do disposto no art. 32, parágrafo 2.º, inciso IV;",
           "runs": [
             {
@@ -40767,7 +40769,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT14IX",
+          "uid": "art14IX",
           "text": "IX - convocar os Secretários Municipais ou responsáveis pela administração direta e indireta para prestar informações sobre matéria de sua competência, sem prejuízo do disposto no art. 32, § 2º, inciso IV, sob pena de censura pública e outras penalidades vigentes no ordenamento em caso de ausência sem justificação adequada; (Redação dada pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -40794,7 +40796,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT14X",
+          "uid": "art14X",
           "text": "X — autorizar a convocação de referendo e plebiscito, exceto os casos previstos nesta Lei;",
           "runs": [
             {
@@ -40818,7 +40820,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT14XI",
+          "uid": "art14XI",
           "text": "XI — decidir sobre a perda do mandato de Vereador, ressalvado o disposto no artigo 18, parágrafo 3.º;",
           "runs": [
             {
@@ -40844,7 +40846,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XII",
-          "uid": "artADT14XII",
+          "uid": "art14XII",
           "text": "XII — tomar e julgar as contas do Prefeito, da Mesa da Câmara Municipal e do Tribunal de Contas do Município;",
           "runs": [
             {
@@ -40862,7 +40864,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIII",
-          "uid": "artADT14XIII",
+          "uid": "art14XIII",
           "text": "XIII — zelar pela preservação de sua competência legislativa, sustando os atos normativos do Executivo que exorbitem do poder regulamentar;",
           "runs": [
             {
@@ -40880,7 +40882,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIV",
-          "uid": "artADT14XIV",
+          "uid": "art14XIV",
           "text": "XIV — julgar o Prefeito, o Vice-Prefeito e os Vereadores, nos casos previstos nesta Lei; (Incluído pela Emenda à Lei Orgânica nº 1 de 1990 e renumerado pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -40910,7 +40912,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XV",
-          "uid": "artADT14XV",
+          "uid": "art14XV",
           "text": "XV — fiscalizar e controlar diretamente os atos do Poder Executivo, incluídos os da administração indireta, acompanhando sua gestão e avaliando seu resultado operacional, com o auxílio do Tribunal de Contas do Município, sempre que solicitado;",
           "runs": [
             {
@@ -40934,7 +40936,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVI",
-          "uid": "artADT14XVI",
+          "uid": "art14XVI",
           "text": "XVI — escolher 3 (três) dos membros do Tribunal de Contas do Município, após argüição em sessão pública;",
           "runs": [
             {
@@ -40958,7 +40960,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVII",
-          "uid": "artADT14XVII",
+          "uid": "art14XVII",
           "text": "XVII — aprovar previamente, após argüição em sessão pública, a escolha dos titulares dos cargos de Conselheiros do Tribunal de Contas, indicados pelo Prefeito;",
           "runs": [
             {
@@ -40982,7 +40984,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVIII",
-          "uid": "artADT14XVIII",
+          "uid": "art14XVIII",
           "text": "XVIII — exercer a fiscalização financeira, orçamentária, operacional e patrimonial do Município, auxiliada, quando solicitado, pelo Tribunal de Contas do Município;",
           "runs": [
             {
@@ -41000,7 +41002,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIX",
-          "uid": "artADT14XIX",
+          "uid": "art14XIX",
           "text": "XIX — conceder título de cidadão honorário ou qualquer outra honraria ou homenagem à pessoa que reconhecidamente tenha prestado serviço ao Município, mediante decreto legislativo aprovado pelo voto de, no mínimo 2/3 (dois terços) de seus membros;",
           "runs": [
             {
@@ -41018,7 +41020,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XX",
-          "uid": "artADT14XX",
+          "uid": "art14XX",
           "text": "XX — proceder à tomada de contas do Prefeito por meio de Comissão Especial quando não apresentadas à Câmara no prazo e forma estabelecidas na lei;",
           "runs": [
             {
@@ -41048,7 +41050,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XXI",
-          "uid": "artADT14XXI",
+          "uid": "art14XXI",
           "text": "XXI — criar, organizar e disciplinar o funcionamento dos Conselhos e Comissões da Câmara Municipal. (Incluído pela Emenda à Lei Orgânica nº 1 de 1990 e renumerado pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -41078,7 +41080,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XXII",
-          "uid": "artADT14XXII",
+          "uid": "art14XXII",
           "text": "XXII - votar moção de censura pública aos secretários municipais e aos subprefeitos em relação ao desempenho de suas funções. (Incluído pela Emenda à Lei Orgânica nº 8 de 1991)",
           "runs": [
             {
@@ -41099,7 +41101,8 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -41110,13 +41113,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT15",
-      "is_adt": true,
+      "art_number": "15",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 15",
-        "uid": "artADT15",
+        "uid": "art15",
         "text": "Art. 15 — No primeiro ano de cada legislatura, no dia 1.º de janeiro, às 15 (quinze) horas, em sessão de instalação, independente de número, sob a presidência do Vereador mais idoso dentre os presentes, os Vereadores prestarão compromisso e tomarão posse.",
         "runs": [
           {
@@ -41135,7 +41138,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT15p1",
+          "uid": "art15p1",
           "text": "§ 1.º — No ato da posse os Vereadores deverão desincompatibilizar-se e, na mesma ocasião, bem como ao término do mandato, deverão fazer a declaração pública de seus bens, a ser transcrita em livro próprio, constando de ata o seu resumo, e publicada no Diário Oficial do Município, no prazo máximo de 30 (trinta) dias.",
           "runs": [
             {
@@ -41153,7 +41156,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT15p2",
+          "uid": "art15p2",
           "text": "§ 2.º — O Vereador que não tomar posse, na sessão prevista neste artigo, deverá fazê-lo no prazo de 15 (quinze) dias, ressalvados os casos de motivo justo e aceito pela Câmara.",
           "runs": [
             {
@@ -41170,17 +41173,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT16",
-      "is_adt": true,
+      "art_number": "16",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 16",
-        "uid": "artADT16",
+        "uid": "art16",
         "text": "Art. 16 — Os Vereadores gozam de inviolabilidade por suas opiniões, palavras e votos no exercício do mandato, na circunscrição do Município.",
         "runs": [
           {
@@ -41199,7 +41203,7 @@
         {
           "unit_type": "PARAGRAFO_UNICO",
           "identifier": "Parágrafo único",
-          "uid": "artADT16pu",
+          "uid": "art16pu",
           "text": "Parágrafo único — Os Vereadores não serão obrigados a testemunhar sobre informações recebidas ou prestadas em razão do exercício do mandato, nem sobre as pessoas que lhes confiaram ou deles receberam informações.",
           "runs": [
             {
@@ -41216,17 +41220,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT17",
-      "is_adt": true,
+      "art_number": "17",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 17",
-        "uid": "artADT17",
+        "uid": "art17",
         "text": "Art. 17 — O Vereador não poderá:",
         "runs": [
           {
@@ -41245,7 +41250,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT17I",
+          "uid": "art17I",
           "text": "I — desde a expedição do diploma:",
           "runs": [
             {
@@ -41269,7 +41274,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT17a",
+          "uid": "art17a",
           "text": "a) firmar ou manter contrato com órgãos da administração direta, autarquia, empresa pública, sociedade de economia mista, fundação instituída ou mantida pelo Poder Público, ou empresa concessionária de serviço público, salvo quando o contrato obedecer à cláusulas uniformes;",
           "runs": [
             {
@@ -41293,7 +41298,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT17b",
+          "uid": "art17b",
           "text": "b) aceitar ou exercer cargo, função ou emprego remunerado, inclusive os de que seja demissível \"ad nutum\", nas entidades constantes da alínea anterior, ressalvado o disposto na Constituição da República e nesta Lei;",
           "runs": [
             {
@@ -41318,7 +41323,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT17II",
+          "uid": "art17II",
           "text": "II — desde a posse:",
           "runs": [
             {
@@ -41342,7 +41347,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT17a",
+          "uid": "art17a",
           "text": "a) ser proprietário, controlador ou diretor de empresa que goze de favor decorrente de contrato com pessoa jurídica de direito público, ou nela exercer função remunerada;",
           "runs": [
             {
@@ -41360,7 +41365,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT17b",
+          "uid": "art17b",
           "text": "b) ocupar cargo ou função de que seja demissível \"ad nutum’’, nas entidades referidas no inciso I, alínea \"a\", deste artigo, ressalvado o disposto na Constituição da República e nesta Lei;",
           "runs": [
             {
@@ -41385,7 +41390,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "c)",
-          "uid": "artADT17c",
+          "uid": "art17c",
           "text": "c) patrocinar causa em que seja interessada qualquer das entidades a que se refere o inciso I, alínea \"a\", deste artigo;",
           "runs": [
             {
@@ -41403,7 +41408,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "d)",
-          "uid": "artADT17d",
+          "uid": "art17d",
           "text": "d) ser titular de mais de um cargo ou mandato público eletivo em qualquer nível.",
           "runs": [
             {
@@ -41420,17 +41425,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT18",
-      "is_adt": true,
+      "art_number": "18",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 18",
-        "uid": "artADT18",
+        "uid": "art18",
         "text": "Art. 18 — Perderá o mandato o Vereador:",
         "runs": [
           {
@@ -41449,7 +41455,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT18I",
+          "uid": "art18I",
           "text": "I — que infringir qualquer das proibições estabelecidas no artigo anterior;",
           "runs": [
             {
@@ -41473,7 +41479,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT18II",
+          "uid": "art18II",
           "text": "II — cujo procedimento for declarado incompatível com o decoro parlamentar;",
           "runs": [
             {
@@ -41497,7 +41503,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT18III",
+          "uid": "art18III",
           "text": "III — que deixar de comparecer, em cada sessão legislativa, à terça parte das sessões ordinárias, salvo licenças ou missão autorizada pela Câmara;",
           "runs": [
             {
@@ -41515,7 +41521,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT18IV",
+          "uid": "art18IV",
           "text": "IV — que perder ou tiver suspensos os direitos políticos;",
           "runs": [
             {
@@ -41539,7 +41545,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT18V",
+          "uid": "art18V",
           "text": "V — quando o decretar a Justiça Eleitoral;",
           "runs": [
             {
@@ -41563,7 +41569,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT18VI",
+          "uid": "art18VI",
           "text": "VI — que sofrer condenação criminal em sentença transitada em julgado, que implique em restrição à liberdade de locomoção.",
           "runs": [
             {
@@ -41587,7 +41593,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT18p1",
+          "uid": "art18p1",
           "text": "§ 1.º — É incompatível com o decoro parlamentar, além dos casos definidos no Regimento Interno, o abuso das prerrogativas asseguradas a membros da Câmara Municipal ou a percepção de vantagens indevidas.",
           "runs": [
             {
@@ -41613,7 +41619,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT18p2",
+          "uid": "art18p2",
           "text": "§ 2.º — Nos casos dos incisos I, II e VI deste artigo, acolhida a acusação pela maioria absoluta dos Vereadores, por quórum de 2/3 (dois terços), assegurado o direito de defesa.",
           "runs": [
             {
@@ -41631,7 +41637,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT18p3",
+          "uid": "art18p3",
           "text": "§ 3.º — Nos casos dos incisos III a V, a perda será declarada pela Mesa, de ofício ou mediante provocação de qualquer dos membros da Câmara ou de partido político nela representado, assegurado o direito de defesa.",
           "runs": [
             {
@@ -41649,7 +41655,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT18p4",
+          "uid": "art18p4",
           "text": "§ 4.º — Lei disporá sobre o procedimento a ser obedecido nos processos de perda de mandato decididos pela Câmara, e sobre a aplicação de outras penalidades, assegurado o contraditório.",
           "runs": [
             {
@@ -41665,7 +41671,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT18p4",
+          "uid": "art18p4",
           "text": "§4º - A Câmara Municipal disporá sobre o procedimento a ser obedecido nos processos de perda de mandato decididos pela Câmara, e sobre a aplicação de outras penalidades, assegurado o contraditório. (Redação dada pela Emenda à Lei Orgânica nº 15 de 1993)",
           "runs": [
             {
@@ -41686,17 +41692,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT19",
-      "is_adt": true,
+      "art_number": "19",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 19",
-        "uid": "artADT19",
+        "uid": "art19",
         "text": "Art. 19 — A Câmara Municipal instituirá o Código de Ética dos Vereadores.",
         "runs": [
           {
@@ -41713,17 +41720,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT20",
-      "is_adt": true,
+      "art_number": "20",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 20",
-        "uid": "artADT20",
+        "uid": "art20",
         "text": "Art. 20 — O Vereador poderá licenciar-se:",
         "runs": [
           {
@@ -41742,7 +41750,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT20I",
+          "uid": "art20I",
           "text": "I — por motivo de doença devidamente comprovada;",
           "runs": [
             {
@@ -41766,7 +41774,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT20II",
+          "uid": "art20II",
           "text": "II — em face de licença gestante ou paternidade;",
           "runs": [
             {
@@ -41790,7 +41798,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT20III",
+          "uid": "art20III",
           "text": "III — para desempenhar missões temporárias de interesse do Município;",
           "runs": [
             {
@@ -41808,7 +41816,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT20IV",
+          "uid": "art20IV",
           "text": "IV — para tratar, com prejuízo dos seus vencimentos, de interesses particulares, por prazo determinado, nunca inferior a 30 (trinta) dias, nem superior a 120 (cento e vinte) dias por sessão legislativa, não podendo reassumir o exercício do mandato antes do término da licença.",
           "runs": [
             {
@@ -41832,7 +41840,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT20IV",
+          "uid": "art20IV",
           "text": "IV – para tratar, com prejuízo dos seus vencimentos, de interesses particulares, por prazo determinado, não superior a 120 (cento e vinte) dias por sessão legislativa, não podendo reassumir o exercício do mandato antes do término da licença. (Redação dada pela Emenda à Lei Orgânica nº 33 de 2009)",
           "runs": [
             {
@@ -41860,7 +41868,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT20p1",
+          "uid": "art20p1",
           "text": "§ 1.º — Para fins de remuneração considerar-se-á como em exercício o Vereador:",
           "runs": [
             {
@@ -41878,7 +41886,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT20I",
+          "uid": "art20I",
           "text": "I — licenciado nos termos dos incisos I e II do \"caput\" deste artigo;",
           "runs": [
             {
@@ -41902,7 +41910,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT20II",
+          "uid": "art20II",
           "text": "II — licenciado na forma do inciso III, se a missão decorrer de expressa designação da Câmara ou tiver sido previamente aprovada pelo Plenário.",
           "runs": [
             {
@@ -41926,7 +41934,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT20p2",
+          "uid": "art20p2",
           "text": "§ 2.º — A licença gestante e paternidade será concedida segundo os mesmos critérios e condições estabelecidos para os funcionários públicos municipais.",
           "runs": [
             {
@@ -41943,17 +41951,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT21",
-      "is_adt": true,
+      "art_number": "21",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 21",
-        "uid": "artADT21",
+        "uid": "art21",
         "text": "Art. 21 — Não perderá o mandato, considerando-se automaticamente licenciado, o Vereador investido na função de Ministro de Estado, Secretário de Estado, Secretário Municipal ou chefe de missão diplomática temporária, devendo optar pelos vencimentos do cargo ou pela remuneração do mandato.",
         "runs": [
           {
@@ -41970,17 +41979,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT22",
-      "is_adt": true,
+      "art_number": "22",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 22",
-        "uid": "artADT22",
+        "uid": "art22",
         "text": "Art. 22 — No caso de vaga, de investidura prevista no artigo anterior ou de licença de Vereador superior a 30 (trinta) dias, o Presidente convocará imediatamente o suplente.",
         "runs": [
           {
@@ -41999,7 +42009,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT22p1",
+          "uid": "art22p1",
           "text": "§ 1.º — O suplente convocado deverá tomar posse dentro de 15 (quinze) dias, salvo motivo justo aceito pela Câmara.",
           "runs": [
             {
@@ -42017,7 +42027,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT22p2",
+          "uid": "art22p2",
           "text": "§ 2.º — Em caso de vaga, não havendo suplente, o Presidente comunicará o fato, dentro de 48 (quarenta e oito) horas, diretamente ao Tribunal Regional Eleitoral.",
           "runs": [
             {
@@ -42034,17 +42044,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT23",
-      "is_adt": true,
+      "art_number": "23",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 23",
-        "uid": "artADT23",
+        "uid": "art23",
         "text": "Art. 23 — No exercício de seu mandato, o Vereador terá livre acesso às repartições públicas municipais, podendo diligenciar pessoalmente junto aos órgãos da administração direta e indireta, inclusive junto ao Tribunal de Contas do Município, devendo ser atendido pelos respectivos responsáveis, na forma da lei.",
         "runs": [
           {
@@ -42061,7 +42072,8 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -42072,13 +42084,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT24",
-      "is_adt": true,
+      "art_number": "24",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 24",
-        "uid": "artADT24",
+        "uid": "art24",
         "text": "Art. 24 — Imediatamente após a posse, os Vereadores reunir-se-ão sob a presidência do mais idoso dos presentes e, havendo maioria absoluta dos membros da Câmara, elegerão os componentes da Mesa, que ficarão automaticamente empossados.",
         "runs": [
           {
@@ -42097,7 +42109,7 @@
         {
           "unit_type": "PARAGRAFO_UNICO",
           "identifier": "Parágrafo único",
-          "uid": "artADT24pu",
+          "uid": "art24pu",
           "text": "Parágrafo único — Não havendo número legal, o Vereador mais idoso dentre os presentes permanecerá na Presidência e convocará sessões diárias, até que seja eleita a Mesa.",
           "runs": [
             {
@@ -42114,17 +42126,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT25",
-      "is_adt": true,
+      "art_number": "25",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 25",
-        "uid": "artADT25",
+        "uid": "art25",
         "text": "Art. 25 — A eleição para renovação da Mesa realizar-se-á no dia 15 (quinze) de dezembro e a posse dos eleitos dar-se-á no dia 1.º de janeiro do ano subseqüente.",
         "runs": [
           {
@@ -42149,7 +42162,7 @@
         {
           "unit_type": "PARAGRAFO_UNICO",
           "identifier": "Parágrafo único",
-          "uid": "artADT25pu",
+          "uid": "art25pu",
           "text": "Parágrafo único — O Regimento Interno disporá sobre a eleição e as atribuições dos membros da Mesa, que será composta por 5 (cinco) membros titulares e 2 (dois) suplentes.",
           "runs": [
             {
@@ -42174,17 +42187,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT26",
-      "is_adt": true,
+      "art_number": "26",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 26",
-        "uid": "artADT26",
+        "uid": "art26",
         "text": "Art. 26. O mandato da Mesa será de 1 (um) ano, permitidas reeleições para o mesmo cargo. (NR) (Redação dada pela Emenda nº 43 de 2023)",
         "runs": [
           {
@@ -42204,7 +42218,7 @@
         {
           "unit_type": "PARAGRAFO_UNICO",
           "identifier": "Parágrafo único",
-          "uid": "artADT26pu",
+          "uid": "art26pu",
           "text": "Parágrafo único — Pelo voto de 2/3 (dois terços) dos membros da Câmara, qualquer componente da Mesa poderá ser destituído, quando negligente ou omisso no desempenho de suas atribuições regimentais, elegendo-se outro Vereador para completar o mandato.",
           "runs": [
             {
@@ -42224,7 +42238,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 26",
-          "uid": "artADT26",
+          "uid": "art26",
           "text": "Art. 26 — O mandato da Mesa será de 1 (um) ano, permitida uma reeleição.",
           "runs": [
             {
@@ -42244,7 +42258,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 26",
-          "uid": "artADT26",
+          "uid": "art26",
           "text": "Art. 26. O mandato da Mesa será de 1 (um) ano, permitidas duas reeleições para o mesmo cargo. (Redação dada pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -42263,17 +42277,18 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT27",
-      "is_adt": true,
+      "art_number": "27",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 27",
-        "uid": "artADT27",
+        "uid": "art27",
         "text": "Art. 27. À Mesa, dentre outras atribuições compete: (Redação dada pela Emenda à Lei Orgânica nº 41, de 18 de novembro de 2021, que entra em vigor 120 dias após sua promulgação)",
         "runs": [
           {
@@ -42293,7 +42308,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT27I",
+          "uid": "art27I",
           "text": "I — tomar a iniciativa nas matérias a que se refere o inciso III do artigo 14, nos termos do Regimento Interno. (Incluído pela Emenda à Lei Orgânica nº 1 de 1990 e alterado pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -42339,7 +42354,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT27II",
+          "uid": "art27II",
           "text": "II — suplementar, mediante ato, as dotações do orçamento da Câmara, observado o limite da autorização constante da Lei Orçamentária, desde que sejam provenientes de anulação total ou parcial de suas dotações orçamentárias;",
           "runs": [
             {
@@ -42363,7 +42378,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT27III",
+          "uid": "art27III",
           "text": "III — apresentar Projetos de Lei dispondo sobre abertura de créditos suplementares ou especiais, através de anulação parcial ou total da dotação da Câmara;",
           "runs": [
             {
@@ -42381,7 +42396,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT27IV",
+          "uid": "art27IV",
           "text": "IV — devolver à Tesouraria da Prefeitura, o saldo de caixa existente na Câmara no final do exercício;",
           "runs": [
             {
@@ -42405,7 +42420,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT27V",
+          "uid": "art27V",
           "text": "V — enviar ao Tribunal de Contas do Município, até o dia 31 de março, as contas do exercício anterior;",
           "runs": [
             {
@@ -42429,7 +42444,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT27VI",
+          "uid": "art27VI",
           "text": "VI — nomear, promover, comissionar, conceder gratificações e licenças, pôr em disponibilidade, exonerar, demitir, aposentar e punir servidores da Câmara Municipal, nos termos da lei;",
           "runs": [
             {
@@ -42457,7 +42472,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT27VI",
+          "uid": "art27VI",
           "text": "VI - nomear, promover, comissionar, conceder gratificação e licenças, pôr em disponibilidade, exonerar, demitir e punir servidores da Câmara Municipal, nos termos da Lei; (Redação dada pela Emenda à Lei Orgânica nº 41, de 18 de novembro de 2021, que entra em vigor 120 dias após sua promulgação)",
           "runs": [
             {
@@ -42478,7 +42493,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT27VI",
+          "uid": "art27VI",
           "text": "VI - nomear, promover, comissionar, conceder gratificações e licenças, pôr em disponibilidade, exonerar, demitir, aposentar e punir servidores da Câmara Municipal, nos termos da lei; (Redação dada pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -42497,7 +42512,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT27VII",
+          "uid": "art27VII",
           "text": "VII — declarar a perda do mandato de Vereador na forma do § 3.º do artigo 18 desta Lei;",
           "runs": [
             {
@@ -42523,7 +42538,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT27VIII",
+          "uid": "art27VIII",
           "text": "VIII — instalar na forma do Regimento Interno, Tribuna Popular, onde representantes de entidades e movimentos da sociedade civil, inscritos previamente, debaterão, com os Vereadores questões de interesse do Município.",
           "runs": [
             {
@@ -42551,7 +42566,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 27",
-          "uid": "artADT27",
+          "uid": "art27",
           "text": "Art. 27 — À Mesa, dentre outras atribuições, compete:",
           "runs": [
             {
@@ -42569,17 +42584,18 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT28",
-      "is_adt": true,
+      "art_number": "28",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 28",
-        "uid": "artADT28",
+        "uid": "art28",
         "text": "Art. 28 — Ressalvados os projetos de lei de iniciativa privativa, a matéria constante de projeto de lei rejeitado somente poderá ser reapresentada, na mesma sessão legislativa, mediante proposta da maioria absoluta dos membros da Câmara Municipal.",
         "runs": [
           {
@@ -42596,7 +42612,8 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -42607,13 +42624,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT29",
-      "is_adt": true,
+      "art_number": "29",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 29",
-        "uid": "artADT29",
+        "uid": "art29",
         "text": "Art. 29 — A Câmara Municipal reunir-se-á anualmente em sua sede, em sessão legislativa ordinária, de 1.º de fevereiro a 30 de junho, e de 1.º de agosto a 15 de dezembro.",
         "runs": [
           {
@@ -42632,7 +42649,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT29p1",
+          "uid": "art29p1",
           "text": "§ 1.º — A sessão legislativa ordinária não será interrompida sem a aprovação dos projetos de lei de diretrizes orçamentárias e do orçamento.",
           "runs": [
             {
@@ -42650,7 +42667,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT29p2",
+          "uid": "art29p2",
           "text": "§ 2.º — A Câmara se reunirá em sessões ordinárias, extraordinárias ou solenes, conforme dispuser o seu Regimento Interno.",
           "runs": [
             {
@@ -42676,7 +42693,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT29p3",
+          "uid": "art29p3",
           "text": "§ 3.º — As sessões extraordinárias serão convocadas, na forma regimental, em sessão ou fora dela, e, neste caso, mediante comunicação pessoal e escrita aos Vereadores, pelo Presidente da Câmara, com antecedência mínima de 24 (vinte e quatro) horas.",
           "runs": [
             {
@@ -42694,7 +42711,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT29p4",
+          "uid": "art29p4",
           "text": "§ 4.º — As sessões extraordinárias e solenes não serão, em hipótese alguma, remuneradas.",
           "runs": [
             {
@@ -42712,7 +42729,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 5º",
-          "uid": "artADT29p5",
+          "uid": "art29p5",
           "text": "§ 5º As sessões da Câmara Municipal, bem como as reuniões das Comissões, poderão ocorrer com a participação remota dos Vereadores, conforme dispuser o seu Regimento Interno. (Incluído pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -42730,17 +42747,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT30",
-      "is_adt": true,
+      "art_number": "30",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 30",
-        "uid": "artADT30",
+        "uid": "art30",
         "text": "Art. 30 — As sessões da Câmara serão públicas, salvo deliberação em contrário, tomada por 2/3 (dois terços) de seus membros, quando ocorrer motivo relevante.",
         "runs": [
           {
@@ -42757,17 +42775,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT31",
-      "is_adt": true,
+      "art_number": "31",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 31",
-        "uid": "artADT31",
+        "uid": "art31",
         "text": "Art. 31 — No período de recesso, a Câmara poderá ser extraordinariamente convocada:",
         "runs": [
           {
@@ -42786,7 +42805,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT31I",
+          "uid": "art31I",
           "text": "I — pelo Prefeito;",
           "runs": [
             {
@@ -42810,7 +42829,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT31II",
+          "uid": "art31II",
           "text": "II — pela maioria absoluta dos Vereadores.",
           "runs": [
             {
@@ -42834,7 +42853,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT31p1",
+          "uid": "art31p1",
           "text": "§ 1.º — A convocação será feita mediante ofício ao Presidente da Câmara, para reunir-se, no mínimo, dentro de 2 (dois) dias.",
           "runs": [
             {
@@ -42852,7 +42871,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT31p2",
+          "uid": "art31p2",
           "text": "§ 2.º — Durante a sessão legislativa extraordinária, a Câmara deliberará exclusivamente sobre a matéria para a qual foi convocada.",
           "runs": [
             {
@@ -42869,7 +42888,8 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -42880,13 +42900,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT32",
-      "is_adt": true,
+      "art_number": "32",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 32",
-        "uid": "artADT32",
+        "uid": "art32",
         "text": "Art. 32 — A Câmara terá Comissões permanentes e temporárias, constituidas na forma e com as atribuições previstas no respectivo Regimento ou no ato de que resultar a sua criação.",
         "runs": [
           {
@@ -42919,7 +42939,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT32p1",
+          "uid": "art32p1",
           "text": "§ 1.º — Em cada Comissão será assegurada, tanto quanto possível, a representação proporcional dos partidos que participam da Câmara.",
           "runs": [
             {
@@ -42937,7 +42957,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT32p2",
+          "uid": "art32p2",
           "text": "§ 2.º — Às Comissões, em razão da matéria de sua competência, cabe:",
           "runs": [
             {
@@ -42955,7 +42975,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT32I",
+          "uid": "art32I",
           "text": "I — estudar proposições submetidas ao seu exame, na forma do Regimento ;",
           "runs": [
             {
@@ -42985,7 +43005,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT32II",
+          "uid": "art32II",
           "text": "II — fiscalizar, inclusive efetuando diligências, vistorias e levantamentos \"in loco\", os atos da administração direta e indireta, nos termos da legislação pertinente, em especial para verificar a regularidade, a eficiência e a eficácia dos seus órgãos no cumprimento dos objetivos institucionais, recorrendo ao auxílio do Tribunal de Contas, sempre que necessário;",
           "runs": [
             {
@@ -43009,7 +43029,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT32III",
+          "uid": "art32III",
           "text": "III — solicitar ao Prefeito informações sobre assuntos inerentes à administração;",
           "runs": [
             {
@@ -43027,7 +43047,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT32IV",
+          "uid": "art32IV",
           "text": "IV — convocar os Secretários Municipais, os responsáveis pela administração direta e indireta e os Conselheiros do Tribunal de Contas para prestar informações sobre assuntos inerentes às suas atribuições; (Vide Adin 11.754-0/6, que declarou inconstitucional parte deste inciso)",
           "runs": [
             {
@@ -43059,7 +43079,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT32V",
+          "uid": "art32V",
           "text": "V — acompanhar, junto ao Executivo, os atos de regulamentação, velando por sua completa adequação;",
           "runs": [
             {
@@ -43083,7 +43103,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT32VI",
+          "uid": "art32VI",
           "text": "VI — acompanhar, junto ao Executivo, a elaboração da proposta orçamentária, bem como a sua posterior execução;",
           "runs": [
             {
@@ -43107,7 +43127,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT32VII",
+          "uid": "art32VII",
           "text": "VII — discutir e votar projeto de lei que dispensar, na forma do Regimento, a competência do Plenário, salvo com recurso de 1/10 (um décimo) dos membros da Casa;",
           "runs": [
             {
@@ -43133,7 +43153,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT32VIII",
+          "uid": "art32VIII",
           "text": "VIII — realizar audiências públicas;",
           "runs": [
             {
@@ -43151,7 +43171,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT32IX",
+          "uid": "art32IX",
           "text": "IX — solicitar informações ou depoimentos de autoridades ou cidadãos;",
           "runs": [
             {
@@ -43175,7 +43195,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT32X",
+          "uid": "art32X",
           "text": "X — receber petições, reclamações, representações ou queixas de associações e entidades comunitárias ou de qualquer pessoa contra atos e omissões de autoridades municipais ou entidades públicas;",
           "runs": [
             {
@@ -43199,7 +43219,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT32XI",
+          "uid": "art32XI",
           "text": "XI — apreciar programas de obras, planos regionais e setoriais de desenvolvimento e sobre eles emitir parecer;",
           "runs": [
             {
@@ -43217,7 +43237,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XII",
-          "uid": "artADT32XII",
+          "uid": "art32XII",
           "text": "XII — requisitar, dos responsáveis, a exibição de documentos e a prestação dos esclarecimentos necessários;",
           "runs": [
             {
@@ -43235,7 +43255,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIII",
-          "uid": "artADT32XIII",
+          "uid": "art32XIII",
           "text": "XIII — solicitar ao Presidente do Tribunal de Contas informações sobre assuntos inerentes à atuação administrativa desse órgão.",
           "runs": [
             {
@@ -43253,7 +43273,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT32p3",
+          "uid": "art32p3",
           "text": "§ 3.º — As Comissões permanentes deverão, na forma estabelecida pelo Regimento Interno, reunir-se em audiência pública especialmente para ouvir representantes de entidades legalmente constituídas, ou representantes de no mínimo 1.500 (um mil e quinhentos) eleitores do Município que subscrevam requerimento, sobre assunto de interesse público, sempre que essas entidades ou eleitores o requererem.",
           "runs": [
             {
@@ -43279,7 +43299,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT32p4",
+          "uid": "art32p4",
           "text": "§ 4º A Câmara Municipal de São Paulo deverá criar uma Comissão Permanente voltada especificamente para o exercício da fiscalização e do controle dos atos do Poder Executivo, incluídos os da Administração Indireta, sem prejuízo das competências constitucionais atribuídas ao Plenário da Câmara e ao Tribunal de Contas do Município. (Incluído pela Emenda à Lei Orgânica nº 29 de 2007)",
           "runs": [
             {
@@ -43301,17 +43321,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT33",
-      "is_adt": true,
+      "art_number": "33",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 33",
-        "uid": "artADT33",
+        "uid": "art33",
         "text": "Art. 33 — As Comissões Parlamentares de Inquérito terão poderes de investigação próprios das autoridades judiciais, além de outros previstos no Regimento Interno, em matéria de interesse do Município, e serão criadas pela Câmara, mediante requerimento de 1/3 (um terço) de seus membros, aprovados por maioria absoluta, para apuração de fato determinado, em prazo certo, adequado à consecução dos seus fins, sendo suas conclusões, se for o caso, encaminhadas ao Ministério Público, para que promova a responsabilidade civil ou criminal dos infratores. (Adin 055.218-0/2 - Tribunal de Justiça do Estado de São Paulo)(Vide Precedente Regimental nº 02 de 2001)",
         "runs": [
           {
@@ -43359,7 +43380,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT33p1",
+          "uid": "art33p1",
           "text": "§ 1.º — As Comissões Parlamentares de Inquérito, no interesse da investigação, além das atribuições previstas nos incisos II, IV, IX e XII do § 2.º do art. 32 e daquelas previstas no Regimento Interno, poderão:",
           "runs": [
             {
@@ -43393,7 +43414,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT33I",
+          "uid": "art33I",
           "text": "I — tomar depoimento de autoridade municipal, intimar testemunhas e inquirí-las sob compromisso, nos termos desta lei;",
           "runs": [
             {
@@ -43423,7 +43444,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT33II",
+          "uid": "art33II",
           "text": "II — proceder a verificações contábeis em livros, papéis e documentos de órgãos da administração direta, indireta e fundacional.",
           "runs": [
             {
@@ -43447,7 +43468,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT33p2",
+          "uid": "art33p2",
           "text": "§ 2.º — O Regimento Interno preverá o modo de funcionamento das Comissões Parlamentares de Inquérito.",
           "runs": [
             {
@@ -43472,7 +43493,8 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -43483,13 +43505,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT34",
-      "is_adt": true,
+      "art_number": "34",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 34",
-        "uid": "artADT34",
+        "uid": "art34",
         "text": "Art. 34 — O Processo Legislativo compreende a elaboração de:",
         "runs": [
           {
@@ -43508,7 +43530,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT34I",
+          "uid": "art34I",
           "text": "I — emendas à Lei Orgânica;",
           "runs": [
             {
@@ -43532,7 +43554,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT34II",
+          "uid": "art34II",
           "text": "II — leis;",
           "runs": [
             {
@@ -43556,7 +43578,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT34III",
+          "uid": "art34III",
           "text": "III — decretos legislativos;",
           "runs": [
             {
@@ -43574,7 +43596,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT34IV",
+          "uid": "art34IV",
           "text": "IV — resoluções.",
           "runs": [
             {
@@ -43597,17 +43619,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT35",
-      "is_adt": true,
+      "art_number": "35",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 35",
-        "uid": "artADT35",
+        "uid": "art35",
         "text": "Art. 35 - As deliberações da Câmara Municipal de São Paulo e das suas Comissões se darão sempre por voto aberto. (Redação dada pela Emenda à Lei Orgânica nº 19 de 2001)",
         "runs": [
           {
@@ -43630,7 +43653,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT35I",
+          "uid": "art35I",
           "text": "I — julgamento político do Prefeito ou de Vereador; (Revogado pela Emenda à Lei Orgânica nº 19 de 2001)",
           "runs": [
             {
@@ -43656,7 +43679,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT35II",
+          "uid": "art35II",
           "text": "II — eleições dos membros da Mesa e de seus substitutos; (Revogado pela Emenda à Lei Orgânica nº 19 de 2001)",
           "runs": [
             {
@@ -43682,7 +43705,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT35III",
+          "uid": "art35III",
           "text": "III — aprovação prévia de Conselheiro do Tribunal de Contas indicado pelo Executivo. (Revogado pela Emenda à Lei Orgânica nº 19 de 2001)",
           "runs": [
             {
@@ -43710,7 +43733,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 35",
-          "uid": "artADT35",
+          "uid": "art35",
           "text": "Art. 35 — As deliberações da Câmara Municipal e das suas Comissões se darão sempre por voto aberto, salvo as seguintes hipóteses:",
           "runs": [
             {
@@ -43724,17 +43747,18 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT36",
-      "is_adt": true,
+      "art_number": "36",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 36",
-        "uid": "artADT36",
+        "uid": "art36",
         "text": "Art. 36 — A Lei Orgânica do Município poderá ser emendada mediante proposta: (Redação dada pela Emenda à Lei Orgânica nº 14 de 1993)",
         "runs": [
           {
@@ -43757,7 +43781,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT36I",
+          "uid": "art36I",
           "text": "I — de 1/3 (um terço), no mínimo, dos membros da Câmara Municipal;",
           "runs": [
             {
@@ -43781,7 +43805,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT36II",
+          "uid": "art36II",
           "text": "II — do Prefeito;",
           "runs": [
             {
@@ -43805,7 +43829,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT36III",
+          "uid": "art36III",
           "text": "III — de cidadãos, mediante iniciativa popular assinada por, no mínimo 5% (cinco por cento) dos eleitores do Município.",
           "runs": [
             {
@@ -43823,7 +43847,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT36p1",
+          "uid": "art36p1",
           "text": "§ 1.º — A Lei Orgânica não poderá ser emendada na vigência de estado de defesa, estado de sítio ou intervenção.",
           "runs": [
             {
@@ -43841,7 +43865,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT36p2",
+          "uid": "art36p2",
           "text": "§ 2.º — A proposta será discutida e votada em 2 (dois) turnos, considerando-se aprovada quando obtiver, em ambas as votações, o voto favorável de 2/3 (dois terços) dos membros da Câmara Municipal. (Vide ADIN nº 2050840-43.2024.8.26.0000)",
           "runs": [
             {
@@ -43866,7 +43890,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT36p2",
+          "uid": "art36p2",
           "text": "§2º — A proposta será discutida e votada em 2 (dois) turnos, considerando-se aprovada quando obtiver, em ambas as votações, o voto favorável de 2/3 (dois terços) dos membros da Câmara Municipal, com um intervalo mínimo de 48 (quarenta e oito) horas entre um turno e outro, obrigatoriamente. (Redação dada pela Emenda à Lei Orgânica nº 14 de 1993) (Vide ADIN nº 2050840-43.2024.8.26.0000)",
           "runs": [
             {
@@ -43898,7 +43922,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT36p3",
+          "uid": "art36p3",
           "text": "§ 3.º — A emenda aprovada será promulgada pela Mesa da Câmara Municipal, com o respectivo número de ordem.",
           "runs": [
             {
@@ -43916,7 +43940,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT36p4",
+          "uid": "art36p4",
           "text": "§ 4.º — A matéria constante de emenda rejeitada ou havida por prejudicada não poderá ser objeto de nova proposta na mesma sessão legislativa.",
           "runs": [
             {
@@ -43936,7 +43960,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 36",
-          "uid": "artADT36",
+          "uid": "art36",
           "text": "Art. 36 — A Lei Orgânica poderá ser emendada mediante proposta:",
           "runs": [
             {
@@ -43950,17 +43974,18 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT37",
-      "is_adt": true,
+      "art_number": "37",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 37",
-        "uid": "artADT37",
+        "uid": "art37",
         "text": "Art. 37 — A iniciativa das leis cabe a qualquer membro ou Comissão permanente da Câmara Municipal, ao Prefeito e aos cidadãos, na forma e nos casos previstos nesta Lei Orgânica.",
         "runs": [
           {
@@ -43979,7 +44004,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT37p1",
+          "uid": "art37p1",
           "text": "§ 1.º — Compete exclusivamente à Câmara Municipal a iniciativa das leis que disponham sobre os Conselhos de Representantes, previstos na seção VIII deste capítulo.",
           "runs": [
             {
@@ -43997,7 +44022,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT37p2",
+          "uid": "art37p2",
           "text": "§ 2.º — São de iniciativa privativa do Prefeito as leis que disponham sobre:",
           "runs": [
             {
@@ -44015,7 +44040,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT37I",
+          "uid": "art37I",
           "text": "I — criação, extinção ou transformação de cargos, funções ou empregos públicos na administração direta, autárquica e fundacional;",
           "runs": [
             {
@@ -44039,7 +44064,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT37II",
+          "uid": "art37II",
           "text": "II — fixação ou aumento de remuneração dos servidores;",
           "runs": [
             {
@@ -44063,7 +44088,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT37III",
+          "uid": "art37III",
           "text": "III — servidores públicos municipais, seu regime jurídico, provimento de cargos, estabilidade e aposentadoria;",
           "runs": [
             {
@@ -44081,7 +44106,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT37IV",
+          "uid": "art37IV",
           "text": "IV — organização administrativa, serviços públicos e matéria orçamentária;",
           "runs": [
             {
@@ -44105,7 +44130,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT37IV",
+          "uid": "art37IV",
           "text": "IV - organização administrativa e matéria orçamentária; (Redação dada pela Emenda à Lei Orgânica nº 28 de 2006)",
           "runs": [
             {
@@ -44127,7 +44152,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT37V",
+          "uid": "art37V",
           "text": "V — desafetação, aquisição, alienação e concessão de bens imóveis municipais.",
           "runs": [
             {
@@ -44144,17 +44169,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT38",
-      "is_adt": true,
+      "art_number": "38",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 38",
-        "uid": "artADT38",
+        "uid": "art38",
         "text": "Art. 38 — O Prefeito poderá solicitar que os projetos de sua iniciativa tramitem em regime de urgência.",
         "runs": [
           {
@@ -44173,7 +44199,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT38p1",
+          "uid": "art38p1",
           "text": "§ 1.º — Se a Câmara Municipal não deliberar em até 30 (trinta) dias, o projeto será incluído na Ordem do Dia, sobrestando-se a deliberação quanto aos demais assuntos, até que se ultime a votação.",
           "runs": [
             {
@@ -44191,7 +44217,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT38p2",
+          "uid": "art38p2",
           "text": "§ 2.º — Os prazos do parágrafo anterior não correm nos períodos de recesso, nem se aplicam aos projetos de código.",
           "runs": [
             {
@@ -44208,17 +44234,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT39",
-      "is_adt": true,
+      "art_number": "39",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 39",
-        "uid": "artADT39",
+        "uid": "art39",
         "text": "Art. 39 — O Regimento Interno da Câmara Municipal disciplinará os casos de decreto legislativo e de resolução.",
         "runs": [
           {
@@ -44243,17 +44270,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT40",
-      "is_adt": true,
+      "art_number": "40",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 40",
-        "uid": "artADT40",
+        "uid": "art40",
         "text": "Art. 40 — A discussão e votação de matéria constante da Ordem do Dia só poderá ser efetuada com a presença da maioria absoluta dos membros da Câmara. (Incluído pela Emenda à Lei Orgânica nº 1 de 1990 e alterado pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
         "runs": [
           {
@@ -44284,7 +44312,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT40p1",
+          "uid": "art40p1",
           "text": "§ 1.º — A aprovação da matéria em discussão, salvo as exceções previstas nesta Lei Orgânica, dependerá do voto favorável da maioria dos Vereadores presentes à sessão. ",
           "runs": [
             {
@@ -44302,7 +44330,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT40p2",
+          "uid": "art40p2",
           "text": "§ 2.º — Os projetos de lei e a aprovação e alteração do Regimento Interno serão apreciadas em 2 (dois) turnos de discussão e votação.",
           "runs": [
             {
@@ -44327,7 +44355,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT40p3",
+          "uid": "art40p3",
           "text": "§ 3.º — Dependerão do voto favorável da maioria absoluta dos membros da Câmara a aprovação e as alterações das seguintes matérias:",
           "runs": [
             {
@@ -44345,7 +44373,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT40I",
+          "uid": "art40I",
           "text": "I — matéria tributária;",
           "runs": [
             {
@@ -44369,7 +44397,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT40II",
+          "uid": "art40II",
           "text": "II — Código de Obras e Edificações e outros Códigos;",
           "runs": [
             {
@@ -44387,7 +44415,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT40III",
+          "uid": "art40III",
           "text": "III — Estatuto dos Servidores Municipais;",
           "runs": [
             {
@@ -44405,7 +44433,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT40IV",
+          "uid": "art40IV",
           "text": "IV — criação de cargos, funções e empregos da administração direta, autárquica e fundacional, bem como sua remuneração;",
           "runs": [
             {
@@ -44429,7 +44457,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT40V",
+          "uid": "art40V",
           "text": "V — concessão de serviço público;",
           "runs": [
             {
@@ -44453,7 +44481,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT40VI",
+          "uid": "art40VI",
           "text": "VI — concessão de direito real de uso;",
           "runs": [
             {
@@ -44477,7 +44505,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT40VII",
+          "uid": "art40VII",
           "text": "VII — alienação de bens imóveis;",
           "runs": [
             {
@@ -44495,7 +44523,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT40VIII",
+          "uid": "art40VIII",
           "text": "VIII — autorização para obtenção de empréstimo de particular, inclusive para as autarquias, fundações e demais entidades controladas pelo Poder Público;",
           "runs": [
             {
@@ -44513,7 +44541,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT40IX",
+          "uid": "art40IX",
           "text": "IX — lei de diretrizes orçamentárias, plano plurianual e lei orçamentária anual;",
           "runs": [
             {
@@ -44537,7 +44565,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT40X",
+          "uid": "art40X",
           "text": "X — aquisição de bens imóveis por doação com encargo;",
           "runs": [
             {
@@ -44561,7 +44589,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT40XI",
+          "uid": "art40XI",
           "text": "XI — criação, organização e supressão de distritos e subdistritos, e divisão do território do Município em áreas administrativas; (Redação dada pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -44583,7 +44611,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XII",
-          "uid": "artADT40XII",
+          "uid": "art40XII",
           "text": "XII — criação, estruturação e atribuição das Secretarias, Sub Prefeituras, Conselhos de Representantes e dos órgãos da Administração Pública;",
           "runs": [
             {
@@ -44601,7 +44629,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIII",
-          "uid": "artADT40XIII",
+          "uid": "art40XIII",
           "text": "XIII — realização de operações de crédito para abertura de créditos adicionais, suplementares ou especiais com finalidade precisa;",
           "runs": [
             {
@@ -44619,7 +44647,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIV",
-          "uid": "artADT40XIV",
+          "uid": "art40XIV",
           "text": "XIV — rejeição de veto;",
           "runs": [
             {
@@ -44637,7 +44665,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XV",
-          "uid": "artADT40XV",
+          "uid": "art40XV",
           "text": "XV — Regimento Interno da Câmara Municipal; (Redação dada pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -44666,7 +44694,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVI",
-          "uid": "artADT40XVI",
+          "uid": "art40XVI",
           "text": "XVI — alteração de denominação de próprios, vias e logradouros públicos; (Redação dada pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -44688,7 +44716,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVII",
-          "uid": "artADT40XVII",
+          "uid": "art40XVII",
           "text": "XVII — isenções de impostos municipais; (Redação dada pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -44710,7 +44738,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XVIII",
-          "uid": "artADT40XVIII",
+          "uid": "art40XVIII",
           "text": "XVIII — todo e qualquer tipo de anistia. (Redação dada pela republicação da Lei Orgânica no Diário Oficial do Município de São Paulo - Suplemento em 06/04/1990)",
           "runs": [
             {
@@ -44732,7 +44760,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIX",
-          "uid": "artADT40XIX",
+          "uid": "art40XIX",
           "text": "XIX – concessão administrativa de uso. (Incluído pela Emenda à Lei Orgânica nº 11 de 1991)",
           "runs": [
             {
@@ -44754,7 +44782,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT40p4",
+          "uid": "art40p4",
           "text": "§ 4.º — Dependerão do voto favorável de 3/5 (três quintos) dos membros da Câmara as seguintes matérias:",
           "runs": [
             {
@@ -44772,7 +44800,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT40I",
+          "uid": "art40I",
           "text": "I — zoneamento urbano;",
           "runs": [
             {
@@ -44800,7 +44828,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT40I",
+          "uid": "art40I",
           "text": "I - disciplina do Parcelamento, Uso e Ocupação do Solo; (Redação dada pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -44819,7 +44847,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT40II",
+          "uid": "art40II",
           "text": "II — Plano Diretor.",
           "runs": [
             {
@@ -44837,7 +44865,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT40III",
+          "uid": "art40III",
           "text": "III - Zoneamento geo-ambiental. (Incluído pela Emenda à Lei Orgânica nº 20 de 2001)",
           "runs": [
             {
@@ -44865,7 +44893,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 5º",
-          "uid": "artADT40p5",
+          "uid": "art40p5",
           "text": "§ 5.º — Dependerão do voto favorável de 2/3 (dois terços) dos membros da Câmara a aprovação e alterações das seguintes matérias:",
           "runs": [
             {
@@ -44883,7 +44911,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT40I",
+          "uid": "art40I",
           "text": "I — rejeição do parecer prévio do Tribunal de Contas, referido no art. 48, inciso I;",
           "runs": [
             {
@@ -44915,7 +44943,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT40II",
+          "uid": "art40II",
           "text": "II — destituição dos membros da Mesa;",
           "runs": [
             {
@@ -44939,7 +44967,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT40III",
+          "uid": "art40III",
           "text": "III — emendas à Lei Orgânica;",
           "runs": [
             {
@@ -44957,7 +44985,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT40IV",
+          "uid": "art40IV",
           "text": "IV — concessão de título de cidadão honorário ou qualquer outra honraria ou homenagem. (Revogado pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -44990,7 +45018,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT40V",
+          "uid": "art40V",
           "text": "V - moção de censura pública aos secretários e subprefeitos referida no inciso XXII do art. 14. (Incluído pela Emenda à Lei Orgânica nº 8 de 1991)",
           "runs": [
             {
@@ -45019,17 +45047,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT41",
-      "is_adt": true,
+      "art_number": "41",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 41",
-        "uid": "artADT41",
+        "uid": "art41",
         "text": "Art. 41 — A Câmara Municipal, através de suas Comissões permanentes, na forma regimental e mediante prévia e ampla publicidade, convocará obrigatóriamente pelo menos 2 (duas) audiências públicas durante a tramitação de projetos de lei que versem sobre:",
         "runs": [
           {
@@ -45054,7 +45083,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT41I",
+          "uid": "art41I",
           "text": "I — Plano Diretor;",
           "runs": [
             {
@@ -45072,7 +45101,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT41II",
+          "uid": "art41II",
           "text": "II — plano plurianual;",
           "runs": [
             {
@@ -45096,7 +45125,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT41III",
+          "uid": "art41III",
           "text": "III — diretrizes orçamentárias;",
           "runs": [
             {
@@ -45114,7 +45143,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT41IV",
+          "uid": "art41IV",
           "text": "IV — orçamento;",
           "runs": [
             {
@@ -45138,7 +45167,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT41V",
+          "uid": "art41V",
           "text": "V — matéria tributária;",
           "runs": [
             {
@@ -45162,7 +45191,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT41VI",
+          "uid": "art41VI",
           "text": "VI — zoneamento urbano, geo-ambiental e uso e ocupação do solo;",
           "runs": [
             {
@@ -45198,7 +45227,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT41VI",
+          "uid": "art41VI",
           "text": "VI - disciplina do Parcelamento, Uso e Ocupação do Solo e zoneamento ambiental; (Redação dada pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -45217,7 +45246,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT41VII",
+          "uid": "art41VII",
           "text": "VII — Código de Obras e Edificações;",
           "runs": [
             {
@@ -45235,7 +45264,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT41VIII",
+          "uid": "art41VIII",
           "text": "VIII — política municipal de meio ambiente;",
           "runs": [
             {
@@ -45253,7 +45282,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT41IX",
+          "uid": "art41IX",
           "text": "IX — plano municipal de saneamento;",
           "runs": [
             {
@@ -45277,7 +45306,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT41X",
+          "uid": "art41X",
           "text": "X — sistema de vigilância sanitária, epidemiológica e de saúde do trabalhador.",
           "runs": [
             {
@@ -45301,7 +45330,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT41XI",
+          "uid": "art41XI",
           "text": "XI — atenção relativa à Criança e ao Adolescente. (Incluído pela Emenda à Lei Orgânica nº 17 de 1994)",
           "runs": [
             {
@@ -45324,7 +45353,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT41XI",
+          "uid": "art41XI",
           "text": "XI – atenção relativa à Criança, ao Adolescente e ao Jovem. (Alterado pela Emenda à Lei Orgânica nº 37 de 2013)",
           "runs": [
             {
@@ -45347,7 +45376,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT41p1",
+          "uid": "art41p1",
           "text": "§ 1.º — A Câmara poderá convocar uma só audiência englobando dois ou mais projetos de lei relativos à mesma matéria.",
           "runs": [
             {
@@ -45365,7 +45394,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT41p2",
+          "uid": "art41p2",
           "text": "§ 2.º — Serão realizadas audiências públicas durante a tramitação de outros projetos de lei mediante requerimento de 0,1% (um décimo por cento) de eleitores do Município.",
           "runs": [
             {
@@ -45382,17 +45411,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT42",
-      "is_adt": true,
+      "art_number": "42",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 42",
-        "uid": "artADT42",
+        "uid": "art42",
         "text": "Art. 42 — Aprovado o projeto de lei, na forma regimental, será enviado ao Prefeito que, aquiescendo, o sancionará e promulgará.",
         "runs": [
           {
@@ -45411,7 +45441,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT42p1",
+          "uid": "art42p1",
           "text": "§ 1.º — Se o Prefeito julgar o projeto, no todo ou em parte, inconstitucional ou contrário ao interesse público, veta-lo-á total ou parcialmente, no prazo de 15 (quinze) dias úteis contados da data do recebimento, e comunicará, dentro de 48 (quarenta e oito) horas, ao Presidente da Câmara Municipal os motivos do veto.",
           "runs": [
             {
@@ -45435,7 +45465,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT42p1",
+          "uid": "art42p1",
           "text": "§ 1º-A. O veto parcial somente abrangerá texto integral de artigo, de parágrafo, de inciso ou de alínea. (Incluído pela Emenda à Lei Orgânica nº 42 de 2022)",
           "runs": [
             {
@@ -45454,7 +45484,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT42p2",
+          "uid": "art42p2",
           "text": "§ 2.º — Sendo negada a sanção, as razões do veto serão comunicadas ao Presidente da Câmara Municipal e publicadas.",
           "runs": [
             {
@@ -45472,7 +45502,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT42p3",
+          "uid": "art42p3",
           "text": "§ 3.º — Decorrido o prazo de 15 (quinze) dias, sem a sanção do Prefeito, observar-se-á o disposto no § 6.º deste artigo.",
           "runs": [
             {
@@ -45490,7 +45520,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT42p4",
+          "uid": "art42p4",
           "text": "§ 4.º — Esgotado, sem deliberação, o prazo estabelecido no parágrafo anterior, o veto será incluído na Ordem do Dia da sessão imediata, sobrestadas as demais proposições, até sua votação final.",
           "runs": [
             {
@@ -45508,7 +45538,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 5º",
-          "uid": "artADT42p5",
+          "uid": "art42p5",
           "text": "§ 5.º — A Câmara Municipal deliberará sobre o veto, em um único turno de votação e discussão, no prazo de 30 (trinta) dias de seu recebimento, só podendo ser rejeitado pelo voto da maioria absoluta dos vereadores. (Incluído pela Emenda à Lei Orgânica nº 1 de 1990)",
           "runs": [
             {
@@ -45531,7 +45561,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 6º",
-          "uid": "artADT42p6",
+          "uid": "art42p6",
           "text": "§ 6.º — Se o veto não for mantido, será o projeto enviado ao Prefeito para, em 48 (quarenta e oito) horas, promulgá-lo.",
           "runs": [
             {
@@ -45549,7 +45579,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 7º",
-          "uid": "artADT42p7",
+          "uid": "art42p7",
           "text": "§ 7.º — Se a lei não for promulgada pelo Prefeito, nos casos dos §§ 3.º e 5.º, o Presidente da Câmara Municipal a promulgará e, se este não o fizer em igual prazo, caberá aos demais membros da Mesa, nas mesmas condições, fazê-lo, observada a precedência dos cargos.",
           "runs": [
             {
@@ -45566,17 +45596,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT43",
-      "is_adt": true,
+      "art_number": "43",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 43",
-        "uid": "artADT43",
+        "uid": "art43",
         "text": "Art. 43 — O projeto de lei que receber parecer contrário, quanto ao mérito, de todas as Comissões, será tido como rejeitado, salvo com recurso para o Plenário, nos termos do Regimento Interno.",
         "runs": [
           {
@@ -45601,17 +45632,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT44",
-      "is_adt": true,
+      "art_number": "44",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 44",
-        "uid": "artADT44",
+        "uid": "art44",
         "text": "Art. 44 — A iniciativa dos cidadãos prevista nos arts. 5.º, 36 e 37 desta Lei, será exercida obedecidos os seguintes preceitos:",
         "runs": [
           {
@@ -45660,7 +45692,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT44I",
+          "uid": "art44I",
           "text": "I — para projetos de emendas à Lei Orgânica e de lei de interesse específico do Município, da cidade ou de bairros, será necessária a manifestação de pelo menos 5% (cinco por cento) do eleitorado;",
           "runs": [
             {
@@ -45684,7 +45716,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT44II",
+          "uid": "art44II",
           "text": "II — para requerer à Câmara Municipal a realização do plebiscito sobre questões de relevante interesse do Município, da cidade ou de bairros, bem como para a realização de referendo sobre lei, será necessária a manifestação de pelo menos 1 % (um por cento) do eleitorado.",
           "runs": [
             {
@@ -45708,7 +45740,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT44p1",
+          "uid": "art44p1",
           "text": "§ 1.º — O Regimento Interno da Câmara Municipal assegurará tramitação especial e urgente às proposituras previstas nos incisos I e II deste artigo, garantindo a defesa oral a representante dos seus respectivos responsáveis.",
           "runs": [
             {
@@ -45734,7 +45766,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT44p2",
+          "uid": "art44p2",
           "text": "§ 2.º — A Câmara emitirá parecer sobre o requerimento de que trata o inciso II deste artigo e encaminhará, num prazo não superior a 30 (trinta) dias, o pedido de realização do plebiscito ou do referendo ao Tribunal Regional Eleitoral, assegurada a divulgação dos argumentos favoráveis e contrários à lei ou à proposta a ser submetida à consulta popular.",
           "runs": [
             {
@@ -45751,17 +45783,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT45",
-      "is_adt": true,
+      "art_number": "45",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 45",
-        "uid": "artADT45",
+        "uid": "art45",
         "text": "Art. 45 - As questões relevantes aos destinos do Município poderão ser submetidas a plebiscito ou referendo por proposta do Executivo, por 1/3 (um terço) dos vereadores ou por pelo menos 2% (dois por cento) do eleitorado, decidido pelo Plenário da Câmara Municipal. (Redação dada pela Emenda à Lei Orgânica nº 24 de 2001)",
         "runs": [
           {
@@ -45786,7 +45819,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 45",
-          "uid": "artADT45",
+          "uid": "art45",
           "text": "Art. 45 — As questões relevantes aos destinos do Município poderão ser submetidas a plebiscito ou referendo por requerimento de pelo menos 2% (dois por cento) do eleitorado ao Tribunal Regional Eleitoral, ouvida a Câmara Municipal.",
           "runs": [
             {
@@ -45800,17 +45833,18 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT46",
-      "is_adt": true,
+      "art_number": "46",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 46",
-        "uid": "artADT46",
+        "uid": "art46",
         "text": "Art. 46 - A legislação referente ao Plano Diretor e ao zoneamento urbano poderá ser alterada uma vez por ano, observado o disposto no art. 41 desta lei. (Redação dada pela Emenda à Lei Orgânica nº 18 de 1995)",
         "runs": [
           {
@@ -45838,7 +45872,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT46p1",
+          "uid": "art46p1",
           "text": "§1º - Para os efeitos do presente artigo será considerado o ano em que a lei tenha sido aprovada pela Câmara Municipal. (Incluído pela Emenda à Lei Orgânica nº 18 de 1995)",
           "runs": [
             {
@@ -45860,7 +45894,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT46p2",
+          "uid": "art46p2",
           "text": "§2º - Ficam excluídas do disposto no \"caput\" deste artigo as alterações constantes de leis específicas que atendam às seguintes condições: (Incluído pela Emenda à Lei Orgânica nº 18 de 1995)",
           "runs": [
             {
@@ -45882,7 +45916,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT46a",
+          "uid": "art46a",
           "text": "a) sejam aprovadas com o quorum estabelecido para a alteração da Lei Orgânica do Município; e (Incluída pela Emenda à Lei Orgânica nº 18 de 1995)",
           "runs": [
             {
@@ -45910,7 +45944,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT46b",
+          "uid": "art46b",
           "text": "b) contenham dispositivo que autorize a exclusão do previsto no \"caput\" deste artigo. (Incluída pela Emenda à Lei Orgânica nº 18 de 1995)",
           "runs": [
             {
@@ -45934,7 +45968,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 46",
-          "uid": "artADT46",
+          "uid": "art46",
           "text": "Art. 46 — A legislação referente ao Plano Diretor e ao zoneamento urbano somente poderá ser alterada uma vez por ano, observado o disposto no art. 41 desta Lei.",
           "runs": [
             {
@@ -45962,7 +45996,8 @@
           "children": []
         }
       ],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -45973,13 +46008,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT47",
-      "is_adt": true,
+      "art_number": "47",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 47",
-        "uid": "artADT47",
+        "uid": "art47",
         "text": "Art. 47 — A fiscalização contábil, financeira, orçamentária, operacional e patrimonial do Município e das entidades da administração direta e indireta, quanto à legalidade, legitimidade, economicidade, aplicação das subvenções e renúncia de receitas, será exercida pela Câmara Municipal, mediante controle externo e pelo sistema de controle interno dos Poderes Executivo e Legislativo.",
         "runs": [
           {
@@ -45998,7 +46033,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT47p1",
+          "uid": "art47p1",
           "text": "§ 1.º — Prestará contas qualquer pessoa física ou jurídica, de direito público ou de direito privado, que utilize, arrecade, guarde, gerencie ou administre dinheiro, bens e valores públicos ou pelas quais o Município responda, ou que, em nome deste, assuma obrigações de natureza pecuniária.",
           "runs": [
             {
@@ -46022,7 +46057,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT47p2",
+          "uid": "art47p2",
           "text": "§ 2.º — As contas do Município ficarão, durante 60 (sessenta) dias, anualmente, à disposição de qualquer contribuinte, para exame e apreciação, o qual poderá questionar- lhe a legitimidade, nos termos da lei.",
           "runs": [
             {
@@ -46050,7 +46085,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT47p2",
+          "uid": "art47p2",
           "text": "§ 2º - As contas do Município ficarão disponíveis, inclusive por meios eletrônicos, durante todo o exercício, na Câmara Municipal e no órgão técnico responsável pela sua elaboração, para consulta e apreciação pelos cidadãos e instituições da sociedade, os quais poderão questionar-lhe a legitimidade, nos termos da lei. (Redação dada pela Emenda à Lei Orgânica nº 24 de 2001)",
           "runs": [
             {
@@ -46069,17 +46104,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT48",
-      "is_adt": true,
+      "art_number": "48",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 48",
-        "uid": "artADT48",
+        "uid": "art48",
         "text": "Art. 48 — O controle externo, a cargo da Câmara Municipal, será exercido com o auxílio do Tribunal de Contas do Município de São Paulo, ao qual compete:",
         "runs": [
           {
@@ -46098,7 +46134,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT48I",
+          "uid": "art48I",
           "text": "I — apreciar as contas prestadas anualmente pelo Prefeito, pela Mesa da Câmara e pelo próprio Tribunal, mediante parecer prévio que deverá ser elaborado em 90 (noventa) dias, a contar da data de seu recebimento, que terá seu termo final em 31 de março de cada exercício;",
           "runs": [
             {
@@ -46126,7 +46162,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT48I",
+          "uid": "art48I",
           "text": "I – apreciar contas prestadas anualmente pelo Prefeito, pela Mesa da Câmara e pelo próprio Tribunal, que serão apresentadas obrigatoriamente até 31 de março de cada exercício, mediante parecer prévio informativo, que deverá ser elaborado e enviado à Câmara Municipal no prazo máximo de 120 (cento e vinte) dias, contados da data de seu recebimento, já incluídos nesse prazo eventuais diligências e apreciação definitiva de recursos administrativos. (Redação dada pela Emenda à Lei Orgânica nº 29 de 2007)",
           "runs": [
             {
@@ -46152,7 +46188,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT48II",
+          "uid": "art48II",
           "text": "II — apreciar, através de parecer, as contas dos administradores e demais responsáveis por dinheiro, bens e valores públicos, da administração direta, autarquias, empresas públicas e sociedades de economia mista, incluídas as fundações instituídas ou mantidas pelo Poder Público Municipal, e as contas daqueles que derem causa a perda, extravio ou outra irregularidade de que resulte prejuízo ao erário; (Adin 11.754-0/6)",
           "runs": [
             {
@@ -46185,7 +46221,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT48III",
+          "uid": "art48III",
           "text": "III — apreciar, para fins de registro, a legalidade dos atos de admissão de pessoal, a qualquer título, na administração direta e indireta, executadas as nomeações para cargo de provimento em comissão, bem como a das concessões de aposentadorias e pensões, ressalvadas as melhorias posteriores que não alterem o fundamento legal do ato concessório;",
           "runs": [
             {
@@ -46203,7 +46239,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT48IV",
+          "uid": "art48IV",
           "text": "IV — realizar, nas unidades administrativas dos Poderes Legislativo e Executivo e nas demais entidades referidas no inciso II, inspeções e auditorias de natureza contábil, financeira, orçamentária, operacional e patrimonial, por iniciativa própria e, ainda, quando forem solicitadas:",
           "runs": [
             {
@@ -46227,7 +46263,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT48a",
+          "uid": "art48a",
           "text": "a) pela Câmara Municipal, por qualquer de suas Comissões;",
           "runs": [
             {
@@ -46245,7 +46281,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT48b",
+          "uid": "art48b",
           "text": "b) por cidadãos que subscreverem requerimento de pelo menos 1% (um por cento) do eleitorado do Município;",
           "runs": [
             {
@@ -46263,7 +46299,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT48V",
+          "uid": "art48V",
           "text": "V — fiscalizar a aplicação de recursos de qualquer natureza, repassados ao Município, pela União, pelo Estado, ou qualquer outra entidade, mediante convênio, acordo, ajuste e outros instrumentos congêneres;",
           "runs": [
             {
@@ -46287,7 +46323,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT48VI",
+          "uid": "art48VI",
           "text": "VI — manifestar-se, no prazo de 30 (trinta) dias, sobre os empréstimos a serem contraídos pelo Município quando for solicitado pela Câmara Municipal;",
           "runs": [
             {
@@ -46311,7 +46347,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT48VII",
+          "uid": "art48VII",
           "text": "VII — prestar informações solicitadas pela Câmara Municipal por suas Comissões ou lideranças partidárias, sobre a fiscalização contábil, financeira, orçamentária, operacional e patrimonial e sobre os resultados de auditorias e inspeções que tenham sido realizadas;",
           "runs": [
             {
@@ -46329,7 +46365,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT48VIII",
+          "uid": "art48VIII",
           "text": "VIII — aplicar aos responsáveis as sanções previstas em lei, em caso de ilegalidade de procedimento no que tange às receitas, despesas ou irregularidades das contas;",
           "runs": [
             {
@@ -46347,7 +46383,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT48IX",
+          "uid": "art48IX",
           "text": "IX — assinalar prazo para que o órgão ou entidade adote as providências necessárias ao exato cumprimento da lei, sob pena de incidir nas sanções legais cabíveis pela desobediência;",
           "runs": [
             {
@@ -46371,7 +46407,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT48X",
+          "uid": "art48X",
           "text": "X — sustar, se não atendido, a execução do ato impugnado, comunicando a decisão à Câmara Municipal, em prazo não superior a 15 (quinze) dias, ressalvado o disposto no  § 1.º, deste artigo;",
           "runs": [
             {
@@ -46401,7 +46437,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT48XI",
+          "uid": "art48XI",
           "text": "XI — representar ao Poder competente sobre irregularidades ou abusos apurados;",
           "runs": [
             {
@@ -46419,7 +46455,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XII",
-          "uid": "artADT48XII",
+          "uid": "art48XII",
           "text": "XII — encaminhar ao Legislativo sugestão de criação, transformação e extinção de cargos, empregos e funções do Quadro de Pessoal do Tribunal, bem como a fixação da respectiva remuneração, observados os níveis de remuneração dos servidores da Câmara Municipal. (Adin 11.754-0/6)",
           "runs": [
             {
@@ -46448,7 +46484,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT48p1",
+          "uid": "art48p1",
           "text": "§ 1.º — No caso de contrato, o ato de sustação será adotado diretamente pela Câmara Municipal que solicitará, de imediato, ao Poder Executivo, as medidas cabíveis.",
           "runs": [
             {
@@ -46466,7 +46502,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT48p2",
+          "uid": "art48p2",
           "text": "§ 2.º — Para efeito da apreciação prevista no inciso II, as entidades nele referidas deverão encaminhar ao Tribunal os seus balanços e demais demonstrativos até 5 (cinco) meses seguintes ao término do exercício financeiro.",
           "runs": [
             {
@@ -46484,7 +46520,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT48p3",
+          "uid": "art48p3",
           "text": "§ 3.º — Para os fins previstos no inciso III, os órgãos e entidades nele referidos encaminharão ao Tribunal de Contas, semestralmente, seus quadros gerais de pessoal, bem como as alterações havidas, no prazo máximo de 30 (trinta) dias a contar da data em que as mesmas ocorrerem.",
           "runs": [
             {
@@ -46502,7 +46538,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT48p4",
+          "uid": "art48p4",
           "text": "§ 4.º — As decisões do Tribunal de que resultem imputação de débito ou multa terão eficácia de título executivo.",
           "runs": [
             {
@@ -46520,7 +46556,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 5º",
-          "uid": "artADT48p5",
+          "uid": "art48p5",
           "text": "§ 5.º — O Tribunal encaminhará à Câmara Municipal relatório de suas atividades, trimestralmente, e, anualmente, as suas contas para julgamento.",
           "runs": [
             {
@@ -46538,7 +46574,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 6º",
-          "uid": "artADT48p6",
+          "uid": "art48p6",
           "text": "§ 6.º — Decorrido o prazo de 60 (sessenta) dias, contados da data do recebimento do parecer prévio do Tribunal, sem que tenha havido deliberação, as contas referidas no inciso I serão incluídas na Ordem do Dia, sobrestando-se a deliberação quanto aos demais assuntos, até que se ultime a votação.",
           "runs": [
             {
@@ -46558,7 +46594,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 6º",
-          "uid": "artADT48p6",
+          "uid": "art48p6",
           "text": "§ 6º Decorrido o prazo de 120 (cento e vinte) dias, contados da data do recebimento do parecer prévio do Tribunal, se que tenha havido deliberação, as contas referidas no inciso I serão incluídas na Ordem do Dia, sobrestando-se a deliberação quanto aos demais assuntos, até que se ultime a votação. (Redação dada pela Emenda à Lei Orgânica nº 29 de 2007)",
           "runs": [
             {
@@ -46577,17 +46613,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT49",
-      "is_adt": true,
+      "art_number": "49",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 49",
-        "uid": "artADT49",
+        "uid": "art49",
         "text": "Art. 49 — O Tribunal de Contas, órgão de auxílio da Câmara Municipal, integrado por 5 (cinco) conselheiros, tem sede no Município de São Paulo e quadro próprio de pessoal, exercendo as atribuições previstas na Constituição da República, no que couber, e nesta Lei, em todo o Município.",
         "runs": [
           {
@@ -46613,7 +46650,7 @@
         {
           "unit_type": "PARAGRAFO_UNICO",
           "identifier": "Parágrafo único",
-          "uid": "artADT49pu",
+          "uid": "art49pu",
           "text": "Parágrafo único — Os Conselheiros do Tribunal de Contas do Município de São Paulo serão nomeados dentre brasileiros que satisfaçam os seguintes requisitos:",
           "runs": [
             {
@@ -46631,7 +46668,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT49I",
+          "uid": "art49I",
           "text": "I — mais de 35 (trinta e cinco) e menos de 65 (sessenta e cinco) anos de idade;",
           "runs": [
             {
@@ -46655,7 +46692,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT49II",
+          "uid": "art49II",
           "text": "II — idoneidade moral e reputação ilibada;",
           "runs": [
             {
@@ -46679,7 +46716,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT49III",
+          "uid": "art49III",
           "text": "III — notórios conhecimentos jurídicos, contábeis, econômicos e financeiros ou de administração pública;",
           "runs": [
             {
@@ -46697,7 +46734,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT49IV",
+          "uid": "art49IV",
           "text": "IV — mais de dez anos de exercício de função ou de formação profissional que exija os conhecimentos mencionados no inciso anterior.",
           "runs": [
             {
@@ -46721,7 +46758,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT49V",
+          "uid": "art49V",
           "text": "V – não incidam nos casos de inelegibilidade, nos termos da legislação federal. (Incluído pela Emenda à Lei Orgânica nº 35 de 2012)",
           "runs": [
             {
@@ -46749,17 +46786,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT50",
-      "is_adt": true,
+      "art_number": "50",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 50",
-        "uid": "artADT50",
+        "uid": "art50",
         "text": "Art. 50 — Os Conselheiros do Tribunal de Contas serão escolhidos, obedecidas as seguintes condições:",
         "runs": [
           {
@@ -46778,7 +46816,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT50I",
+          "uid": "art50I",
           "text": "I — 2 (dois) pelo Prefeito, com aprovação da Câmara Municipal;",
           "runs": [
             {
@@ -46796,7 +46834,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT50II",
+          "uid": "art50II",
           "text": "II — 3 (três) pela Câmara Municipal.",
           "runs": [
             {
@@ -46814,7 +46852,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT50p1",
+          "uid": "art50p1",
           "text": "§ 1.º — Ocorrendo vaga para Conselheiro, a indicação deverá ser feita no prazo de até 15 (quinze) dias, deliberando a Câmara Municipal pela aprovação ou não do nome indicado, no prazo de 30 (trinta) dias.",
           "runs": [
             {
@@ -46832,7 +46870,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT50p2",
+          "uid": "art50p2",
           "text": "§ 2.º — A substituição dos Conselheiros, em suas faltas e impedimentos, será definida por lei.",
           "runs": [
             {
@@ -46850,7 +46888,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT50p3",
+          "uid": "art50p3",
           "text": "§ 3.º — Os Conselheiros do Tribunal de Contas do Município farão declaração de bens, no ato da posse e no término do exercício do cargo.",
           "runs": [
             {
@@ -46867,17 +46905,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT51",
-      "is_adt": true,
+      "art_number": "51",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 51",
-        "uid": "artADT51",
+        "uid": "art51",
         "text": "Art. 51 — A Câmara Municipal exercerá a fiscalização sobre os atos internos do Tribunal de Contas do Município podendo, a qualquer momento, por deliberação de seu Plenário, realizar auditorias, inspeções ou quaisquer medidas que considere necessárias. (Adin 11.754-0/6)",
         "runs": [
           {
@@ -46905,17 +46944,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT52",
-      "is_adt": true,
+      "art_number": "52",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 52",
-        "uid": "artADT52",
+        "uid": "art52",
         "text": "Art. 52 — A Câmara Municipal, por suas Comissões permanentes, diante de despesas não autorizadas, ainda que sob a forma de investimentos não programados ou subsídios não aprovados, poderá solicitar à autoridade municipal responsável que, no prazo de 5 (cinco) dias, preste os esclarecimentos necessários.",
         "runs": [
           {
@@ -46934,7 +46974,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT52p1",
+          "uid": "art52p1",
           "text": "§ 1.º — Não prestados os esclarecimentos, ou considerados insuficientes, solicitará ao Tribunal parecer sobre a matéria, no prazo de 30 (trinta) dias.",
           "runs": [
             {
@@ -46952,7 +46992,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT52p2",
+          "uid": "art52p2",
           "text": "§ 2.º — Entendendo o Tribunal irregular a despesa, as Comissões permanentes, se julgarem que o gasto possa causar dano irreparável ou grave lesão à economia pública, proporão à Câmara sua sustação.",
           "runs": [
             {
@@ -46969,17 +47009,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT53",
-      "is_adt": true,
+      "art_number": "53",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 53",
-        "uid": "artADT53",
+        "uid": "art53",
         "text": "Art. 53 — Os Poderes Executivo e Legislativo manterão, de forma integrada, sistema de controle interno, com a finalidade de: (Vide Decreto nº 59.496, de 08 de junho de 2020)",
         "runs": [
           {
@@ -47002,7 +47043,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT53I",
+          "uid": "art53I",
           "text": "I — avaliar o adequado cumprimento das metas previstas no plano plurianual, a execução dos programas de governo e dos orçamentos do Município;",
           "runs": [
             {
@@ -47026,7 +47067,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT53II",
+          "uid": "art53II",
           "text": "II — comprovar a legalidade e avaliar os resultados quanto à eficácia e à eficiência da gestão orçamentária, financeira e patrimonial dos órgãos da administração direta e indireta, bem como de aplicação de recursos públicos por entidades de direito privado;",
           "runs": [
             {
@@ -47050,7 +47091,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT53III",
+          "uid": "art53III",
           "text": "III — exercer o controle das operações de crédito, avais e garantias, bem como dos direitos e haveres do Município;",
           "runs": [
             {
@@ -47068,7 +47109,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT53IV",
+          "uid": "art53IV",
           "text": "IV — apoiar o controle externo, no exercício de sua missão institucional, o qual terá acesso a toda e qualquer informação, documentos ou registro que repute necessários para o cumprimento de sua função;",
           "runs": [
             {
@@ -47092,7 +47133,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT53V",
+          "uid": "art53V",
           "text": "V — organizar e executar, por iniciativa própria ou por solicitação do Tribunal de Contas do Município, programação trimestral de auditorias contábil, financeira, orçamentária, operacional e patrimonial nas unidades administrativas sob seu controle.",
           "runs": [
             {
@@ -47116,7 +47157,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT53p1",
+          "uid": "art53p1",
           "text": "§ 1.º — Para fins do disposto neste artigo, a Câmara Municipal e o Tribunal de Contas do Município terão acesso direto, através de sistema integrado de processamento de dados, às informações processadas em todos os órgãos da administração direta e indireta do Município.",
           "runs": [
             {
@@ -47134,7 +47175,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT53p2",
+          "uid": "art53p2",
           "text": "§ 2.º — Os responsáveis pelo controle interno, ao tomarem conhecimento de qualquer irregularidade, ilegalidade ou ofensa ao art. 37 da Constituição da República, deverão representar à autoridade competente, dando ciência à Câmara Municipal, sob pena de responsabilidade solidária.",
           "runs": [
             {
@@ -47159,7 +47200,8 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -47170,13 +47212,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT54",
-      "is_adt": true,
+      "art_number": "54",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 54",
-        "uid": "artADT54",
+        "uid": "art54",
         "text": "Art. 54 — A cada área administrativa do Município, a ser definida em lei, corresponderá um Conselho de Representantes, cujos membros serão eleitos na forma estabelecida na referida legislação. (Vide Adin nº 0000302-59.2005.8.26.0000 (994.05.000302-5)",
         "runs": [
           {
@@ -47197,17 +47239,18 @@
       },
       "children": [],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT55",
-      "is_adt": true,
+      "art_number": "55",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 55",
-        "uid": "artADT55",
+        "uid": "art55",
         "text": "Art. 55 — Aos Conselhos de Representantes compete, além do estabelecido em lei, as seguintes atribuições:",
         "runs": [
           {
@@ -47226,7 +47269,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT55I",
+          "uid": "art55I",
           "text": "I — participar, em nível local, do processo de Planejamento Municipal e em especial da elaboração das propostas de diretrizes orçamentárias e do orçamento municipal bem como do Plano Diretor e das respectivas revisões;",
           "runs": [
             {
@@ -47250,7 +47293,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT55II",
+          "uid": "art55II",
           "text": "II — participar, em nível local, da fiscalização da execução do orçamento e dos demais atos da administração municipal;",
           "runs": [
             {
@@ -47274,7 +47317,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT55III",
+          "uid": "art55III",
           "text": "III — encaminhar representações ao Executivo e à Câmara Municipal, a respeito de questões relacionadas com o interesse da população local.",
           "runs": [
             {
@@ -47292,7 +47335,7 @@
         {
           "unit_type": "OTHER",
           "identifier": "",
-          "uid": "artADT55",
+          "uid": "art55",
           "text": "Seção IX",
           "runs": [
             {
@@ -47307,7 +47350,7 @@
         {
           "unit_type": "OTHER",
           "identifier": "",
-          "uid": "artADT55",
+          "uid": "art55",
           "text": "Da Procuradoria-Geral da Câmara Municipal de São Paulo",
           "runs": [
             {
@@ -47321,17 +47364,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "article",
-      "art_number": "ADT55-A",
-      "is_adt": true,
+      "art_number": "55-A",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 55-A",
-        "uid": "artADT55-A",
+        "uid": "art55-A",
         "text": "Art. 55-A. A Procuradoria-Geral da Câmara Municipal de São Paulo, órgão institucional do Poder Legislativo Municipal, de caráter permanente, vinculado diretamente à sua Mesa Diretora, desenvolve atividades típicas e exclusivas de Estado e se insere nas funções essenciais à Justiça, nos termos do Capítulo IV, Seção II, art. 132 da Constituição Federal, é composta por procuradores legislativos de carreira e estruturada por lei, e tem por competência exercer a representação judicial, a consultoria e o assessoramento técnico-jurídico do Poder Legislativo Municipal, cabendo-lhe o recebimento dos honorários advocatícios titularizados pelos procuradores em ações judiciais e em todas as transações, compromissos, acordos extrajudiciais ou congêneres realizados com ou entre terceiros, decorrentes da atividade institucional e administrativa da Câmara Municipal de São Paulo, por quaisquer de seus órgãos ou comissões permanentes ou temporárias. (Inserido pela Emenda a Lei Orgânica nº 43 de 2023)",
         "runs": [
           {
@@ -47367,7 +47411,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT55-Ap1",
+          "uid": "art55-Ap1",
           "text": "§ 1º A Procuradoria-Geral da Câmara Municipal de São Paulo é organizada por lei de iniciativa da Mesa Diretora, observados os princípios e regras pertinentes da Constituição Federal, da Constituição do Estado e desta Lei Orgânica, que disciplina sua competência e dispõe sobre os requisitos e a forma de designação do Procurador-Geral Legislativo, dentre os membros da carreira.(Inserido pela Emenda a Lei Orgânica nº 43 de 2023)",
           "runs": [
             {
@@ -47394,7 +47438,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT55-Ap2",
+          "uid": "art55-Ap2",
           "text": "§ 2º O ingresso na carreira de Procurador Legislativo depende de concurso público de provas e títulos, com a participação da Ordem dos Advogados do Brasil. (Inserido pela Emenda a Lei Orgânica nº 43 de 2023) ",
           "runs": [
             {
@@ -47423,7 +47467,8 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Lei Orgânica"
+      "law_name": "Lei Orgânica",
+      "law_prefix": "LO"
     },
     {
       "type": "heading",
@@ -47448,13 +47493,13 @@
     },
     {
       "type": "article",
-      "art_number": "ADT29",
-      "is_adt": true,
+      "art_number": "29",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 29",
-        "uid": "artADT29",
+        "uid": "art29",
         "text": "  Art. 29. O Município reger-se-á por lei orgânica, votada em dois turnos, com o interstício mínimo de dez dias, e aprovada por dois terços dos membros da Câmara Municipal, que a promulgará, atendidos os princípios estabelecidos nesta Constituição, na Constituição do respectivo Estado e os seguintes preceitos:",
         "runs": [
           {
@@ -47473,7 +47518,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT29I",
+          "uid": "art29I",
           "text": "I - eleição do Prefeito, do Vice-Prefeito e dos Vereadores, para mandato de quatro anos, mediante pleito direto e simultâneo realizado em todo o País;",
           "runs": [
             {
@@ -47494,7 +47539,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT29II",
+          "uid": "art29II",
           "text": "II - eleição do Prefeito e do Vice-Prefeito até noventa dias antes do término do mandato dos que devam suceder, aplicadas as regras do art. 77, no caso de municípios com mais de duzentos mil eleitores;",
           "runs": [
             {
@@ -47518,7 +47563,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT29II",
+          "uid": "art29II",
           "text": "II - eleição do Prefeito e do Vice-Prefeito realizada no primeiro domingo de outubro do ano anterior ao término do mandato dos que devam suceder, aplicadas as regras do art. 77, no caso de Municípios com mais de duzentos mil eleitores;         (Redação dada pela Emenda Constitucional nº 16, de 1997)",
           "runs": [
             {
@@ -47538,7 +47583,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT29III",
+          "uid": "art29III",
           "text": "III - posse do Prefeito e do Vice-Prefeito no dia 1º de janeiro do ano subseqüente ao da eleição;",
           "runs": [
             {
@@ -47559,7 +47604,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT29IV",
+          "uid": "art29IV",
           "text": "IV - número de Vereadores proporcional à população do Município, observados os seguintes limites:",
           "runs": [
             {
@@ -47583,7 +47628,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT29a",
+          "uid": "art29a",
           "text": "a) mínimo de nove e máximo de vinte e um nos Municípios de até um milhão de habitantes;",
           "runs": [
             {
@@ -47599,7 +47644,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT29b",
+          "uid": "art29b",
           "text": "b) mínimo de trinta e três e máximo de quarenta e um nos Municípios de mais de um milhão e menos de cinco milhões de habitantes;",
           "runs": [
             {
@@ -47615,7 +47660,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "c)",
-          "uid": "artADT29c",
+          "uid": "art29c",
           "text": "c) mínimo de quarenta e dois e máximo de cinqüenta e cinco nos Municípios de mais de cinco milhões de habitantes;",
           "runs": [
             {
@@ -47639,7 +47684,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT29IV",
+          "uid": "art29IV",
           "text": "IV - para a composição das Câmaras Municipais, será observado o limite máximo de:         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)         (Produção de efeito) (Vide ADIN 4307)",
           "runs": [
             {
@@ -47671,7 +47716,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT29a",
+          "uid": "art29a",
           "text": "a) 9 (nove) Vereadores, nos Municípios de até 15.000 (quinze mil) habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47691,7 +47736,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT29b",
+          "uid": "art29b",
           "text": "b) 11 (onze) Vereadores, nos Municípios de mais de 15.000 (quinze mil) habitantes e de até 30.000 (trinta mil) habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47711,7 +47756,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "c)",
-          "uid": "artADT29c",
+          "uid": "art29c",
           "text": "c) 13 (treze) Vereadores, nos Municípios com mais de 30.000 (trinta mil) habitantes e de até 50.000 (cinquenta mil) habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47731,7 +47776,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "d)",
-          "uid": "artADT29d",
+          "uid": "art29d",
           "text": "d) 15 (quinze) Vereadores, nos Municípios de mais de 50.000 (cinquenta mil) habitantes e de até 80.000 (oitenta mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47751,7 +47796,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "e)",
-          "uid": "artADT29e",
+          "uid": "art29e",
           "text": "e) 17 (dezessete) Vereadores, nos Municípios de mais de 80.000 (oitenta mil) habitantes e de até 120.000 (cento e vinte mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47771,7 +47816,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "f)",
-          "uid": "artADT29f",
+          "uid": "art29f",
           "text": "f) 19 (dezenove) Vereadores, nos Municípios de mais de 120.000 (cento e vinte mil) habitantes e de até 160.000 (cento sessenta mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47791,7 +47836,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "g)",
-          "uid": "artADT29g",
+          "uid": "art29g",
           "text": "g) 21 (vinte e um) Vereadores, nos Municípios de mais de 160.000 (cento e sessenta mil) habitantes e de até 300.000 (trezentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47811,7 +47856,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "h)",
-          "uid": "artADT29h",
+          "uid": "art29h",
           "text": "h) 23 (vinte e três) Vereadores, nos Municípios de mais de 300.000 (trezentos mil) habitantes e de até 450.000 (quatrocentos e cinquenta mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47831,7 +47876,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "i)",
-          "uid": "artADT29i",
+          "uid": "art29i",
           "text": "i) 25 (vinte e cinco) Vereadores, nos Municípios de mais de 450.000 (quatrocentos e cinquenta mil) habitantes e de até 600.000 (seiscentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47851,7 +47896,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "j)",
-          "uid": "artADT29j",
+          "uid": "art29j",
           "text": "j) 27 (vinte e sete) Vereadores, nos Municípios de mais de 600.000 (seiscentos mil) habitantes e de até 750.000 (setecentos cinquenta mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47871,7 +47916,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "k)",
-          "uid": "artADT29k",
+          "uid": "art29k",
           "text": "k) 29 (vinte e nove) Vereadores, nos Municípios de mais de 750.000 (setecentos e cinquenta mil) habitantes e de até 900.000 (novecentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47891,7 +47936,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "l)",
-          "uid": "artADT29l",
+          "uid": "art29l",
           "text": "l) 31 (trinta e um) Vereadores, nos Municípios de mais de 900.000 (novecentos mil) habitantes e de até 1.050.000 (um milhão e cinquenta mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47911,7 +47956,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "m)",
-          "uid": "artADT29m",
+          "uid": "art29m",
           "text": "m) 33 (trinta e três) Vereadores, nos Municípios de mais de 1.050.000 (um milhão e cinquenta mil) habitantes e de até 1.200.000 (um milhão e duzentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47931,7 +47976,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "n)",
-          "uid": "artADT29n",
+          "uid": "art29n",
           "text": "n) 35 (trinta e cinco) Vereadores, nos Municípios de mais de 1.200.000 (um milhão e duzentos mil) habitantes e de até 1.350.000 (um milhão e trezentos e cinquenta mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47951,7 +47996,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "o)",
-          "uid": "artADT29o",
+          "uid": "art29o",
           "text": "o) 37 (trinta e sete) Vereadores, nos Municípios de 1.350.000 (um milhão e trezentos e cinquenta mil) habitantes e de até 1.500.000 (um milhão e quinhentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47971,7 +48016,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "p)",
-          "uid": "artADT29p",
+          "uid": "art29p",
           "text": "p) 39 (trinta e nove) Vereadores, nos Municípios de mais de 1.500.000 (um milhão e quinhentos mil) habitantes e de até 1.800.000 (um milhão e oitocentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -47991,7 +48036,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "q)",
-          "uid": "artADT29q",
+          "uid": "art29q",
           "text": "q) 41 (quarenta e um) Vereadores, nos Municípios de mais de 1.800.000 (um milhão e oitocentos mil) habitantes e de até 2.400.000 (dois milhões e quatrocentos mil) habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48011,7 +48056,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "r)",
-          "uid": "artADT29r",
+          "uid": "art29r",
           "text": "r) 43 (quarenta e três) Vereadores, nos Municípios de mais de 2.400.000 (dois milhões e quatrocentos mil) habitantes e de até 3.000.000 (três milhões) de habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48031,7 +48076,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "s)",
-          "uid": "artADT29s",
+          "uid": "art29s",
           "text": "s) 45 (quarenta e cinco) Vereadores, nos Municípios de mais de 3.000.000 (três milhões) de habitantes e de até 4.000.000 (quatro milhões) de habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48051,7 +48096,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "t)",
-          "uid": "artADT29t",
+          "uid": "art29t",
           "text": "t) 47 (quarenta e sete) Vereadores, nos Municípios de mais de 4.000.000 (quatro milhões) de habitantes e de até 5.000.000 (cinco milhões) de habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48071,7 +48116,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "u)",
-          "uid": "artADT29u",
+          "uid": "art29u",
           "text": "u) 49 (quarenta e nove) Vereadores, nos Municípios de mais de 5.000.000 (cinco milhões) de habitantes e de até 6.000.000 (seis milhões) de habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48091,7 +48136,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "v)",
-          "uid": "artADT29v",
+          "uid": "art29v",
           "text": "v) 51 (cinquenta e um) Vereadores, nos Municípios de mais de 6.000.000 (seis milhões) de habitantes e de até 7.000.000 (sete milhões) de habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48111,7 +48156,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "w)",
-          "uid": "artADT29w",
+          "uid": "art29w",
           "text": "w) 53 (cinquenta e três) Vereadores, nos Municípios de mais de 7.000.000 (sete milhões) de habitantes e de até 8.000.000 (oito milhões) de habitantes; e             (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48131,7 +48176,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "x)",
-          "uid": "artADT29x",
+          "uid": "art29x",
           "text": "x) 55 (cinquenta e cinco) Vereadores, nos Municípios de mais de 8.000.000 (oito milhões) de habitantes;         (Incluída pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48151,7 +48196,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT29V",
+          "uid": "art29V",
           "text": "V - remuneração do Prefeito, do Vice-Prefeito e dos Vereadores fixada pela Câmara Municipal em cada legislatura, para a subseqüente, observado o que dispõem os arts. 37, XI, 150, II, 153, III, e 153, § 2.º, I;",
           "runs": [
             {
@@ -48191,7 +48236,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT29V",
+          "uid": "art29V",
           "text": "V - subsídios do Prefeito, do Vice-Prefeito e dos Secretários Municipais fixados por lei de iniciativa da Câmara Municipal, observado o que dispõem os arts. 37, XI, 39, § 4º, 150, II, 153, III, e 153, § 2º, I;         (Redação dada pela Emenda constitucional nº 19, de 1998)",
           "runs": [
             {
@@ -48223,7 +48268,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT29VI",
+          "uid": "art29VI",
           "text": "VI - a remuneração dos Vereadores corresponderá a, no máximo, setenta e cinco por cento daquela estabelecida, em espécie, para os Deputados Estaduais, ressalvado o que dispõe o art. 37, XI;         (Incluído pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48245,7 +48290,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT29VI",
+          "uid": "art29VI",
           "text": "VI - subsídio dos Vereadores fixado por lei de iniciativa da Câmara Municipal, na razão de, no máximo, setenta e cinco por cento daquele estabelecido, em espécie, para os Deputados Estaduais, observado o que dispõem os arts. 39, § 4º, 57, § 7º, 150, II, 153, III, e 153, § 2º, I;         (Redação dada pela Emenda constitucional nº 19, de 1998)",
           "runs": [
             {
@@ -48283,7 +48328,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT29VI",
+          "uid": "art29VI",
           "text": "VI - o subsídio dos Vereadores será fixado pelas respectivas Câmaras Municipais em cada legislatura para a subseqüente, observado o que dispõe esta Constituição, observados os critérios estabelecidos na respectiva Lei Orgânica e os seguintes limites máximos:         (Redação dada pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48309,7 +48354,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "a)",
-          "uid": "artADT29a",
+          "uid": "art29a",
           "text": "a) em Municípios de até dez mil habitantes, o subsídio máximo dos Vereadores corresponderá a vinte por cento do subsídio dos Deputados Estaduais;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48329,7 +48374,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "b)",
-          "uid": "artADT29b",
+          "uid": "art29b",
           "text": "b) em Municípios de dez mil e um a cinqüenta mil habitantes, o subsídio máximo dos Vereadores corresponderá a trinta por cento do subsídio dos Deputados Estaduais;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48355,7 +48400,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "c)",
-          "uid": "artADT29c",
+          "uid": "art29c",
           "text": "c) em Municípios de cinqüenta mil e um a cem mil habitantes, o subsídio máximo dos Vereadores corresponderá a quarenta por cento do subsídio dos Deputados Estaduais;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48381,7 +48426,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "d)",
-          "uid": "artADT29d",
+          "uid": "art29d",
           "text": "d) em Municípios de cem mil e um a trezentos mil habitantes, o subsídio máximo dos Vereadores corresponderá a cinqüenta por cento do subsídio dos Deputados Estaduais;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48407,7 +48452,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "e)",
-          "uid": "artADT29e",
+          "uid": "art29e",
           "text": "e) em Municípios de trezentos mil e um a quinhentos mil habitantes, o subsídio máximo dos Vereadores corresponderá a sessenta por cento do subsídio dos Deputados Estaduais;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48427,7 +48472,7 @@
         {
           "unit_type": "ALINEA",
           "identifier": "f)",
-          "uid": "artADT29f",
+          "uid": "art29f",
           "text": "f) em Municípios de mais de quinhentos mil habitantes, o subsídio máximo dos Vereadores corresponderá a setenta e cinco por cento do subsídio dos Deputados Estaduais;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48447,7 +48492,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT29VII",
+          "uid": "art29VII",
           "text": "VII - o total da despesa com a remuneração dos Vereadores não poderá ultrapassar o montante de cinco por cento da receita do Município;         (Incluído pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48467,7 +48512,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT29VIII",
+          "uid": "art29VIII",
           "text": "VIII - inviolabilidade dos Vereadores por suas opiniões, palavras e votos no exercício do mandato e na circunscrição do Município;         (Renumerado do inciso VI, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48487,7 +48532,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT29IX",
+          "uid": "art29IX",
           "text": "IX - proibições e incompatibilidades, no exercício da vereança, similares, no que couber, ao disposto nesta Constituição para os membros do Congresso Nacional e na Constituição do respectivo Estado para os membros da Assembléia Legislativa;         (Renumerado do inciso VII, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48513,7 +48558,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "X",
-          "uid": "artADT29X",
+          "uid": "art29X",
           "text": "X - julgamento do Prefeito perante o Tribunal de Justiça;         (Renumerado do inciso VIII, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48545,7 +48590,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XI",
-          "uid": "artADT29XI",
+          "uid": "art29XI",
           "text": "XI - organização das funções legislativas e fiscalizadoras da Câmara Municipal;         (Renumerado do inciso IX, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48565,7 +48610,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XII",
-          "uid": "artADT29XII",
+          "uid": "art29XII",
           "text": "XII - cooperação das associações representativas no planejamento municipal;         (Renumerado do inciso X, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48591,7 +48636,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIII",
-          "uid": "artADT29XIII",
+          "uid": "art29XIII",
           "text": "XIII - iniciativa popular de projetos de lei de interesse específico do Município, da cidade ou de bairros, através de manifestação de, pelo menos, cinco por cento do eleitorado;         (Renumerado do inciso XI, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48611,7 +48656,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "XIV",
-          "uid": "artADT29XIV",
+          "uid": "art29XIV",
           "text": "XIV - perda do mandato do Prefeito, nos termos do art. 28, parágrafo único .         (Renumerado do inciso XII, pela Emenda Constitucional nº 1, de 1992)",
           "runs": [
             {
@@ -48638,17 +48683,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Constituição Federal"
+      "law_name": "Constituição Federal",
+      "law_prefix": "CF"
     },
     {
       "type": "article",
-      "art_number": "ADT29-A",
-      "is_adt": true,
+      "art_number": "29-A",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 29-A",
-        "uid": "artADT29-A",
+        "uid": "art29-A",
         "text": "  Art. 29-A. O total da despesa do Poder Legislativo Municipal, incluídos os subsídios dos Vereadores e os demais gastos com pessoal inativo e pensionistas, não poderá ultrapassar os seguintes percentuais, relativos ao somatório da receita tributária e das transferências previstas no § 5º do art. 153 e nos arts. 158 e 159 desta Constituição, efetivamente realizado no exercício anterior:   (Redação dada pela Emenda Constitucional nº 109, de 2021)     (Vigência)",
         "runs": [
           {
@@ -48686,7 +48732,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT29-AI",
+          "uid": "art29-AI",
           "text": "I - oito por cento para Municípios com população de até cem mil habitantes;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48724,7 +48770,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT29-AI",
+          "uid": "art29-AI",
           "text": "I - 7% (sete por cento) para Municípios com população de até 100.000 (cem mil) habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)         (Produção de efeito)",
           "runs": [
             {
@@ -48752,7 +48798,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT29-AII",
+          "uid": "art29-AII",
           "text": "II - sete por cento para Municípios com população entre cem mil e um e trezentos mil habitantes;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48774,7 +48820,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT29-AII",
+          "uid": "art29-AII",
           "text": "II - 6% (seis por cento) para Municípios com população entre 100.000 (cem mil) e 300.000 (trezentos mil) habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48794,7 +48840,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT29-AIII",
+          "uid": "art29-AIII",
           "text": "III - seis por cento para Municípios com população entre trezentos mil e um e quinhentos mil habitantes;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48816,7 +48862,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT29-AIII",
+          "uid": "art29-AIII",
           "text": "III - 5% (cinco por cento) para Municípios com população entre 300.001 (trezentos mil e um) e 500.000 (quinhentos mil) habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48836,7 +48882,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT29-AIV",
+          "uid": "art29-AIV",
           "text": "IV - cinco por cento para Municípios com população acima de quinhentos mil habitantes.         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48866,7 +48912,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT29-AIV",
+          "uid": "art29-AIV",
           "text": "IV - 4,5% (quatro inteiros e cinco décimos por cento) para Municípios com população entre 500.001 (quinhentos mil e um) e 3.000.000 (três milhões) de habitantes;         (Redação dada pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48886,7 +48932,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT29-AV",
+          "uid": "art29-AV",
           "text": "V - 4% (quatro por cento) para Municípios com população entre 3.000.001 (três milhões e um) e 8.000.000 (oito milhões) de habitantes;         (Incluído pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48906,7 +48952,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT29-AVI",
+          "uid": "art29-AVI",
           "text": "VI - 3,5% (três inteiros e cinco décimos por cento) para Municípios com população acima de 8.000.001 (oito milhões e um) habitantes.         (Incluído pela Emenda Constituição Constitucional nº 58, de 2009)",
           "runs": [
             {
@@ -48926,7 +48972,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT29-Ap1",
+          "uid": "art29-Ap1",
           "text": "§ 1 o A Câmara Municipal não gastará mais de setenta por cento de sua receita com folha de pagamento, incluído o gasto com o subsídio de seus Vereadores.         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48952,7 +48998,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT29-Ap2",
+          "uid": "art29-Ap2",
           "text": "§ 2 o Constitui crime de responsabilidade do Prefeito Municipal:         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -48978,7 +49024,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT29-AI",
+          "uid": "art29-AI",
           "text": "I - efetuar repasse que supere os limites definidos neste artigo;         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -49010,7 +49056,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT29-AII",
+          "uid": "art29-AII",
           "text": "II - não enviar o repasse até o dia vinte de cada mês; ou         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -49030,7 +49076,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT29-AIII",
+          "uid": "art29-AIII",
           "text": "III - enviá-lo a menor em relação à proporção fixada na Lei Orçamentária.         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -49050,7 +49096,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT29-Ap3",
+          "uid": "art29-Ap3",
           "text": "§ 3 o Constitui crime de responsabilidade do Presidente da Câmara Municipal o desrespeito ao § 1 o deste artigo.         (Incluído pela Emenda Constitucional nº 25, de 2000)",
           "runs": [
             {
@@ -49084,7 +49130,7 @@
         {
           "unit_type": "ARTIGO",
           "identifier": "Art. 29-A",
-          "uid": "artADT29-A",
+          "uid": "art29-A",
           "text": "Art. 29-A. O total da despesa do Poder Legislativo Municipal, incluídos os subsídios dos Vereadores e excluídos os gastos com inativos, não poderá ultrapassar os seguintes percentuais, relativos ao somatório da receita tributária e das transferências previstas no § 5 o do art. 153 e nos arts. 158 e 159, efetivamente realizado no exercício anterior:         (Incluído pela Emenda Constitucional nº 25, de 2000)    ",
           "runs": [
             {
@@ -49127,17 +49173,18 @@
           "children": []
         }
       ],
-      "law_name": "Constituição Federal"
+      "law_name": "Constituição Federal",
+      "law_prefix": "CF"
     },
     {
       "type": "article",
-      "art_number": "ADT30",
-      "is_adt": true,
+      "art_number": "30",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 30",
-        "uid": "artADT30",
+        "uid": "art30",
         "text": "  Art. 30. Compete aos Municípios:",
         "runs": [
           {
@@ -49153,7 +49200,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "I",
-          "uid": "artADT30I",
+          "uid": "art30I",
           "text": "I - legislar sobre assuntos de interesse local;",
           "runs": [
             {
@@ -49174,7 +49221,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "II",
-          "uid": "artADT30II",
+          "uid": "art30II",
           "text": "II - suplementar a legislação federal e a estadual no que couber;      (Vide ADPF 672)",
           "runs": [
             {
@@ -49193,7 +49240,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "III",
-          "uid": "artADT30III",
+          "uid": "art30III",
           "text": "III - instituir e arrecadar os tributos de sua competência, bem como aplicar suas rendas, sem prejuízo da obrigatoriedade de prestar contas e publicar balancetes nos prazos fixados em lei;",
           "runs": [
             {
@@ -49208,7 +49255,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IV",
-          "uid": "artADT30IV",
+          "uid": "art30IV",
           "text": "IV - criar, organizar e suprimir distritos, observada a legislação estadual;",
           "runs": [
             {
@@ -49229,7 +49276,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "V",
-          "uid": "artADT30V",
+          "uid": "art30V",
           "text": "V - organizar e prestar, diretamente ou sob regime de concessão ou permissão, os serviços públicos de interesse local, incluído o de transporte coletivo, que tem caráter essencial;",
           "runs": [
             {
@@ -49250,7 +49297,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT30VI",
+          "uid": "art30VI",
           "text": "VI - manter, com a cooperação técnica e financeira da União e do Estado, programas de educação pré-escolar e de ensino fundamental;",
           "runs": [
             {
@@ -49274,7 +49321,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VI",
-          "uid": "artADT30VI",
+          "uid": "art30VI",
           "text": "VI - manter, com a cooperação técnica e financeira da União e do Estado, programas de educação infantil e de ensino fundamental;         (Redação dada pela Emenda Constitucional nº 53, de 2006)",
           "runs": [
             {
@@ -49294,7 +49341,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VII",
-          "uid": "artADT30VII",
+          "uid": "art30VII",
           "text": "VII - prestar, com a cooperação técnica e financeira da União e do Estado, serviços de atendimento à saúde da população;",
           "runs": [
             {
@@ -49309,7 +49356,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "VIII",
-          "uid": "artADT30VIII",
+          "uid": "art30VIII",
           "text": "VIII - promover, no que couber, adequado ordenamento territorial, mediante planejamento e controle do uso, do parcelamento e da ocupação do solo urbano;",
           "runs": [
             {
@@ -49324,7 +49371,7 @@
         {
           "unit_type": "INCISO",
           "identifier": "IX",
-          "uid": "artADT30IX",
+          "uid": "art30IX",
           "text": "IX - promover a proteção do patrimônio histórico-cultural local, observada a legislação e a ação fiscalizadora federal e estadual.",
           "runs": [
             {
@@ -49344,17 +49391,18 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Constituição Federal"
+      "law_name": "Constituição Federal",
+      "law_prefix": "CF"
     },
     {
       "type": "article",
-      "art_number": "ADT31",
-      "is_adt": true,
+      "art_number": "31",
+      "is_adt": false,
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
         "identifier": "Art. 31",
-        "uid": "artADT31",
+        "uid": "art31",
         "text": "  Art. 31. A fiscalização do Município será exercida pelo Poder Legislativo Municipal, mediante controle externo, e pelos sistemas de controle interno do Poder Executivo Municipal, na forma da lei.",
         "runs": [
           {
@@ -49370,7 +49418,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "artADT31p1",
+          "uid": "art31p1",
           "text": "§ 1º O controle externo da Câmara Municipal será exercido com o auxílio dos Tribunais de Contas dos Estados ou do Município ou dos Conselhos ou Tribunais de Contas dos Municípios, onde houver.",
           "runs": [
             {
@@ -49385,7 +49433,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "artADT31p2",
+          "uid": "art31p2",
           "text": "§ 2º O parecer prévio, emitido pelo órgão competente sobre as contas que o Prefeito deve anualmente prestar, só deixará de prevalecer por decisão de dois terços dos membros da Câmara Municipal.",
           "runs": [
             {
@@ -49400,7 +49448,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "artADT31p3",
+          "uid": "art31p3",
           "text": "§ 3º As contas dos Municípios ficarão, durante sessenta dias, anualmente, à disposição de qualquer contribuinte, para exame e apreciação, o qual poderá questionar-lhes a legitimidade, nos termos da lei.",
           "runs": [
             {
@@ -49415,7 +49463,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "artADT31p4",
+          "uid": "art31p4",
           "text": "§ 4º É vedada a criação de Tribunais, Conselhos ou órgãos de Contas Municipais.",
           "runs": [
             {
@@ -49429,7 +49477,8 @@
         }
       ],
       "all_versions": [],
-      "law_name": "Constituição Federal"
+      "law_name": "Constituição Federal",
+      "law_prefix": "CF"
     }
   ]
 }

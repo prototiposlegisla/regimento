@@ -1,5 +1,11 @@
 [
   {
+    "subject": "Propositura",
+    "vides": [
+      "Projeto"
+    ]
+  },
+  {
     "subject": "Proposições",
     "refs": [
       {
@@ -295,8 +301,30 @@
           {
             "art": "176",
             "detail": "§ 10º"
+          },
+          {
+            "art": "41",
+            "detail": "I",
+            "law_prefix": "LO"
           }
         ]
+      }
+    ],
+    "vides": [
+      "Emenda",
+      "Indicação",
+      "Moção",
+      "Projeto de Lei",
+      "Requerimento",
+      "Substitutivo"
+    ]
+  },
+  {
+    "subject": "Requerimento",
+    "refs": [
+      {
+        "art": "212",
+        "detail": ""
       }
     ]
   }

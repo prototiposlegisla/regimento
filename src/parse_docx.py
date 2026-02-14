@@ -429,6 +429,7 @@ def _build_document(
             norma_m = RE_NORMA.match(cp.text)
             if norma_m:
                 current_law_name = norma_m.group(1).strip()
+                in_adt = False  # Reset: ADT is per-law, not global
                 if current_article:
                     doc.elements.append(current_article)
                     current_article = None

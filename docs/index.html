@@ -459,6 +459,53 @@ mark {
   text-decoration: underline;
 }
 
+/* References index */
+.ref-categories {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.ref-cat-btn {
+  padding: 5px 12px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background .15s, color .15s;
+}
+.ref-cat-btn.active {
+  background: var(--selected-border);
+  color: #fff;
+  border-color: var(--selected-border);
+}
+.ref-cat-btn:hover:not(.active) { background: #e0e0e0; }
+.ref-group-title {
+  font-weight: 700;
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+  margin: 12px 0 4px;
+  letter-spacing: .3px;
+}
+.ref-entry {
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  border-bottom: 1px solid #f0f0f0;
+}
+.ref-entry b { color: #c0392b; }
+.ref-art-link {
+  color: var(--selected-border);
+  text-decoration: none;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+}
+.ref-art-link:hover { text-decoration: underline; }
+
 /* ===== SUBJECT PILL (bottom) ===== */
 #subject-pill {
   display: none;
@@ -4528,6 +4575,7 @@ mark {
     <div id="index-tabs">
       <button class="index-tab active" data-tab="systematic">Sistemático</button>
       <button class="index-tab" data-tab="subject">Remissivo</button>
+      <button class="index-tab" data-tab="references">Referências</button>
     </div>
     <div id="index-search-wrapper">
       <input id="index-search" type="text" placeholder="Pesquisar no índice...">
@@ -5826,6 +5874,46 @@ mark {
   }
 ];
 
+  const REFERENCIAS_INDEX = [
+  {
+    "category": "Prazos",
+    "groups": [
+      {
+        "title": "ATRIBUIÇÕES DA MESA",
+        "entries": [
+          {
+            "html": "A Mesa eleita, em ato que deverá ser publicado dentro de <b>60 (sessenta) dias</b> após sua constituição, fixará a competência de cada um de seus membros.",
+            "art_ref": "10"
+          }
+        ]
+      },
+      {
+        "title": "DO PRESIDENTE",
+        "entries": [
+          {
+            "html": "Compete ao Presidente providenciar a expedição, no prazo de <b>20 (vinte) dias úteis</b>, das certidões que lhe forem solicitadas.",
+            "art_ref": "18, XII"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Quoruns",
+    "groups": [
+      {
+        "title": "DA CÂMARA MUNICIPAL",
+        "entries": [
+          {
+            "html": "Havendo motivo relevante ou de força maior, a Câmara poderá, por deliberação da Mesa, “ad referendum” da <b>maioria absoluta</b> dos Vereadores, reunir-se em outro edifício ou em ponto diverso na cidade de São Paulo.",
+            "art_ref": "1º, §2º"
+          }
+        ]
+      }
+    ]
+  }
+];
+
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
   const MARKER_PALETTE = [
     { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
@@ -5851,6 +5939,7 @@ mark {
   let zoomTimeout = null;
   let searchMatches = [];
   let searchIdx = 0;
+  let currentRefCategory = 0;
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -6301,6 +6390,8 @@ mark {
 
     if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
+    } else if (currentIndexTab === 'references') {
+      renderReferencesIndex(filter);
     } else {
       renderSubjectIndex(filter);
     }
@@ -6591,6 +6682,76 @@ mark {
       }
 
       $indexContent.appendChild(div);
+    }
+  }
+
+  function renderReferencesIndex(filter) {
+    if (!REFERENCIAS_INDEX.length) {
+      $indexContent.textContent = 'Nenhuma referência disponível.';
+      return;
+    }
+
+    // Category buttons
+    const catBar = document.createElement('div');
+    catBar.className = 'ref-categories';
+    REFERENCIAS_INDEX.forEach((cat, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'ref-cat-btn' + (idx === currentRefCategory ? ' active' : '');
+      btn.textContent = cat.category;
+      btn.addEventListener('click', () => {
+        currentRefCategory = idx;
+        renderIndex();
+      });
+      catBar.appendChild(btn);
+    });
+    $indexContent.appendChild(catBar);
+
+    // Render groups/entries for active category
+    const cat = REFERENCIAS_INDEX[currentRefCategory];
+    if (!cat) return;
+
+    for (const group of cat.groups) {
+      const hasMatch = !filter || group.entries.some(e => {
+        const text = e.html.replace(/<[^>]*>/g, '');
+        return textMatchesFilter(text, filter);
+      });
+      if (!hasMatch && !textMatchesFilter(group.title, filter)) continue;
+
+      if (group.title) {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'ref-group-title';
+        titleEl.textContent = group.title;
+        $indexContent.appendChild(titleEl);
+      }
+
+      for (const entry of group.entries) {
+        const entryText = entry.html.replace(/<[^>]*>/g, '');
+        if (filter && !textMatchesFilter(entryText, filter) && !textMatchesFilter(group.title, filter)) continue;
+
+        const entryEl = document.createElement('div');
+        entryEl.className = 'ref-entry';
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = entry.html;
+        entryEl.appendChild(textSpan);
+
+        if (entry.art_ref) {
+          const linkEl = document.createElement('a');
+          linkEl.className = 'ref-art-link';
+          linkEl.href = '#';
+          linkEl.textContent = ' — Art. ' + entry.art_ref;
+          linkEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeIndex();
+            // Extract base article number for navigation
+            const artNum = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
+            navigateToArt(artNum, '');
+          });
+          entryEl.appendChild(linkEl);
+        }
+
+        $indexContent.appendChild(entryEl);
+      }
     }
   }
 

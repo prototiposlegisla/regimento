@@ -452,6 +452,53 @@ mark {
   text-decoration: underline;
 }
 
+/* References index */
+.ref-categories {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.ref-cat-btn {
+  padding: 5px 12px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background .15s, color .15s;
+}
+.ref-cat-btn.active {
+  background: var(--selected-border);
+  color: #fff;
+  border-color: var(--selected-border);
+}
+.ref-cat-btn:hover:not(.active) { background: #e0e0e0; }
+.ref-group-title {
+  font-weight: 700;
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+  margin: 12px 0 4px;
+  letter-spacing: .3px;
+}
+.ref-entry {
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  border-bottom: 1px solid #f0f0f0;
+}
+.ref-entry b { color: #c0392b; }
+.ref-art-link {
+  color: var(--selected-border);
+  text-decoration: none;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+}
+.ref-art-link:hover { text-decoration: underline; }
+
 /* ===== SUBJECT PILL (bottom) ===== */
 #subject-pill {
   display: none;

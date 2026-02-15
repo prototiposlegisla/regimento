@@ -39,6 +39,11 @@ def main() -> None:
         help="Caminho do XLSX (padrão: remissivo.xlsx)",
     )
     parser.add_argument(
+        "--referencias",
+        default=str(BASE_DIR / "referencias.docx"),
+        help="Caminho do DOCX de referências (padrão: referencias.docx)",
+    )
+    parser.add_argument(
         "--output",
         default=str(BASE_DIR / "docs" / "index.html"),
         help="Caminho de saída (padrão: docs/index.html)",
@@ -48,7 +53,7 @@ def main() -> None:
     t0 = time.time()
 
     # ── 1. Parse DOCX ──────────────────────────────────────────────────
-    print("[1/6] Parseando DOCX...")
+    print("[1/7] Parseando DOCX...")
     from src.parse_docx import parse_docx
 
     doc = parse_docx(args.docx)
@@ -59,7 +64,7 @@ def main() -> None:
     print(f"      → {len(headings)} headings, {len(articles)} artigos")
 
     # ── 2. Resolve amendments ──────────────────────────────────────────
-    print("[2/6] Resolvendo emendas...")
+    print("[2/7] Resolvendo emendas...")
     from src.resolve_amendments import resolve_amendments
 
     doc = resolve_amendments(doc)
@@ -72,7 +77,7 @@ def main() -> None:
     print(f"      → {version_count} versões anteriores detectadas")
 
     # ── 3. Parse XLSX ──────────────────────────────────────────────────
-    print("[3/6] Parseando XLSX...")
+    print("[3/7] Parseando XLSX...")
     from src.parse_xlsx import parse_xlsx, parse_law_mapping
 
     xlsx_path = Path(args.xlsx)
@@ -103,22 +108,37 @@ def main() -> None:
                 for v in el.all_versions:
                     v.uid = v.uid.replace("art", f"art{lp}", 1)
 
-    # ── 4. Build systematic index ──────────────────────────────────────
-    print("[4/6] Gerando índice sistemático...")
+    # ── 4. Parse referencias DOCX ────────────────────────────────────
+    print("[4/7] Parseando referências...")
+    from src.parse_referencias import parse_referencias
+
+    ref_path = Path(args.referencias)
+    if ref_path.exists():
+        referencias_data = parse_referencias(ref_path)
+        entry_count = sum(
+            len(e["entries"]) for cat in referencias_data for e in cat["groups"]
+        )
+        print(f"      → {len(referencias_data)} categorias, {entry_count} entradas")
+    else:
+        print("      → DOCX de referências não encontrado, aba vazia")
+        referencias_data = []
+
+    # ── 5. Build systematic index ──────────────────────────────────────
+    print("[5/7] Gerando índice sistemático...")
     from src.build_index import build_systematic_index
 
     systematic_index = build_systematic_index(doc)
     print(f"      → {len(systematic_index)} nós raiz")
 
-    # ── 5. Render HTML cards ───────────────────────────────────────────
-    print("[5/6] Renderizando cards HTML...")
+    # ── 6. Render HTML cards ───────────────────────────────────────────
+    print("[6/7] Renderizando cards HTML...")
     from src.render_html import render_cards
 
     cards_html = render_cards(doc)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
-    # ── 6. Assemble ────────────────────────────────────────────────────
-    print("[6/6] Montando dist/index.html...")
+    # ── 7. Assemble ────────────────────────────────────────────────────
+    print("[7/7] Montando dist/index.html...")
     from src.assemble import assemble
 
     output_path = Path(args.output)
@@ -126,6 +146,7 @@ def main() -> None:
         cards_html=cards_html,
         systematic_index=systematic_index,
         subject_index=subject_list,
+        referencias_index=referencias_data,
         base_dir=BASE_DIR,
         output_path=output_path,
     )
@@ -162,6 +183,13 @@ def main() -> None:
             encoding="utf-8",
         )
         print(f"  → {debug_dir / 'subject_index.json'}")
+
+        # Referencias index
+        (debug_dir / "referencias_index.json").write_text(
+            json.dumps(referencias_data, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(f"  → {debug_dir / 'referencias_index.json'}")
 
 
 if __name__ == "__main__":

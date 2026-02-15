@@ -10,6 +10,7 @@ def assemble(
     cards_html: str,
     systematic_index: list[dict],
     subject_index: list[dict],
+    referencias_index: list[dict],
     base_dir: Path,
     output_path: Path,
 ) -> None:
@@ -25,9 +26,11 @@ def assemble(
     # Inject data into JS placeholders
     sys_json = json.dumps(systematic_index, ensure_ascii=False, indent=2)
     subj_json = json.dumps(subject_index, ensure_ascii=False, indent=2)
+    ref_json = json.dumps(referencias_index, ensure_ascii=False, indent=2)
 
     js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", sys_json)
     js = js.replace("/*__SUBJECT_INDEX__*/[]", subj_json)
+    js = js.replace("/*__REFERENCIAS_INDEX__*/[]", ref_json)
 
     # Assemble final HTML
     final = template.replace("{{CSS}}", css)

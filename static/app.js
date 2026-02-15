@@ -6,6 +6,8 @@
 
   const SUBJECT_INDEX = /*__SUBJECT_INDEX__*/[];
 
+  const REFERENCIAS_INDEX = /*__REFERENCIAS_INDEX__*/[];
+
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
   const MARKER_PALETTE = [
     { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
@@ -31,6 +33,7 @@
   let zoomTimeout = null;
   let searchMatches = [];
   let searchIdx = 0;
+  let currentRefCategory = 0;
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -481,6 +484,8 @@
 
     if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
+    } else if (currentIndexTab === 'references') {
+      renderReferencesIndex(filter);
     } else {
       renderSubjectIndex(filter);
     }
@@ -771,6 +776,76 @@
       }
 
       $indexContent.appendChild(div);
+    }
+  }
+
+  function renderReferencesIndex(filter) {
+    if (!REFERENCIAS_INDEX.length) {
+      $indexContent.textContent = 'Nenhuma referência disponível.';
+      return;
+    }
+
+    // Category buttons
+    const catBar = document.createElement('div');
+    catBar.className = 'ref-categories';
+    REFERENCIAS_INDEX.forEach((cat, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'ref-cat-btn' + (idx === currentRefCategory ? ' active' : '');
+      btn.textContent = cat.category;
+      btn.addEventListener('click', () => {
+        currentRefCategory = idx;
+        renderIndex();
+      });
+      catBar.appendChild(btn);
+    });
+    $indexContent.appendChild(catBar);
+
+    // Render groups/entries for active category
+    const cat = REFERENCIAS_INDEX[currentRefCategory];
+    if (!cat) return;
+
+    for (const group of cat.groups) {
+      const hasMatch = !filter || group.entries.some(e => {
+        const text = e.html.replace(/<[^>]*>/g, '');
+        return textMatchesFilter(text, filter);
+      });
+      if (!hasMatch && !textMatchesFilter(group.title, filter)) continue;
+
+      if (group.title) {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'ref-group-title';
+        titleEl.textContent = group.title;
+        $indexContent.appendChild(titleEl);
+      }
+
+      for (const entry of group.entries) {
+        const entryText = entry.html.replace(/<[^>]*>/g, '');
+        if (filter && !textMatchesFilter(entryText, filter) && !textMatchesFilter(group.title, filter)) continue;
+
+        const entryEl = document.createElement('div');
+        entryEl.className = 'ref-entry';
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = entry.html;
+        entryEl.appendChild(textSpan);
+
+        if (entry.art_ref) {
+          const linkEl = document.createElement('a');
+          linkEl.className = 'ref-art-link';
+          linkEl.href = '#';
+          linkEl.textContent = ' — Art. ' + entry.art_ref;
+          linkEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeIndex();
+            // Extract base article number for navigation
+            const artNum = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
+            navigateToArt(artNum, '');
+          });
+          entryEl.appendChild(linkEl);
+        }
+
+        $indexContent.appendChild(entryEl);
+      }
     }
   }
 

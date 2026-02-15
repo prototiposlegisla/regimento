@@ -838,12 +838,17 @@
       }
       if (!card) continue;
       if (!ref.detail) {
+        // Artigo inteiro
+        card.classList.add('detail-highlight');
+      } else if (ref.detail.trim().toLowerCase() === 'caput') {
         // Caput: first <p> that isn't .art-para
         const caput = card.querySelector('p:not(.art-para):not(.old-version)');
         if (caput) caput.classList.add('detail-highlight');
       } else {
         for (const uid of card.querySelectorAll('.unit-id')) {
-          if (uid.textContent.trim() === ref.detail.trim()) {
+          const dt = ref.detail.trim();
+          const ut = uid.textContent.trim();
+          if (ut === dt || (dt === '§ú' && ut === 'Parágrafo único')) {
             const p = uid.closest('p');
             if (p) p.classList.add('detail-highlight');
             break;

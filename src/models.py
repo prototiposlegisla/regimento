@@ -151,7 +151,7 @@ def _run_to_dict(r: TextRun) -> dict:
 class SubjectRef:
     """Referência de dispositivo no índice remissivo."""
     art: str  # número do artigo
-    detail: str = ""  # ex: "§ 1º", "II", "Parágrafo único"
+    detail: str = ""  # ex: "§ 1º", "II", "§ú"
     law_prefix: str = ""  # ex: "LO" (empty = Regimento)
 
 

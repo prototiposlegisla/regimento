@@ -138,13 +138,14 @@ def _normalize_detail(raw: str) -> str:
     "II" → "II"
     "§10" → "§ 10"
     "§1" → "§ 1º"
-    "PU" → "Parágrafo único"
+    "PU" → "§ú"
+    "§ú" → "§ú"
     "p1" → "§ 1º"
     """
     raw = raw.strip()
 
-    if raw.upper() == "PU":
-        return "Parágrafo único"
+    if raw.upper() == "PU" or raw == "§ú":
+        return "§ú"
 
     # §N → § Nº
     m = re.match(r"^[§Ss]\s*(\d+)$", raw)

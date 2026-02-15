@@ -28,7 +28,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 1",
+        "identifier": "Art. 1º",
         "uid": "art1",
         "text": "Art. 1º - A Câmara Municipal de São Paulo tem sua sede no Palácio Anchieta, na Capital do Estado de São Paulo.",
         "runs": [
@@ -104,7 +104,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 2",
+        "identifier": "Art. 2º",
         "uid": "art2",
         "text": "Art. 2º - Para os efeitos regimentais, a legislatura é dividida em 4 (quatro) sessões legislativas. (Vide Precedente Regimental nº 01/2002)",
         "runs": [
@@ -158,7 +158,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 3",
+        "identifier": "Art. 3º",
         "uid": "art3",
         "text": "Art. 3º - A Câmara Municipal de São Paulo instalar-se-á, no primeiro ano de cada legislatura, no dia 1º de janeiro, às 15:00 (quinze) horas, em sessão solene, independentemente de número, sob a presidência do Vereador mais idoso dentre os presentes.",
         "runs": [
@@ -228,7 +228,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4",
+        "identifier": "Art. 4°",
         "uid": "art4",
         "text": "Art. 4° - Ainda com o Vereador mais idoso na direção dos trabalhos e havendo maioria absoluta dos membros, observando-se o disposto nos artigos 10 e 11, passar-se-á à eleição da Mesa que regerá os trabalhos da Câmara durante a primeira sessão legislativa, iniciando-se pela do Presidente.",
         "runs": [
@@ -305,7 +305,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 5",
+        "identifier": "Art. 5°",
         "uid": "art5",
         "text": "Art. 5° - A Mesa eleita, com mandato de 1 (um) ano, será composta do Presidente, do 1ª Vice-Presidente, do 2a Vice-Presidente, do 1º Secretário e do 2º Secretário. (Vide ADIN Nº 9013401-84.1998.8.26.0000)",
         "runs": [
@@ -349,7 +349,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 6",
+        "identifier": "Art. 6º",
         "uid": "art6",
         "text": "Art. 6º - As funções dos membros da Mesa somente cessarão:",
         "runs": [
@@ -478,7 +478,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 7",
+        "identifier": "Art. 7°",
         "uid": "art7",
         "text": "Art. 7° - Vago qualquer cargo da Mesa, a eleição respectiva deverá realizar-se na fase do Expediente da primeira sessão subsequente à vaga ocorrida, ou em sessão extraordinária para esse fim convocada. (Precedente Regimental nº 04 de 1993)",
         "runs": [
@@ -672,7 +672,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 8",
+        "identifier": "Art. 8°",
         "uid": "art8",
         "text": "Art. 8° - O Presidente e o 1º Vice-Presidente não poderão fazer parte de nenhuma Comissão Permanente.",
         "runs": [
@@ -760,7 +760,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 9",
+        "identifier": "Art. 9°",
         "uid": "art9",
         "text": "Art. 9° - A eleição para renovação da Mesa será realizada no dia 15 de dezembro, em sessão extraordinária, e a posse dos eleitos dar-se-á no dia 1º de janeiro do ano subsequente.",
         "runs": [
@@ -39058,7 +39058,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 1",
+        "identifier": "Art. 1º",
         "uid": "artADT1",
         "text": "Art. 1º- Ao entrar em vigência o Regimento Interno a que se refere o presente Ato, serão observadas as disposições transitórias consignadas nos artigos seguintes.",
         "runs": [
@@ -39082,7 +39082,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 2",
+        "identifier": "Art. 2º",
         "uid": "artADT2",
         "text": "Art. 2º- Todas as proposituras apresentadas em obediência às disposições regimentais anteriores terão a tramitação prevista neste Regimento.",
         "runs": [
@@ -39106,7 +39106,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 3",
+        "identifier": "Art. 3º",
         "uid": "artADT3",
         "text": "Art. 3º- As matérias previstas no artigo 46, inciso X, e artigo 81, que se encontrem na Ordem do Dia ou em condições de pauta quando da promulgação do Regimento Interno, serão votadas pelo Plenário da Câmara Municipal.",
         "runs": [
@@ -39138,7 +39138,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4",
+        "identifier": "Art. 4º",
         "uid": "artADT4",
         "text": "Art. 4º- Os requerimentos de transcrição de artigos e documentos nos Anais da Câmara a que se refere o artigo 231 da Resolução na 3/68, instruídos ou não de parecer da Comissão Relatora, terão suas ementas publicadas na Imprensa Oficial e serão posteriormente arquivados.",
         "runs": [
@@ -39162,7 +39162,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-A",
+        "identifier": "Art. 4ºA",
         "uid": "artADT4-A",
         "text": "Art. 4ºA - As sessões ordinárias, da Câmara Municipal de São Paulo, que terão duração de 4 (quatro) horas, só se realizarão às terças, quartas e quintas-feiras, com início às 14:00 horas, e pelo período que perdurar o estado de racionamento de energia elétrica estabelecido pelo Governo Federal, desde que presentes, para sua abertura, 1/3 (um terço) dos membros da Câmara. (Redação dada pela Resolução 11 de 23 de agosto de 2001).",
         "runs": [
@@ -39183,7 +39183,7 @@
       "all_versions": [
         {
           "unit_type": "ARTIGO",
-          "identifier": "Art. 4-A",
+          "identifier": "Art. 4ºA",
           "uid": "artADT4-A",
           "text": "Art. 4ºA - As sessões ordinárias, da Câmara Municipal de São Paulo, que terão duração de 4 (quatro) horas, só se realizarão às terças, quartas e quintas-feiras, com início às 13:00 horas, a partir de 1º de junho de 2001 e pelo período que perdurar o estado de racionamento de energia elétrica estabelecido pelo Governo Federal, desde que presentes, para sua abertura, no mínimo, 1/3 (um terço) dos membros da Câmara.  (Incluído pela Resolução 07 de 31 de maio de 2001).",
           "runs": [
@@ -39212,7 +39212,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-B",
+        "identifier": "Art. 4ºB",
         "uid": "artADT4-B",
         "text": "Art. 4ºB - As sessões solenes, realizadas nos termos dos arts. 193 e 194 do Regimento Interno da Câmara Municipal de São Paulo, a partir de 1º de junho de 2001 e pelo período que perdurar o estado de racionamento de energia elétrica estabelecido pelo Governo Federal, somente poderão ser agendadas pelo Cerimonial para o período diurno, proibido o agendamento de qualquer sessão solene ou evento extraordinário que tenha término previsto para horário que ultrapasse as 19:00 horas. (Incluído pela Resolução 07 de 31 de maio de 2001).",
         "runs": [
@@ -39262,7 +39262,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-C",
+        "identifier": "Art. 4º-C",
         "uid": "artADT4-C",
         "text": "Art. 4º-C. As Comissões Parlamentares de Inquérito já em funcionamento quando da alteração do inciso III do art. 93 também poderão ser prorrogadas por até duas vezes, cada uma por igual período. (Inserido pela Resolução nº 03, de 18 de junho de 2019)",
         "runs": [
@@ -39293,7 +39293,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-D",
+        "identifier": "Art. 4º-D",
         "uid": "artADT4-D",
         "text": "Art. 4º-D. Enquanto perdurar a situação emergencial de saúde pública do Covid-19, os projetos de lei do Executivo e do Legislativo que versarem sobre essa matéria tramitarão em regime de urgência e poderão ser deliberados por meio do sistema virtual, em sessões extraordinárias. (Incluído pela Resolução nº 3 de 2020) (Vide Precedente Regimental nº 01/20) (Vide Precedente Regimental nº 02, de 24 de junho de 2020)",
         "runs": [
@@ -39335,7 +39335,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-E",
+        "identifier": "Art. 4º-E",
         "uid": "artADT4-E",
         "text": "Art. 4º-E. Inclui-se, como hipótese de motivo justo previsto no art. 111, § 1º do Regimento Interno da Câmara Municipal de São Paulo, a ausência justificada dos Vereadores maiores de 60 (sessenta) anos, gestantes e aqueles portadores de doenças crônicas ou imunodeprimidos, enquanto perdurar a situação emergencial de saúde pública do Covid-19. (Incluído pela Resolução nº 3 de 2020)",
         "runs": [
@@ -39371,7 +39371,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-F",
+        "identifier": "Art. 4º-F",
         "uid": "artADT4-F",
         "text": "Art. 4º-F. Ficam suspensas as Sessões Ordinárias e as Reuniões Ordinárias de Comissões a serem realizadas na Câmara Municipal de São Paulo pelo prazo de 45 (quarenta e cinco) dias a partir do dia 19 de março de 2020, enquanto perdurar a situação emergencial de saúde pública do Covid-19. (Incluído pela Resolução nº 3 de 2020) (Vide Resolução nº 04 de 25 de abril de 2020)",
         "runs": [
@@ -39497,7 +39497,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-G",
+        "identifier": "Art. 4º-G",
         "uid": "artADT4-G",
         "text": "Art. 4º-G. Ficam suspensos os prazos de funcionamento das Comissões Parlamentares de Inquérito enquanto mantida a realização das Sessões Ordinárias, Extraordinárias, Solenes e reuniões das Comissões exclusivamente pelo sistema virtual. (Inserido pela Resolução nº 1, de 03 de março de 2021)",
         "runs": [
@@ -39525,7 +39525,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 4-H",
+        "identifier": "Art. 4º-H",
         "uid": "artADT4-H",
         "text": "Art. 4º-H. O prazo destinado à votação nominal previsto no art. 2º, inciso III, da Resolução nº 16, de 4 de novembro de 1997, será de 5 (cinco) minutos, quando a votação ocorrer exclusivamente pelo sistema virtual. (Inserido pela Resolução nº 1, de 03 de março de 2021)",
         "runs": [
@@ -39588,7 +39588,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 5",
+        "identifier": "Art. 5º",
         "uid": "artADT5",
         "text": "Art. 5º- O presente Ato das Disposições Transitórias é promulgado pela Mesa da Câmara na forma do disposto no artigo 395 do Regimento Interno.",
         "runs": [
@@ -39612,7 +39612,7 @@
       "is_revoked": false,
       "caput": {
         "unit_type": "ARTIGO",
-        "identifier": "Art. 6",
+        "identifier": "Art. 6º",
         "uid": "artADT6",
         "text": "Art. 6º- Revogam-se as disposições em contrário.",
         "runs": [

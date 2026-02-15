@@ -30,13 +30,13 @@ RE_CAPITULO = re.compile(r"^CAP[ÍI]TULO\s+", re.IGNORECASE)
 RE_SECAO = re.compile(r"^SE[ÇC][ÃA]O\s+", re.IGNORECASE)
 RE_SUBSECAO = re.compile(r"^SUBSE[ÇC][ÃA]O\s+", re.IGNORECASE)
 # Matches: Art. 43, Art. 183-A, Art. 4ºA, Art. 4º-C.
-# Group 1 = number, Group 2 = optional letter suffix (only without space before letter)
+# Group 1 = number, Group 2 = ordinal mark, Group 3/4 = optional letter suffix
 RE_ARTIGO = re.compile(
-    r"^Art\.\s*(\d+)[ºª°]?\s*"
+    r"^Art\.\s*(\d+)([ºª°])?\s*"
     r"(?:[-–]([A-H])(?=[.\s\xa0])|([A-H])(?=\s*[-–—.]))?",
 )
 RE_PARAGRAFO_UNICO = re.compile(r"^Par[aá]grafo\s+[uú]nico", re.IGNORECASE)
-RE_PARAGRAFO_NUM = re.compile(r"^[§Ss]\s*(\d+)")
+RE_PARAGRAFO_NUM = re.compile(r"^[§Ss]\s*(\d+)(\.?[ºª°]?)")
 RE_INCISO = re.compile(r"^l?[IVXLC]+\s*[-–—]")
 RE_ALINEA = re.compile(r"^[a-z]\)")
 RE_SUB_ALINEA = re.compile(r"^\d+\)")
@@ -339,17 +339,26 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
         if m:
             ut = UnitType.ARTIGO
             num_part = m.group(1)
-            letter_part = m.group(2) or m.group(3) or ""
+            ordinal = m.group(2) or ""
+            letter_with_dash = m.group(3)   # "A" from "-A"
+            letter_no_dash = m.group(4)     # "A" from "ºA"
+            letter_part = letter_with_dash or letter_no_dash or ""
             art_number = f"{num_part}-{letter_part}" if letter_part else num_part
-            ident = f"Art. {art_number}"
+            if letter_with_dash:
+                ident = f"Art. {num_part}{ordinal}-{letter_with_dash}"
+            elif letter_no_dash:
+                ident = f"Art. {num_part}{ordinal}{letter_no_dash}"
+            else:
+                ident = f"Art. {num_part}{ordinal}"
         elif RE_PARAGRAFO_UNICO.match(text):
             ut = UnitType.PARAGRAFO_UNICO
             ident = "Parágrafo único"
         elif RE_PARAGRAFO_NUM.match(text):
             m2 = RE_PARAGRAFO_NUM.match(text)
             num = m2.group(1) if m2 else ""
+            suffix = m2.group(2) if m2 and m2.group(2) else "º"
             ut = UnitType.PARAGRAFO_NUM
-            ident = f"§ {num}º" if num != "1" else "§ 1º"
+            ident = f"§ {num}{suffix}"
         elif RE_INCISO.match(text):
             ut = UnitType.INCISO
             # Extract roman numeral

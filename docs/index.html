@@ -528,10 +528,14 @@ mark {
   max-width: calc(100vw - 32px);
 }
 #subject-pill.open { display: flex; flex-wrap: wrap; }
+body.pill-open #cards-container { padding-bottom: 300px; }
 
 #pill-label {
   font-weight: 600;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100vw - 80px);
 }
 
 #pill-nav {
@@ -6882,6 +6886,7 @@ mark {
     subjectFilter = true;
     $pillFilter.classList.add('active');
     $subjectPill.classList.add('open');
+    document.body.classList.add('pill-open');
     $pillLabel.textContent = entry.subject;
     updatePill();
     applySubjectFilter();
@@ -6892,6 +6897,7 @@ mark {
   function closeSubjectPill() {
     activeSubject = null;
     $subjectPill.classList.remove('open');
+    document.body.classList.remove('pill-open');
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
     getAllCards().forEach(c => c.classList.remove('filtered-out'));

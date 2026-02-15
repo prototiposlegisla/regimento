@@ -521,10 +521,14 @@ mark {
   max-width: calc(100vw - 32px);
 }
 #subject-pill.open { display: flex; flex-wrap: wrap; }
+body.pill-open #cards-container { padding-bottom: 300px; }
 
 #pill-label {
   font-weight: 600;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100vw - 80px);
 }
 
 #pill-nav {

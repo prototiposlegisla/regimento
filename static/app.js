@@ -947,6 +947,7 @@
     subjectFilter = true;
     $pillFilter.classList.add('active');
     $subjectPill.classList.add('open');
+    document.body.classList.add('pill-open');
     $pillLabel.textContent = entry.subject;
     updatePill();
     applySubjectFilter();
@@ -957,6 +958,7 @@
   function closeSubjectPill() {
     activeSubject = null;
     $subjectPill.classList.remove('open');
+    document.body.classList.remove('pill-open');
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
     getAllCards().forEach(c => c.classList.remove('filtered-out'));

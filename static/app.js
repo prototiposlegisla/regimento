@@ -362,9 +362,12 @@
         const card = el.closest('.card-artigo');
         if (card) {
           const lawPrefix = card.dataset.law;
-          if (!label.startsWith('Art.')) {
-            // Sub-units: prepend article number
-            const pre = lawPrefix ? lawPrefix + ':' : '';
+          const pre = lawPrefix ? lawPrefix + ':' : '';
+          if (el.dataset.path) {
+            // Use hierarchical path: "I,b,2" → "13,I,b,2"
+            label = pre + 'Art.' + card.dataset.art + ',' + el.dataset.path;
+          } else if (!label.startsWith('Art.')) {
+            // Sub-units without path: prepend article number
             label = pre + 'Art.' + card.dataset.art + ',' + label;
           } else if (lawPrefix) {
             // Caput of other laws: prepend law prefix
@@ -921,12 +924,15 @@
         const caput = card.querySelector('p:not(.art-para):not(.old-version)');
         if (caput) caput.classList.add('detail-highlight');
       } else {
+        const dt = ref.detail.trim();
+        let found = false;
         for (const uid of card.querySelectorAll('.unit-id')) {
-          const dt = ref.detail.trim();
+          const path = uid.dataset.path || '';
           const ut = uid.textContent.trim();
-          if (ut === dt || (dt === '§ú' && ut === 'Parágrafo único')) {
+          if (path === dt || ut === dt || (dt === '§ú' && ut === 'Parágrafo único')) {
             const p = uid.closest('p');
             if (p) p.classList.add('detail-highlight');
+            found = true;
             break;
           }
         }

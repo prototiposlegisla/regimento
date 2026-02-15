@@ -15532,6 +15532,36 @@
     },
     {
       "type": "article",
+      "art_number": "101",
+      "is_adt": false,
+      "is_revoked": false,
+      "caput": {
+        "unit_type": "ARTIGO",
+        "identifier": "Art. 101",
+        "uid": "art101",
+        "text": "Art. 101 - Plenário é o órgão deliberativo e soberano da Câmara, constituído pela reunião dos Vereadores em exercício, em local, forma e número estabelecidos neste Regimento.",
+        "runs": [
+          {
+            "text": "Art"
+          },
+          {
+            "text": "."
+          },
+          {
+            "text": " 101 - Plenário é o órgão deliberativo e soberano da Câmara, constituído pela reunião dos Vereadores em exercício, em local, forma e número estabelecidos neste Regimento."
+          }
+        ],
+        "is_revoked": false,
+        "is_old_version": false,
+        "amendment_note": "",
+        "children": []
+      },
+      "children": [],
+      "all_versions": [],
+      "law_name": "Regimento Interno"
+    },
+    {
+      "type": "article",
       "art_number": "102",
       "is_adt": false,
       "is_revoked": false,
@@ -22559,34 +22589,47 @@
           "is_old_version": true,
           "amendment_note": "(Revogado pela Resolução 8 de 30 de junho de 2001)",
           "children": []
-        },
-        {
-          "unit_type": "OTHER",
-          "identifier": "",
-          "uid": "art172_2",
-          "text": "Art 173 - Os projetos cuja urgência tenha sido concedida pelo Plenário figurarão na pauta da Ordem do Dia, na sessão ordinária subsequente, como itens preferenciais, pela ordem de votação dos respectivos requerimentos, observado o disposto no parágrafo 3º do artigo 167.",
-          "runs": [
-            {
-              "text": "Art"
-            },
-            {
-              "text": " 173 - Os projetos cuja urgência tenha sido concedida pelo Plenário figurarão na pauta da Ordem do Dia, na sessão ordinária subsequente, como itens preferenciais, pela ordem de votação dos respectivos requerimentos, observado o disposto no "
-            },
-            {
-              "text": "parágrafo 3º do artigo 167.",
-              "url": "https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&TipArq=1",
-              "anchor": "par%C3%A1grafo%203%C2%BA%20do%20artigo%20167"
-            }
-          ],
-          "is_revoked": false,
-          "is_old_version": false,
-          "amendment_note": "",
-          "children": []
-        },
+        }
+      ],
+      "all_versions": [],
+      "law_name": "Regimento Interno"
+    },
+    {
+      "type": "article",
+      "art_number": "173",
+      "is_adt": false,
+      "is_revoked": false,
+      "caput": {
+        "unit_type": "ARTIGO",
+        "identifier": "Art. 173",
+        "uid": "art173",
+        "text": "Art. 173 - Os projetos cuja urgência tenha sido concedida pelo Plenário figurarão na pauta da Ordem do Dia, na sessão ordinária subsequente, como itens preferenciais, pela ordem de votação dos respectivos requerimentos, observado o disposto no parágrafo 3º do artigo 167.",
+        "runs": [
+          {
+            "text": "Art"
+          },
+          {
+            "text": "."
+          },
+          {
+            "text": " 173 - Os projetos cuja urgência tenha sido concedida pelo Plenário figurarão na pauta da Ordem do Dia, na sessão ordinária subsequente, como itens preferenciais, pela ordem de votação dos respectivos requerimentos, observado o disposto no "
+          },
+          {
+            "text": "parágrafo 3º do artigo 167.",
+            "url": "https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&TipArq=1",
+            "anchor": "par%C3%A1grafo%203%C2%BA%20do%20artigo%20167"
+          }
+        ],
+        "is_revoked": false,
+        "is_old_version": false,
+        "amendment_note": "",
+        "children": []
+      },
+      "children": [
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 1º",
-          "uid": "art172p1",
+          "uid": "art173p1",
           "text": "§ 1º - Se o projeto para o qual tenha sido concedida urgência não se encontrar no momento a ser apreciado, o Presidente determinará a imediata reconstituição do processo.",
           "runs": [
             {
@@ -22601,7 +22644,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 2º",
-          "uid": "art172p2",
+          "uid": "art173p2",
           "text": "§ 2º - A urgência só prevalecerá para a sessão ordinária subsequente àquela em que tenha sido concedida, salvo se a sessão for encerrada com o projeto ainda em debate, caso em que o mesmo figurará como primeiro item da Ordem do Dia da sessão ordinária seguinte, após os vetos que eventualmente sejam incluídos, ficando prejudicadas as demais inclusões.",
           "runs": [
             {
@@ -22616,7 +22659,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 3º",
-          "uid": "art172p3",
+          "uid": "art173p3",
           "text": "§ 3º- Se o projeto incluído na pauta em regime de urgência depender de pareceres das Comissões, estes poderão ser verbais, admitindo-se, ainda, sejam as manifestações emitidas em um único instrumento escrito, exigindo-se a presença no Plenário da maioria dos membros de cada Comissão.",
           "runs": [
             {
@@ -22631,7 +22674,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 4º",
-          "uid": "art172p4",
+          "uid": "art173p4",
           "text": "§ 4º - Não se admitem a discussão e a votação de projetos sem prévia manifestação das Comissões.",
           "runs": [
             {
@@ -22646,7 +22689,7 @@
         {
           "unit_type": "PARAGRAFO_NUM",
           "identifier": "§ 5º",
-          "uid": "art172p5",
+          "uid": "art173p5",
           "text": "§ 5º - Aprovada a urgência, as Comissões deverão, obrigatoriamente, manifestar-se até a sessão ordinária subseqüente.",
           "runs": [
             {
@@ -24778,26 +24821,38 @@
           "is_old_version": false,
           "amendment_note": "",
           "children": []
-        },
-        {
-          "unit_type": "OTHER",
-          "identifier": "",
-          "uid": "art205_2",
-          "text": "Art 206 - A instalação de sessão permanente, durante o transcorrer de qualquer sessão plenária, implicará no imediato encerramento desta última.",
-          "runs": [
-            {
-              "text": "Art"
-            },
-            {
-              "text": " 206 - A instalação de sessão permanente, durante o transcorrer de qualquer sessão plenária, implicará no imediato encerramento desta última."
-            }
-          ],
-          "is_revoked": false,
-          "is_old_version": false,
-          "amendment_note": "",
-          "children": []
         }
       ],
+      "all_versions": [],
+      "law_name": "Regimento Interno"
+    },
+    {
+      "type": "article",
+      "art_number": "206",
+      "is_adt": false,
+      "is_revoked": false,
+      "caput": {
+        "unit_type": "ARTIGO",
+        "identifier": "Art. 206",
+        "uid": "art206",
+        "text": "Art. 206 - A instalação de sessão permanente, durante o transcorrer de qualquer sessão plenária, implicará no imediato encerramento desta última.",
+        "runs": [
+          {
+            "text": "Art"
+          },
+          {
+            "text": "."
+          },
+          {
+            "text": " 206 - A instalação de sessão permanente, durante o transcorrer de qualquer sessão plenária, implicará no imediato encerramento desta última."
+          }
+        ],
+        "is_revoked": false,
+        "is_old_version": false,
+        "amendment_note": "",
+        "children": []
+      },
+      "children": [],
       "all_versions": [],
       "law_name": "Regimento Interno"
     },
@@ -35937,26 +35992,38 @@
           "is_old_version": false,
           "amendment_note": "",
           "children": []
-        },
-        {
-          "unit_type": "OTHER",
-          "identifier": "",
-          "uid": "art330_2",
-          "text": "Art 331 - Os projetos de lei do Executivo relativos a créditos adicionais também serão numerados, independentemente de leitura, e desde logo enviados à Comissão de Finanças e Orçamento.",
-          "runs": [
-            {
-              "text": "Art"
-            },
-            {
-              "text": " 331 - Os projetos de lei do Executivo relativos a créditos adicionais também serão numerados, independentemente de leitura, e desde logo enviados à Comissão de Finanças e Orçamento."
-            }
-          ],
-          "is_revoked": false,
-          "is_old_version": false,
-          "amendment_note": "",
-          "children": []
         }
       ],
+      "all_versions": [],
+      "law_name": "Regimento Interno"
+    },
+    {
+      "type": "article",
+      "art_number": "331",
+      "is_adt": false,
+      "is_revoked": false,
+      "caput": {
+        "unit_type": "ARTIGO",
+        "identifier": "Art. 331",
+        "uid": "art331",
+        "text": "Art. 331 - Os projetos de lei do Executivo relativos a créditos adicionais também serão numerados, independentemente de leitura, e desde logo enviados à Comissão de Finanças e Orçamento.",
+        "runs": [
+          {
+            "text": "Art"
+          },
+          {
+            "text": "."
+          },
+          {
+            "text": " 331 - Os projetos de lei do Executivo relativos a créditos adicionais também serão numerados, independentemente de leitura, e desde logo enviados à Comissão de Finanças e Orçamento."
+          }
+        ],
+        "is_revoked": false,
+        "is_old_version": false,
+        "amendment_note": "",
+        "children": []
+      },
+      "children": [],
       "all_versions": [],
       "law_name": "Regimento Interno"
     },
@@ -36592,26 +36659,37 @@
         "amendment_note": "",
         "children": []
       },
-      "children": [
-        {
-          "unit_type": "OTHER",
-          "identifier": "",
-          "uid": "art345_2",
-          "text": "Art 346 - Respeitadas as disposições expressas neste Capítulo para discussão e votação de projetos de leis orçamentárias, serão aplicadas, no que couber, as normas estabelecidas no Regimento Interno para os demais projetos de lei.",
-          "runs": [
-            {
-              "text": "Art"
-            },
-            {
-              "text": " 346 - Respeitadas as disposições expressas neste Capítulo para discussão e votação de projetos de leis orçamentárias, serão aplicadas, no que couber, as normas estabelecidas no Regimento Interno para os demais projetos de lei."
-            }
-          ],
-          "is_revoked": false,
-          "is_old_version": false,
-          "amendment_note": "",
-          "children": []
-        }
-      ],
+      "children": [],
+      "all_versions": [],
+      "law_name": "Regimento Interno"
+    },
+    {
+      "type": "article",
+      "art_number": "346",
+      "is_adt": false,
+      "is_revoked": false,
+      "caput": {
+        "unit_type": "ARTIGO",
+        "identifier": "Art. 346",
+        "uid": "art346",
+        "text": "Art. 346 - Respeitadas as disposições expressas neste Capítulo para discussão e votação de projetos de leis orçamentárias, serão aplicadas, no que couber, as normas estabelecidas no Regimento Interno para os demais projetos de lei.",
+        "runs": [
+          {
+            "text": "Art"
+          },
+          {
+            "text": "."
+          },
+          {
+            "text": " 346 - Respeitadas as disposições expressas neste Capítulo para discussão e votação de projetos de leis orçamentárias, serão aplicadas, no que couber, as normas estabelecidas no Regimento Interno para os demais projetos de lei."
+          }
+        ],
+        "is_revoked": false,
+        "is_old_version": false,
+        "amendment_note": "",
+        "children": []
+      },
+      "children": [],
       "all_versions": [],
       "law_name": "Regimento Interno"
     },

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import re
 from typing import Optional
 
 from .models import (
@@ -62,23 +63,52 @@ class HTMLRenderer:
             parts.append(self._render_unit_as_p(art.caput, is_caput=True))
 
         # Children in document order (old versions interleaved)
+        path_ctx = ["", "", "", ""]  # [para, inciso, alinea, sub]
         for child in art.children:
             if child.is_old_version:
                 parts.append(self._render_old_version(child))
             else:
-                parts.append(self._render_unit_as_p(child, is_caput=False))
+                path = self._update_path_ctx(child, path_ctx)
+                parts.append(self._render_unit_as_p(
+                    child, is_caput=False, path=path,
+                ))
 
         parts.append("  </div>")
         return "\n".join(parts)
 
+    def _update_path_ctx(
+        self, unit: DocumentUnit, ctx: list[str],
+    ) -> str:
+        """Atualiza contexto hierárquico e retorna path comma-separated.
+
+        ctx = [para, inciso, alinea, sub]
+        Formato do path: "I,b,2", "§ 1º,I", "§ú", etc.
+        """
+        if unit.unit_type in (UnitType.PARAGRAFO_UNICO, UnitType.PARAGRAFO_NUM):
+            ctx[0] = "§ú" if unit.unit_type == UnitType.PARAGRAFO_UNICO else unit.identifier
+            ctx[1] = ctx[2] = ctx[3] = ""
+        elif unit.unit_type == UnitType.INCISO:
+            ctx[1] = unit.identifier  # "I", "II", etc.
+            ctx[2] = ctx[3] = ""
+        elif unit.unit_type == UnitType.ALINEA:
+            ctx[2] = re.sub(r"\)$", "", unit.identifier)  # "a)" → "a"
+            ctx[3] = ""
+        elif unit.unit_type in (UnitType.SUB_ALINEA, UnitType.ITEM_NUM):
+            m = re.match(r"(\d+)", unit.identifier)
+            ctx[3] = m.group(1) if m else unit.identifier
+        else:
+            return ""
+
+        return ",".join(part for part in ctx if part)
+
     def _render_unit_as_p(
-        self, unit: DocumentUnit, is_caput: bool
+        self, unit: DocumentUnit, is_caput: bool, path: str = "",
     ) -> str:
         cls = "" if is_caput else ' class="art-para"'
         uid = html.escape(unit.uid)
 
         # Build inline content
-        inner = self._render_unit_id(unit)
+        inner = self._render_unit_id(unit, path=path)
         inner += " — "
         inner += self._render_runs_after_identifier(unit)
 
@@ -96,10 +126,11 @@ class HTMLRenderer:
 
         return f"    <p{cls}>{inner}</p>{footnote_html}"
 
-    def _render_unit_id(self, unit: DocumentUnit) -> str:
+    def _render_unit_id(self, unit: DocumentUnit, path: str = "") -> str:
         uid = html.escape(unit.uid)
         label = html.escape(unit.identifier)
-        return f'<span class="unit-id" data-uid="{uid}">{label}</span>'
+        path_attr = f' data-path="{html.escape(path)}"' if path else ""
+        return f'<span class="unit-id" data-uid="{uid}"{path_attr}>{label}</span>'
 
     def _render_runs_after_identifier(self, unit: DocumentUnit) -> str:
         """Renderiza os runs removendo o identificador do início."""
@@ -108,7 +139,6 @@ class HTMLRenderer:
 
         # Find where the identifier ends in the text
         # Pattern: "Art. 43  - text" or "§ 1º - text" or "I - text"
-        import re
         # Remove identifier + separator from start
         patterns = [
             re.escape(ident) + r"\s*[-–—.]\s*",

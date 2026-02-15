@@ -709,6 +709,15 @@
             "detail": "caput"
           }
         ]
+      },
+      {
+        "sub_subject": "SubAssunto3",
+        "refs": [
+          {
+            "art": "13",
+            "detail": "I,b"
+          }
+        ]
       }
     ]
   }

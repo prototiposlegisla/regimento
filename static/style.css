@@ -164,12 +164,15 @@ body {
   font-weight: 700;
   text-align: center;
   font-size: calc(1.1rem * var(--zoom-scale));
-  color: #555;
   text-transform: uppercase;
   letter-spacing: .5px;
   padding: calc(12px * var(--zoom-scale));
-  background: #e8e8e8;
 }
+.card-titulo.nivel-norma    { background: #222; color: #fff; }
+.card-titulo.nivel-titulo   { background: #555; color: #fff; }
+.card-titulo.nivel-capitulo { background: #888; color: #fff; }
+.card-titulo.nivel-secao    { background: #aaa; color: #fff; }
+.card-titulo.nivel-subsecao { background: #c8c8c8; color: #333; }
 
 .card-artigo .art-para {
   margin-top: calc(6px * var(--zoom-scale));

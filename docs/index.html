@@ -171,12 +171,15 @@ body {
   font-weight: 700;
   text-align: center;
   font-size: calc(1.1rem * var(--zoom-scale));
-  color: #555;
   text-transform: uppercase;
   letter-spacing: .5px;
   padding: calc(12px * var(--zoom-scale));
-  background: #e8e8e8;
 }
+.card-titulo.nivel-norma    { background: #222; color: #fff; }
+.card-titulo.nivel-titulo   { background: #555; color: #fff; }
+.card-titulo.nivel-capitulo { background: #888; color: #fff; }
+.card-titulo.nivel-secao    { background: #aaa; color: #fff; }
+.card-titulo.nivel-subsecao { background: #c8c8c8; color: #333; }
 
 .card-artigo .art-para {
   margin-top: calc(6px * var(--zoom-scale));
@@ -525,14 +528,10 @@ mark {
   max-width: calc(100vw - 32px);
 }
 #subject-pill.open { display: flex; flex-wrap: wrap; }
-body.pill-open #cards-container { padding-bottom: 300px; }
 
 #pill-label {
   font-weight: 600;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100vw - 80px);
 }
 
 #pill-nav {
@@ -664,11 +663,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
 <!-- CARDS -->
 <div id="cards-container">
-  <div class="card card-titulo" data-section="norma1">Regimento Interno</div>
+  <div class="card card-titulo nivel-norma" data-section="norma1">Regimento Interno</div>
 
-  <div class="card card-titulo" data-section="tit1">TÍTULO I<br>DA CÂMARA MUNICIPAL</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit1">TÍTULO I<br>DA CÂMARA MUNICIPAL</div>
 
-  <div class="card card-titulo" data-section="cap1">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap1">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
   <div class="card card-artigo" data-art="1">
     <p><span class="unit-id" data-uid="art1">Art. 1º</span> — A Câmara Municipal de São Paulo tem sua sede no Palácio Anchieta, na Capital do Estado de São Paulo.</p>
@@ -690,7 +689,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art2pu" data-path="§ú">Parágrafo único</span> — Cada sessão legislativa será contada de 1º de fevereiro a 30 de junho e de 1º de agosto a 15 de dezembro.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap2">CAPÍTULO II<br>DA INSTALAÇÃO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap2">CAPÍTULO II<br>DA INSTALAÇÃO</div>
 
   <div class="card card-artigo" data-art="3">
     <p><span class="unit-id" data-uid="art3">Art. 3º</span> — A Câmara Municipal de São Paulo instalar-se-á, no primeiro ano de cada legislatura, no dia 1º de janeiro, às 15:00 (quinze) horas, em sessão solene, independentemente de número, sob a presidência do Vereador mais idoso dentre os presentes.</p>
@@ -705,9 +704,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art4p2" data-path="§ 2º">§ 2º</span> — Declarado eleito e empossado o Presidente, este assumirá a direção dos trabalhos, passando-se à eleição dos demais membros da Mesa.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit2">TÍTULO II<br>DA MESA DA CÂMARA</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit2">TÍTULO II<br>DA MESA DA CÂMARA</div>
 
-  <div class="card card-titulo" data-section="cap3">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap3">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
   <div class="card card-artigo" data-art="5">
     <p><span class="unit-id" data-uid="art5">Art. 5°</span> — A Mesa eleita, com mandato de 1 (um) ano, será composta do Presidente, do 1ª Vice-Presidente, do 2a Vice-Presidente, do 1º Secretário e do 2º Secretário. <a href="https://esaj.tjsp.jus.br/cposg/search.do;jsessionid=C0420972C8516B8E5924A59B5273D5ED.cposg2?conversationId=&amp;paginaConsulta=1&amp;localPesquisa.cdLocal=-1&amp;cbPesquisa=NUMPROC&amp;tipoNuProcesso=UNIFICADO&amp;numeroDigitoAnoUnificado=9013401-84.1998&amp;foroNumeroUnificado=0000&amp;dePesquisaNuUnificado=9013401-84.1998.8.26.0000&amp;dePesquisa=&amp;uuidCaptcha=sajcaptcha_9bba161055bf489493715313009d0346&amp;g-recaptcha-response=03AOLTBLSCQ2C0RHagC3vYZYVBp16XjZszMekJtgXSXTluaUJ40wfjbgojJUPCFOsnaBFzOuTcTkiHD0-QXnnf2Up_EkScsNzU994f1YIK1m1fmRx5ta4q-up_CQeHCuURQazVMsjO2aMdN6WJT4O-8-53cAaNz2ElrswroRCYHFnZe9B74GwKmkxBEvYSjJ_HNhCEhuM13cJTLnrum8qJ_w1jd6lzdu4xVwCnYUoqL_qWl10EdJE0COXdkWhaBfI28T2gI2p-kumJGY_VtufJsz_6KzAVGgWYPDX85ud8OLhZrDd8MnczvPsHy77_vZsTDHDlgTjbe4Zd&amp;pbEnviar=Pesquisar" target="_blank" rel="noopener">(Vide ADIN Nº 9013401-84.1998.8.26.0000)</a></p>
@@ -743,7 +742,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art8pu_3" data-path="§ú">Parágrafo único</span> — Em Comissões Temporárias e Extraordinárias de caráter permanente não se aplica o disposto no “caput” deste artigo. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2019&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução nº 01 de 03 de abril de 2019)</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="cap4">CAPÍTULO II<br>DA ELEIÇÃO DA MESA</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap4">CAPÍTULO II<br>DA ELEIÇÃO DA MESA</div>
 
   <div class="card card-artigo" data-art="9">
     <p><span class="unit-id" data-uid="art9">Art. 9°</span> — A eleição para renovação da Mesa será realizada no dia 15 de dezembro, em sessão extraordinária, e a posse dos eleitos dar-se-á no dia 1º de janeiro do ano subsequente.</p>
@@ -764,7 +763,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art11">Art. 11</span> — Para a eleição da Mesa, a votação será feita mediante voto secreto, em cédula própria, para cada cargo, com a indicação deste e os nomes dos concorrentes.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap5">CAPÍTULO III<br>DAS ATRIBUIÇÕES DA MESA</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap5">CAPÍTULO III<br>DAS ATRIBUIÇÕES DA MESA</div>
 
   <div class="card card-artigo" data-art="12">
     <p><span class="unit-id" data-uid="art12">Art. 12</span> — A Mesa eleita, em ato que deverá ser publicado dentro de 60 (sessenta) dias após sua constituição, fixará a competência de cada um de seus membros, respeitadas as atribuições já definidas por este Regimento Interno. (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=Ato&amp;NUMERO=383&amp;ANO=1992&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Ato nº 383/1992</a>) (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=Ato&amp;NUMERO=432&amp;ANO=1993&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Ato nº 432/1993</a>) (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=Ato&amp;NUMERO=483&amp;ANO=1994&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Ato nº 483/1994</a>)</p>
@@ -801,7 +800,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art15">Art. 15</span> — Os contratos de qualquer natureza, que a Câmara Municipal firmar com terceiros, serão assinados pela maioria dos membros efetivos da Mesa, sob pena de nulidade.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap6">CAPÍTULO IV<br>DO PRESIDENTE</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap6">CAPÍTULO IV<br>DO PRESIDENTE</div>
 
   <div class="card card-artigo" data-art="16">
     <p><span class="unit-id" data-uid="art16">Art. 16</span> — O Presidente é o representante da Câmara, em juízo ou fora dele. <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=2004&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 02/2004)</a></p>
@@ -904,7 +903,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art23">Art. 23</span> — Quando o Presidente estiver com a palavra, no exercício de suas funções, durante as sessões plenárias, não poderá ser interrompido nem aparteado.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap7">CAPÍTULO V<br>DOS VICE-PRESIDENTES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap7">CAPÍTULO V<br>DOS VICE-PRESIDENTES</div>
 
   <div class="card card-artigo" data-art="24">
     <p><span class="unit-id" data-uid="art24">Art. 24</span> — Sempre que o Presidente não se achar no recinto à hora regimental de início das sessões, o 1º Vice- Presidente o substituirá no desempenho de suas funções, cedendo-lhe o lugar à sua presença. (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=Ato&amp;NUMERO=383&amp;ANO=1992&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Ato nº 383/1992</a>)</p>
@@ -916,7 +915,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art25">Art. 25</span> — Obedecida a ordem estabelecida no artigo anterior, os Vice-Presidentes substituirão o Presidente em suas faltas, ausências, impedimentos ou licenças, ficando, nas duas últimas hipóteses, investidos na plenitude das respectivas funções. (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=Ato&amp;NUMERO=383&amp;ANO=1992&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Ato nº 383/1992</a>)</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap8">CAPÍTULO VI<br>DOS SECRETÁRIOS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap8">CAPÍTULO VI<br>DOS SECRETÁRIOS</div>
 
   <div class="card card-artigo" data-art="26">
     <p><span class="unit-id" data-uid="art26">Art. 26</span> — São atribuições do 1º Secretário:</p>
@@ -936,7 +935,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art27pu" data-path="§ú">Parágrafo único</span> — Quando o 1º e 2º Suplentes da Mesa estiverem ocupando os cargos de 1º e 2º Vice-Presidentes, vago o cargo de Presidente, assumirá o 1º Secretário.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap9">CAPÍTULO VII<br>DAS CONTAS DA MESA</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap9">CAPÍTULO VII<br>DAS CONTAS DA MESA</div>
 
   <div class="card card-artigo" data-art="28">
     <p><span class="unit-id" data-uid="art28">Art. 28</span> — As contas da Mesa da Câmara compõem-se de:</p>
@@ -948,7 +947,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art29">Art. 29</span> — Os balancetes mensais, assinados pelo Presidente, e o balanço anual, assinado pela Mesa, serão publicados no órgão oficial de imprensa do Município e afixados no saguão da Câmara, para conhecimento geral.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap10">CAPÍTULO VIII<br>DA RENÚNCIA E DESTITUIÇÃO DA MESA</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap10">CAPÍTULO VIII<br>DA RENÚNCIA E DESTITUIÇÃO DA MESA</div>
 
   <div class="card card-artigo" data-art="30">
     <p><span class="unit-id" data-uid="art30">Art. 30</span> — A renúncia do Vereador ao cargo que ocupa na Mesa dar-se-á por ofício a ela dirigido e se efetivará, independentemente de deliberação do Plenário, a partir do momento que for lida em sessão.</p>
@@ -999,9 +998,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art37pu" data-path="§ú">Parágrafo único</span> — Terão preferência na ordem de inscrição, respectivamente, o relator do parecer e o acusado ou acusados.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit3">TÍTULO III<br>DAS COMISSÕES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit3">TÍTULO III<br>DAS COMISSÕES</div>
 
-  <div class="card card-titulo" data-section="cap11">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap11">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
   <div class="card card-artigo" data-art="38">
     <p class="old-version">Art. 38 - As Comissões serão:</p>
@@ -1043,9 +1042,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="old-version">§ 10 - Fica criada a Comissão Extraordinária Permanente da Mulher, com 5 (cinco) membros, respeitada a proporcionalidade partidária e, seguindo as mesmas regras dos parágrafos anteriores deste artigo. (Inserido pela Resolução 5 de 02 de abril de 2003) (Revogado pela Resolução 01 de 21 de março de 2007). <span class="amendment-note">(Revogado pela Resolução 01 de 21 de março de 2007)</span></p>
   </div>
 
-  <div class="card card-titulo" data-section="cap12">CAPÍTULO II<br>DAS COMISSÕES PERMANENTES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap12">CAPÍTULO II<br>DAS COMISSÕES PERMANENTES</div>
 
-  <div class="card card-titulo" data-section="sec1">SEÇÃO I<br>DISPOSIÇÕES PRELIMINARES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec1">SEÇÃO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
   <div class="card card-artigo" data-art="39">
     <p><span class="unit-id" data-uid="art39">Art. 39</span> — As Comissões Permanentes, em número de 7 (sete), têm as seguintes denominações e composição:</p>
@@ -1065,7 +1064,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art39VII_3" data-path="VII">VII</span> — Saúde, Promoção Social, Trabalho e Mulher, com 7 (sete) membros. (Redação dada pela <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2025&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Resolução nº 01, de 13 de março de 2025</a>.)</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec2">SEÇÃO II<br>Da Composição das Comissões Permanentes</div>
+  <div class="card card-titulo nivel-secao" data-section="sec2">SEÇÃO II<br>Da Composição das Comissões Permanentes</div>
 
   <div class="card card-artigo" data-art="40">
     <p><span class="unit-id" data-uid="art40">Art. 40</span> — A representação numérica das bancadas nas Comissões será estabelecida dividindo-se o número de Vereadores de cada partido, exceto os citados no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 8º</a>, pelo número de Comissões, sendo que o inteiro do quociente final, dito quociente partidário, representará o número de vagas que cada bancada terá nas Comissões.</p>
@@ -1107,7 +1106,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art45pu" data-path="§ú">Parágrafo único</span> — A substituição perdurará enquanto persistir a licença ou o impedimento.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec3">SEÇÃO III<br>DA COMPETÊNCIA DAS COMISSÕES PERMANENTES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec3">SEÇÃO III<br>DA COMPETÊNCIA DAS COMISSÕES PERMANENTES</div>
 
   <div class="card card-artigo" data-art="46">
     <p><span class="unit-id" data-uid="art46">Art. 46</span> — Às Comissões Permanentes, em razão da matéria de sua competência, cabe:</p>
@@ -1383,7 +1382,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art48">Art. 48</span> — E vedado às Comissões Permanentes, ao apreciarem proposição ou qualquer matéria submetida ao seu exame, opinar sobre aspectos que não sejam de sua atribuição específica.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec4">SEÇÃO IV<br>Dos Presidentes e Vice-Presidentes das Comissões Permanentes</div>
+  <div class="card card-titulo nivel-secao" data-section="sec4">SEÇÃO IV<br>Dos Presidentes e Vice-Presidentes das Comissões Permanentes</div>
 
   <div class="card card-artigo" data-art="49">
     <p><span class="unit-id" data-uid="art49">Art. 49</span> — Os Presidentes e Vice-Presidentes das Comissões Permanentes serão escolhidos na forma do disposto no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 43</a>.</p>
@@ -1434,7 +1433,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art54">Art. 54</span> — Se, por qualquer razão, o Presidente deixar de fazer parte da Comissão, ou renunciar à presidência, proceder-se-á a nova eleição, observado o disposto no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 43 e seu § 1º</a>, salvo se faltarem menos de 3 (três) meses para o término da sessão legislativa, sendo, neste caso, substituído pelo Vice-Presidente.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec5">SEÇÃO V<br>Das Subcomissões</div>
+  <div class="card card-titulo nivel-secao" data-section="sec5">SEÇÃO V<br>Das Subcomissões</div>
 
   <div class="card card-artigo" data-art="55">
     <p><span class="unit-id" data-uid="art55">Art. 55</span> — As Comissões Permanentes poderão constituir, dentre seus próprios componentes, sem poder decisório:</p>
@@ -1448,7 +1447,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art56">Art. 56</span> — A matéria apreciada em Subcomissão Permanente ou Temporária concluirá por um relatório, sujeito à deliberação do plenário da respectiva Comissão.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec6">SEÇÃO VI<br>As Reuniões</div>
+  <div class="card card-titulo nivel-secao" data-section="sec6">SEÇÃO VI<br>As Reuniões</div>
 
   <div class="card card-artigo" data-art="57">
     <p><span class="unit-id" data-uid="art57">Art. 57</span> — As Comissões Permanentes reunir-se-ão: <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=3&amp;ANO=2004&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 03 de 2004)</a>e <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=1&amp;ANO=2015&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 01 de 2015).</a></p>
@@ -1481,7 +1480,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art61pu" data-path="§ú">Parágrafo único</span> — As atas das reuniões secretas, uma vez aprovadas ao término da reunião, depois de rubricadas em todas as folhas e lacradas pelo Presidente e Vice-Presidente da Comissão, serão recolhidas aos arquivos da Câmara.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec7">SEÇÃO VII<br>Dos Trabalhos</div>
+  <div class="card card-titulo nivel-secao" data-section="sec7">SEÇÃO VII<br>Dos Trabalhos</div>
 
   <div class="card card-artigo" data-art="62">
     <p><span class="unit-id" data-uid="art62">Art. 62</span> — - As deliberações das Comissões serão tomadas por maioria dos votos, observado o disposto na <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">seção IX </a>deste Capítulo.</p>
@@ -1546,7 +1545,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art73">Art. 73</span> — As disposições e prazos estabelecidos na presente Seção não se aplicam às proposituras de iniciativa dos cidadãos, definida no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">Título IX</a> deste Regimento.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec8">SEÇÃO VIII<br>Dos Pareceres</div>
+  <div class="card card-titulo nivel-secao" data-section="sec8">SEÇÃO VIII<br>Dos Pareceres</div>
 
   <div class="card card-artigo" data-art="74">
     <p><span class="unit-id" data-uid="art74">Art. 74</span> — Parecer é o pronunciamento oficial da Comissão sobre qualquer matéria sujeita ao seu estudo.</p>
@@ -1595,7 +1594,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art80">Art. 80</span> — O projeto de lei que receber parecer contrário, quanto ao mérito, de todas as Comissões, será tido como rejeitado, ressalvado o recurso previsto no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 79</a>.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec9">SEÇÃO IX<br>Da Deliberação Sobre Proposições</div>
+  <div class="card card-titulo nivel-secao" data-section="sec9">SEÇÃO IX<br>Da Deliberação Sobre Proposições</div>
 
   <div class="card card-artigo" data-art="81">
     <p><span class="unit-id" data-uid="art81">Art. 81</span> — As Comissões Permanentes poderão discutir e votar proposições, inclusive projetos de lei, na forma do<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener"> artigo 46, inciso X</a>, em razão de matéria de sua competência, excetuados os projetos: (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=1&amp;ANO=2004&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Precedente Regimental nº 01/2004</a>)</p>
@@ -1628,7 +1627,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art84pu" data-path="§ú">Parágrafo único</span> — No caso do inciso I, serão contados como pela rejeição os votos contrários, os vencidos e os em separado, quando divergente, para efeito de deliberação.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec10">SEÇÃO X<br>Das Audiências Públicas</div>
+  <div class="card card-titulo nivel-secao" data-section="sec10">SEÇÃO X<br>Das Audiências Públicas</div>
 
   <div class="card card-artigo" data-art="85">
     <p><span class="unit-id" data-uid="art85">Art. 85</span> — As Comissões Permanentes, isoladamente ou em conjunto, deverão convocar audiências públicas sobre:</p>
@@ -1667,7 +1666,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art88p2" data-path="§ 2º">§ 2º</span> — É permitido, a qualquer tempo, o translado de peças e fornecimento de cópias aos interessados.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap13">CAPÍTULO III<br>DAS COMISSÕES TEMPORÁRIAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap13">CAPÍTULO III<br>DAS COMISSÕES TEMPORÁRIAS</div>
 
   <div class="card card-artigo" data-art="89">
     <p><span class="unit-id" data-uid="art89">Art. 89</span> — As Comissões Temporárias são:</p>
@@ -1754,7 +1753,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art100pu" data-path="§ú">Parágrafo único</span> — Aplicam-se às Comissões Temporárias, no que couber, as disposições regimentais relativas às Comissões Permanentes.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit4">TÍTULO IV<br>DO PLENÁRIO</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit4">TÍTULO IV<br>DO PLENÁRIO</div>
 
   <div class="card card-artigo" data-art="101">
     <p><span class="unit-id" data-uid="art101">Art. 101</span> — Plenário é o órgão deliberativo e soberano da Câmara, constituído pela reunião dos Vereadores em exercício, em local, forma e número estabelecidos neste Regimento.</p>
@@ -1851,9 +1850,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art105XXXIV" data-path="XXXIV">XXXIV</span> — exercer outras atribuições regimentais e legais.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit5">TÍTULO V<br>DOS VEREADORES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit5">TÍTULO V<br>DOS VEREADORES</div>
 
-  <div class="card card-titulo" data-section="cap14">CAPÍTULO I<br>DA POSSE</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap14">CAPÍTULO I<br>DA POSSE</div>
 
   <div class="card card-artigo" data-art="106">
     <p><span class="unit-id" data-uid="art106">Art. 106</span> — Os Vereadores serão empossados pela sua presença à sessão solene de instalação da Câmara em cada legislatura, na forma dos parágrafos 1º e 2º do artigo 3º.</p>
@@ -1862,9 +1861,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art106p3" data-path="§ 3º">§ 3º</span> — O Vereador, no caso do parágrafo anterior, bem como os Suplentes posteriormente convocados serão empossados perante o Presidente, apresentando o respectivo diploma, a declaração de bens e prestando o compromisso regimental no decorrer da sessão ordinária ou extraordinária.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap15">CAPÍTULO II<br>DOS DIREITOS E DEVERES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap15">CAPÍTULO II<br>DOS DIREITOS E DEVERES</div>
 
-  <div class="card card-titulo" data-section="sec11">DOS VEREADORES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec11">DOS VEREADORES</div>
 
   <div class="card card-artigo" data-art="107">
     <p><span class="unit-id" data-uid="art107">Art. 107</span> — Os Vereadores gozam de inviolabilidade por suas opiniões, palavras e votos no exercício do mandato, na circunscrição do Município, e outros direitos previstos na legislação vigente.</p>
@@ -1891,7 +1890,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art110">Art. 110</span> — Não será subvencionada viagem de Vereador ao exterior, salvo quando, a serviço do Município, houver designação e concessão de licença pela Câmara.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap16">CAPÍTULO III<br>DAS FALTAS E LICENÇAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap16">CAPÍTULO III<br>DAS FALTAS E LICENÇAS</div>
 
   <div class="card card-artigo" data-art="111">
     <p class="old-version">Art. 111 - Será atribuída falta ao Vereador que não comparecer às sessões plenárias ou às reuniões ordinárias das Comissões Permanentes, salvo motivo justo. (Vide Ato nº 654/99)</p>
@@ -1941,7 +1940,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art118pu" data-path="§ú">Parágrafo único</span> — Na falta de Suplente, o Presidente da Câmara comunicará o fato, dentro de 48 (quarenta e oito) horas, diretamente ao Tribunal Regional Eleitoral.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap17">CAPÍTULO IV<br>DOS LÍDERES E VICE-LÍDERES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap17">CAPÍTULO IV<br>DOS LÍDERES E VICE-LÍDERES</div>
 
   <div class="card card-artigo" data-art="119">
     <p><span class="unit-id" data-uid="art119">Art. 119</span> — Os Vereadores são agrupados por representações partidárias ou Blocos Parlamentares.</p>
@@ -1965,7 +1964,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art121">Art. 121</span> — O Prefeito, mediante ofício à Mesa, poderá indicar um Vereador para exercer a Liderança e mais 3 (três) Vereadores para exercerem a Vice-Liderança do Governo, os quais gozarão de todas as prerrogativas concedidas às Lideranças. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=2&amp;ANO=1999&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução nº 2 de 29 de junho de 1999)</a>.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap18">CAPÍTULO V<br>DA REMUNERAÇÃO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap18">CAPÍTULO V<br>DA REMUNERAÇÃO</div>
 
   <div class="card card-artigo" data-art="122">
     <p><span class="unit-id" data-uid="art122">Art. 122</span> — À Mesa da Câmara incumbe elaborar projetos destinados a fixar a remuneração dos Vereadores, Prefeito e Vice-Prefeito a viger na legislatura subsequente.</p>
@@ -1980,7 +1979,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art124">Art. 124</span> — A remuneração dos Vereadores sofrerá desconto de 1/20 (um vinte avos), quando ocorrer falta injustificada, na forma do <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 111.</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="cap19">CAPÍTULO VI<br>DA EXTINÇÃO E PERDA DO MANDATO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap19">CAPÍTULO VI<br>DA EXTINÇÃO E PERDA DO MANDATO</div>
 
   <div class="card card-artigo" data-art="125">
     <p><span class="unit-id" data-uid="art125">Art. 125</span> — Perderá o mandato o Vereador:</p>
@@ -2028,11 +2027,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art131">Art. 131</span> — Cassado o mandato do Vereador, a Mesa expedirá a respectiva resolução.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit6">TÍTULO VI<br>DAS SESSÕES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit6">TÍTULO VI<br>DAS SESSÕES</div>
 
-  <div class="card card-titulo" data-section="cap20">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap20">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
-  <div class="card card-titulo" data-section="sec12">SEÇÃO I<br>Das Espécies de Sessão e de Sua Abertura</div>
+  <div class="card card-titulo nivel-secao" data-section="sec12">SEÇÃO I<br>Das Espécies de Sessão e de Sua Abertura</div>
 
   <div class="card card-artigo" data-art="132">
     <p><span class="unit-id" data-uid="art132">Art. 132</span> — As sessões da Câmara serão:</p>
@@ -2084,7 +2083,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art138pu" data-path="§ú">Parágrafo único</span> — Cada Bancada poderá credenciar assessores para acompanhar os trabalhos na proporção de um para cada cinco membros da mesma, desde que igualmente trajados.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec13">SEÇÃO II<br>Do Uso da Palavra</div>
+  <div class="card card-titulo nivel-secao" data-section="sec13">SEÇÃO II<br>Do Uso da Palavra</div>
 
   <div class="card card-artigo" data-art="139">
     <p><span class="unit-id" data-uid="art139">Art. 139</span> — Durante as sessões, o Vereador só poderá falar para:</p>
@@ -2115,7 +2114,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art140XIV" data-path="XIV">XIV</span> — o Vereador poderá falar também por meio do sistema de videoconferência. (Inserido pela <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2025&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Resolução nº 01, de 13 de março de 2025</a>.)</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec14">SEÇÃO III<br>Da Suspensão e do Encerramento da Sessão</div>
+  <div class="card card-titulo nivel-secao" data-section="sec14">SEÇÃO III<br>Da Suspensão e do Encerramento da Sessão</div>
 
   <div class="card card-artigo" data-art="141">
     <p><span class="unit-id" data-uid="art141">Art. 141</span> — A sessão poderá ser suspensa:</p>
@@ -2133,7 +2132,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art142III" data-path="III">III</span> — tumulto grave.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec15">SEÇÃO IV<br>Da Prorrogação das Sessões</div>
+  <div class="card card-titulo nivel-secao" data-section="sec15">SEÇÃO IV<br>Da Prorrogação das Sessões</div>
 
   <div class="card card-artigo" data-art="143">
     <p><span class="unit-id" data-uid="art143">Art. 143</span> — As sessões, cuja abertura exija prévia constatação de “quorum” a requerimento de qualquer Vereador e mediante deliberação do Plenário, poderão ser prorrogadas por tempo determinado, não inferior a uma hora nem superior a 4 (quatro), ressalvado o disposto no parágrafo 2º deste artigo.</p>
@@ -2155,7 +2154,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art145">Art. 145</span> — Nenhuma sessão plenária poderá ir além das 24 (vinte e quatro) horas do dia em que foi iniciada, ressalvada a sessão solene.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec16">SEÇÃO V<br>Da Ata e da Imprensa Oficial</div>
+  <div class="card card-titulo nivel-secao" data-section="sec16">SEÇÃO V<br>Da Ata e da Imprensa Oficial</div>
 
   <div class="card card-artigo" data-art="146">
     <p><span class="unit-id" data-uid="art146">Art. 146</span> — A ata das sessões da Câmara será constituída pela publicação, na Imprensa Oficial, da íntegra do respectivo apanhamento taquigráfico.</p>
@@ -2185,9 +2184,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art150pu" data-path="§ú">Parágrafo único</span> — A revisão feita em discursos ou apartes, de forma nenhuma poderá deturpar o sentido do debate, restringindo- se apenas à maneira formal de expressá-los.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap21">CAPÍTULO II<br>DAS SESSÕES ORDINÁRIAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap21">CAPÍTULO II<br>DAS SESSÕES ORDINÁRIAS</div>
 
-  <div class="card card-titulo" data-section="sec17">SEÇÃO I<br>Disposições Preliminares</div>
+  <div class="card card-titulo nivel-secao" data-section="sec17">SEÇÃO I<br>Disposições Preliminares</div>
 
   <div class="card card-artigo" data-art="151">
     <p><span class="unit-id" data-uid="art151">Art. 151</span> — As sessões ordinárias, que terão a duração de 4 (quatro) horas, só se realizarão às terças, quartas e quintas-feiras, com início às 15:00 horas, desde que presentes, para sua abertura, no mínimo, 1/3 (um terço) dos membros da Câmara. (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=7&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Resolução nº 7 de 2001</a>) (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=2019&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Precedente Regimental nº 02/19</a>)</p>
@@ -2220,7 +2219,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art156">Art. 156</span> — Fica limitado em até 5 (cinco) o número de cópias, quando se tratar de solicitação de envio de pronunciamentos a que se referem os artigos <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">157, § 5º e 160 ,§ 6°</a>, bem como de requerimentos, restrito o envio às entidades ou áreas afetas.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec18">SEÇÃO II<br>Do Pequeno Expediente</div>
+  <div class="card card-titulo nivel-secao" data-section="sec18">SEÇÃO II<br>Do Pequeno Expediente</div>
 
   <div class="card card-artigo" data-art="157">
     <p class="old-version">Art. 157 - No Pequeno Expediente, que terá a duração máxima de 45 (quarenta e cinco) minutos, o Presidente dará a palavra aos Vereadores, durante 5 (cinco) minutos improrrogáveis a cada orador, a fim de expor assunto de sua livre escolha, não se permitindo apartes. (Precedente Regimental nº 02/2004)</p>
@@ -2237,7 +2236,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art158">Art. 158</span> — O Vereador chamado para falar no Pequeno Expediente poderá, se desejar, encaminhar à Mesa seu discurso para ser publicado, desde que não exceda a duas laudas datilografadas.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec19">SEÇÃO III<br>Do Grande Expediente</div>
+  <div class="card card-titulo nivel-secao" data-section="sec19">SEÇÃO III<br>Do Grande Expediente</div>
 
   <div class="card card-artigo" data-art="159">
     <p class="old-version">Art. 159 - Concluído o Pequeno Expediente, passar-se-á ao Grande Expediente, cuja duração máxima será de 60 (sessenta) minutos.</p>
@@ -2264,7 +2263,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art162">Art. 162</span> — <s>Se o Vereador chamado estiver ausente e não tiver cedido o seu tempo, o respectivo líder partidário poderá ocupar a tribuna em seu lugar ou cedê-lo a outro membro de sua bancada</s>. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2019&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Revogado pela Resolução nº 01 de 03 de abril de 2019).</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="sec20">SEÇÃO IV<br>Do Prolongamento do Expediente</div>
+  <div class="card card-titulo nivel-secao" data-section="sec20">SEÇÃO IV<br>Do Prolongamento do Expediente</div>
 
   <div class="card card-artigo" data-art="163">
     <p><span class="unit-id" data-uid="art163">Art. 163</span> — Concluído o Grande Expediente, passar-se-á ao Prolongamento do Expediente, cuja duração máxima será de 30 (trinta) minutos, exigindo-se para discussão a presença de 1/3 (um terço) dos membros da Câmara e, para deliberação, a presença da maioria absoluta. <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=2004&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 02/2004)</a></p>
@@ -2315,7 +2314,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art169pu" data-path="§ú">Parágrafo único</span> — Se a verificação de presença acusar existência de “quorum” regimental para deliberação, serão votados, preliminarmente, os requerimentos mencionados no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">inciso II do artigo 164</a>, passando-se, a seguir, à votação dos demais cuja discussão já tenha sido encerrada.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec21">SEÇÃO V<br>Da Ordem do Dia</div>
+  <div class="card card-titulo nivel-secao" data-section="sec21">SEÇÃO V<br>Da Ordem do Dia</div>
 
   <div class="card card-artigo" data-art="170">
     <p><span class="unit-id" data-uid="art170">Art. 170</span> — Concluído o Prolongamento do Expediente, passar-se-á à Ordem do Dia, que terá duração de uma hora e quarenta e cinco minutos, acrescendo-se a esse tempo o que eventualmente remanesça de fase anterior da sessão.</p>
@@ -2409,7 +2408,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art178">Art. 178</span> — Esgotada a pauta da Ordem do Dia e se nenhum Vereador solicitar a palavra para explicação pessoal, ou findo o tempo destinado à sessão, o Presidente dará por encerrados os trabalhos, depois de anunciar a publicação da Ordem do Dia da sessão seguinte. <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=2004&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 02/2004)</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="sec22">SEÇÃO VI<br>Da Explicação Pessoal</div>
+  <div class="card card-titulo nivel-secao" data-section="sec22">SEÇÃO VI<br>Da Explicação Pessoal</div>
 
   <div class="card card-artigo" data-art="179">
     <p><span class="unit-id" data-uid="art179">Art. 179</span> — Esgotada a pauta da Ordem do Dia, desde que presente 1/3 (um terço), no mínimo, dos Vereadores, passar-se-á à Explicação Pessoal, pelo tempo restante da sessão.</p>
@@ -2428,7 +2427,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art182">Art. 182</span> — As sessões ordinárias não serão prorrogadas para a Explicação Pessoal.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap22">CAPÍTULO III<br>DAS SESSÕES EXTRAORDINÁRIAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap22">CAPÍTULO III<br>DAS SESSÕES EXTRAORDINÁRIAS</div>
 
   <div class="card card-artigo" data-art="183">
     <p><span class="unit-id" data-uid="art183">Art. 183</span> — As sessões extraordinárias poderão ser convocadas: <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=2004&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 02/2004)</a></p>
@@ -2508,7 +2507,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art192II" data-path="II">II</span> — quanto à preferência para votação, ao adiamento e à retirada de proposição da pauta, o disposto nos <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigos 175,176 e 177</a>.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap23">CAPÍTULO IV<br>DAS SESSÕES SOLENES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap23">CAPÍTULO IV<br>DAS SESSÕES SOLENES</div>
 
   <div class="card card-artigo" data-art="193">
     <p><span class="unit-id" data-uid="art193">Art. 193</span> — As sessões solenes destinam-se à realização de solenidade e outras atividades decorrentes de decretos legislativos, resoluções e requerimentos.</p>
@@ -2518,7 +2517,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art194">Art. 194</span> — As sessões solenes previstas pelo artigo anterior serão convocadas pelo Presidente, de ofício, ou a requerimento subscrito, no mínimo, por 1/3 (um terço) dos Vereadores, deferido de plano pelo Presidente, e para o fim específico que lhes for determinado.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap24">CAPÍTULO V<br>DAS SESSÕES SECRETAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap24">CAPÍTULO V<br>DAS SESSÕES SECRETAS</div>
 
   <div class="card card-artigo" data-art="195">
     <p><span class="unit-id" data-uid="art195">Art. 195</span> — Excepcionalmcnte, a Câmara poderá realizar sessões secretas, mediante requerimento subscrito, no mínimo, por 2/3 (dois terços) de seus membros, deferido de plano pelo Presidente.</p>
@@ -2548,7 +2547,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art201">Art. 201</span> — Antes de se encerrar a sessão secreta, a Câmara deliberará se o assunto nela ventilado deverá ou não ser publicado, total ou parcialmente, cabendo ao Presidente enviar à Imprensa Oficial o comunicado respectivo, cujo texto será previamente aprovado pelo Plenário.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap25">CAPÍTULO VI<br>DAS SESSÕES PERMANENTES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap25">CAPÍTULO VI<br>DAS SESSÕES PERMANENTES</div>
 
   <div class="card card-artigo" data-art="202">
     <p><span class="unit-id" data-uid="art202">Art. 202</span> — Excepcionalmente, poderá a Câmara declarar-se em sessão permanente, por deliberação da Mesa ou a requerimento subscrito, no mínimo, pela maioria absoluta dos Vereadores, deferido de imediato pelo Presidente.</p>
@@ -2571,7 +2570,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art206">Art. 206</span> — A instalação de sessão permanente, durante o transcorrer de qualquer sessão plenária, implicará no imediato encerramento desta última.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap26">CAPÍTULO VII<br>DA TRIBUNA POPULAR</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap26">CAPÍTULO VII<br>DA TRIBUNA POPULAR</div>
 
   <div class="card card-artigo" data-art="207">
     <p><span class="unit-id" data-uid="art207">Art. 207</span> — Fica assegurada, conforme previsto <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=LOM&amp;NUMERO=0&amp;ANO=1990&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">no artigo 27, inciso VIII da Lei Orgânica do Município</a>, a instalação da Tribuna Popular, na primeira terça-feira do mês, em sessão extraordinária, com até 90 (noventa) minutos de duração, logo após o encerramento da sessão ordinária, no auditório “Pedroso Horta”, salvo motivo de força maior, sempre que, no mínimo, 5 (cinco) representantes de diferentes entidades ou movimentos sociais populares se inscrevam em livro próprio, disponível para tanto junto à Mesa da Câmara, sob responsabilidade do Presidente, para debater com os Vereadores questões de interesse do Município ou proposituras em apreciação na Câmara.</p>
@@ -2596,9 +2595,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art210">Art. 210</span> — A Secretaria da Mesa fará publicar, na Imprensa Oficial, com pelo menos 48 (quarenta e oito) horas de antecedência, a instalação da Tribuna Popular, com a lista de inscritos convocados e respectivos temas a serem tratados.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit7">TÍTULO VII<br>DAS PROPOSIÇÕES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit7">TÍTULO VII<br>DAS PROPOSIÇÕES</div>
 
-  <div class="card card-titulo" data-section="cap27">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap27">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
   <div class="card card-artigo" data-art="211">
     <p><span class="unit-id" data-uid="art211">Art. 211</span> — As proposições consistirão em:</p>
@@ -2659,16 +2658,16 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art218">Art. 218</span> — As proposições deverão ser encaminhadas à Mesa no momento próprio, datilografadas e acompanhadas do necessário número de cópias.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap28">CAPÍTULO II<br>DAS INDICAÇÕES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap28">CAPÍTULO II<br>DAS INDICAÇÕES</div>
 
   <div class="card card-artigo" data-art="219">
     <p><span class="unit-id" data-uid="art219">Art. 219</span> — Indicação é a proposição em que o Vereador sugere aos poderes competentes medidas de interesse público.</p>
     <p class="art-para"><span class="unit-id" data-uid="art219pu" data-path="§ú">Parágrafo único</span> — Apresentada a indicação, até a hora do término do Prolongamento do Expediente, o Presidente a despachará, independentemente de deliberação do Plenário.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap29">CAPÍTULO III<br>DOS REQUERIMENTOS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap29">CAPÍTULO III<br>DOS REQUERIMENTOS</div>
 
-  <div class="card card-titulo" data-section="sec23">Disposições Preliminares</div>
+  <div class="card card-titulo nivel-secao" data-section="sec23">Disposições Preliminares</div>
 
   <div class="card card-artigo" data-art="220">
     <p><span class="unit-id" data-uid="art220">Art. 220</span> — Requerimento é a proposição dirigida por qualquer Vereador ou Comissão ao Presidente ou à Mesa, sobre matéria de competência da Câmara.</p>
@@ -2692,7 +2691,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art222">Art. 222</span> — Não se admitirão emendas a requerimentos, facultando-se, apenas, a apresentação de substitutivo.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec24">SEÇÃO II<br>Dos Requerimentos Sujeitos a Despacho de Plano pelo Presidente.</div>
+  <div class="card card-titulo nivel-secao" data-section="sec24">SEÇÃO II<br>Dos Requerimentos Sujeitos a Despacho de Plano pelo Presidente.</div>
 
   <div class="card card-artigo" data-art="223">
     <p><span class="unit-id" data-uid="art223">Art. 223</span> — Será despachado de plano pelo Presidente o requerimento que solicitar:</p>
@@ -2721,7 +2720,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art224">Art. 224</span> — Os requerimentos de informação versarão sobre fato relacionado com matéria legislativa em trâmite ou sobre fato sujeito à fiscalização da Câmara.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec25">SEÇÃO III<br>Dos Requerimentos Sujeitos à Deliberação do Plenário</div>
+  <div class="card card-titulo nivel-secao" data-section="sec25">SEÇÃO III<br>Dos Requerimentos Sujeitos à Deliberação do Plenário</div>
 
   <div class="card card-artigo" data-art="225">
     <p><span class="unit-id" data-uid="art225">Art. 225</span> — Dependerá de deliberação do Plenário, mas não sofrerá discussão, o requerimento que solicitar:</p>
@@ -2770,7 +2769,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art227">Art. 227</span> — Sempre que um requerimento comporte discussão, cada Vereador disporá, para discuti-lo, de 5 (cinco) minutos, não se admitindo encaminhamento de votação nem declaração de voto.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap30">CAPÍTULO IV DAS MOÇÕES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap30">CAPÍTULO IV DAS MOÇÕES</div>
 
   <div class="card card-artigo" data-art="228">
     <p><span class="unit-id" data-uid="art228">Art. 228</span> — Moção é a proposição em que é sugerida a manifestação da Câmara sobre determinado assunto, reivindicando providências, hipotecando solidariedade, protestando ou repudiando.</p>
@@ -2789,9 +2788,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art231">Art. 231</span> — Cada Vereador disporá de 5 (cinco) minutos para discussão de moções, não se admitindo encaminhamento de votação nem declaração de voto.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap31">CAPÍTULO V<br>DOS PROJETOS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap31">CAPÍTULO V<br>DOS PROJETOS</div>
 
-  <div class="card card-titulo" data-section="sec26">SEÇÃO I<br>Disposições Preliminares</div>
+  <div class="card card-titulo nivel-secao" data-section="sec26">SEÇÃO I<br>Disposições Preliminares</div>
 
   <div class="card card-artigo" data-art="232">
     <p><span class="unit-id" data-uid="art232">Art. 232</span> — A Câmara exerce sua função legislativa por meio de:</p>
@@ -2852,7 +2851,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art238VI" data-path="VI">VI</span> — justificação, com a exposição circunstanciada dos motivos de mérito que fundamentam a adoção da medida proposta.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec27">SEÇÃO II<br>Da Tramitação dos Projetos</div>
+  <div class="card card-titulo nivel-secao" data-section="sec27">SEÇÃO II<br>Da Tramitação dos Projetos</div>
 
   <div class="card card-artigo" data-art="239">
     <p><span class="unit-id" data-uid="art239">Art. 239</span> — Os projetos apresentados até o início do Prolongamento do Expediente serão lidos, enviados à publicação na Imprensa Oficial e despachados de plano às Comissões Permanentes.</p>
@@ -2913,7 +2912,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art247p2" data-path="§ 2º">§ 2º</span> — O projeto de resolução a que se refere o “caput” será votado em dois turnos, com intervalo mínimo de 48 (quarenta e oito) horas entre eles.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec28">SEÇÃO III<br>Da Primeira Discussão</div>
+  <div class="card card-titulo nivel-secao" data-section="sec28">SEÇÃO III<br>Da Primeira Discussão</div>
 
   <div class="card card-artigo" data-art="248">
     <p><span class="unit-id" data-uid="art248">Art. 248</span> — Instruído o projeto com, os pareceres de todas as Comissões a que for despachado, e não se tratando de projeto passível, de ser discutido e votado conclusivamente pelas Comissões, será consíderado em condições de pauta.</p>
@@ -2945,7 +2944,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="old-version">§ 2º - Se o projeto ou o Substitutivo for aprovado sem emendas, figurará na pauta da sessão ordinária subsequente. (Revogado pela Resolução 3 de 18 de abril de 1995). <span class="amendment-note">(Revogado pela Resolução 3 de 18 de abril de 1995)</span></p>
   </div>
 
-  <div class="card card-titulo" data-section="sec29">SEÇÃO IV<br>Da Segunda Discussão</div>
+  <div class="card card-titulo nivel-secao" data-section="sec29">SEÇÃO IV<br>Da Segunda Discussão</div>
 
   <div class="card card-artigo" data-art="254">
     <p><span class="unit-id" data-uid="art254">Art. 254</span> — O tempo para discutir projeto em fase de segunda discussão será de 30 (trinta) minutos para cada Vereador.</p>
@@ -2968,7 +2967,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art258">Art. 258</span> — Aprovado o projeto ou o substitutivo com emendas, será o processo despachado à Comissão de mérito, para ser redigido conforme o vencido, dentro do prazo de 5 (cinco) dias.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec30">SEÇÃO V<br>Da Redação Final</div>
+  <div class="card card-titulo nivel-secao" data-section="sec30">SEÇÃO V<br>Da Redação Final</div>
 
   <div class="card card-artigo" data-art="259">
     <p><span class="unit-id" data-uid="art259">Art. 259</span> — A redação final, observadas as exceções regimentais, será proposta em parecer da Comissão de mérito ou da Comissão de Constituição e Justiça, que concluirá pelo texto definitivo do projeto, com as alterações decorrentes das emendas aprovadas.</p>
@@ -3018,7 +3017,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art268">Art. 268</span> — Aprovado o parecer com redação final do projeto, será este enviado à sanção do Prefeito ou à promulgação do Presidente.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap32">CAPÍTULO VI<br>DOS SUBSTITUTIVOS E DAS EMENDAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap32">CAPÍTULO VI<br>DOS SUBSTITUTIVOS E DAS EMENDAS</div>
 
   <div class="card card-artigo" data-art="269">
     <p><span class="unit-id" data-uid="art269">Art. 269</span> — Substitutivo é a proposição apresentada por Vereadores, por Comissão Permanente ou pela Mesa, para substituir outra já existente sobre o mesmo assunto.</p>
@@ -3056,7 +3055,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art273pu" data-path="§ú">Parágrafo único</span> — O recebimento de substitutivo ou emenda impertinente não implica na obrigatoriedade de sua votação, podendo o Presidente considerá-los prejudicados antes de submetê-los a votos.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap33">CAPÍTULO VII<br>DA RETIRADA E ARQUIVAMENTO DE PROPOSIÇÕES</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap33">CAPÍTULO VII<br>DA RETIRADA E ARQUIVAMENTO DE PROPOSIÇÕES</div>
 
   <div class="card card-artigo" data-art="274">
     <p><span class="unit-id" data-uid="art274">Art. 274</span> — A retirada de proposição dar-se-á:</p>
@@ -3076,11 +3075,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art275p4" data-path="§ 4º">§ 4º</span> — Não poderão ser desarquivadas as proposições inquinadas de inconstitucionalidade ou ilegalidade, ou as que tenham parecer contrário das Comissões de mérito.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit8">TÍTULO VIII<br>DOS DEBATES E DELIBERAÇÕES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit8">TÍTULO VIII<br>DOS DEBATES E DELIBERAÇÕES</div>
 
-  <div class="card card-titulo" data-section="cap34">CAPÍTULO I<br>DA DISCUSSÃO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap34">CAPÍTULO I<br>DA DISCUSSÃO</div>
 
-  <div class="card card-titulo" data-section="sec31">SEÇÃO I<br>Disposições Preliminares</div>
+  <div class="card card-titulo nivel-secao" data-section="sec31">SEÇÃO I<br>Disposições Preliminares</div>
 
   <div class="card card-artigo" data-art="276">
     <p><span class="unit-id" data-uid="art276">Art. 276</span> — Discussão é a fase dos trabalhos destinada aos debates em Plenário.</p>
@@ -3125,7 +3124,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art281pu" data-path="§ú">Parágrafo único</span> — O orador interrompido para votação de requerimento de prorrogação da sessão, mesmo que ausente à votação do requerimento, não perderá sua vez de falar, desde que presente quando chamado a continuar seu discurso.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec32">SEÇÃO II<br>Dos Apartes</div>
+  <div class="card card-titulo nivel-secao" data-section="sec32">SEÇÃO II<br>Dos Apartes</div>
 
   <div class="card card-artigo" data-art="282">
     <p><span class="unit-id" data-uid="art282">Art. 282</span> — Aparte é a interrupção consentida, breve e oportuna do orador, para indagação, esclarecimento ou contestação, não podendo ter duração superior a 2 (dois) minutos.</p>
@@ -3144,7 +3143,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art283p3" data-path="§ 3º">§ 3º</span> — Os apartes só poderão ser revistos pelo autor com permissão do orador que, por sua vez, não poderá modificá-los.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec33">SEÇÃO III<br>Do Encerramento da Discussão</div>
+  <div class="card card-titulo nivel-secao" data-section="sec33">SEÇÃO III<br>Do Encerramento da Discussão</div>
 
   <div class="card card-artigo" data-art="284">
     <p><span class="unit-id" data-uid="art284">Art. 284</span> — O encerramento da discussão dar-se-á: <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=0&amp;ANO=1997&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Vide Precedente Regimental sem número, de 1997)</a></p>
@@ -3172,9 +3171,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art286">Art. 286</span> — Se o requerimento de encerramento de discussão for rejeitado, só poderá ser reformulado depois de terem falado, no mínimo mais 4 (quatro) Vereadores. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=8&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução 8 de 30 de junho de 2001).</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="cap35">CAPÍTULO II<br>DA VOTAÇÃO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap35">CAPÍTULO II<br>DA VOTAÇÃO</div>
 
-  <div class="card card-titulo" data-section="sec34">SEÇÃO I<br>Disposições Preliminares</div>
+  <div class="card card-titulo nivel-secao" data-section="sec34">SEÇÃO I<br>Disposições Preliminares</div>
 
   <div class="card card-artigo" data-art="287">
     <p><span class="unit-id" data-uid="art287">Art. 287</span> — Votação é o ato complementar da discussão, através do qual o Plenário manifesta sua vontade deliberativa.</p>
@@ -3203,7 +3202,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art289pu" data-path="§ú">Parágrafo único</span> — As normas constantes do presente artigo serão aplicadas ao Vereador que substituir o Presidente na direção dos trabalhos.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec35">SEÇÃO II<br>Do Encaminhamento da Votação</div>
+  <div class="card card-titulo nivel-secao" data-section="sec35">SEÇÃO II<br>Do Encaminhamento da Votação</div>
 
   <div class="card card-artigo" data-art="290">
     <p><span class="unit-id" data-uid="art290">Art. 290</span> — A partir do instante em que o Presidente declarar a matéria já debatida e com discussão encerrada, poderá ser solicitada a palavra para encaminhamento da votação, ressalvados os impedimentos regimentais.</p>
@@ -3218,7 +3217,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art292">Art. 292</span> — Ainda que haja, no processo, substitutivos e emendas, haverá apenas um encaminhamento de votação, que versará sobre todas as peças do processo.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec36">SEÇÃO III<br>Dos Processos de Votação</div>
+  <div class="card card-titulo nivel-secao" data-section="sec36">SEÇÃO III<br>Dos Processos de Votação</div>
 
   <div class="card card-artigo" data-art="293">
     <p><span class="unit-id" data-uid="art293">Art. 293</span> — São 3 (três) os processos de votação:</p>
@@ -3291,7 +3290,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art300">Art. 300</span> — Será obrigatoriamente publicado, na Imprensa Oficial, o “Boletim de Apuração” respectivo.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec37">SEÇÃO IV<br>Da Verificação Nominal de Votação</div>
+  <div class="card card-titulo nivel-secao" data-section="sec37">SEÇÃO IV<br>Da Verificação Nominal de Votação</div>
 
   <div class="card card-artigo" data-art="301">
     <p class="old-version">Art. 301 - Se algum Vereador tiver dúvida quanto ao resultado da votação simbólica proclamada pelo Presidente, poderá requerer verificação nominal de votação.</p>
@@ -3307,7 +3306,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art301p4_2" data-path="§ 4°">§ 4°</span> — Aplica-se à verificação nominal de votação, no que couber, o disposto no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">art. 296 e parágrafos</a>. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=3&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução nº 3 de 20 de abril de 1995)</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="sec38">SEÇÃO V<br>Da Declaração de Voto</div>
+  <div class="card card-titulo nivel-secao" data-section="sec38">SEÇÃO V<br>Da Declaração de Voto</div>
 
   <div class="card card-artigo" data-art="302">
     <p><span class="unit-id" data-uid="art302">Art. 302</span> — Declaração de voto é o pronunciamento do Vereador sobre os motivos que o levaram a se manifestar contrária ou favoravelmente à matéria votada.</p>
@@ -3325,7 +3324,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art304">Art. 304</span> — Em declaração de voto, cada Vereador disporá de 5 (cinco) minutos, sendo vedados apartes.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap36">CAPÍTULO III<br>DO TEMPO DE USO DA PALAVRA</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap36">CAPÍTULO III<br>DO TEMPO DE USO DA PALAVRA</div>
 
   <div class="card card-artigo" data-art="305">
     <p><span class="unit-id" data-uid="art305">Art. 305</span> — O tempo de que dispõe o Vereador, sempre que ocupar a tribuna, será controlado pelo Secretário, para conhecimento do Presidente, e começará a fluir no instante em que lhe for dada a palavra.</p>
@@ -3358,9 +3357,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art306XI" data-path="XI">XI</span> — para solicitar esclarecimentos ao Prefeito e a Secretários Municipais, quando estes comparecerem à Câmara, convocados ou não: 5 (cinco) minutos, sem apartes.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap37">CAPÍTULO IV<br>DAS QUESTÕES DE ORDEM E DOS PRECEDENTES REGIMENTAIS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap37">CAPÍTULO IV<br>DAS QUESTÕES DE ORDEM E DOS PRECEDENTES REGIMENTAIS</div>
 
-  <div class="card card-titulo" data-section="sec39">SEÇÃO I<br>Das Questões de Ordem</div>
+  <div class="card card-titulo nivel-secao" data-section="sec39">SEÇÃO I<br>Das Questões de Ordem</div>
 
   <div class="card card-artigo" data-art="307">
     <p><span class="unit-id" data-uid="art307">Art. 307</span> — Pela ordem, o Vereador só poderá falar, declarando o motivo, para: <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=1&amp;ANO=2007&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Precedente Regimental nº 01 de 2007)</a></p>
@@ -3391,7 +3390,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art310">Art. 310</span> — Se a questão de ordem comportar resposta, esta deverá ser dada imediatamente, se possível, ou, caso contrário, em fase posterior da mes-ma sessão, ou na sessão ordinária seguinte.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec40">SEÇÃO II<br>Do Recurso às Decisões do Presidente</div>
+  <div class="card card-titulo nivel-secao" data-section="sec40">SEÇÃO II<br>Do Recurso às Decisões do Presidente</div>
 
   <div class="card card-artigo" data-art="311">
     <p><span class="unit-id" data-uid="art311">Art. 311</span> — Da decisão ou omissão do Presidente em questão de ordem, representação ou proposição de qualquer Vereador cabe recurso ao Plenário, nos termos da presente Seção.</p>
@@ -3407,7 +3406,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art312p5" data-path="§ 5º">§ 5º</span> — Rejeitado o recurso, a decisão do Presidente será integralmente mantida.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec41">SEÇÃO III<br>Dos Precedentes Regimentais</div>
+  <div class="card card-titulo nivel-secao" data-section="sec41">SEÇÃO III<br>Dos Precedentes Regimentais</div>
 
   <div class="card card-artigo" data-art="313">
     <p><span class="unit-id" data-uid="art313">Art. 313</span> — Os casos não previstos neste Regimento serão decididos pelo Presidente, passando as respectivas decisões a constituir precedentes regimentais, que orientarão a solução de casos análogos. (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=0&amp;ANO=1997&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Procedente Regimental sem número, de 1997</a>) (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=1&amp;ANO=2021&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Precedente Regimental nº 01/2021)</a> (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=2021&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Precedente Regimental nº 02/2021)</a></p>
@@ -3420,7 +3419,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art314">Art. 314</span> — Ao final de cada sessão legislativa, a Mesa fará, através de Ato, a consolidação de todos os precedentes regimentais firmados, publicando-os em avulso para distribuição aos Vereadores.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit9">TÍTULO IX<br>DA TRAMITAÇÃO ESPECIAL E URGENTE DE PROPOSITURAS DE INICIATIVA DOS CIDADÃOS</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit9">TÍTULO IX<br>DA TRAMITAÇÃO ESPECIAL E URGENTE DE PROPOSITURAS DE INICIATIVA DOS CIDADÃOS</div>
 
   <div class="card card-artigo" data-art="315">
     <p><span class="unit-id" data-uid="art315">Art. 315</span> — Será assegurada tramitação especial e urgente às proposituras de iniciativa popular.</p>
@@ -3487,7 +3486,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art323">Art. 323</span> — Do resultado da deliberação em Plenário será dado conhecimento às entidades ou aos cidadãos responsáveis pela propositura.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit10">TÍTULO X<br>DA FASE ESPECIAL DA SESSÃO LEGISLATIVA</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit10">TÍTULO X<br>DA FASE ESPECIAL DA SESSÃO LEGISLATIVA</div>
 
   <div class="card card-artigo" data-art="324">
     <p><span class="unit-id" data-uid="art324">Art. 324</span> — No período de recesso, a Câmara poderá ser extraordinariamente convocada:</p>
@@ -3514,11 +3513,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art328">Art. 328</span> — Aplicam-se, nos períodos extraordinários, as disposições regimentais não colidentes com as normas estabelecidas neste Título.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit11">TÍTULO XI<br>DA ELABORAÇÃO LEGISLATIVA ESPECIAL</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit11">TÍTULO XI<br>DA ELABORAÇÃO LEGISLATIVA ESPECIAL</div>
 
-  <div class="card card-titulo" data-section="cap38">CAPÍTULO I<br>DOS ORÇAMENTOS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap38">CAPÍTULO I<br>DOS ORÇAMENTOS</div>
 
-  <div class="card card-titulo" data-section="sec42">SEÇÃO I<br>Disposições Preliminares</div>
+  <div class="card card-titulo nivel-secao" data-section="sec42">SEÇÃO I<br>Disposições Preliminares</div>
 
   <div class="card card-artigo" data-art="329">
     <p><span class="unit-id" data-uid="art329">Art. 329</span> — Os projetos de leis orçamentárias de iniciativa do Poder Executivo, previstos no <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=LOM&amp;NUMERO=0&amp;ANO=1990&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">artigo 137 da Lei Orgânica do Município</a>, deverão ser en-viados à Câmara nos seguintes prazos:</p>
@@ -3549,7 +3548,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art334">Art. 334</span> — Em nenhuma fase da tramitação desses projetos de lei conceder-se-á vista do processo a qualquer Vereador.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec43">SEÇÃO II<br>Da Tramitação dos Projetos de Leis Orçamentárias</div>
+  <div class="card card-titulo nivel-secao" data-section="sec43">SEÇÃO II<br>Da Tramitação dos Projetos de Leis Orçamentárias</div>
 
   <div class="card card-artigo" data-art="335">
     <p><span class="unit-id" data-uid="art335">Art. 335</span> — A Comissão de Finanças e Orçamento, para apreciação dos projetos de leis orçamentárias, observará as mesmas normas que disciplinam os trabalhos das Comissões Permanentes, em especial as previstas pela <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">Seção VII do Capítulo II do Título III</a> deste Regimento.</p>
@@ -3611,7 +3610,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art346">Art. 346</span> — Respeitadas as disposições expressas neste Capítulo para discussão e votação de projetos de leis orçamentárias, serão aplicadas, no que couber, as normas estabelecidas no Regimento Interno para os demais projetos de lei.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap39">CAPÍTULO II<br>Da Concessão de Títulos Honoríficos</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap39">CAPÍTULO II<br>Da Concessão de Títulos Honoríficos</div>
 
   <div class="card card-artigo" data-art="347">
     <p><span class="unit-id" data-uid="art347">Art. 347</span> — Por via de projeto de decreto legislativo, aprovado em discussão e votação únicas, no mínimo por 2/3 (dois terços) de seus membros, a Câmara poderá conceder título de cidadão honorário ou qualquer outra honraria ou homenagem a personalidades nacionais ou estrangeiras radicadas no País, comprovadamente dignas da honraria.</p>
@@ -3642,7 +3641,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art351p2" data-path="§ 2º">§ 2º</span> — Nas sessões a que alude o presente artigo, para falar em nome da Câmara, só será permitida a palavra do Vereador autor da propositura como orador oficial, ou de outro por ele designado.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap40">CAPÍTULO III<br>DOS MEMBROS DO TRIBUNAL DE CONTAS DO MUNICÍPIO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap40">CAPÍTULO III<br>DOS MEMBROS DO TRIBUNAL DE CONTAS DO MUNICÍPIO</div>
 
   <div class="card card-artigo" data-art="352">
     <p><span class="unit-id" data-uid="art352">Art. 352</span> — A indicação de membros do Tribunal de Contas do Município será feita atendidas as normas previstas nos <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=LOM&amp;NUMERO=0&amp;ANO=1990&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">artigos 49 e 50 da Lei Orgânica do Município.</a></p>
@@ -3680,7 +3679,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art359">Art. 359</span> — Na discussão do parecer e na votação dos nomes serão aplicadas as normas gerais estabelecidas por este Regimento.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit12">TÍTULO XII<br>DA SANÇÃO, DO VETO, DA PROMULGAÇÃO E REGISTROS DE LEIS, DECRETOS LEGISLATIVOS E RESOLUÇÕES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit12">TÍTULO XII<br>DA SANÇÃO, DO VETO, DA PROMULGAÇÃO E REGISTROS DE LEIS, DECRETOS LEGISLATIVOS E RESOLUÇÕES</div>
 
   <div class="card card-artigo" data-art="360">
     <p><span class="unit-id" data-uid="art360">Art. 360</span> — O projeto aprovado pela Câmara será enviado, dentro de 10 (dez) dias úteis contados da data de sua aprovação, ao Prefeito que, aquiescendo, o sancionará e o promulgará.</p>
@@ -3749,7 +3748,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art371">Art. 371</span> — <s>Os originais de Emendas à Lei Orgânica, de Leis, de Decretos Legislativos e de Resoluções serão registrados em livros próprios, </s><s>rubr-cados</s><s> pelo Presidente da Câmara e arquivados na Secretaria da Câmara, enviando-se ao Prefeito, para os fins legais, cópia autêntica dos autógrafos e, quando for o caso, dos Decretos Legislativos devidamente assinados pelo Presidente. </s>(Revogado pela <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2025&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Resolução nº 01, de 13 de março de 2025</a>.)</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit13">TÍTULO XIII<br>DA SECRETARIA DA CÂMARA</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit13">TÍTULO XIII<br>DA SECRETARIA DA CÂMARA</div>
 
   <div class="card card-artigo" data-art="372">
     <p><span class="unit-id" data-uid="art372">Art. 372</span> — Os serviços administrativos da Câmara serão feitos através de sua Secretaria, segundo as determinações da Mesa e serão regidos pelo respectivo Regulamento.</p>
@@ -3761,7 +3760,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art373pu" data-path="§ú">Parágrafo único</span> — Depois de devidamente informada por escrito, a interpelação será encaminhada ao Vereador interessado para conhecimento.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit14">TÍTULO XIV<br>DA POLÍCIA INTERNA</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit14">TÍTULO XIV<br>DA POLÍCIA INTERNA</div>
 
   <div class="card card-artigo" data-art="374">
     <p><span class="unit-id" data-uid="art374">Art. 374</span> — O policiamento do edifício da Câmara, externa e internamente, compete privativa-mente à Mesa, sob a direção do Presidente, sem intervenção de qualquer outra autoridade.</p>
@@ -3786,9 +3785,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art378p2" data-path="§ 2º">§ 2º</span> — Não sendo suficientes as medidas previstas no parágrafo anterior, poderá o Presidente suspender ou encerrar a sessão.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit15">TÍTULO XV<br>DO PREFEITO E DOS SECRETÁRIOS MUNICIPAIS</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit15">TÍTULO XV<br>DO PREFEITO E DOS SECRETÁRIOS MUNICIPAIS</div>
 
-  <div class="card card-titulo" data-section="cap41">CAPÍTULO I<br>DO COMPARECIMENTO DO PREFEITO À CÂMARA</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap41">CAPÍTULO I<br>DO COMPARECIMENTO DO PREFEITO À CÂMARA</div>
 
   <div class="card card-artigo" data-art="379">
     <p><span class="unit-id" data-uid="art379">Art. 379</span> — Poderá o Prefeito comparecer à Câmara, em dia e hora previamente estabelecidos, para prestar esclarecimentos sobre qualquer matéria, quando julgar oportuno fazê-lo.</p>
@@ -3799,7 +3798,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art380">Art. 380</span> — Sempre que comparecer à Câmara, o Prefeito terá assento à Mesa, à direita do Presidente.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap42">CAPÍTULO II<br>DA CONVOCAÇÃO DOS SECRETÁRIOS MUNICIPAIS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap42">CAPÍTULO II<br>DA CONVOCAÇÃO DOS SECRETÁRIOS MUNICIPAIS</div>
 
   <div class="card card-artigo" data-art="381">
     <p><span class="unit-id" data-uid="art381">Art. 381</span> — Os Secretários Municipais poderão ser convocados, a requerimento de qualquer Vereador, para prestar informações que lhes forem solicitadas sobre o assunto de sua competência administrativa.</p>
@@ -3822,7 +3821,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art384">Art. 384</span> — Não havendo mais Vereadores inscritos para indagações relativas aos quesitos do instrumento de convocação, o Secretário convocado, obedecidos os mesmos critérios, será interpelado sobre outros assuntos relevantes que, por dever de ofício, seja obrigado a conhecer.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap43">CAPÍTULO III<br>DAS CONTAS</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap43">CAPÍTULO III<br>DAS CONTAS</div>
 
   <div class="card card-artigo" data-art="385">
     <p><span class="unit-id" data-uid="art385">Art. 385</span> — As contas do Prefeito, da Mesa da Câmara e do Tribunal de Contas do Município correspondentes a cada exercício financeiro, serão julgadas pela Câmara, através do parecer prévio do Tribunal de Contas do Município.</p>
@@ -3843,7 +3842,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art388pu" data-path="§ú">Parágrafo único</span> — As contas do Município ficarão, anualmente, durante 60 (sessenta) dias, após sua chegada à Câmara, à disposição de qualquer contribuinte, para exame e apreciação, o qual poderá questionar-lhe a legitimidade, nos termos da lei.</p>
   </div>
 
-  <div class="card card-titulo" data-section="cap44">CAPÍTULO IV<br>DA RESPONSABILIDADE DO PREFEITO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap44">CAPÍTULO IV<br>DA RESPONSABILIDADE DO PREFEITO</div>
 
   <div class="card card-artigo" data-art="389">
     <p><span class="unit-id" data-uid="art389">Art. 389</span> — Nos crimes comuns e nos de responsabilidade, o Prefeito e o Vice-Prefeito serão processados e julgados pelo Tribunal de Justiça do Estado, nos termos da legislação federal aplicável.</p>
@@ -3866,7 +3865,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art391">Art. 391</span> — O Prefeito perderá o mandato, por extinção declarada pela Mesa da Câmara Municipal, nos casos previstos no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=LOM&amp;NUMERO=0&amp;ANO=1990&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">artigo 74 da Lei Orgânica do Município</a>.</p>
   </div>
 
-  <div class="card card-titulo" data-section="tit16">TÍTULO XVI<br>DA REFORMA DO REGIMENTO INTERNO</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit16">TÍTULO XVI<br>DA REFORMA DO REGIMENTO INTERNO</div>
 
   <div class="card card-artigo" data-art="392">
     <p><span class="unit-id" data-uid="art392">Art. 392</span> — O Regimento Interno da Câmara somente poderá ser alterado, reformado ou substituído através de Resolução.</p>
@@ -3889,7 +3888,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="art395">Art. 395</span> — Esta Resolução entrará em vigor na data de sua publicação, revogando-se as disposições em contrário.</p>
   </div>
 
-  <div class="card card-titulo" data-section="adt">ATO DAS DISPOSIÇÕES TRANSITÓRIAS</div>
+  <div class="card card-titulo nivel-titulo" data-section="adt">ATO DAS DISPOSIÇÕES TRANSITÓRIAS</div>
 
   <div class="card card-artigo" data-art="ADT1">
     <p><span class="unit-id" data-uid="artADT1">Art. 1º</span> — Ao entrar em vigência o Regimento Interno a que se refere o presente Ato, serão observadas as disposições transitórias consignadas nos artigos seguintes.</p>
@@ -3953,13 +3952,13 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="artADT6">Art. 6º</span> — Revogam-se as disposições em contrário.</p>
   </div>
 
-  <div class="card card-titulo" data-section="norma2">Lei Orgânica</div>
+  <div class="card card-titulo nivel-norma" data-section="norma2">Lei Orgânica</div>
 
-  <div class="card card-titulo" data-section="tit17">TÍTULO III<br>DA ORGANIZAÇÃO DOS PODERES</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit17">TÍTULO III<br>DA ORGANIZAÇÃO DOS PODERES</div>
 
-  <div class="card card-titulo" data-section="cap45">CAPÍTULO I<br>DO PODER LEGISLATIVO</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap45">CAPÍTULO I<br>DO PODER LEGISLATIVO</div>
 
-  <div class="card card-titulo" data-section="sec44">SEÇÃO I<br>DA CÂMARA MUNICIPAL</div>
+  <div class="card card-titulo nivel-secao" data-section="sec44">SEÇÃO I<br>DA CÂMARA MUNICIPAL</div>
 
   <div class="card card-artigo" data-art="12" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4026,7 +4025,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="artLOM14XXII" data-path="XXII">XXII</span> — votar moção de censura pública aos secretários municipais e aos subprefeitos em relação ao desempenho de suas funções. <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=8&amp;ANO=1991&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Incluído pela Emenda à Lei Orgânica nº 8 de 1991)</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="sec45">SEÇÃO II<br>DOS VEREADORES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec45">SEÇÃO II<br>DOS VEREADORES</div>
 
   <div class="card card-artigo" data-art="15" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4106,7 +4105,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="artLOM23">Art. 23</span> — No exercício de seu mandato, o Vereador terá livre acesso às repartições públicas municipais, podendo diligenciar pessoalmente junto aos órgãos da administração direta e indireta, inclusive junto ao Tribunal de Contas do Município, devendo ser atendido pelos respectivos responsáveis, na forma da lei.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec46">SEÇÃO III<br>DA MESA DA CÂMARA</div>
+  <div class="card card-titulo nivel-secao" data-section="sec46">SEÇÃO III<br>DA MESA DA CÂMARA</div>
 
   <div class="card card-artigo" data-art="24" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4149,7 +4148,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p><span class="unit-id" data-uid="artLOM28">Art. 28</span> — Ressalvados os projetos de lei de iniciativa privativa, a matéria constante de projeto de lei rejeitado somente poderá ser reapresentada, na mesma sessão legislativa, mediante proposta da maioria absoluta dos membros da Câmara Municipal.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec47">SEÇÃO IV<br>DAS SESSÕES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec47">SEÇÃO IV<br>DAS SESSÕES</div>
 
   <div class="card card-artigo" data-art="29" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4175,7 +4174,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="artLOM31p2_2" data-path="§ 2.º">§ 2.º</span> — Durante a sessão legislativa extraordinária, a Câmara deliberará exclusivamente sobre a matéria para a qual foi convocada.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec48">SEÇÃO V<br>DAS COMISSÕES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec48">SEÇÃO V<br>DAS COMISSÕES</div>
 
   <div class="card card-artigo" data-art="32" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4208,7 +4207,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="artLOM33p2" data-path="§ 2.º">§ 2.º</span> — O <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=2&amp;ANO=1991&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Regimento Interno</a> preverá o modo de funcionamento das Comissões Parlamentares de Inquérito.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec49">SEÇÃO VI<br>DO PROCESSO LEGISLATIVO</div>
+  <div class="card card-titulo nivel-secao" data-section="sec49">SEÇÃO VI<br>DO PROCESSO LEGISLATIVO</div>
 
   <div class="card card-artigo" data-art="34" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4368,7 +4367,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="artLOM46p2b" data-path="§ 2º,b">b)</span> — contenham dispositivo que autorize a exclusão do previsto no &quot;caput&quot; deste artigo. <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Incluída pela Emenda à Lei Orgânica nº 18 de 1995)</a></p>
   </div>
 
-  <div class="card card-titulo" data-section="sec50">SEÇÃO VII<br>DA FISCALIZAÇÃO CONTÁBIL, FINANCEIRA E ORÇAMENTÁRIA</div>
+  <div class="card card-titulo nivel-secao" data-section="sec50">SEÇÃO VII<br>DA FISCALIZAÇÃO CONTÁBIL, FINANCEIRA E ORÇAMENTÁRIA</div>
 
   <div class="card card-artigo" data-art="47" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4450,7 +4449,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="artLOM53p2" data-path="§ 2.º">§ 2.º</span> — Os responsáveis pelo controle interno, ao tomarem conhecimento de qualquer irregularidade, ilegalidade ou ofensa ao <a href="https://www.planalto.gov.br/ccivil_03/constituicao/Constituicao.htm" target="_blank" rel="noopener">art. 37 da Constituição da República</a>, deverão representar à autoridade competente, dando ciência à Câmara Municipal, sob pena de responsabilidade solidária.</p>
   </div>
 
-  <div class="card card-titulo" data-section="sec51">SEÇÃO VIII<br>DOS CONSELHOS DE REPRESENTANTES</div>
+  <div class="card card-titulo nivel-secao" data-section="sec51">SEÇÃO VIII<br>DOS CONSELHOS DE REPRESENTANTES</div>
 
   <div class="card card-artigo" data-art="54" data-law="LOM">
     <span class="law-badge">LOM</span>
@@ -4474,11 +4473,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="artLOM55-Ap2" data-path="§ 2º">§ 2º</span> — O ingresso na carreira de Procurador Legislativo depende de concurso público de provas e títulos, com a participação da Ordem dos Advogados do Brasil. (<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda </a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">a</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> Lei Orgânica nº 43 de 2023)</a> </p>
   </div>
 
-  <div class="card card-titulo" data-section="norma3">Constituição Federal</div>
+  <div class="card card-titulo nivel-norma" data-section="norma3">Constituição Federal</div>
 
-  <div class="card card-titulo" data-section="tit18">TÍTULO III<br>Da Organização do Estado</div>
+  <div class="card card-titulo nivel-titulo" data-section="tit18">TÍTULO III<br>Da Organização do Estado</div>
 
-  <div class="card card-titulo" data-section="cap46">CAPÍTULO IV<br>Dos Municípios</div>
+  <div class="card card-titulo nivel-capitulo" data-section="cap46">CAPÍTULO IV<br>Dos Municípios</div>
 
   <div class="card card-artigo" data-art="29" data-law="CF">
     <span class="law-badge">CF</span>
@@ -6883,7 +6882,6 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     subjectFilter = true;
     $pillFilter.classList.add('active');
     $subjectPill.classList.add('open');
-    document.body.classList.add('pill-open');
     $pillLabel.textContent = entry.subject;
     updatePill();
     applySubjectFilter();
@@ -6894,7 +6892,6 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   function closeSubjectPill() {
     activeSubject = null;
     $subjectPill.classList.remove('open');
-    document.body.classList.remove('pill-open');
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
     getAllCards().forEach(c => c.classList.remove('filtered-out'));

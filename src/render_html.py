@@ -33,10 +33,23 @@ class HTMLRenderer:
         if h.subtitle:
             text += "<br>" + html.escape(h.subtitle)
         section = html.escape(h.data_section)
+        nivel = self._heading_nivel(h)
         return (
-            f'  <div class="card card-titulo" data-section="{section}">'
+            f'  <div class="card card-titulo {nivel}" data-section="{section}">'
             f"{text}</div>"
         )
+
+    @staticmethod
+    def _heading_nivel(h: SectionHeading) -> str:
+        if h.data_section.startswith("norma"):
+            return "nivel-norma"
+        if h.level == UnitType.TITULO:
+            return "nivel-titulo"
+        if h.level == UnitType.CAPITULO:
+            return "nivel-capitulo"
+        if h.level == UnitType.SECAO:
+            return "nivel-secao"
+        return "nivel-subsecao"
 
     def _render_article(self, art: ArticleBlock) -> str:
         art_num = html.escape(art.art_number)

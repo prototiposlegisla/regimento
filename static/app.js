@@ -372,8 +372,9 @@
           }
         }
       }
-      // Compact label: remove º, spaces, abbreviate Parágrafo único → §ú
+      // Compact label: remove Art., º, spaces, abbreviate Parágrafo único → §ú
       label = label.replace(/Parágrafo único/gi, '§ú');
+      label = label.replace(/Art\.\s*/g, '');
       label = label.replace(/\u00ba/g, '').replace(/\s+/g, '');
 
       const btn = document.createElement('button');

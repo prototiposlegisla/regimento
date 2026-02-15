@@ -203,29 +203,30 @@ mark {
 }
 
 .marker-btn {
-  min-width: 36px; height: 36px;
-  border-radius: 18px;
-  border: 2px solid rgba(0,0,0,.12);
+  min-width: 28px; height: 28px;
+  border-radius: 6px;
+  border: none;
   color: #fff;
   font-weight: 700;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  transition: transform .15s;
-  padding: 0 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  transition: transform .15s, opacity .15s;
+  padding: 2px 6px;
   white-space: nowrap;
   line-height: 1.1;
   text-align: center;
+  opacity: .75;
 }
-.marker-btn:hover { transform: scale(1.1); }
+.marker-btn:hover { transform: scale(1.05); opacity: 1; }
 
 #marker-clear-all {
-  min-width: 36px; height: 36px;
-  border-radius: 18px;
-  border: 2px solid rgba(0,0,0,.12);
+  min-width: 28px; height: 28px;
+  border-radius: 6px;
+  border: none;
   background: #666;
   color: #fff;
   font-size: 18px;
@@ -459,7 +460,7 @@ mark {
   .card { border-radius: 6px; }
   #header { padding: 8px; gap: 6px; }
   #marker-nav { right: 6px; }
-  .marker-btn { width: 34px; height: 34px; font-size: 11px; }
+  .marker-btn { min-width: 24px; height: 24px; font-size: 10px; padding: 1px 5px; }
 }
 </style>
 </head>
@@ -881,7 +882,10 @@ mark {
     for (const marker of markersList) {
       const palette = MARKER_PALETTE[marker.colorIdx];
       const el = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
-      const label = el ? el.textContent : marker.uid;
+      let label = el ? el.textContent.trim() : marker.uid;
+      // Compact label: remove Art., º, spaces
+      label = label.replace(/Art\.\s*/g, '');
+      label = label.replace(/\u00ba/g, '').replace(/\s+/g, '');
 
       const btn = document.createElement('button');
       btn.className = 'marker-btn';

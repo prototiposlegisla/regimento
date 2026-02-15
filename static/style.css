@@ -413,6 +413,11 @@ mark {
   font-size: 14px;
 }
 .sys-item:hover { background: #f0f0f0; }
+.sys-art-range {
+  color: #999;
+  font-weight: 400;
+  font-size: 12px;
+}
 
 .sys-law {
   background: #e8f4fd;

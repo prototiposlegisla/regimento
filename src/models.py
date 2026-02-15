@@ -220,6 +220,7 @@ class SysIndexNode:
     """Nó do índice sistemático."""
     title: str
     section_id: str = ""
+    art_range: str = ""
     children: list[SysIndexNode | SysIndexLeaf] = field(default_factory=list)
 
 
@@ -239,5 +240,7 @@ def sys_index_to_list(nodes: list[SysIndexNode | SysIndexLeaf]) -> list[dict]:
             d: dict = {"title": n.title, "children": sys_index_to_list(n.children)}
             if n.section_id:
                 d["section_id"] = n.section_id
+            if n.art_range:
+                d["art_range"] = n.art_range
             result.append(d)
     return result

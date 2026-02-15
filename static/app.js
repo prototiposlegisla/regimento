@@ -529,6 +529,12 @@
       const title = document.createElement('div');
       title.className = isLaw ? 'sys-title sys-law' : 'sys-title';
       title.textContent = isLaw ? '— ' + group.title : group.title;
+      if (group.art_range && (!group.children || !group.children.length)) {
+        const rangeSpan = document.createElement('span');
+        rangeSpan.className = 'sys-art-range';
+        rangeSpan.textContent = ' ' + group.art_range;
+        title.appendChild(rangeSpan);
+      }
       if (group.section_id) {
         title.style.cursor = 'pointer';
         title.addEventListener('click', () => {
@@ -567,6 +573,12 @@
     el.className = 'sys-item';
     el.style.paddingLeft = indent + 'px';
     el.textContent = node.title;
+    if (node.art_range && (!node.children || !node.children.length)) {
+      const rangeSpan = document.createElement('span');
+      rangeSpan.className = 'sys-art-range';
+      rangeSpan.textContent = ' ' + node.art_range;
+      el.appendChild(rangeSpan);
+    }
 
     if (node.section_id) {
       el.addEventListener('click', () => {

@@ -1129,6 +1129,10 @@
   }, { passive: false });
 
   // ===== INIT =====
+  try {
+    const savedZoom = localStorage.getItem('regimento-zoom');
+    if (savedZoom) setZoom(parseFloat(savedZoom));
+  } catch (e) {}
   loadMarkers();
   applyMarkers();
   renderMarkerNav();

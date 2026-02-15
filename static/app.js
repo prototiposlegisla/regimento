@@ -723,10 +723,11 @@
       const title = document.createElement('div');
       title.className = 'subj-title';
       title.textContent = entry.subject;
-      if (entry.refs && entry.refs.length > 0) {
+      const allRefs = collectAllRefs(entry);
+      if (allRefs.length > 0) {
         title.addEventListener('click', () => {
           closeIndex();
-          const pillEntry = { subject: entry.subject, refs: collectAllRefs(entry) };
+          const pillEntry = { subject: entry.subject, refs: allRefs };
           openSubjectPill(pillEntry);
         });
       } else {
@@ -758,11 +759,15 @@
           subTitle.className = 'subj-title';
           subTitle.style.fontSize = '13px';
           subTitle.textContent = '— ' + ch.sub_subject;
-          subTitle.addEventListener('click', ((child) => () => {
-            closeIndex();
-            const pillEntry = { subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs };
-            openSubjectPill(pillEntry);
-          })(ch));
+          if (ch.refs && ch.refs.length > 0) {
+            subTitle.addEventListener('click', ((child) => () => {
+              closeIndex();
+              const pillEntry = { subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs };
+              openSubjectPill(pillEntry);
+            })(ch));
+          } else {
+            subTitle.classList.add('no-refs');
+          }
           subDiv.appendChild(subTitle);
 
           const subRefs = document.createElement('div');
@@ -1068,6 +1073,8 @@
     $zoomIndicator.classList.add('show');
     clearTimeout(zoomTimeout);
     zoomTimeout = setTimeout(() => $zoomIndicator.classList.remove('show'), 800);
+
+    try { localStorage.setItem('regimento-zoom', zoomScale); } catch (e) {}
 
     if (selectedCard) {
       selectedCard.scrollIntoView({ block: 'center', behavior: 'instant' });

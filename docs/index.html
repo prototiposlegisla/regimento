@@ -718,7 +718,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <button id="btn-clear-search" title="Limpar busca">&times;</button>
     <button id="btn-filter" class="active" title="Filtrar resultados">&#9698;</button>
   </div>
-  <button id="btn-compact" title="Modo compacto">≡</button>
+  <button id="btn-compact" title="Modo compacto"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3h10M4 7h10M4 11h10M4 15h10"/></svg></button>
 </div>
 
 <!-- READING LINE -->
@@ -6652,6 +6652,16 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     }
   }
 
+  function preserveScroll(fn) {
+    const card = selectedCard;
+    const topBefore = card ? card.getBoundingClientRect().top : null;
+    fn();
+    if (card && topBefore !== null && !card.classList.contains('filtered-out')) {
+      const topAfter = card.getBoundingClientRect().top;
+      window.scrollBy(0, topAfter - topBefore);
+    }
+  }
+
   let scrollTick = false;
   window.addEventListener('scroll', () => {
     if (scrollTick) return;
@@ -6821,13 +6831,13 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
   $btnClearSearch.addEventListener('click', () => {
     $searchInput.value = '';
-    doSearch('');
+    preserveScroll(() => doSearch(''));
   });
 
   $btnFilter.addEventListener('click', () => {
     searchFilter = !searchFilter;
     $btnFilter.classList.toggle('active', searchFilter);
-    doSearch($searchInput.value.trim());
+    preserveScroll(() => doSearch($searchInput.value.trim()));
   });
 
   function updateSearchCounter() {
@@ -7530,8 +7540,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     document.body.classList.remove('pill-open');
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
-    getAllCards().forEach(c => c.classList.remove('filtered-out'));
-    if (currentSearch) doSearch(currentSearch);
+    preserveScroll(() => {
+      getAllCards().forEach(c => c.classList.remove('filtered-out'));
+      if (currentSearch) doSearch(currentSearch);
+    });
   }
 
   function updatePill() {
@@ -7612,9 +7624,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   $pillFilter.addEventListener('click', () => {
     subjectFilter = !subjectFilter;
     $pillFilter.classList.toggle('active', subjectFilter);
-    applySubjectFilter();
-    highlightAllSubjectDetails();
-    if (currentSearch) doSearch(currentSearch);
+    preserveScroll(() => {
+      applySubjectFilter();
+      highlightAllSubjectDetails();
+      if (currentSearch) doSearch(currentSearch);
+    });
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);
@@ -7630,8 +7644,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   let initialZoom = 1;
 
   function setZoom(scale) {
-    zoomScale = Math.max(0.4, Math.min(2.5, scale));
-    document.documentElement.style.setProperty('--zoom-scale', zoomScale);
+    preserveScroll(() => {
+      zoomScale = Math.max(0.4, Math.min(2.5, scale));
+      document.documentElement.style.setProperty('--zoom-scale', zoomScale);
+    });
 
     $zoomIndicator.textContent = Math.round(zoomScale * 100) + '%';
     $zoomIndicator.classList.add('show');
@@ -7639,10 +7655,6 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     zoomTimeout = setTimeout(() => $zoomIndicator.classList.remove('show'), 800);
 
     try { localStorage.setItem('regimento-zoom', zoomScale); } catch (e) {}
-
-    if (selectedCard) {
-      selectedCard.scrollIntoView({ block: 'center', behavior: 'instant' });
-    }
   }
 
   document.addEventListener('touchstart', (e) => {
@@ -7697,9 +7709,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   let compactMode = false;
 
   function setCompactMode(on) {
-    compactMode = on;
-    $cards.classList.toggle('compact', compactMode);
-    $btnCompact.classList.toggle('active', compactMode);
+    preserveScroll(() => {
+      compactMode = on;
+      $cards.classList.toggle('compact', compactMode);
+      $btnCompact.classList.toggle('active', compactMode);
+    });
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 

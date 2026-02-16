@@ -100,6 +100,16 @@
     }
   }
 
+  function preserveScroll(fn) {
+    const card = selectedCard;
+    const topBefore = card ? card.getBoundingClientRect().top : null;
+    fn();
+    if (card && topBefore !== null && !card.classList.contains('filtered-out')) {
+      const topAfter = card.getBoundingClientRect().top;
+      window.scrollBy(0, topAfter - topBefore);
+    }
+  }
+
   let scrollTick = false;
   window.addEventListener('scroll', () => {
     if (scrollTick) return;
@@ -269,13 +279,13 @@
 
   $btnClearSearch.addEventListener('click', () => {
     $searchInput.value = '';
-    doSearch('');
+    preserveScroll(() => doSearch(''));
   });
 
   $btnFilter.addEventListener('click', () => {
     searchFilter = !searchFilter;
     $btnFilter.classList.toggle('active', searchFilter);
-    doSearch($searchInput.value.trim());
+    preserveScroll(() => doSearch($searchInput.value.trim()));
   });
 
   function updateSearchCounter() {
@@ -978,8 +988,10 @@
     document.body.classList.remove('pill-open');
     $pillDropdown.classList.remove('open');
     clearDetailHighlight();
-    getAllCards().forEach(c => c.classList.remove('filtered-out'));
-    if (currentSearch) doSearch(currentSearch);
+    preserveScroll(() => {
+      getAllCards().forEach(c => c.classList.remove('filtered-out'));
+      if (currentSearch) doSearch(currentSearch);
+    });
   }
 
   function updatePill() {
@@ -1060,9 +1072,11 @@
   $pillFilter.addEventListener('click', () => {
     subjectFilter = !subjectFilter;
     $pillFilter.classList.toggle('active', subjectFilter);
-    applySubjectFilter();
-    highlightAllSubjectDetails();
-    if (currentSearch) doSearch(currentSearch);
+    preserveScroll(() => {
+      applySubjectFilter();
+      highlightAllSubjectDetails();
+      if (currentSearch) doSearch(currentSearch);
+    });
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);
@@ -1078,8 +1092,10 @@
   let initialZoom = 1;
 
   function setZoom(scale) {
-    zoomScale = Math.max(0.4, Math.min(2.5, scale));
-    document.documentElement.style.setProperty('--zoom-scale', zoomScale);
+    preserveScroll(() => {
+      zoomScale = Math.max(0.4, Math.min(2.5, scale));
+      document.documentElement.style.setProperty('--zoom-scale', zoomScale);
+    });
 
     $zoomIndicator.textContent = Math.round(zoomScale * 100) + '%';
     $zoomIndicator.classList.add('show');
@@ -1087,10 +1103,6 @@
     zoomTimeout = setTimeout(() => $zoomIndicator.classList.remove('show'), 800);
 
     try { localStorage.setItem('regimento-zoom', zoomScale); } catch (e) {}
-
-    if (selectedCard) {
-      selectedCard.scrollIntoView({ block: 'center', behavior: 'instant' });
-    }
   }
 
   document.addEventListener('touchstart', (e) => {
@@ -1145,9 +1157,11 @@
   let compactMode = false;
 
   function setCompactMode(on) {
-    compactMode = on;
-    $cards.classList.toggle('compact', compactMode);
-    $btnCompact.classList.toggle('active', compactMode);
+    preserveScroll(() => {
+      compactMode = on;
+      $cards.classList.toggle('compact', compactMode);
+      $btnCompact.classList.toggle('active', compactMode);
+    });
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 

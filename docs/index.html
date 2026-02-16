@@ -7453,6 +7453,12 @@ body.pill-open #cards-container { padding-bottom: 300px; }
           if (level && !found[level]) {
             found[level] = true;
             prev.classList.remove('filtered-out');
+            // Mark all lower levels as found so we don't pick up
+            // headings from other branches (e.g. a capítulo from
+            // a previous título that isn't an ancestor of this article)
+            const hierarchy = ['norma', 'tit', 'cap', 'sec', 'subsec'];
+            const idx = hierarchy.indexOf(level);
+            for (let i = idx + 1; i < hierarchy.length; i++) found[hierarchy[i]] = true;
           }
           if (level === 'norma') break;
         }

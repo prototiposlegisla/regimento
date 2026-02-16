@@ -208,6 +208,16 @@ body {
   text-decoration: none;
 }
 
+/* Article summary */
+.art-summary {
+  display: block;
+  font-size: calc(.78rem * var(--zoom-scale));
+  color: #888;
+  font-style: italic;
+  margin-bottom: calc(4px * var(--zoom-scale));
+  line-height: 1.3;
+}
+
 /* Law badge */
 .law-badge {
   position: absolute;
@@ -680,8 +690,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   <div class="card card-titulo nivel-capitulo" data-section="cap1">CAPÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
   <div class="card card-artigo" data-art="1">
+    <span class="art-summary">Sede da Câmara</span>
     <p><span class="unit-id" data-uid="art1">Art. 1º</span> — A Câmara Municipal de São Paulo tem sua sede no Palácio Anchieta, na Capital do Estado de São Paulo.</p>
-    <p class="art-para"><span class="unit-id" data-uid="art1p1" data-path="§ 1º">§ 1º</span> — Reputam-se nulas as sessões da Câmara realizadas fora de sua sede, à exceção das sessões solenes ou comemorativas.<sup class="footnote-ref" data-note="1">[1]</sup></p>
+    <p class="art-para"><span class="unit-id" data-uid="art1p1" data-path="§ 1º">§ 1º</span> — Reputam-se nulas as sessões da Câmara realizadas fora de sua sede, à exceção das sessões solenes ou comemorativas. <sup class="footnote-ref" data-note="1">[1]</sup></p>
     <div class="footnote-box" data-note="1">
       <button class="footnote-close">&times;</button>
       <strong>Nota 1:</strong> <br>teste
@@ -691,7 +702,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       <button class="footnote-close">&times;</button>
       <strong>Nota 2:</strong> <br>- tema tal: <div class="fn-indent">Art. 5° - A Mesa eleita, com mandato de 1 (um) ano, será composta do Presidente, do 1ª Vice-Presidente, do 2a Vice-Presidente, do 1º Secretário e do 2º Secretário. <br>[...]<br>Art. 45 - No caso de vaga, licença ou impedimento de qualquer membro das Comissões Permanentes, caberá ao Presidente da Câmara a designação de substituto, mediante indicação do Líder do Partido a que pertença a vaga.</div><br>- exemplo de comentário: <div class="fn-indent">Art. 46 - Às Comissões Permanentes, em razão da matéria de sua competência, cabe:<br>I - estudar proposições e outras matérias submetidas ao seu exame:</div><br>
     </div>
-    <p class="art-para"><span class="unit-id" data-uid="art1p3" data-path="§ 3º">§ 3º</span> — Na sede da Câmara não se realizarão atos estranhos à sua função, sem prévia autorização da Mesa. <sup class="footnote-ref" data-note="3">[3]</sup></p>
+    <p class="art-para"><span class="unit-id" data-uid="art1p3" data-path="§ 3º">§ 3º</span> — Na sede da Câmara não se realizarão atos estranhos à sua função, sem prévia autorização da Mesa.  <sup class="footnote-ref" data-note="3">[3]</sup></p>
     <div class="footnote-box" data-note="3">
       <button class="footnote-close">&times;</button>
       <strong>Nota 3:</strong> <br><div class="fn-indent">Art. 9° - A eleição para renovação da Mesa será realizada no dia 15 de dezembro, em sessão extraordinária, e a posse dos eleitos dar-se-á no dia 1º de janeiro do ano subsequente.</div><br>
@@ -699,6 +710,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   </div>
 
   <div class="card card-artigo" data-art="2">
+    <span class="art-summary">Legislatura e Sessão Legislativa</span>
     <p><span class="unit-id" data-uid="art2">Art. 2º</span> — Para os efeitos regimentais, a legislatura é dividida em 4 (quatro) sessões legislativas. (Vide <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=1&amp;ANO=2002&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Precedente Regimental nº 01/2002</a>)</p>
     <p class="art-para"><span class="unit-id" data-uid="art2pu" data-path="§ú">Parágrafo único</span> — Cada sessão legislativa será contada de 1º de fevereiro a 30 de junho e de 1º de agosto a 15 de dezembro.</p>
   </div>
@@ -706,6 +718,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   <div class="card card-titulo nivel-capitulo" data-section="cap2">CAPÍTULO II<br>DA INSTALAÇÃO</div>
 
   <div class="card card-artigo" data-art="3">
+    <span class="art-summary">teste</span>
     <p><span class="unit-id" data-uid="art3">Art. 3º</span> — A Câmara Municipal de São Paulo instalar-se-á, no primeiro ano de cada legislatura, no dia 1º de janeiro, às 15:00 (quinze) horas, em sessão solene, independentemente de número, sob a presidência do Vereador mais idoso dentre os presentes.</p>
     <p class="art-para"><span class="unit-id" data-uid="art3p1" data-path="§ 1º">§ 1º</span> — Os Vereadores presentes serão empossados pelo Presidente dos trabalhos, após a leitura do compromisso nos seguintes termos:</p>
     <p class="art-para"><span class="unit-id" data-uid="art3_2"></span> — “Prometo exercer com dedicação e lealdade o meu mandato, cumprindo e fazendo cumprir a Constituição da República, a Constituição Estadual, a Lei Orgânica do Município e a legislação em vigor, defendendo a justiça social, a paz e a igualdade de tratamento a todos os cidadãos”.</p>

@@ -201,6 +201,16 @@ body {
   text-decoration: none;
 }
 
+/* Article summary */
+.art-summary {
+  display: block;
+  font-size: calc(.78rem * var(--zoom-scale));
+  color: #888;
+  font-style: italic;
+  margin-bottom: calc(4px * var(--zoom-scale));
+  line-height: 1.3;
+}
+
 /* Law badge */
 .law-badge {
   position: absolute;

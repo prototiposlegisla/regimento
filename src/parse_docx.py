@@ -61,11 +61,11 @@ def parse_docx(path: str | Path) -> ParsedDocument:
     path = Path(path)
     with zipfile.ZipFile(path, "r") as zf:
         rels = _parse_rels(zf)
-        footnotes_map = _parse_footnotes_xml(zf)
+        footnotes_map, summaries_map = _parse_footnotes_xml(zf)
         paragraphs = _parse_document_xml(zf, rels)
 
     raw_units = _classify_paragraphs(paragraphs)
-    doc = _build_document(raw_units, footnotes_map)
+    doc = _build_document(raw_units, footnotes_map, summaries_map)
     return doc
 
 
@@ -94,18 +94,22 @@ def _parse_rels(zf: zipfile.ZipFile) -> dict[str, tuple[str, str]]:
     return rels
 
 
-def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[FootnotePara]]:
-    """Parseia word/footnotes.xml → {id: [FootnotePara]}.
+def _parse_footnotes_xml(
+    zf: zipfile.ZipFile,
+) -> tuple[dict[int, list[FootnotePara]], dict[int, str]]:
+    """Parseia word/footnotes.xml → (footnotes_map, summaries_map).
 
-    Footnotes whose content starts with "b " or "B " (build notes)
-    are excluded from the result.
+    Footnotes whose content starts with "b " (build notes) are excluded.
+    Footnotes whose content starts with "s " are extracted as article
+    summaries (the text after "s " is the summary string).
     """
     w = NS["w"]
     footnotes: dict[int, list[FootnotePara]] = {}
+    summaries: dict[int, str] = {}
     try:
         data = zf.read("word/footnotes.xml")
     except KeyError:
-        return footnotes
+        return footnotes, summaries
 
     root = ET.fromstring(data)
     for fn_el in root.findall(f"{{{w}}}footnote"):
@@ -138,17 +142,22 @@ def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[FootnotePara]]:
                     indent = True
             paras.append(FootnotePara(runs=runs, indent=indent))
 
-        # Exclude build notes: first non-empty paragraph starts with "b " or "B "
+        # Check first non-empty paragraph for special prefixes
         first_text = ""
         for p in paras:
             first_text = "".join(r.text for r in p.runs).strip()
             if first_text:
                 break
+        # Exclude build notes: "b " prefix
         if first_text.lower() == "b" or first_text[:2].lower() == "b ":
+            continue
+        # Summary notes: "s " prefix → extract as summary text
+        if first_text[:2].lower() == "s ":
+            summaries[fn_id] = first_text[2:].strip()
             continue
 
         footnotes[fn_id] = paras
-    return footnotes
+    return footnotes, summaries
 
 
 from dataclasses import dataclass as _dc
@@ -419,11 +428,14 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
 
 def _build_document(
     classified: list[_ClassifiedParagraph],
-    footnotes_map: dict[int, list[TextRun]] | None = None,
+    footnotes_map: dict[int, list[FootnotePara]] | None = None,
+    summaries_map: dict[int, str] | None = None,
 ) -> ParsedDocument:
     """Constrói ParsedDocument a partir dos parágrafos classificados."""
     if footnotes_map is None:
         footnotes_map = {}
+    if summaries_map is None:
+        summaries_map = {}
     footnote_counter = [0]  # mutable counter for global numbering
 
     doc = ParsedDocument()
@@ -614,9 +626,17 @@ def _build_document(
                 if current_article:
                     doc.elements.append(current_article)
 
+                # Extract summary from "s " footnotes on the caput
+                summary = ""
+                for fn_id in cp.footnote_ids:
+                    if fn_id in summaries_map:
+                        summary = summaries_map[fn_id]
+                        break
+
                 current_article = ArticleBlock(
                     art_number=effective_num,
                     is_adt=in_adt,
+                    summary=summary,
                     law_name=current_law_name,
                 )
                 current_article.caput = caput

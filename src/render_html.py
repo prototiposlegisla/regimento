@@ -62,6 +62,11 @@ class HTMLRenderer:
             f'  <div class="card card-artigo{revoked_cls}" data-art="{art_num}"{law_attr}>'
         )
 
+        # Article summary
+        if art.summary:
+            summary = html.escape(art.summary)
+            parts.append(f'    <span class="art-summary">{summary}</span>')
+
         # Law badge (for non-default laws)
         if art.law_prefix:
             badge = html.escape(art.law_prefix)

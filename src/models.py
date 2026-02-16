@@ -85,6 +85,7 @@ class ArticleBlock:
     caput: DocumentUnit | None = None
     children: list[DocumentUnit] = field(default_factory=list)
     all_versions: list[DocumentUnit] = field(default_factory=list)
+    summary: str = ""  # síntese do artigo (de footnote com prefixo "s ")
     is_revoked: bool = False
     law_name: str = ""  # ex: "Lei Orgânica do Município de São Paulo"
     law_prefix: str = ""  # ex: "LO" (empty = Regimento, the default)
@@ -117,6 +118,8 @@ class ParsedDocument:
                     "children": [_unit_to_dict(c) for c in el.children],
                     "all_versions": [_unit_to_dict(v) for v in el.all_versions],
                 }
+                if el.summary:
+                    d["summary"] = el.summary
                 if el.law_name:
                     d["law_name"] = el.law_name
                 if el.law_prefix:

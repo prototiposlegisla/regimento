@@ -1140,10 +1140,26 @@
     }
   }, { passive: false });
 
+  // ===== COMPACT MODE =====
+  const $btnCompact = document.getElementById('btn-compact');
+  let compactMode = false;
+
+  function setCompactMode(on) {
+    compactMode = on;
+    $cards.classList.toggle('compact', compactMode);
+    $btnCompact.classList.toggle('active', compactMode);
+    try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
+  }
+
+  $btnCompact.addEventListener('click', () => setCompactMode(!compactMode));
+
   // ===== INIT =====
   try {
     const savedZoom = localStorage.getItem('regimento-zoom');
     if (savedZoom) setZoom(parseFloat(savedZoom));
+  } catch (e) {}
+  try {
+    if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);
   } catch (e) {}
   loadMarkers();
   applyMarkers();

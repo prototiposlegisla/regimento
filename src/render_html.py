@@ -62,6 +62,12 @@ class HTMLRenderer:
             f'  <div class="card card-artigo{revoked_cls}" data-art="{art_num}"{law_attr}>'
         )
 
+        # Compact-mode label (hidden by default, shown via CSS)
+        compact_suffix = " ADT" if art.law_prefix == "ADT" else ""
+        parts.append(
+            f'    <span class="art-compact-label">Art. {art_num}{compact_suffix}</span>'
+        )
+
         # Article summary
         if art.summary:
             summary = html.escape(art.summary)

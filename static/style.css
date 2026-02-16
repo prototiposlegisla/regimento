@@ -226,6 +226,48 @@ body {
   line-height: 1;
 }
 
+/* Compact-mode label (hidden by default) */
+.art-compact-label { display: none; }
+
+/* ===== COMPACT MODE BUTTON ===== */
+#btn-compact {
+  width: 36px; height: 36px;
+  border: none; background: #eee; border-radius: 8px;
+  font-weight: 700; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+#btn-compact:hover { background: #ddd; }
+#btn-compact.active { background: var(--selected-border); color: #fff; }
+
+/* ===== COMPACT MODE ===== */
+#cards-container.compact .card-artigo > p,
+#cards-container.compact .card-artigo > .art-para,
+#cards-container.compact .old-version,
+#cards-container.compact .footnote-box,
+#cards-container.compact .law-badge { display: none; }
+
+#cards-container.compact .art-compact-label {
+  display: inline;
+  font-weight: 700;
+}
+
+#cards-container.compact .art-summary {
+  display: inline;
+  margin: 0;
+  font-size: calc(.85rem * var(--zoom-scale));
+}
+#cards-container.compact .art-summary::before {
+  content: " — ";
+  font-style: normal;
+  color: #aaa;
+}
+
+#cards-container.compact .card-artigo {
+  padding: calc(8px * var(--zoom-scale)) calc(12px * var(--zoom-scale));
+  line-height: 1.3;
+}
+
 /* Search highlight */
 mark {
   background: #ffe066;

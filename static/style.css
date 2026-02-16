@@ -225,6 +225,10 @@ body {
   letter-spacing: .5px;
   line-height: 1;
 }
+.card-artigo[data-law] > p:first-of-type,
+.card-artigo[data-law] > .old-version:first-of-type {
+  padding-right: calc(40px * var(--zoom-scale));
+}
 
 /* Compact-mode label (hidden by default) */
 .art-compact-label { display: none; }

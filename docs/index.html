@@ -232,6 +232,10 @@ body {
   letter-spacing: .5px;
   line-height: 1;
 }
+.card-artigo[data-law] > p:first-of-type,
+.card-artigo[data-law] > .old-version:first-of-type {
+  padding-right: calc(40px * var(--zoom-scale));
+}
 
 /* Compact-mode label (hidden by default) */
 .art-compact-label { display: none; }
@@ -5793,15 +5797,87 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   },
   {
     "title": "Lei Orgânica",
-    "children": [],
-    "section_id": "norma2",
-    "art_range": "(art. 12–55-A)"
+    "children": [
+      {
+        "title": "TÍTULO III — DA ORGANIZAÇÃO DOS PODERES",
+        "children": [
+          {
+            "title": "CAPÍTULO I — DO PODER LEGISLATIVO",
+            "children": [
+              {
+                "title": "SEÇÃO I — DA CÂMARA MUNICIPAL",
+                "children": [],
+                "section_id": "sec44",
+                "art_range": "(art. 12–14)"
+              },
+              {
+                "title": "SEÇÃO II — DOS VEREADORES",
+                "children": [],
+                "section_id": "sec45",
+                "art_range": "(art. 15–23)"
+              },
+              {
+                "title": "SEÇÃO III — DA MESA DA CÂMARA",
+                "children": [],
+                "section_id": "sec46",
+                "art_range": "(art. 24–28)"
+              },
+              {
+                "title": "SEÇÃO IV — DAS SESSÕES",
+                "children": [],
+                "section_id": "sec47",
+                "art_range": "(art. 29–31)"
+              },
+              {
+                "title": "SEÇÃO V — DAS COMISSÕES",
+                "children": [],
+                "section_id": "sec48",
+                "art_range": "(art. 32–33)"
+              },
+              {
+                "title": "SEÇÃO VI — DO PROCESSO LEGISLATIVO",
+                "children": [],
+                "section_id": "sec49",
+                "art_range": "(art. 34–46)"
+              },
+              {
+                "title": "SEÇÃO VII — DA FISCALIZAÇÃO CONTÁBIL, FINANCEIRA E ORÇAMENTÁRIA",
+                "children": [],
+                "section_id": "sec50",
+                "art_range": "(art. 47–53)"
+              },
+              {
+                "title": "SEÇÃO VIII — DOS CONSELHOS DE REPRESENTANTES",
+                "children": [],
+                "section_id": "sec51",
+                "art_range": "(art. 54–55-A)"
+              }
+            ],
+            "section_id": "cap45"
+          }
+        ],
+        "section_id": "tit17"
+      }
+    ],
+    "section_id": "norma2"
   },
   {
     "title": "Constituição Federal",
-    "children": [],
-    "section_id": "norma3",
-    "art_range": "(art. 29–31)"
+    "children": [
+      {
+        "title": "TÍTULO III — Da Organização do Estado",
+        "children": [
+          {
+            "title": "CAPÍTULO IV — Dos Municípios",
+            "children": [],
+            "section_id": "cap46",
+            "art_range": "(art. 29–31)"
+          }
+        ],
+        "section_id": "tit18"
+      }
+    ],
+    "section_id": "norma3"
   }
 ];
 
@@ -7091,7 +7167,6 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       const isLaw = group.section_id && group.section_id.startsWith('norma');
 
       if (filter && !textMatchesFilter(group.title, filter)) {
-        if (isLaw) continue;
         const hasChild = group.children && group.children.some(ch => sysNodeMatches(ch, filter));
         if (!hasChild) continue;
       }

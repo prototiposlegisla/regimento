@@ -25,11 +25,11 @@ def build_systematic_index(doc: ParsedDocument) -> list[dict]:
 
 def _build_tree(doc: ParsedDocument) -> list[SysIndexNode]:
     root: list[SysIndexNode] = []
-    non_default_laws: list[SysIndexNode] = []
 
     current_titulo: SysIndexNode | None = None
     current_capitulo: SysIndexNode | None = None
     current_secao: SysIndexNode | None = None
+    current_law_node: SysIndexNode | None = None  # container for non-default laws
 
     first_norma_seen = False
     in_default_law = True  # Start in default law mode
@@ -48,52 +48,50 @@ def _build_tree(doc: ParsedDocument) -> list[SysIndexNode]:
                 first_norma_seen = True
                 in_default_law = True
             else:
-                # Non-default law — record it, stop adding structure
+                # Non-default law — add as top-level node with children
                 in_default_law = False
-                non_default_laws.append(SysIndexNode(
+                current_law_node = SysIndexNode(
                     title=el.text, section_id=el.data_section,
-                ))
-            continue
-
-        # Skip headings belonging to non-default laws
-        if not in_default_law:
+                )
+                root.append(current_law_node)
+                current_titulo = None
+                current_capitulo = None
+                current_secao = None
             continue
 
         heading_text = el.text
         if el.subtitle:
             heading_text += " — " + el.subtitle
 
+        node = SysIndexNode(
+            title=heading_text, section_id=el.data_section,
+        )
+
+        # Determine the parent container (root list vs law node)
+        container = current_law_node.children if not in_default_law and current_law_node else root
+
         if el.level == UnitType.TITULO:
-            current_titulo = SysIndexNode(
-                title=heading_text, section_id=el.data_section,
-            )
+            current_titulo = node
             current_capitulo = None
             current_secao = None
-            root.append(current_titulo)
+            container.append(current_titulo)
 
         elif el.level == UnitType.CAPITULO:
-            current_capitulo = SysIndexNode(
-                title=heading_text, section_id=el.data_section,
-            )
+            current_capitulo = node
             current_secao = None
             if current_titulo:
                 current_titulo.children.append(current_capitulo)
             else:
-                root.append(current_capitulo)
+                container.append(current_capitulo)
 
         elif el.level in (UnitType.SECAO, UnitType.SUBSECAO):
-            current_secao = SysIndexNode(
-                title=heading_text, section_id=el.data_section,
-            )
+            current_secao = node
             if current_capitulo:
                 current_capitulo.children.append(current_secao)
             elif current_titulo:
                 current_titulo.children.append(current_secao)
             else:
-                root.append(current_secao)
-
-    # Append non-default laws at the end
-    root.extend(non_default_laws)
+                container.append(current_secao)
 
     return root
 
@@ -126,9 +124,6 @@ def _collect_direct_articles(doc: ParsedDocument) -> dict[str, list[str]]:
                     current_secao_id = None
                 continue
 
-            if not in_default_law:
-                continue
-
             if el.level == UnitType.TITULO:
                 current_titulo_id = el.data_section
                 current_capitulo_id = None
@@ -140,15 +135,12 @@ def _collect_direct_articles(doc: ParsedDocument) -> dict[str, list[str]]:
                 current_secao_id = el.data_section
 
         elif isinstance(el, ArticleBlock):
-            if not in_default_law:
-                if current_norma_id:
-                    result[current_norma_id].append(el.art_number)
-            else:
-                section_id = (
-                    current_secao_id or current_capitulo_id or current_titulo_id
-                )
-                if section_id:
-                    result[section_id].append(el.art_number)
+            section_id = (
+                current_secao_id or current_capitulo_id
+                or current_titulo_id or current_norma_id
+            )
+            if section_id:
+                result[section_id].append(el.art_number)
 
     return dict(result)
 

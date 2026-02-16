@@ -529,7 +529,6 @@
       const isLaw = group.section_id && group.section_id.startsWith('norma');
 
       if (filter && !textMatchesFilter(group.title, filter)) {
-        if (isLaw) continue;
         const hasChild = group.children && group.children.some(ch => sysNodeMatches(ch, filter));
         if (!hasChild) continue;
       }

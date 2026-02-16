@@ -566,8 +566,9 @@ mark {
   display: none;
   position: fixed;
   bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0; right: 0;
+  margin: 0 auto;
+  width: fit-content;
   background: #fff;
   border-radius: 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,.18);
@@ -578,7 +579,7 @@ mark {
   font-size: 14px;
   max-width: calc(100vw - 32px);
 }
-#subject-pill.open { display: flex; flex-wrap: wrap; }
+#subject-pill.open { display: flex; flex-wrap: wrap; justify-content: center; }
 body.pill-open #cards-container { padding-bottom: 300px; }
 
 #pill-label {
@@ -587,6 +588,13 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: calc(100vw - 80px);
+}
+
+#pill-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 #pill-nav {

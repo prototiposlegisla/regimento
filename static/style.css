@@ -246,6 +246,7 @@ mark {
   position: relative;
 }
 .footnote-box.open { display: block; }
+.fn-indent { margin-left: 1.5em; }
 
 .footnote-close {
   position: absolute;

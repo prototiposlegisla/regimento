@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .models import (
     TextRun, DocumentUnit, SectionHeading, ArticleBlock,
-    ParsedDocument, UnitType, Footnote,
+    ParsedDocument, UnitType, Footnote, FootnotePara,
 )
 
 # ── Namespaces ──────────────────────────────────────────────────────────
@@ -94,14 +94,14 @@ def _parse_rels(zf: zipfile.ZipFile) -> dict[str, tuple[str, str]]:
     return rels
 
 
-def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[TextRun]]:
-    """Parseia word/footnotes.xml → {id: [TextRun]}.
+def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[FootnotePara]]:
+    """Parseia word/footnotes.xml → {id: [FootnotePara]}.
 
     Footnotes whose content starts with "b " or "B " (build notes)
     are excluded from the result.
     """
     w = NS["w"]
-    footnotes: dict[int, list[TextRun]] = {}
+    footnotes: dict[int, list[FootnotePara]] = {}
     try:
         data = zf.read("word/footnotes.xml")
     except KeyError:
@@ -119,8 +119,9 @@ def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[TextRun]]:
         except ValueError:
             continue
 
-        runs: list[TextRun] = []
+        paras: list[FootnotePara] = []
         for p_el in fn_el.findall(f"{{{w}}}p"):
+            runs: list[TextRun] = []
             for r_el in p_el.findall(f"{{{w}}}r"):
                 # Skip footnoteRef marker run (just the superscript number)
                 if r_el.find(f"{{{w}}}footnoteRef") is not None:
@@ -128,13 +129,25 @@ def _parse_footnotes_xml(zf: zipfile.ZipFile) -> dict[int, list[TextRun]]:
                 tr = _parse_run(r_el, w)
                 if tr.text:
                     runs.append(tr)
+            # Detect paragraph indent via <w:ind w:left="...">
+            indent = False
+            ppr = p_el.find(f"{{{w}}}pPr")
+            if ppr is not None:
+                ind_el = ppr.find(f"{{{w}}}ind")
+                if ind_el is not None and ind_el.get(f"{{{w}}}left", "0") != "0":
+                    indent = True
+            paras.append(FootnotePara(runs=runs, indent=indent))
 
-        # Exclude build notes (content starts with "b " or "B ")
-        full_text = "".join(r.text for r in runs).lstrip()
-        if full_text.startswith("b ") or full_text.startswith("B "):
+        # Exclude build notes: first non-empty paragraph starts with "b " or "B "
+        first_text = ""
+        for p in paras:
+            first_text = "".join(r.text for r in p.runs).strip()
+            if first_text:
+                break
+        if first_text.lower() == "b" or first_text[:2].lower() == "b ":
             continue
 
-        footnotes[fn_id] = runs
+        footnotes[fn_id] = paras
     return footnotes
 
 
@@ -669,7 +682,7 @@ def _build_document(
 
 def _build_footnotes(
     fn_ids: list[int],
-    fn_map: dict[int, list[TextRun]],
+    fn_map: dict[int, list[FootnotePara]],
     counter: list[int],
 ) -> list[Footnote]:
     """Cria objetos Footnote a partir dos IDs referenciados no parágrafo."""
@@ -679,7 +692,7 @@ def _build_footnotes(
             counter[0] += 1
             result.append(Footnote(
                 number=counter[0],
-                content=fn_map[fn_id],
+                paragraphs=fn_map[fn_id],
             ))
     return result
 

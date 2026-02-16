@@ -37,10 +37,17 @@ class TextRun:
 
 
 @dataclass
+class FootnotePara:
+    """Parágrafo dentro de uma nota de rodapé."""
+    runs: list[TextRun] = field(default_factory=list)
+    indent: bool = False
+
+
+@dataclass
 class Footnote:
     """Nota de rodapé associada a um parágrafo."""
     number: int
-    content: list[TextRun] = field(default_factory=list)
+    paragraphs: list[FootnotePara] = field(default_factory=list)
 
 
 @dataclass

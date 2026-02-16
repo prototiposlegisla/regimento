@@ -7,8 +7,8 @@ import re
 from typing import Optional
 
 from .models import (
-    ArticleBlock, DocumentUnit, ParsedDocument, SectionHeading,
-    TextRun, UnitType,
+    ArticleBlock, DocumentUnit, Footnote, FootnotePara,
+    ParsedDocument, SectionHeading, TextRun, UnitType,
 )
 
 
@@ -209,7 +209,32 @@ class HTMLRenderer:
 
     def _render_footnote(self, fn: Footnote) -> str:
         note_num = fn.number
-        content = self._render_runs(fn.content)
+        parts: list[str] = []
+        in_indent = False
+        has_content = False  # whether previous iteration added visible content
+        for para in fn.paragraphs:
+            rendered = self._render_runs(para.runs).replace("\n", "<br>")
+            # Handle indent transitions before anything else
+            if not para.indent and in_indent:
+                parts.append("</div>")
+                in_indent = False
+                has_content = False
+            if para.indent and not in_indent:
+                parts.append('<div class="fn-indent">')
+                in_indent = True
+                has_content = False
+            # Empty paragraph → preserve as line break
+            if not rendered.strip():
+                parts.append("<br>")
+                continue
+            # <br> between consecutive same-level paragraphs
+            if has_content:
+                parts.append("<br>")
+            parts.append(rendered)
+            has_content = True
+        if in_indent:
+            parts.append("</div>")
+        content = "".join(parts)
         return (
             f'    <div class="footnote-box" data-note="{note_num}">\n'
             f'      <button class="footnote-close">&times;</button>\n'

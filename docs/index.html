@@ -137,6 +137,33 @@ body {
   outline-offset: 1px;
 }
 
+/* ===== BREADCRUMB (scroll context) ===== */
+#breadcrumb {
+  position: fixed;
+  top: calc(var(--header-h) + 6px);
+  left: 50%;
+  z-index: 190;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-8px);
+  transition: opacity .2s ease, transform .2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#breadcrumb.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
 /* ===== CARDS ===== */
 #cards-container {
   padding: 12px;
@@ -170,7 +197,7 @@ body {
 .card-titulo {
   font-weight: 700;
   text-align: center;
-  font-size: calc(1.1rem * var(--zoom-scale));
+  font-size: calc(1rem * var(--zoom-scale));
   text-transform: uppercase;
   letter-spacing: .5px;
   padding: calc(12px * var(--zoom-scale));
@@ -211,7 +238,7 @@ body {
 /* Article summary */
 .art-summary {
   display: block;
-  font-size: calc(.78rem * var(--zoom-scale));
+  font-size: calc(1rem * var(--zoom-scale));
   color: #888;
   font-style: italic;
   margin-bottom: calc(4px * var(--zoom-scale));
@@ -305,7 +332,7 @@ mark {
   padding: calc(10px * var(--zoom-scale));
   margin-top: calc(6px * var(--zoom-scale));
   border-radius: 4px;
-  font-size: calc(.9rem * var(--zoom-scale));
+  font-size: calc(1rem * var(--zoom-scale));
   position: relative;
 }
 .footnote-box.open { display: block; }
@@ -732,6 +759,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   </div>
   <button id="btn-compact" title="Modo compacto"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3h10M4 7h10M4 11h10M4 15h10"/></svg></button>
 </div>
+
+<!-- BREADCRUMB (scroll context) -->
+<div id="breadcrumb"></div>
 
 <!-- READING LINE -->
 <div id="reading-line"></div>
@@ -1424,7 +1454,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art47Xd_2" data-path="X,d">d)</span> — estudar e propor políticas públicas aptas à solução das dificuldades atinentes ao idoso e à Assistência Social, e proporcionar a melhoria da qualidade de vida dos munícipes e a integração social dos idosos; <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=4&amp;ANO=2010&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução nº 04 de 17 de março de 2010).</a></p>
     <p class="art-para"><span class="unit-id" data-uid="art47Xe_2" data-path="X,e">e)</span> — levantar dados e estatísticas que forem referentes a idosos, aposentados e pensionistas, bem como mapear as dificuldades encontradas no âmbito da Assistência Social no Município; <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=4&amp;ANO=2010&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução nº 04 de 17 de março de 2010).</a></p>
     <p class="art-para"><span class="unit-id" data-uid="art47Xf" data-path="X,f">f)</span> — realizar debates e seminários destinados a diagnosticar os problemas enfrentados pelos idosos, aposentados e pensionistas, bem como no tocante aos problemas relativos à Assistência Social do Município, a fim de apontar suas possíveis soluções. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=4&amp;ANO=2010&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Inserido pela Resolução nº 04 de 17 de março de 2010).</a></p>
-    <p class="art-para"><span class="unit-id" data-uid="art47XI" data-path="XI">XI</span> — <s>Da</s><s> Comissão Extraordinária Permanente de Defesa dos Direitos da Criança e do Adolescente:</s> <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ATOCMSP&amp;NUMERO=1&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução 01 de 04 de novembro de 2001)</a> <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2007&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Revogado pela Resolução nº 1 de 2007)</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="art47XI" data-path="XI">XI</span> — <s>Da</s><s> Comissão Extraordinária Permanente de Defesa dos Direitos da Criança e do Adolescente</s>: <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ATOCMSP&amp;NUMERO=1&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução 01 de 04 de novembro de 2001)</a> <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2007&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Revogado pela Resolução nº 1 de 2007)</a></p>
     <p class="old-version">a) receber, avaliar e proceder a investigação de denúncias relativas às ameaças ou violações aos direitos da criança e do adolescente; (Redação dada pela Resolução 01 de 04 de novembro de 2001) (Revogado pela Resolução nº 1 de 2007) <span class="amendment-note">(Redação dada pela Resolução 01 de 04 de novembro de 2001)</span></p>
     <p class="old-version">b) fiscalizar e acompanhar programas governamentais relativos à proteção dos direitos da criança e do adolescente (Redação dada pela Resolução 01 de 04 de novembro de 2001) (Revogado pela Resolução nº 1 de 2007) <span class="amendment-note">(Redação dada pela Resolução 01 de 04 de novembro de 2001)</span></p>
     <p class="old-version">c) colaborar com entidades não-governamentais, nacionais e internacionais que atuem na defesa dos direitos da criança e do adolescente; (Redação dada pela Resolução 01 de 04 de novembro de 2001) (Revogado pela Resolução nº 1 de 2007) <span class="amendment-note">(Redação dada pela Resolução 01 de 04 de novembro de 2001)</span></p>
@@ -1896,7 +1926,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   <div class="card card-artigo" data-art="95">
     <span class="art-compact-label">Art. 95</span>
     <p class="old-version">Art. 95 - A Comissão Parlamentar de Inquérito, quando da conclusão de seus trabalhos, elaborará relatório sobre a matéria, enviando-o à publicação, no máximo em 15 (quinze) dias após o encerramento do prazo. (Revogado pela Resolução 12 de 2001) <span class="amendment-note">(Revogado pela Resolução 12 de 2001)</span></p>
-    <p><span class="unit-id" data-uid="art95">Art. 95</span> — A Comissão Parlamentar de Inquérito elaborará relatório sobre a matéria, votando-o e enviando-o à publicação, no prazo máximo de 15 (quinze) dias após a conclusão de seus trabalhos, respeitado o disposto no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 93</a>, III e no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 97</a>, parágrafo único deste Regimento Interno. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=12&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução 12 de 12 de setembro de  2001)</a></p>
+    <p><span class="unit-id" data-uid="art95">Art. 95</span> — A Comissão Parlamentar de Inquérito elaborará relatório sobre a matéria, votando-o e enviando-o à publicação, no prazo máximo de 15 (quinze) dias após a conclusão de seus trabalhos, respeitado o disposto no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 93</a>, III e no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 97</a>, parágrafo único deste Regimento Interno. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=12&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução 12 de 12 de setembro </a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=12&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">de  2001</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=12&amp;ANO=2001&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">)</a></p>
     <p class="art-para"><span class="unit-id" data-uid="art95pu" data-path="§ú">Parágrafo único</span> — O Presidente da Comissão deverá comunicar, em Plenário, a conclusão de seus trabalhos, mencionando o encaminhamento do respectivo relatório para publicação.</p>
   </div>
 
@@ -2914,7 +2944,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art212III" data-path="III">III</span> — quando, apresentadas antes do prazo regimental fixado no <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 215</a>e sem a exigência dele constante, consubstanciem matéria anteriormente rejeitada ou vetada e com veto mantido;</p>
     <p class="art-para"><span class="unit-id" data-uid="art212IV" data-path="IV">IV</span> — quando contiver o mesmo teor de outra já apresentada na mesma sessão legislativa e as que disponham no mesmo sentido de lei existente, sem alterá-la, verificado pela seção competente, salvo recurso ao Plenário.</p>
     <p class="art-para"><span class="unit-id" data-uid="art212p1" data-path="§ 1º">§ 1º</span> — As razões da devolução ao autor de qualquer proposição, nos termos do presente artigo, deverão ser devidamente fundamentadas pelo Presidente, por escrito.</p>
-    <p class="art-para"><span class="unit-id" data-uid="art212p2" data-path="§ 2º">§ 2º</span> — Não se conformando o autor com a decisão do Presidente em devolvê-la, poderá recorrer do ato ao Plenário, nos termos dos<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigos 311 e 312.</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="art212p2" data-path="§ 2º">§ 2º</span> — Não se conformando o autor com a decisão do Presidente em devolvê-la, poderá recorrer do ato ao Plenário, nos termos dos<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigos</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener"> 311 e 312.</a></p>
   </div>
 
   <div class="card card-artigo" data-art="212-A">
@@ -3014,11 +3044,11 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <p class="art-para"><span class="unit-id" data-uid="art223X" data-path="X">X</span> — a não convocação de sessão, nos termos do <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 155</a> e do parágrafo 2º do <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 183.</a></p>
     <p class="art-para"><span class="unit-id" data-uid="art223XI" data-path="XI">XI</span> — justificação de falta do Vereador às sessões plenárias;</p>
     <p class="art-para"><span class="unit-id" data-uid="art223XII" data-path="XII">XII</span> — constituição de Comissão de Representação, quando requerida pela maioria absoluta dos Vereadores;</p>
-    <p class="art-para"><span class="unit-id" data-uid="art223XIII" data-path="XIII">XIII</span> — volta à tramitação de proposição arquivada em término de legislatura, nos termos do<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 275.</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="art223XIII" data-path="XIII">XIII</span> — volta à tramitação de proposição arquivada em término de legislatura, nos termos do<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener"> 275.</a></p>
     <p class="old-version">Parágrafo único - Serão necessariamente escritos os requerimentos a que aludem os incisos VI a XIII. (Revogado pela Resolução 18 de 20 de dezembro de 1995). <span class="amendment-note">(Revogado pela Resolução 18 de 20 de dezembro de 1995)</span></p>
-    <p class="art-para"><span class="unit-id" data-uid="art223puXIV" data-path="XIV">XIV</span> — manifestação por motivo de luto nacional, de pesar por falecimento de autoridade ou personalidade ou ainda, por calamidade pública; <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Incluido pela Resolução 18 de 20 de dezembro de 1995)</a></p>
-    <p class="art-para"><span class="unit-id" data-uid="art223puXV" data-path="XV">XV</span> — inserção em ata de voto de louvor, júbilo ou congratulações por ato ou acontecimento de alta significação. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Incluido pela Resolução 18 de 20 de dezembro de 1995)</a></p>
-    <p class="art-para"><span class="unit-id" data-uid="art223p1" data-path="§ 1º">§ 1º</span> — Serão necessariamente escritos os requerimentos a que aludem os incisos VI a XV. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Incluido pela Resolução 18 de 20 de dezembro de 1995)</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="art223puXIV" data-path="XIV">XIV</span> — manifestação por motivo de luto nacional, de pesar por falecimento de autoridade ou personalidade ou ainda, por calamidade pública; <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Incluido</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> pela Resolução 18 de 20 de dezembro de 1995)</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="art223puXV" data-path="XV">XV</span> — inserção em ata de voto de louvor, júbilo ou congratulações por ato ou acontecimento de alta significação. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Incluido</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> pela Resolução 18 de 20 de dezembro de 1995)</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="art223p1" data-path="§ 1º">§ 1º</span> — Serão necessariamente escritos os requerimentos a que aludem os incisos VI a XV. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Incluido</a><a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=18&amp;ANO=1995&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> pela Resolução 18 de 20 de dezembro de 1995)</a></p>
     <p class="old-version">§ 2º - Os requerimentos a que aludem os incisos XIV e XV somente serão admitidos quando subscritos pela maioria absoluta dos membros da Câmara. (Incluido pela Resolução 18 de 20 de dezembro de 1995) <span class="amendment-note">(Incluido pela Resolução 18 de 20 de dezembro de 1995)</span></p>
     <p class="art-para"><span class="unit-id" data-uid="art223p2_2" data-path="§ 2º">§ 2º</span> — Os requerimentos a que aludem os incisos XIV e XV somente serão admitidos quando subscritos por um terço dos membros da Câmara. <a href="http://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2019&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">(Redação dada pela Resolução nº 01 de 03 de abril de 2019)</a></p>
   </div>
@@ -3120,7 +3150,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     <span class="art-compact-label">Art. 233</span>
     <p><span class="unit-id" data-uid="art233">Art. 233</span> — O projeto de emenda à Lei Orgânica é a proposição que objetiva alterá-la, modificando, incluindo ou suprimindo os seus dispositivos, competindo à Mesa da Câmara sua promulgação.</p>
     <p class="art-para"><span class="unit-id" data-uid="art233p1" data-path="§ 1º">§ 1º</span> — Será necessário a subscrição de, no mínimo, 1/3 (um terço) dos membros da Câmara, quando se tratar de iniciativa de Vereador, da Mesa da Câmara ou de Comissão.</p>
-    <p class="art-para"><span class="unit-id" data-uid="art233p2" data-path="§ 2º">§ 2º</span> — Tratando-se de iniciativa de cidadãos, deverá ser obedecido o disposto no inciso II do<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo 317</a> e demais normas do Título IX.</p>
+    <p class="art-para"><span class="unit-id" data-uid="art233p2" data-path="§ 2º">§ 2º</span> — Tratando-se de iniciativa de cidadãos, deverá ser obedecido o disposto no inciso II do<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener">artigo</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&amp;TipArq=1" target="_blank" rel="noopener"> 317</a> e demais normas do Título IX.</p>
     <p class="art-para"><span class="unit-id" data-uid="art233p3" data-path="§ 3º">§ 3º</span> — Caso seja iniciativa do Prefeito, seguirá a tramitação normal.</p>
   </div>
 
@@ -4200,7 +4230,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
   <div class="card card-artigo revoked" data-art="371">
     <span class="art-compact-label">Art. 371</span>
-    <p><span class="unit-id" data-uid="art371">Art. 371</span> — <s>Os originais de Emendas à Lei Orgânica, de Leis, de Decretos Legislativos e de Resoluções serão registrados em livros próprios, rubr-cados pelo Presidente da Câmara e arquivados na Secretaria da Câmara, enviando-se ao Prefeito, para os fins legais, cópia autêntica dos autógrafos e, quando for o caso, dos Decretos Legislativos devidamente assinados pelo Presidente. </s>(Revogado pela <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2025&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Resolução nº 01, de 13 de março de 2025</a>.)</p>
+    <p><span class="unit-id" data-uid="art371">Art. 371</span> — <s>Os originais de Emendas à Lei Orgânica, de Leis, de Decretos Legislativos e de Resoluções serão registrados em livros próprios, </s><s>rubr-cados</s><s> pelo Presidente da Câmara e arquivados na Secretaria da Câmara, enviando-se ao Prefeito, para os fins legais, cópia autêntica dos autógrafos e, quando for o caso, dos Decretos Legislativos devidamente assinados pelo Presidente. </s>(Revogado pela <a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&amp;NUMERO=1&amp;ANO=2025&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Resolução nº 01, de 13 de março de 2025</a>.)</p>
   </div>
 
   <div class="card card-titulo nivel-titulo" data-section="tit13">TÍTULO XIII<br>DA SECRETARIA DA CÂMARA</div>
@@ -5006,9 +5036,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   <div class="card card-artigo" data-art="55-A" data-law="LOM">
     <span class="art-compact-label">Art. 55-A</span>
     <span class="law-badge">LOM</span>
-    <p><span class="unit-id" data-uid="artLOM55-A">Art. 55-A</span> — A Procuradoria-Geral da Câmara Municipal de São Paulo, órgão institucional do Poder Legislativo Municipal, de caráter permanente, vinculado diretamente à sua Mesa Diretora, desenvolve atividades típicas e exclusivas de Estado e se insere nas funções essenciais à Justiça, nos termos do Capítulo IV, Seção II, <a href="https://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm" target="_blank" rel="noopener">art. 132 da Constituição Federal,</a> é composta por procuradores legislativos de carreira e estruturada por lei, e tem por competência exercer a representação judicial, a consultoria e o assessoramento técnico-jurídico do Poder Legislativo Municipal, cabendo-lhe o recebimento dos honorários advocatícios titularizados pelos procuradores em ações judiciais e em todas as transações, compromissos, acordos extrajudiciais ou congêneres realizados com ou entre terceiros, decorrentes da atividade institucional e administrativa da Câmara Municipal de São Paulo, por quaisquer de seus órgãos ou comissões permanentes ou temporárias. (<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda a Lei Orgânica nº 43 de 2023)</a></p>
-    <p class="art-para"><span class="unit-id" data-uid="artLOM55-Ap1" data-path="§ 1º">§ 1º</span> — A Procuradoria-Geral da Câmara Municipal de São Paulo é organizada por lei de iniciativa da Mesa Diretora, observados os princípios e regras pertinentes da Constituição Federal, da Constituição do Estado e desta Lei Orgânica, que disciplina sua competência e dispõe sobre os requisitos e a forma de designação do Procurador-Geral Legislativo, dentre os membros da carreira.(<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda a Lei Orgânica nº 43 de 2023)</a></p>
-    <p class="art-para"><span class="unit-id" data-uid="artLOM55-Ap2" data-path="§ 2º">§ 2º</span> — O ingresso na carreira de Procurador Legislativo depende de concurso público de provas e títulos, com a participação da Ordem dos Advogados do Brasil. (<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda a Lei Orgânica nº 43 de 2023)</a> </p>
+    <p><span class="unit-id" data-uid="artLOM55-A">Art. 55-A</span> — A Procuradoria-Geral da Câmara Municipal de São Paulo, órgão institucional do Poder Legislativo Municipal, de caráter permanente, vinculado diretamente à sua Mesa Diretora, desenvolve atividades típicas e exclusivas de Estado e se insere nas funções essenciais à Justiça, nos termos do Capítulo IV, Seção II, <a href="https://www.planalto.gov.br/ccivil_03/Constituicao/Constituicao.htm" target="_blank" rel="noopener">art. 132 da Constituição Federal,</a> é composta por procuradores legislativos de carreira e estruturada por lei, e tem por competência exercer a representação judicial, a consultoria e o assessoramento técnico-jurídico do Poder Legislativo Municipal, cabendo-lhe o recebimento dos honorários advocatícios titularizados pelos procuradores em ações judiciais e em todas as transações, compromissos, acordos extrajudiciais ou congêneres realizados com ou entre terceiros, decorrentes da atividade institucional e administrativa da Câmara Municipal de São Paulo, por quaisquer de seus órgãos ou comissões permanentes ou temporárias. (<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda </a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">a</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> Lei Orgânica nº 43 de 2023)</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="artLOM55-Ap1" data-path="§ 1º">§ 1º</span> — A Procuradoria-Geral da Câmara Municipal de São Paulo é organizada por lei de iniciativa da Mesa Diretora, observados os princípios e regras pertinentes da Constituição Federal, da Constituição do Estado e desta Lei Orgânica, que disciplina sua competência e dispõe sobre os requisitos e a forma de designação do Procurador-Geral Legislativo, dentre os membros da carreira.(<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda </a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">a</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> Lei Orgânica nº 43 de 2023)</a></p>
+    <p class="art-para"><span class="unit-id" data-uid="artLOM55-Ap2" data-path="§ 2º">§ 2º</span> — O ingresso na carreira de Procurador Legislativo depende de concurso público de provas e títulos, com a participação da Ordem dos Advogados do Brasil. (<a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">Inserido pela Emenda </a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener">a</a><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=43&amp;ANO=2023&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener"> Lei Orgânica nº 43 de 2023)</a> </p>
   </div>
 
   <div class="card card-titulo nivel-norma" data-section="norma3">Constituição Federal</div>
@@ -6692,6 +6722,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   const $zoomIndicator = document.getElementById('zoom-indicator');
   const $searchNav = document.getElementById('search-nav');
   const $searchCounter = document.getElementById('search-counter');
+  const $breadcrumb = document.getElementById('breadcrumb');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -6748,6 +6779,74 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     }
   }
 
+  // ===== BREADCRUMB (scroll context) =====
+  const headerEl = document.getElementById('header');
+
+  function updateBreadcrumb() {
+    if (compactMode) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    // Find the article card that spans the header bottom
+    const headerBottom = headerEl.getBoundingClientRect().bottom;
+    const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
+    let card = null;
+
+    for (const a of articles) {
+      const rect = a.getBoundingClientRect();
+      if (rect.top <= headerBottom && rect.bottom > headerBottom) {
+        card = a;
+        break;
+      }
+    }
+
+    if (!card) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    const caputUid = card.querySelector('.unit-id:not([data-path])');
+    if (!caputUid || caputUid.getBoundingClientRect().bottom > headerBottom) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    // Find the last unit-id hidden behind the header
+    const unitIds = card.querySelectorAll('.unit-id[data-path]');
+    let currentUnit = null;
+
+    for (const uid of unitIds) {
+      if (uid.closest('.old-version')) continue;
+      if (uid.getBoundingClientRect().bottom <= headerBottom) {
+        currentUnit = uid;
+      }
+    }
+
+    // Build breadcrumb text
+    const lawPrefix = card.dataset.law;
+    const prefix = lawPrefix ? lawPrefix + ' ' : '';
+    let text = prefix + 'Art. ' + card.dataset.art;
+
+    if (currentUnit && currentUnit.dataset.path) {
+      const parts = currentUnit.dataset.path.split(',');
+      text += ' \u203A ' + parts.join(' \u203A ');
+    }
+
+    $breadcrumb.textContent = text;
+    $breadcrumb.classList.add('visible');
+    breadcrumbCard = card;
+  }
+
+  let breadcrumbCard = null;
+
+  $breadcrumb.addEventListener('click', () => {
+    if (breadcrumbCard) {
+      const top = breadcrumbCard.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+    }
+  });
+
   let scrollTick = false;
   window.addEventListener('scroll', () => {
     if (scrollTick) return;
@@ -6755,6 +6854,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     requestAnimationFrame(() => {
       manualSelect = false;
       updateSelection();
+      updateBreadcrumb();
       scrollTick = false;
     });
   });
@@ -7805,6 +7905,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       $cards.classList.toggle('compact', compactMode);
       $btnCompact.classList.toggle('active', compactMode);
     });
+    updateBreadcrumb();
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 
@@ -7822,6 +7923,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   applyMarkers();
   renderMarkerNav();
   updateSelection();
+  updateBreadcrumb();
 
 })();
 

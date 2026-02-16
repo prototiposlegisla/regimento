@@ -130,6 +130,33 @@ body {
   outline-offset: 1px;
 }
 
+/* ===== BREADCRUMB (scroll context) ===== */
+#breadcrumb {
+  position: fixed;
+  top: calc(var(--header-h) + 6px);
+  left: 50%;
+  z-index: 190;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-8px);
+  transition: opacity .2s ease, transform .2s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+#breadcrumb.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
 /* ===== CARDS ===== */
 #cards-container {
   padding: 12px;
@@ -163,7 +190,7 @@ body {
 .card-titulo {
   font-weight: 700;
   text-align: center;
-  font-size: calc(1.1rem * var(--zoom-scale));
+  font-size: calc(1rem * var(--zoom-scale));
   text-transform: uppercase;
   letter-spacing: .5px;
   padding: calc(12px * var(--zoom-scale));
@@ -204,7 +231,7 @@ body {
 /* Article summary */
 .art-summary {
   display: block;
-  font-size: calc(.78rem * var(--zoom-scale));
+  font-size: calc(1rem * var(--zoom-scale));
   color: #888;
   font-style: italic;
   margin-bottom: calc(4px * var(--zoom-scale));
@@ -298,7 +325,7 @@ mark {
   padding: calc(10px * var(--zoom-scale));
   margin-top: calc(6px * var(--zoom-scale));
   border-radius: 4px;
-  font-size: calc(.9rem * var(--zoom-scale));
+  font-size: calc(1rem * var(--zoom-scale));
   position: relative;
 }
 .footnote-box.open { display: block; }

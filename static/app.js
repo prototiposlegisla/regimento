@@ -54,6 +54,7 @@
   const $zoomIndicator = document.getElementById('zoom-indicator');
   const $searchNav = document.getElementById('search-nav');
   const $searchCounter = document.getElementById('search-counter');
+  const $breadcrumb = document.getElementById('breadcrumb');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -110,6 +111,74 @@
     }
   }
 
+  // ===== BREADCRUMB (scroll context) =====
+  const headerEl = document.getElementById('header');
+
+  function updateBreadcrumb() {
+    if (compactMode) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    // Find the article card that spans the header bottom
+    const headerBottom = headerEl.getBoundingClientRect().bottom;
+    const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
+    let card = null;
+
+    for (const a of articles) {
+      const rect = a.getBoundingClientRect();
+      if (rect.top <= headerBottom && rect.bottom > headerBottom) {
+        card = a;
+        break;
+      }
+    }
+
+    if (!card) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    const caputUid = card.querySelector('.unit-id:not([data-path])');
+    if (!caputUid || caputUid.getBoundingClientRect().bottom > headerBottom) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    // Find the last unit-id hidden behind the header
+    const unitIds = card.querySelectorAll('.unit-id[data-path]');
+    let currentUnit = null;
+
+    for (const uid of unitIds) {
+      if (uid.closest('.old-version')) continue;
+      if (uid.getBoundingClientRect().bottom <= headerBottom) {
+        currentUnit = uid;
+      }
+    }
+
+    // Build breadcrumb text
+    const lawPrefix = card.dataset.law;
+    const prefix = lawPrefix ? lawPrefix + ' ' : '';
+    let text = prefix + 'Art. ' + card.dataset.art;
+
+    if (currentUnit && currentUnit.dataset.path) {
+      const parts = currentUnit.dataset.path.split(',');
+      text += ' \u203A ' + parts.join(' \u203A ');
+    }
+
+    $breadcrumb.textContent = text;
+    $breadcrumb.classList.add('visible');
+    breadcrumbCard = card;
+  }
+
+  let breadcrumbCard = null;
+
+  $breadcrumb.addEventListener('click', () => {
+    if (breadcrumbCard) {
+      const top = breadcrumbCard.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+    }
+  });
+
   let scrollTick = false;
   window.addEventListener('scroll', () => {
     if (scrollTick) return;
@@ -117,6 +186,7 @@
     requestAnimationFrame(() => {
       manualSelect = false;
       updateSelection();
+      updateBreadcrumb();
       scrollTick = false;
     });
   });
@@ -1167,6 +1237,7 @@
       $cards.classList.toggle('compact', compactMode);
       $btnCompact.classList.toggle('active', compactMode);
     });
+    updateBreadcrumb();
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 
@@ -1184,5 +1255,6 @@
   applyMarkers();
   renderMarkerNav();
   updateSelection();
+  updateBreadcrumb();
 
 })();

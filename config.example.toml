@@ -1,0 +1,10 @@
+# Copie este arquivo para config.local.toml e ajuste os caminhos.
+# config.local.toml é gitignored — não será versionado.
+
+[sources]
+docx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/regimentoInterno.docx"
+xlsx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/remissivo.xlsx"
+referencias = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/referencias.docx"
+
+[output]
+private = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Regimento arquivo/index.html"

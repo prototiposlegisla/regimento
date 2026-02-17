@@ -56,12 +56,16 @@ RE_AMENDMENT = re.compile(
 RE_NORMA = re.compile(r"^NORMA:\s*(.+)", re.IGNORECASE)
 
 
-def parse_docx(path: str | Path) -> ParsedDocument:
-    """Parseia o DOCX e retorna um ParsedDocument."""
+def parse_docx(path: str | Path, *, include_private: bool = False) -> ParsedDocument:
+    """Parseia o DOCX e retorna um ParsedDocument.
+
+    Args:
+        include_private: Se True, inclui footnotes com prefixo "b " (notas privadas).
+    """
     path = Path(path)
     with zipfile.ZipFile(path, "r") as zf:
         rels = _parse_rels(zf)
-        footnotes_map, summaries_map = _parse_footnotes_xml(zf)
+        footnotes_map, summaries_map = _parse_footnotes_xml(zf, include_private=include_private)
         paragraphs = _parse_document_xml(zf, rels)
 
     raw_units = _classify_paragraphs(paragraphs)
@@ -96,10 +100,13 @@ def _parse_rels(zf: zipfile.ZipFile) -> dict[str, tuple[str, str]]:
 
 def _parse_footnotes_xml(
     zf: zipfile.ZipFile,
+    *,
+    include_private: bool = False,
 ) -> tuple[dict[int, list[FootnotePara]], dict[int, str]]:
     """Parseia word/footnotes.xml → (footnotes_map, summaries_map).
 
-    Footnotes whose content starts with "b " (build notes) are excluded.
+    Footnotes whose content starts with "b " (build notes) are excluded
+    unless *include_private* is True.
     Footnotes whose content starts with "s " are extracted as article
     summaries (the text after "s " is the summary string).
     """
@@ -148,9 +155,25 @@ def _parse_footnotes_xml(
             first_text = "".join(r.text for r in p.runs).strip()
             if first_text:
                 break
-        # Exclude build notes: "b " prefix
-        if first_text.lower() == "b" or first_text[:2].lower() == "b ":
+        # Exclude build notes: "b " prefix (unless include_private)
+        if not include_private and (first_text.lower() == "b" or first_text[:2].lower() == "b "):
             continue
+        # When including private notes, strip the "b " prefix
+        if include_private and (first_text.lower() == "b" or first_text[:2].lower() == "b "):
+            # Remove "b " prefix from the first non-empty paragraph's first run
+            for p in paras:
+                txt = "".join(r.text for r in p.runs).strip()
+                if txt:
+                    # Strip "b " or "b" from the beginning of the first run
+                    for r in p.runs:
+                        stripped = r.text.lstrip()
+                        if stripped.lower().startswith("b "):
+                            r.text = r.text.replace("b ", "", 1).replace("B ", "", 1)
+                            break
+                        elif stripped.lower() == "b":
+                            r.text = ""
+                            break
+                    break
         # Summary notes: "s " prefix → extract as summary text
         if first_text[:2].lower() == "s ":
             summaries[fn_id] = first_text[2:].strip()

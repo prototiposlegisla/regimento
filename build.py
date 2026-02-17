@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Build pipeline: DOCX + XLSX → dist/index.html."""
+"""Build pipeline: DOCX + XLSX → index.html (public + private versions)."""
 
 from __future__ import annotations
 
 import argparse
 import io
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -19,46 +20,39 @@ if sys.stdout.encoding != "utf-8":
 BASE_DIR = Path(__file__).parent
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Gera dist/index.html a partir de regimentoInterno.docx e remissivo.xlsx"
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Salva JSONs intermediários em intermediate/",
-    )
-    parser.add_argument(
-        "--docx",
-        default=str(BASE_DIR / "regimentoInterno.docx"),
-        help="Caminho do DOCX (padrão: regimentoInterno.docx)",
-    )
-    parser.add_argument(
-        "--xlsx",
-        default=str(BASE_DIR / "remissivo.xlsx"),
-        help="Caminho do XLSX (padrão: remissivo.xlsx)",
-    )
-    parser.add_argument(
-        "--referencias",
-        default=str(BASE_DIR / "referencias.docx"),
-        help="Caminho do DOCX de referências (padrão: referencias.docx)",
-    )
-    parser.add_argument(
-        "--output",
-        default=str(BASE_DIR / "docs" / "index.html"),
-        help="Caminho de saída (padrão: docs/index.html)",
-    )
-    args = parser.parse_args()
+def _load_config() -> dict:
+    """Lê config.local.toml (se existir) e retorna dict com paths."""
+    config_path = BASE_DIR / "config.local.toml"
+    if not config_path.exists():
+        return {}
+    try:
+        import tomllib
+    except ModuleNotFoundError:
+        import tomli as tomllib  # type: ignore[no-redef]
+    with open(config_path, "rb") as f:
+        return tomllib.load(f)
+
+
+def _build_once(
+    *,
+    args: argparse.Namespace,
+    include_private: bool,
+    output_path: Path,
+    label: str,
+) -> None:
+    """Executa o pipeline completo uma vez e salva em output_path."""
 
     t0 = time.time()
+    print(f"\n{'═' * 60}")
+    print(f"  Build: {label}")
+    print(f"{'═' * 60}")
 
     # ── 1. Parse DOCX ──────────────────────────────────────────────────
     print("[1/7] Parseando DOCX...")
     from src.parse_docx import parse_docx
 
-    doc = parse_docx(args.docx)
+    doc = parse_docx(args.docx, include_private=include_private)
 
-    # Count elements
     headings = [e for e in doc.elements if hasattr(e, "level")]
     articles = [e for e in doc.elements if hasattr(e, "art_number")]
     print(f"      → {len(headings)} headings, {len(articles)} artigos")
@@ -99,7 +93,6 @@ def main() -> None:
         for el in doc.elements:
             if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping:
                 el.law_prefix = law_mapping[el.law_name]
-                # Prefix uids with law abbreviation to avoid collisions
                 lp = el.law_prefix
                 if el.caput:
                     el.caput.uid = el.caput.uid.replace("art", f"art{lp}", 1)
@@ -138,10 +131,10 @@ def main() -> None:
     print(f"      → {len(cards_html)} caracteres de HTML")
 
     # ── 7. Assemble ────────────────────────────────────────────────────
-    print("[7/7] Montando dist/index.html...")
+    print("[7/7] Montando HTML final...")
     from src.assemble import assemble
 
-    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     assemble(
         cards_html=cards_html,
         systematic_index=systematic_index,
@@ -153,8 +146,7 @@ def main() -> None:
 
     elapsed = time.time() - t0
     size_kb = output_path.stat().st_size / 1024
-    print(f"\n✓ Build completo em {elapsed:.1f}s")
-    print(f"  Saída: {output_path} ({size_kb:.0f} KB)")
+    print(f"\n✓ {label} pronto em {elapsed:.1f}s → {output_path} ({size_kb:.0f} KB)")
 
     # ── Debug output ───────────────────────────────────────────────────
     if args.debug:
@@ -162,7 +154,6 @@ def main() -> None:
         debug_dir = BASE_DIR / "intermediate"
         debug_dir.mkdir(exist_ok=True)
 
-        # Parsed document
         doc_json = doc.to_dict()
         (debug_dir / "parsed_document.json").write_text(
             json.dumps(doc_json, ensure_ascii=False, indent=2),
@@ -170,26 +161,148 @@ def main() -> None:
         )
         print(f"  → {debug_dir / 'parsed_document.json'}")
 
-        # Systematic index
         (debug_dir / "systematic_index.json").write_text(
             json.dumps(systematic_index, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
         print(f"  → {debug_dir / 'systematic_index.json'}")
 
-        # Subject index
         (debug_dir / "subject_index.json").write_text(
             json.dumps(subject_list, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
         print(f"  → {debug_dir / 'subject_index.json'}")
 
-        # Referencias index
         (debug_dir / "referencias_index.json").write_text(
             json.dumps(referencias_data, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
         print(f"  → {debug_dir / 'referencias_index.json'}")
+
+
+def _auto_commit_and_push(no_push: bool) -> None:
+    """Faz git add + commit + push de docs/index.html."""
+    public_html = BASE_DIR / "docs" / "index.html"
+    if not public_html.exists():
+        return
+
+    # Check if there are changes to commit
+    result = subprocess.run(
+        ["git", "diff", "--quiet", "docs/index.html"],
+        cwd=BASE_DIR,
+        capture_output=True,
+    )
+    if result.returncode == 0:
+        # Also check if file is untracked
+        result2 = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", "docs/index.html"],
+            cwd=BASE_DIR,
+            capture_output=True,
+        )
+        if result2.returncode == 0:
+            print("\n⊘ docs/index.html sem alterações — nada a commitar")
+            return
+
+    print("\n── Git ──")
+    subprocess.run(["git", "add", "docs/index.html"], cwd=BASE_DIR, check=True)
+    print("  git add docs/index.html")
+
+    timestamp = time.strftime("%Y-%m-%d %H:%M")
+    msg = f"build: atualiza regimento ({timestamp})"
+    subprocess.run(["git", "commit", "-m", msg], cwd=BASE_DIR, check=True)
+    print(f"  git commit -m \"{msg}\"")
+
+    if no_push:
+        print("  (--no-push: git push pulado)")
+    else:
+        subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
+        print("  git push ✓")
+
+
+def main() -> None:
+    config = _load_config()
+    sources = config.get("sources", {})
+    output_cfg = config.get("output", {})
+
+    # Defaults: config.local.toml → fallback local
+    default_docx = sources.get("docx", str(BASE_DIR / "regimentoInterno.docx"))
+    default_xlsx = sources.get("xlsx", str(BASE_DIR / "remissivo.xlsx"))
+    default_refs = sources.get("referencias", str(BASE_DIR / "referencias.docx"))
+    default_private = output_cfg.get("private", "")
+
+    parser = argparse.ArgumentParser(
+        description="Gera index.html (versão pública e/ou privada) a partir do DOCX e XLSX"
+    )
+    parser.add_argument(
+        "--debug", action="store_true",
+        help="Salva JSONs intermediários em intermediate/",
+    )
+    parser.add_argument(
+        "--docx", default=default_docx,
+        help="Caminho do DOCX",
+    )
+    parser.add_argument(
+        "--xlsx", default=default_xlsx,
+        help="Caminho do XLSX",
+    )
+    parser.add_argument(
+        "--referencias", default=default_refs,
+        help="Caminho do DOCX de referências",
+    )
+    parser.add_argument(
+        "--output", default=str(BASE_DIR / "docs" / "index.html"),
+        help="Caminho de saída da versão pública (padrão: docs/index.html)",
+    )
+    parser.add_argument(
+        "--no-push", action="store_true",
+        help="Pula git commit/push automático",
+    )
+    parser.add_argument(
+        "--only-public", action="store_true",
+        help="Gera apenas a versão pública",
+    )
+    parser.add_argument(
+        "--only-private", action="store_true",
+        help="Gera apenas a versão privada",
+    )
+    args = parser.parse_args()
+
+    if args.only_public and args.only_private:
+        parser.error("--only-public e --only-private são mutuamente exclusivos")
+
+    build_public = not args.only_private
+    build_private = not args.only_public and bool(default_private)
+
+    if not build_public and not build_private:
+        print("Nada a fazer. Configure [output] private em config.local.toml ou use --only-public.")
+        sys.exit(1)
+
+    t_total = time.time()
+
+    if build_public:
+        _build_once(
+            args=args,
+            include_private=False,
+            output_path=Path(args.output),
+            label="Versão pública (sem notas privadas)",
+        )
+
+    if build_private:
+        _build_once(
+            args=args,
+            include_private=True,
+            output_path=Path(default_private),
+            label="Versão privada (com notas privadas)",
+        )
+
+    elapsed_total = time.time() - t_total
+    print(f"\n{'═' * 60}")
+    print(f"  Total: {elapsed_total:.1f}s")
+    print(f"{'═' * 60}")
+
+    # Auto commit/push (only if public version was built)
+    if build_public:
+        _auto_commit_and_push(no_push=args.no_push)
 
 
 if __name__ == "__main__":

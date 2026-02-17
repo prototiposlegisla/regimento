@@ -2,3 +2,6 @@ __pycache__/
 intermediate/
 dist/
 *.pyc
+*.docx
+*.xlsx
+config.local.toml

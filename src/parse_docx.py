@@ -404,7 +404,9 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
         elif RE_PARAGRAFO_NUM.match(text):
             m2 = RE_PARAGRAFO_NUM.match(text)
             num = m2.group(1) if m2 else ""
-            suffix = m2.group(2) if m2 and m2.group(2) else "º"
+            raw_suffix = m2.group(2) if m2 and m2.group(2) else ""
+            # Normaliza: remove ponto antes de ordinal (§ 1.º → § 1º, § 10. → § 10º)
+            suffix = raw_suffix.lstrip(".") or "º"
             ut = UnitType.PARAGRAFO_NUM
             ident = f"§ {num}{suffix}"
         elif RE_INCISO.match(text):

@@ -165,10 +165,17 @@ class HTMLRenderer:
         # Find where the identifier ends in the text
         # Pattern: "Art. 43  - text" or "§ 1º - text" or "I - text"
         # Remove identifier + separator from start
+        escaped = re.escape(ident)
         patterns = [
-            re.escape(ident) + r"\s*[-–—.]\s*",
-            re.escape(ident) + r"\s+",
+            escaped + r"\s*[-–—.]\s*",
+            escaped + r"\s+",
         ]
+        # Aceita ponto antes de marca ordinal no texto do DOCX (§ 1.º com identificador § 1º)
+        if any(c in ident for c in "ºª°"):
+            flex = escaped
+            for c in "ºª°":
+                flex = flex.replace(c, r"\.?" + c)
+            patterns += [flex + r"\s*[-–—.]\s*", flex + r"\s+"]
         skip_chars = 0
         for pat in patterns:
             m = re.match(pat, full_text, re.IGNORECASE)

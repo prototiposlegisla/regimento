@@ -119,6 +119,35 @@ def _build_once(
                 print(m)
             print()
 
+    # Cross-reference: vides pointing to non-existent index entries
+    if subject_list:
+        known_subjects: set[str] = set()
+        for entry in subject_index.entries:
+            known_subjects.add(entry.subject.lower())
+            if entry.sub_subject:
+                known_subjects.add(f"{entry.subject} — {entry.sub_subject}".lower())
+
+        bad_vides: list[str] = []
+        for entry in subject_index.entries:
+            for v in entry.vides:
+                if v.lower() not in known_subjects:
+                    ctx = entry.subject
+                    if entry.sub_subject:
+                        ctx += f" > {entry.sub_subject}"
+                    bad_vides.append(f"  \"{v}\"  (assunto: {ctx})")
+
+        if bad_vides:
+            seen_v: set[str] = set()
+            unique_v: list[str] = []
+            for m in bad_vides:
+                if m not in seen_v:
+                    seen_v.add(m)
+                    unique_v.append(m)
+            print(f"\n⚠ {len(unique_v)} vide(s) referenciando assuntos inexistentes:")
+            for m in unique_v:
+                print(m)
+            print()
+
     # Apply law prefixes to articles based on law_name ↔ mapping
     if law_mapping:
         from src.models import ArticleBlock as _AB

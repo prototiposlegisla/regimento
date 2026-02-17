@@ -596,6 +596,16 @@
     }
   }
 
+  function sysLevelClass(sectionId) {
+    if (!sectionId) return '';
+    if (sectionId.startsWith('norma')) return 'sys-nivel-norma';
+    if (sectionId.startsWith('tit'))   return 'sys-nivel-titulo';
+    if (sectionId.startsWith('cap'))   return 'sys-nivel-capitulo';
+    if (sectionId.startsWith('subsec')) return 'sys-nivel-subsecao';
+    if (sectionId.startsWith('sec'))   return 'sys-nivel-secao';
+    return '';
+  }
+
   function renderSystematicIndex(filter) {
     for (const group of SYSTEMATIC_INDEX) {
       const isLaw = group.section_id && group.section_id.startsWith('norma');
@@ -608,7 +618,8 @@
       const div = document.createElement('div');
       div.className = 'sys-group';
       const title = document.createElement('div');
-      title.className = isLaw ? 'sys-title sys-law' : 'sys-title';
+      const lvl = sysLevelClass(group.section_id);
+      title.className = (isLaw ? 'sys-title sys-law' : 'sys-title') + (lvl ? ' ' + lvl : '');
       title.textContent = isLaw ? '— ' + group.title : group.title;
       if (group.art_range && (!group.children || !group.children.length)) {
         const rangeSpan = document.createElement('span');
@@ -651,7 +662,8 @@
     if (filter && !sysNodeMatches(node, filter)) return;
 
     const el = document.createElement('div');
-    el.className = 'sys-item';
+    const lvl = sysLevelClass(node.section_id);
+    el.className = 'sys-item' + (lvl ? ' ' + lvl : '');
     el.style.paddingLeft = indent + 'px';
     el.textContent = node.title;
     if (node.art_range && (!node.children || !node.children.length)) {

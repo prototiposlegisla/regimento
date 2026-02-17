@@ -65,11 +65,11 @@ def parse_docx(path: str | Path, *, include_private: bool = False) -> ParsedDocu
     path = Path(path)
     with zipfile.ZipFile(path, "r") as zf:
         rels = _parse_rels(zf)
-        footnotes_map, summaries_map = _parse_footnotes_xml(zf, include_private=include_private)
+        footnotes_map, summaries_map, private_fn_ids = _parse_footnotes_xml(zf, include_private=include_private)
         paragraphs = _parse_document_xml(zf, rels)
 
     raw_units = _classify_paragraphs(paragraphs)
-    doc = _build_document(raw_units, footnotes_map, summaries_map)
+    doc = _build_document(raw_units, footnotes_map, summaries_map, private_fn_ids)
     return doc
 
 
@@ -102,21 +102,23 @@ def _parse_footnotes_xml(
     zf: zipfile.ZipFile,
     *,
     include_private: bool = False,
-) -> tuple[dict[int, list[FootnotePara]], dict[int, str]]:
-    """Parseia word/footnotes.xml → (footnotes_map, summaries_map).
+) -> tuple[dict[int, list[FootnotePara]], dict[int, str], set[int]]:
+    """Parseia word/footnotes.xml → (footnotes_map, summaries_map, private_fn_ids).
 
     Footnotes whose content starts with "b " (build notes) are excluded
     unless *include_private* is True.
     Footnotes whose content starts with "s " are extracted as article
     summaries (the text after "s " is the summary string).
+    *private_fn_ids* contains the Word footnote IDs that had the "b " prefix.
     """
     w = NS["w"]
     footnotes: dict[int, list[FootnotePara]] = {}
     summaries: dict[int, str] = {}
+    private_fn_ids: set[int] = set()
     try:
         data = zf.read("word/footnotes.xml")
     except KeyError:
-        return footnotes, summaries
+        return footnotes, summaries, private_fn_ids
 
     root = ET.fromstring(data)
     for fn_el in root.findall(f"{{{w}}}footnote"):
@@ -158,8 +160,9 @@ def _parse_footnotes_xml(
         # Exclude build notes: "b " prefix (unless include_private)
         if not include_private and (first_text.lower() == "b" or first_text[:2].lower() == "b "):
             continue
-        # When including private notes, strip the "b " prefix
+        # When including private notes, strip the "b " prefix and track the ID
         if include_private and (first_text.lower() == "b" or first_text[:2].lower() == "b "):
+            private_fn_ids.add(fn_id)
             # Remove "b " prefix from the first non-empty paragraph's first run
             for p in paras:
                 txt = "".join(r.text for r in p.runs).strip()
@@ -180,7 +183,7 @@ def _parse_footnotes_xml(
             continue
 
         footnotes[fn_id] = paras
-    return footnotes, summaries
+    return footnotes, summaries, private_fn_ids
 
 
 from dataclasses import dataclass as _dc
@@ -453,13 +456,17 @@ def _build_document(
     classified: list[_ClassifiedParagraph],
     footnotes_map: dict[int, list[FootnotePara]] | None = None,
     summaries_map: dict[int, str] | None = None,
+    private_fn_ids: set[int] | None = None,
 ) -> ParsedDocument:
     """Constrói ParsedDocument a partir dos parágrafos classificados."""
     if footnotes_map is None:
         footnotes_map = {}
     if summaries_map is None:
         summaries_map = {}
+    if private_fn_ids is None:
+        private_fn_ids = set()
     footnote_counter = [0]  # mutable counter for global numbering
+    private_counter = [0]   # mutable counter for private "b" notes (resets per article)
 
     doc = ParsedDocument()
     in_adt = False  # Ato das Disposições Transitórias
@@ -626,7 +633,7 @@ def _build_document(
                 is_revoked=_is_revoked_text(cp.text),
                 is_old_version=cp.has_strike,
                 amendment_note=amendment,
-                footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter),
+                footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
             )
 
             # Check if this is a duplicate of the current article
@@ -648,6 +655,9 @@ def _build_document(
                 # Flush previous article and start new one
                 if current_article:
                     doc.elements.append(current_article)
+
+                # Reset private footnote counter for each new card
+                private_counter[0] = 0
 
                 # Extract summary from "s " footnotes on the caput
                 summary = ""
@@ -703,7 +713,7 @@ def _build_document(
                 is_revoked=_is_revoked_text(cp.text),
                 is_old_version=cp.has_strike,
                 amendment_note=amendment,
-                footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter),
+                footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
             )
 
             # Always keep children in document order (old versions
@@ -727,15 +737,26 @@ def _build_footnotes(
     fn_ids: list[int],
     fn_map: dict[int, list[FootnotePara]],
     counter: list[int],
+    private_ids: set[int] | None = None,
+    private_counter: list[int] | None = None,
 ) -> list[Footnote]:
     """Cria objetos Footnote a partir dos IDs referenciados no parágrafo."""
+    if private_ids is None:
+        private_ids = set()
     result: list[Footnote] = []
     for fn_id in fn_ids:
         if fn_id in fn_map:
-            counter[0] += 1
+            is_priv = fn_id in private_ids
+            if is_priv and private_counter is not None:
+                private_counter[0] += 1
+                num = private_counter[0]
+            else:
+                counter[0] += 1
+                num = counter[0]
             result.append(Footnote(
-                number=counter[0],
+                number=num,
                 paragraphs=fn_map[fn_id],
+                is_private=is_priv,
             ))
     return result
 

@@ -48,6 +48,7 @@ class Footnote:
     """Nota de rodapé associada a um parágrafo."""
     number: int
     paragraphs: list[FootnotePara] = field(default_factory=list)
+    is_private: bool = False  # footnotes with "b " prefix (numeração independente)
 
 
 @dataclass

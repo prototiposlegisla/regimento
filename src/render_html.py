@@ -138,9 +138,10 @@ class HTMLRenderer:
 
         # Insert footnote superscript references inline
         for fn in unit.footnotes:
+            note_id = f"b{fn.number}" if fn.is_private else str(fn.number)
             inner += (
-                f'<sup class="footnote-ref" data-note="{fn.number}">'
-                f"[{fn.number}]</sup>"
+                f'<sup class="footnote-ref" data-note="{note_id}">'
+                f"[{note_id}]</sup>"
             )
 
         # Footnote content boxes (hidden by default, toggled by click)
@@ -219,7 +220,7 @@ class HTMLRenderer:
         return "".join(parts)
 
     def _render_footnote(self, fn: Footnote) -> str:
-        note_num = fn.number
+        note_id = f"b{fn.number}" if fn.is_private else str(fn.number)
         parts: list[str] = []
         in_indent = False
         has_content = False  # whether previous iteration added visible content
@@ -247,9 +248,9 @@ class HTMLRenderer:
             parts.append("</div>")
         content = "".join(parts)
         return (
-            f'    <div class="footnote-box" data-note="{note_num}">\n'
+            f'    <div class="footnote-box" data-note="{note_id}">\n'
             f'      <button class="footnote-close">&times;</button>\n'
-            f"      <strong>Nota {note_num}:</strong> {content}\n"
+            f"      <strong>Nota {note_id}:</strong> {content}\n"
             f"    </div>"
         )
 

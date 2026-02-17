@@ -180,7 +180,7 @@ def _build_once(
         print(f"  → {debug_dir / 'referencias_index.json'}")
 
 
-def _auto_commit_and_push(no_push: bool) -> None:
+def _auto_commit_and_push() -> None:
     """Faz git add + commit + push de docs/index.html."""
     public_html = BASE_DIR / "docs" / "index.html"
     if not public_html.exists():
@@ -212,11 +212,8 @@ def _auto_commit_and_push(no_push: bool) -> None:
     subprocess.run(["git", "commit", "-m", msg], cwd=BASE_DIR, check=True)
     print(f"  git commit -m \"{msg}\"")
 
-    if no_push:
-        print("  (--no-push: git push pulado)")
-    else:
-        subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
-        print("  git push ✓")
+    subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
+    print("  git push ✓")
 
 
 def main() -> None:
@@ -254,8 +251,8 @@ def main() -> None:
         help="Caminho de saída da versão pública (padrão: docs/index.html)",
     )
     parser.add_argument(
-        "--no-push", action="store_true",
-        help="Pula git commit/push automático",
+        "--push", action="store_true",
+        help="Faz git add + commit + push de docs/index.html após o build",
     )
     parser.add_argument(
         "--only-public", action="store_true",
@@ -300,9 +297,9 @@ def main() -> None:
     print(f"  Total: {elapsed_total:.1f}s")
     print(f"{'═' * 60}")
 
-    # Auto commit/push (only if public version was built)
-    if build_public:
-        _auto_commit_and_push(no_push=args.no_push)
+    # Commit/push only when explicitly requested
+    if args.push and build_public:
+        _auto_commit_and_push()
 
 
 if __name__ == "__main__":

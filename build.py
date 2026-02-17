@@ -87,6 +87,38 @@ def _build_once(
         print("      → XLSX não encontrado, índice remissivo vazio")
         subject_list = []
 
+    # Cross-reference: articles in XLSX but not in DOCX
+    if subject_list:
+        docx_arts: set[str] = set()
+        for el in doc.elements:
+            if hasattr(el, "art_number"):
+                prefix = law_mapping.get(getattr(el, "law_name", None) or "", "")
+                docx_arts.add(f"{prefix}:{el.art_number}" if prefix else el.art_number)
+
+        missing: list[str] = []
+        for entry in subject_index.entries:
+            for ref in entry.refs:
+                key = f"{ref.law_prefix}:{ref.art}" if ref.law_prefix else ref.art
+                if key not in docx_arts:
+                    label = f"Art. {ref.law_prefix}:{ref.art}" if ref.law_prefix else f"Art. {ref.art}"
+                    ctx = entry.subject
+                    if entry.sub_subject:
+                        ctx += f" > {entry.sub_subject}"
+                    missing.append(f"  {label}  (assunto: {ctx})")
+
+        if missing:
+            # Deduplicate preserving order
+            seen: set[str] = set()
+            unique: list[str] = []
+            for m in missing:
+                if m not in seen:
+                    seen.add(m)
+                    unique.append(m)
+            print(f"\n⚠ {len(unique)} referência(s) na planilha não encontrada(s) no DOCX:")
+            for m in unique:
+                print(m)
+            print()
+
     # Apply law prefixes to articles based on law_name ↔ mapping
     if law_mapping:
         from src.models import ArticleBlock as _AB
@@ -304,3 +336,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    input("\nPressione Enter para fechar...")

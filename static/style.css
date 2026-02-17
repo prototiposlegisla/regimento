@@ -396,7 +396,7 @@ mark {
   top: 25%;
   left: 0; right: 0;
   height: 2px;
-  background: rgba(52,152,219,.15);
+  background: transparent;
   z-index: 50;
   pointer-events: none;
 }

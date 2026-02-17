@@ -164,6 +164,7 @@ class SubjectRef:
     art: str  # número do artigo
     detail: str = ""  # ex: "§ 1º", "II", "§ú"
     law_prefix: str = ""  # ex: "LO" (empty = Regimento)
+    hint: str = ""  # ex: "propor privativamente" (from XLSX parentheses)
 
 
 @dataclass
@@ -200,6 +201,8 @@ class SubjectIndex:
                 rd: dict = {"art": r.art, "detail": r.detail}
                 if r.law_prefix:
                     rd["law_prefix"] = r.law_prefix
+                if r.hint:
+                    rd["hint"] = r.hint
                 refs_dicts.append(rd)
             if e.sub_subject:
                 child: dict = {

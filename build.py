@@ -166,12 +166,22 @@ def _build_once(
     print("[7/7] Montando HTML final...")
     from src.assemble import assemble
 
+    # Build summaries map: {art_number: summary} for fallback hints
+    summaries_map: dict[str, str] = {}
+    for el in doc.elements:
+        if hasattr(el, "art_number") and hasattr(el, "summary") and el.summary:
+            key = el.art_number
+            if hasattr(el, "law_prefix") and el.law_prefix:
+                key = el.law_prefix + ":" + key
+            summaries_map[key] = el.summary
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     assemble(
         cards_html=cards_html,
         systematic_index=systematic_index,
         subject_index=subject_list,
         referencias_index=referencias_data,
+        summaries_map=summaries_map,
         base_dir=BASE_DIR,
         output_path=output_path,
     )

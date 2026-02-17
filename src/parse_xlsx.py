@@ -105,13 +105,20 @@ def _parse_dispositivos(raw: str) -> list[SubjectRef]:
             law_prefix = law_m.group(1)
             line = law_m.group(2).strip()
 
+        # Extract hint from parentheses at end of line: "13,I,b(propor privativamente)"
+        hint = ""
+        hint_m = re.search(r"\(([^)]+)\)\s*$", line)
+        if hint_m:
+            hint = hint_m.group(1).strip()
+            line = line[:hint_m.start()].strip()
+
         # Range: "211-275"
         range_m = re.match(r"^(\d+)\s*[-–—]\s*(\d+)$", line)
         if range_m:
             start = int(range_m.group(1))
             end = int(range_m.group(2))
             for n in range(start, end + 1):
-                refs.append(SubjectRef(art=str(n), law_prefix=law_prefix))
+                refs.append(SubjectRef(art=str(n), law_prefix=law_prefix, hint=hint))
             continue
 
         # Single or with detail: "175,II" or "176,§10" or "176"
@@ -123,11 +130,11 @@ def _parse_dispositivos(raw: str) -> list[SubjectRef]:
             continue
 
         if len(parts) == 1:
-            refs.append(SubjectRef(art=art, law_prefix=law_prefix))
+            refs.append(SubjectRef(art=art, law_prefix=law_prefix, hint=hint))
         else:
             detail_raw = parts[1].strip()
             detail = _normalize_detail(detail_raw)
-            refs.append(SubjectRef(art=art, detail=detail, law_prefix=law_prefix))
+            refs.append(SubjectRef(art=art, detail=detail, law_prefix=law_prefix, hint=hint))
 
     return refs
 

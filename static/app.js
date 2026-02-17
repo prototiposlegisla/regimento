@@ -8,6 +8,8 @@
 
   const REFERENCIAS_INDEX = /*__REFERENCIAS_INDEX__*/[];
 
+  const SUMMARIES_MAP = /*__SUMMARIES_MAP__*/{};
+
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
   const MARKER_PALETTE = [
     { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
@@ -682,71 +684,21 @@
     }
   }
 
-  function formatRefsCompact(refs) {
-    // Group refs by law_prefix first
-    const byLaw = {};
+  function formatRefsList(refs) {
+    // Returns array of {label, hint, art, lawPrefix} — one per ref, no range compaction
+    const result = [];
     for (const r of refs) {
-      const key = r.law_prefix || '';
-      if (!byLaw[key]) byLaw[key] = [];
-      byLaw[key].push(r);
+      const prefix = r.law_prefix ? r.law_prefix + ' ' : '';
+      const label = prefix + 'art. ' + r.art + (r.detail ? ', ' + r.detail : '');
+      // Hint: from XLSX parentheses → fallback to SUMMARIES_MAP
+      let hint = r.hint || '';
+      if (!hint) {
+        const key = r.law_prefix ? r.law_prefix + ':' + r.art : r.art;
+        hint = SUMMARIES_MAP[key] || '';
+      }
+      result.push({ label, hint, art: r.art, lawPrefix: r.law_prefix || '' });
     }
-
-    const allParts = [];
-    for (const [lawPrefix, lawRefs] of Object.entries(byLaw)) {
-      const prefix = lawPrefix ? lawPrefix + ' ' : '';
-
-      // Separate refs with detail from those without
-      const plain = [];
-      const detailed = [];
-      for (const r of lawRefs) {
-        if (r.detail) {
-          detailed.push(r);
-        } else {
-          plain.push(r);
-        }
-      }
-      // Sort plain refs by numeric value
-      plain.sort((a, b) => {
-        const na = parseInt(a.art, 10) || 0;
-        const nb = parseInt(b.art, 10) || 0;
-        return na - nb;
-      });
-      // Group consecutive plain refs into ranges
-      let i = 0;
-      while (i < plain.length) {
-        const start = parseInt(plain[i].art, 10);
-        if (isNaN(start)) {
-          allParts.push(prefix + 'art. ' + plain[i].art);
-          i++;
-          continue;
-        }
-        let end = start;
-        let j = i + 1;
-        while (j < plain.length) {
-          const next = parseInt(plain[j].art, 10);
-          if (!isNaN(next) && next === end + 1) {
-            end = next;
-            j++;
-          } else {
-            break;
-          }
-        }
-        if (end - start >= 2) {
-          allParts.push(prefix + 'arts. ' + start + ' – ' + end);
-        } else if (end - start === 1) {
-          allParts.push(prefix + 'art. ' + start);
-          allParts.push(prefix + 'art. ' + end);
-        } else {
-          allParts.push(prefix + 'art. ' + start);
-        }
-        i = j;
-      }
-      // Add detailed refs
-      for (const r of detailed) {
-        allParts.push(prefix + 'art. ' + r.art + ', ' + r.detail);
-      }
-    }
-    return allParts.join('; ');
+    return result;
   }
 
   function collectAllRefs(entry) {
@@ -828,10 +780,22 @@
 
       // Direct refs
       if (entry.refs && entry.refs.length > 0) {
-        const refs = document.createElement('div');
-        refs.className = 'subj-refs';
-        refs.textContent = formatRefsCompact(entry.refs);
-        div.appendChild(refs);
+        const refsContainer = document.createElement('div');
+        refsContainer.className = 'subj-refs';
+        for (const item of formatRefsList(entry.refs)) {
+          const line = document.createElement('div');
+          line.className = 'subj-ref-line';
+          const labelSpan = document.createTextNode(item.label);
+          line.appendChild(labelSpan);
+          if (item.hint) {
+            const hintSpan = document.createElement('span');
+            hintSpan.className = 'ref-hint';
+            hintSpan.textContent = ' — ' + item.hint;
+            line.appendChild(hintSpan);
+          }
+          refsContainer.appendChild(line);
+        }
+        div.appendChild(refsContainer);
       }
 
       // Vides (cross-references)
@@ -863,7 +827,19 @@
 
           const subRefs = document.createElement('div');
           subRefs.className = 'subj-refs';
-          subRefs.textContent = formatRefsCompact(ch.refs);
+          for (const item of formatRefsList(ch.refs)) {
+            const line = document.createElement('div');
+            line.className = 'subj-ref-line';
+            const labelSpan = document.createTextNode(item.label);
+            line.appendChild(labelSpan);
+            if (item.hint) {
+              const hintSpan = document.createElement('span');
+              hintSpan.className = 'ref-hint';
+              hintSpan.textContent = ' — ' + item.hint;
+              line.appendChild(hintSpan);
+            }
+            subRefs.appendChild(line);
+          }
           subDiv.appendChild(subRefs);
 
           // Vides on sub-subject

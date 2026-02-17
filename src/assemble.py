@@ -11,6 +11,7 @@ def assemble(
     systematic_index: list[dict],
     subject_index: list[dict],
     referencias_index: list[dict],
+    summaries_map: dict[str, str],
     base_dir: Path,
     output_path: Path,
 ) -> None:
@@ -27,10 +28,12 @@ def assemble(
     sys_json = json.dumps(systematic_index, ensure_ascii=False, indent=2)
     subj_json = json.dumps(subject_index, ensure_ascii=False, indent=2)
     ref_json = json.dumps(referencias_index, ensure_ascii=False, indent=2)
+    summaries_json = json.dumps(summaries_map, ensure_ascii=False)
 
     js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", sys_json)
     js = js.replace("/*__SUBJECT_INDEX__*/[]", subj_json)
     js = js.replace("/*__REFERENCIAS_INDEX__*/[]", ref_json)
+    js = js.replace("/*__SUMMARIES_MAP__*/{}", summaries_json)
 
     # Assemble final HTML
     final = template.replace("{{CSS}}", css)

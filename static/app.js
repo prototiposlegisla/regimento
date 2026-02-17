@@ -70,6 +70,14 @@
     return window.innerHeight * 0.25;
   }
 
+  function scrollToReadingLine(card, behavior = 'smooth') {
+    requestAnimationFrame(() => {
+      const rect = card.getBoundingClientRect();
+      const target = window.scrollY + rect.top - getReadingLineY();
+      window.scrollTo({ top: Math.max(0, target), behavior });
+    });
+  }
+
   function updateSelection() {
     if (manualSelect) return;
     const lineY = getReadingLineY();
@@ -981,7 +989,7 @@
           || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
     }
     if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToReadingLine(card);
       selectCard(card, true);
     }
     return card;
@@ -1064,12 +1072,41 @@
     $pillCurrent.textContent = prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
   }
 
+  function findRefTarget(ref) {
+    // Returns the most specific DOM element for a ref (card, caput <p>, or detail <p>)
+    let card;
+    if (ref.law_prefix) {
+      card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"][data-law="${ref.law_prefix}"]`);
+    } else {
+      card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"]:not([data-law])`)
+          || $cards.querySelector(`.card-artigo[data-art="${ref.art}"]`);
+    }
+    if (!card) return null;
+    if (!ref.detail) return card;
+    const dt = ref.detail.trim();
+    if (dt.toLowerCase() === 'caput') {
+      return card.querySelector('p:not(.art-para):not(.old-version)') || card;
+    }
+    for (const uid of card.querySelectorAll('.unit-id')) {
+      const path = uid.dataset.path || '';
+      const ut = uid.textContent.trim();
+      if (path === dt || ut === dt || (dt === '§ú' && ut === 'Parágrafo único')) {
+        return uid.closest('p') || card;
+      }
+    }
+    return card;
+  }
+
   function navigateToSubjectRef(idx) {
     if (!activeSubject) return;
     subjectIdx = idx;
     updatePill();
     const ref = activeSubject.refs[idx];
-    navigateToArt(ref.art, ref.law_prefix || '');
+    const target = findRefTarget(ref);
+    if (!target) return;
+    const card = target.closest('.card') || target;
+    scrollToReadingLine(target);
+    selectCard(card, true);
   }
 
   function applySubjectFilter() {

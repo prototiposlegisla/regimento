@@ -276,7 +276,13 @@ class HTMLRenderer:
         note = ""
         if unit.amendment_note:
             note = f' <span class="amendment-note">{html.escape(unit.amendment_note)}</span>'
-        return f'    <p class="old-version">{text}{note}</p>'
+        # Extract identifier (everything before first separator) for JS diff pairing
+        ident = ""
+        m = re.match(r"(.+?)\s+[-–—]\s", unit.full_text)
+        if m:
+            ident = html.escape(m.group(1).strip())
+        ident_attr = f' data-ident="{ident}"' if ident else ""
+        return f'    <p class="old-version"{ident_attr}>{text}{note}</p>'
 
 
 def render_cards(doc: ParsedDocument) -> str:

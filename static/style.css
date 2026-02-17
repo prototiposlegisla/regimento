@@ -228,6 +228,56 @@ body {
   text-decoration: none;
 }
 
+/* Diff toggle icon (inline, always visible after text) */
+.diff-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(20px * var(--zoom-scale));
+  height: calc(20px * var(--zoom-scale));
+  border-radius: 4px;
+  background: #cce0ff;
+  color: #2a7fff;
+  font-size: calc(12px * var(--zoom-scale));
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  margin-left: calc(6px * var(--zoom-scale));
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.diff-toggle:hover { background: #a8cfff; }
+.old-version.diff-open .diff-toggle { background: var(--selected-border); color: #fff; }
+
+/* Diff panel */
+.diff-panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: calc(10px * var(--zoom-scale));
+  margin-top: calc(4px * var(--zoom-scale));
+  margin-bottom: calc(6px * var(--zoom-scale));
+  font-size: calc(.9rem * var(--zoom-scale));
+  line-height: 1.6;
+  text-decoration: none;
+  opacity: 1;
+}
+.diff-del {
+  background: #fdd;
+  text-decoration: line-through;
+  color: #a00;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+.diff-ins {
+  background: #dfd;
+  color: #060;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
 /* Article summary */
 .art-summary {
   display: block;

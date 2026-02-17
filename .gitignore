@@ -5,3 +5,4 @@ dist/
 *.docx
 *.xlsx
 config.local.toml
+.claude/

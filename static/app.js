@@ -687,6 +687,7 @@
   function sysLevelClass(sectionId) {
     if (!sectionId) return '';
     if (sectionId.startsWith('norma')) return 'sys-nivel-norma';
+    if (sectionId === 'adt')           return 'sys-nivel-titulo';
     if (sectionId.startsWith('tit'))   return 'sys-nivel-titulo';
     if (sectionId.startsWith('cap'))   return 'sys-nivel-capitulo';
     if (sectionId.startsWith('subsec')) return 'sys-nivel-subsecao';

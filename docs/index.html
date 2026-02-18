@@ -578,14 +578,12 @@ mark {
 .sys-item:not([class*="sys-nivel-"]):hover { background: #f0f0f0; }
 .sys-item[class*="sys-nivel-"]:hover,
 .sys-title[class*="sys-nivel-"]:hover {
-  outline: 2px solid #2979ff;
-  outline-offset: -2px;
-  box-shadow: 0 0 0 2px #2979ff;
+  filter: brightness(1.3);
+  box-shadow: inset 0 0 0 2px #2979ff;
 }
 .sys-active[class*="sys-nivel-"] {
-  outline: 2px solid #2979ff;
-  outline-offset: -2px;
-  box-shadow: 0 0 0 2px #2979ff;
+  filter: brightness(1.3);
+  box-shadow: inset 0 0 0 2px #2979ff;
 }
 .sys-active:not([class*="sys-nivel-"]) { background: #e3f2fd; }
 .sys-art-range {
@@ -8022,6 +8020,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   function sysLevelClass(sectionId) {
     if (!sectionId) return '';
     if (sectionId.startsWith('norma')) return 'sys-nivel-norma';
+    if (sectionId === 'adt')           return 'sys-nivel-titulo';
     if (sectionId.startsWith('tit'))   return 'sys-nivel-titulo';
     if (sectionId.startsWith('cap'))   return 'sys-nivel-capitulo';
     if (sectionId.startsWith('subsec')) return 'sys-nivel-subsecao';

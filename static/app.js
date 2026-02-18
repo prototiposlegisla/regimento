@@ -751,7 +751,7 @@
     const el = document.createElement('div');
     const lvl = sysLevelClass(node.section_id);
     el.className = 'sys-item' + (lvl ? ' ' + lvl : '');
-    el.style.paddingLeft = indent + 'px';
+    el.style.marginLeft = indent + 'px';
     el.textContent = node.title;
     if (node.art_range && (!node.children || !node.children.length)) {
       const rangeSpan = document.createElement('span');

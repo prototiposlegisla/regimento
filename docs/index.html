@@ -575,10 +575,12 @@ mark {
   border-radius: 4px;
   font-size: 14px;
 }
-.sys-item:hover { background: #f0f0f0; }
-.sys-item[class*="sys-nivel-"]:hover { background: #333; color: #fff; }
-.sys-item.sys-nivel-secao:hover .sys-art-range,
-.sys-item[class*="sys-nivel-"]:hover .sys-art-range { color: rgba(255,255,255,.7); }
+.sys-item:not([class*="sys-nivel-"]):hover { background: #f0f0f0; }
+.sys-item[class*="sys-nivel-"]:hover {
+  outline: 2px solid #2979ff;
+  outline-offset: -2px;
+  box-shadow: 0 0 0 2px #2979ff;
+}
 .sys-art-range {
   color: rgba(255,255,255,.7);
   font-weight: 400;
@@ -8077,7 +8079,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     const el = document.createElement('div');
     const lvl = sysLevelClass(node.section_id);
     el.className = 'sys-item' + (lvl ? ' ' + lvl : '');
-    el.style.paddingLeft = indent + 'px';
+    el.style.marginLeft = indent + 'px';
     el.textContent = node.title;
     if (node.art_range && (!node.children || !node.children.length)) {
       const rangeSpan = document.createElement('span');

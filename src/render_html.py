@@ -128,7 +128,12 @@ class HTMLRenderer:
     def _render_unit_as_p(
         self, unit: DocumentUnit, is_caput: bool, path: str = "",
     ) -> str:
-        cls = "" if is_caput else ' class="art-para"'
+        if is_caput:
+            cls_style = ""
+        else:
+            depth = len(path.split(",")) if path else 1
+            depth_style = f' style="--depth:{depth}"' if depth > 1 else ""
+            cls_style = f' class="art-para"{depth_style}'
         uid = html.escape(unit.uid)
 
         # Build inline content
@@ -149,7 +154,7 @@ class HTMLRenderer:
         for fn in unit.footnotes:
             footnote_html += "\n" + self._render_footnote(fn)
 
-        return f"    <p{cls}>{inner}</p>{footnote_html}"
+        return f"    <p{cls_style}>{inner}</p>{footnote_html}"
 
     def _render_unit_id(self, unit: DocumentUnit, path: str = "") -> str:
         uid = html.escape(unit.uid)

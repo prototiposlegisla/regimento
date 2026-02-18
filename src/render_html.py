@@ -90,7 +90,7 @@ class HTMLRenderer:
         path_ctx = ["", "", "", ""]  # [para, inciso, alinea, sub]
         for child in art.children:
             if child.is_old_version:
-                parts.append(self._render_old_version(child))
+                parts.append(self._render_old_version(child, is_child=True))
             else:
                 path = self._update_path_ctx(child, path_ctx)
                 parts.append(self._render_unit_as_p(
@@ -277,7 +277,7 @@ class HTMLRenderer:
             parts.append(text)
         return "".join(parts)
 
-    def _render_old_version(self, unit: DocumentUnit) -> str:
+    def _render_old_version(self, unit: DocumentUnit, is_child: bool = False) -> str:
         """Renderiza uma versão antiga (strikethrough + amendment note)."""
         text = html.escape(unit.full_text)
         note = ""
@@ -289,7 +289,8 @@ class HTMLRenderer:
         if m:
             ident = html.escape(m.group(1).strip())
         ident_attr = f' data-ident="{ident}"' if ident else ""
-        return f'    <p class="old-version"{ident_attr}>{text}{note}</p>'
+        cls = "old-version art-para" if is_child else "old-version"
+        return f'    <p class="{cls}"{ident_attr}>{text}{note}</p>'
 
 
 def render_cards(doc: ParsedDocument) -> str:

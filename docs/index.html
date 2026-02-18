@@ -6773,6 +6773,18 @@ body.pill-open #cards-container { padding-bottom: 300px; }
         ]
       }
     ]
+  },
+  {
+    "subject": "Teste 2",
+    "vides": [
+      "TESTE"
+    ]
+  },
+  {
+    "subject": "Teste 3",
+    "vides": [
+      "TESTE|SubAssunto6"
+    ]
   }
 ];
 
@@ -7551,23 +7563,37 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     vides.forEach((v, i) => {
       const link = document.createElement('a');
       link.className = 'vide-link';
-      link.textContent = v;
+      // Support "ASSUNTO|SUBASSUNTO" format
+      const pipeIdx = v.indexOf('|');
+      const subjectPart = pipeIdx !== -1 ? v.slice(0, pipeIdx).trim() : v;
+      const subSubjectPart = pipeIdx !== -1 ? v.slice(pipeIdx + 1).trim() : '';
+      link.textContent = subSubjectPart ? subjectPart + ' — ' + subSubjectPart : v;
       link.href = '#';
       link.addEventListener('click', (e) => {
         e.preventDefault();
         // Find the referenced subject in the index and open it
         const target = SUBJECT_INDEX.find(
-          s => stripAccents(s.subject.toLowerCase()) === stripAccents(v.toLowerCase())
+          s => stripAccents(s.subject.toLowerCase()) === stripAccents(subjectPart.toLowerCase())
         );
         if (target) {
           closeIndex();
-          const pillEntry = { subject: target.subject, refs: collectAllRefs(target) };
-          openSubjectPill(pillEntry);
+          let refs = collectAllRefs(target);
+          let pillLabel = target.subject;
+          if (subSubjectPart && target.children) {
+            const child = target.children.find(
+              ch => stripAccents(ch.sub_subject.toLowerCase()) === stripAccents(subSubjectPart.toLowerCase())
+            );
+            if (child) {
+              refs = child.refs;
+              pillLabel = target.subject + ' — ' + child.sub_subject;
+            }
+          }
+          openSubjectPill({ subject: pillLabel, refs });
         } else {
           // Try to filter the index to show the term
           const $indexSearch = document.getElementById('index-search');
           if ($indexSearch) {
-            $indexSearch.value = v;
+            $indexSearch.value = subjectPart;
             $indexSearch.dispatchEvent(new Event('input'));
           }
         }

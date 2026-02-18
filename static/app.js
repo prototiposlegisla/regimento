@@ -560,7 +560,7 @@
         if (target) {
           const card = target.closest('.card');
           if (card) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            scrollToReadingLine(target);
             selectCard(card, true);
           }
         }

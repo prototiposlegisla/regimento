@@ -576,11 +576,18 @@ mark {
   font-size: 14px;
 }
 .sys-item:not([class*="sys-nivel-"]):hover { background: #f0f0f0; }
-.sys-item[class*="sys-nivel-"]:hover {
+.sys-item[class*="sys-nivel-"]:hover,
+.sys-title[class*="sys-nivel-"]:hover {
   outline: 2px solid #2979ff;
   outline-offset: -2px;
   box-shadow: 0 0 0 2px #2979ff;
 }
+.sys-active[class*="sys-nivel-"] {
+  outline: 2px solid #2979ff;
+  outline-offset: -2px;
+  box-shadow: 0 0 0 2px #2979ff;
+}
+.sys-active:not([class*="sys-nivel-"]) { background: #e3f2fd; }
 .sys-art-range {
   color: rgba(255,255,255,.7);
   font-weight: 400;
@@ -7985,6 +7992,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
     if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
+      if (!filter) syncSystematicToScroll();
     } else if (currentIndexTab === 'references') {
       renderReferencesIndex(filter);
     } else {
@@ -8043,6 +8051,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
         title.appendChild(rangeSpan);
       }
       if (group.section_id) {
+        title.dataset.section = group.section_id;
         title.style.cursor = 'pointer';
         title.addEventListener('click', () => {
           closeIndex();
@@ -8089,6 +8098,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     }
 
     if (node.section_id) {
+      el.dataset.section = node.section_id;
       el.addEventListener('click', () => {
         closeIndex();
         navigateToSection(node.section_id);
@@ -8101,6 +8111,40 @@ body.pill-open #cards-container { padding-bottom: 300px; }
         renderSysNode(child, parent, indent + 12, filter);
       }
     }
+  }
+
+  function getCurrentSectionId() {
+    const headerBottom = headerEl.getBoundingClientRect().bottom;
+    const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
+    let card = null;
+    for (const a of articles) {
+      const rect = a.getBoundingClientRect();
+      if (rect.top > headerBottom) break;
+      card = a;
+    }
+    if (!card) card = articles[0];
+    if (!card) return '';
+    // Walk backwards — first heading found is the most specific (deepest)
+    let prev = card.previousElementSibling;
+    while (prev) {
+      if (prev.classList.contains('card-titulo') && prev.dataset.section) {
+        return prev.dataset.section;
+      }
+      prev = prev.previousElementSibling;
+    }
+    return '';
+  }
+
+  function syncSystematicToScroll() {
+    const sectionId = getCurrentSectionId();
+    if (!sectionId) return;
+    // Remove previous highlight
+    $indexContent.querySelectorAll('.sys-active').forEach(el => el.classList.remove('sys-active'));
+    // Find matching element in the index panel
+    const target = $indexContent.querySelector('[data-section="' + sectionId + '"]');
+    if (!target) return;
+    target.classList.add('sys-active');
+    target.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 
   function navigateToSection(sectionId) {

@@ -657,6 +657,7 @@
 
     if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
+      if (!filter) syncSystematicToScroll();
     } else if (currentIndexTab === 'references') {
       renderReferencesIndex(filter);
     } else {
@@ -715,6 +716,7 @@
         title.appendChild(rangeSpan);
       }
       if (group.section_id) {
+        title.dataset.section = group.section_id;
         title.style.cursor = 'pointer';
         title.addEventListener('click', () => {
           closeIndex();
@@ -761,6 +763,7 @@
     }
 
     if (node.section_id) {
+      el.dataset.section = node.section_id;
       el.addEventListener('click', () => {
         closeIndex();
         navigateToSection(node.section_id);
@@ -773,6 +776,40 @@
         renderSysNode(child, parent, indent + 12, filter);
       }
     }
+  }
+
+  function getCurrentSectionId() {
+    const headerBottom = headerEl.getBoundingClientRect().bottom;
+    const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
+    let card = null;
+    for (const a of articles) {
+      const rect = a.getBoundingClientRect();
+      if (rect.top > headerBottom) break;
+      card = a;
+    }
+    if (!card) card = articles[0];
+    if (!card) return '';
+    // Walk backwards — first heading found is the most specific (deepest)
+    let prev = card.previousElementSibling;
+    while (prev) {
+      if (prev.classList.contains('card-titulo') && prev.dataset.section) {
+        return prev.dataset.section;
+      }
+      prev = prev.previousElementSibling;
+    }
+    return '';
+  }
+
+  function syncSystematicToScroll() {
+    const sectionId = getCurrentSectionId();
+    if (!sectionId) return;
+    // Remove previous highlight
+    $indexContent.querySelectorAll('.sys-active').forEach(el => el.classList.remove('sys-active'));
+    // Find matching element in the index panel
+    const target = $indexContent.querySelector('[data-section="' + sectionId + '"]');
+    if (!target) return;
+    target.classList.add('sys-active');
+    target.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 
   function navigateToSection(sectionId) {

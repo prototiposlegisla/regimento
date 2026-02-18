@@ -124,23 +124,41 @@
   // ===== BREADCRUMB (scroll context) =====
   const headerEl = document.getElementById('header');
 
+  function getHeadingShortTitle(el) {
+    // Collect main text (before <br>) and subtitle (after <br>)
+    let mainText = '', subtitle = '', pastBr = false;
+    for (const node of el.childNodes) {
+      if (node.nodeName === 'BR') { pastBr = true; continue; }
+      if (node.nodeType === Node.TEXT_NODE) {
+        if (!pastBr) mainText += node.textContent;
+        else subtitle += node.textContent;
+      }
+    }
+    mainText = mainText.trim();
+    subtitle = subtitle.trim();
+    // Strip type-word prefix (TÍTULO, CAPÍTULO, SEÇÃO, SUBSEÇÃO) — user deduces from color
+    const num = mainText.replace(/^(T[IÍ]TULO|CAP[IÍ]TULO|SE[CÇ][AÃ]O|SUBSE[CÇ][AÃ]O)\s*/i, '').trim();
+    if (subtitle) return (num ? num + '-' : '') + subtitle;
+    return num || mainText;
+  }
+
   function updateBreadcrumb() {
     if (compactMode) {
       $breadcrumb.classList.remove('visible');
       return;
     }
 
-    // Find the article card that spans the header bottom
+    // Find the last article card whose top is at or above the header bottom.
+    // Using "last above" (instead of "straddles") ensures the breadcrumb stays
+    // visible even when a gap or a title card sits exactly at the header line.
     const headerBottom = headerEl.getBoundingClientRect().bottom;
     const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
     let card = null;
 
     for (const a of articles) {
       const rect = a.getBoundingClientRect();
-      if (rect.top <= headerBottom && rect.bottom > headerBottom) {
-        card = a;
-        break;
-      }
+      if (rect.top > headerBottom) break;
+      card = a;
     }
 
     if (!card) {
@@ -148,16 +166,9 @@
       return;
     }
 
-    const caputUid = card.querySelector('.unit-id:not([data-path])');
-    if (!caputUid || caputUid.getBoundingClientRect().bottom > headerBottom) {
-      $breadcrumb.classList.remove('visible');
-      return;
-    }
-
     // Find the last unit-id hidden behind the header
     const unitIds = card.querySelectorAll('.unit-id[data-path]');
     let currentUnit = null;
-
     for (const uid of unitIds) {
       if (uid.closest('.old-version')) continue;
       if (uid.getBoundingClientRect().bottom <= headerBottom) {
@@ -165,24 +176,92 @@
       }
     }
 
-    // Build breadcrumb text
+    // Collect ancestor heading cards in reverse DOM order (most recent first)
+    const levelOrder = ['norma', 'tit', 'cap', 'sec', 'subsec'];
+    const foundLevels = new Set();
+    const headings = [];
+    let prev = card.previousElementSibling;
+    while (prev && foundLevels.size < levelOrder.length) {
+      if (prev.classList.contains('card-titulo')) {
+        const sec = prev.dataset.section || '';
+        let level = '';
+        if (sec.startsWith('norma')) level = 'norma';
+        else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+        else if (sec.startsWith('cap')) level = 'cap';
+        else if (sec.startsWith('subsec')) level = 'subsec';
+        else if (sec.startsWith('sec')) level = 'sec';
+        if (level && !foundLevels.has(level)) {
+          foundLevels.add(level);
+          // Include if filtered-out (display:none, definitely above) or scrolled above header
+          const isHidden = prev.classList.contains('filtered-out');
+          const rect = prev.getBoundingClientRect();
+          if (isHidden || rect.bottom <= headerBottom) {
+            headings.push({ el: prev, level });
+          }
+        }
+      }
+      prev = prev.previousElementSibling;
+    }
+    headings.reverse(); // restore DOM order: título → capítulo → seção → …
+
+    // Only show breadcrumb when at least one ancestor title is out of view
+    if (headings.length === 0) {
+      $breadcrumb.classList.remove('visible');
+      return;
+    }
+
+    // Build breadcrumb DOM
+    $breadcrumb.innerHTML = '';
+
+    function addSep() {
+      const sep = document.createElement('span');
+      sep.className = 'bc-sep';
+      sep.textContent = '\u203A';
+      $breadcrumb.appendChild(sep);
+    }
+
+    headings.forEach((h, i) => {
+      if (i > 0) addSep();
+      const span = document.createElement('span');
+      span.className = 'bc-item bc-' + h.level;
+      span.textContent = getHeadingShortTitle(h.el);
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const top = h.el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+      });
+      $breadcrumb.appendChild(span);
+    });
+
+    if (headings.length > 0) addSep();
+    const artSpan = document.createElement('span');
+    artSpan.className = 'bc-item bc-article';
     const lawPrefix = card.dataset.law;
-    const prefix = lawPrefix ? lawPrefix + ' ' : '';
-    let text = prefix + 'Art. ' + card.dataset.art;
+    artSpan.textContent = (lawPrefix ? lawPrefix + '\u00a0' : '') + card.dataset.art;
+    artSpan.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const top = card.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+    });
+    $breadcrumb.appendChild(artSpan);
 
     if (currentUnit && currentUnit.dataset.path) {
       const parts = currentUnit.dataset.path.split(',');
-      text += ' \u203A ' + parts.join(' \u203A ');
+      addSep();
+      const pathSpan = document.createElement('span');
+      pathSpan.className = 'bc-path';
+      pathSpan.textContent = parts.join(' \u203A ');
+      $breadcrumb.appendChild(pathSpan);
     }
 
-    $breadcrumb.textContent = text;
     $breadcrumb.classList.add('visible');
     breadcrumbCard = card;
   }
 
   let breadcrumbCard = null;
 
-  $breadcrumb.addEventListener('click', () => {
+  $breadcrumb.addEventListener('click', (e) => {
+    if (e.target.closest('.bc-item')) return;
     if (breadcrumbCard) {
       const top = breadcrumbCard.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });

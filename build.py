@@ -80,6 +80,15 @@ def _build_once(
         law_mapping = parse_law_mapping(xlsx_path)
         if law_mapping:
             print(f"      → {len(law_mapping)} normas mapeadas")
+
+        from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
+        _fmt_errs = _validate_xlsx_fmt(xlsx_path, law_mapping)
+        if _fmt_errs:
+            print(f"\n⚠ {len(_fmt_errs)} problema(s) de formato na planilha remissivo.xlsx:")
+            for _e in _fmt_errs:
+                print(_e)
+            print()
+
         subject_index = parse_xlsx(xlsx_path)
         subject_list = subject_index.to_list()
         print(f"      → {len(subject_list)} assuntos")
@@ -130,7 +139,10 @@ def _build_once(
         bad_vides: list[str] = []
         for entry in subject_index.entries:
             for v in entry.vides:
-                if v.lower() not in known_subjects:
+                # Vides podem usar "Assunto|Sub-assunto"; normaliza para o mesmo
+                # formato que known_subjects usa ("Assunto — Sub-assunto")
+                v_key = v.replace("|", " — ").lower()
+                if v_key not in known_subjects:
                     ctx = entry.subject
                     if entry.sub_subject:
                         ctx += f" > {entry.sub_subject}"

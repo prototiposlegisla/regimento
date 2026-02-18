@@ -3,5 +3,6 @@ intermediate/
 dist/
 *.pyc
 *.xlsx
+*.docx
 config.local.toml
 .claude/

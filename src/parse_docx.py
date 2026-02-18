@@ -653,6 +653,11 @@ def _build_document(
                     current_article.all_versions.append(child)
                 current_article.children = []
                 current_article.caput = caput
+                # Atualiza síntese se o novo caput tiver uma nota "s "
+                for fn_id in cp.footnote_ids:
+                    if fn_id in summaries_map:
+                        current_article.summary = summaries_map[fn_id]
+                        break
             else:
                 # Flush previous article and start new one
                 if current_article:

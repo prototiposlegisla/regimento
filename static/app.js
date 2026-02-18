@@ -618,6 +618,7 @@
   function closeIndex() {
     $indexOverlay.classList.remove('open');
     $indexPanel.classList.remove('open');
+    $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
   }
 
   $btnIndex.addEventListener('click', openIndex);
@@ -860,31 +861,27 @@
       link.href = '#';
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        // Find the referenced subject in the index and open it
-        const target = SUBJECT_INDEX.find(
-          s => stripAccents(s.subject.toLowerCase()) === stripAccents(subjectPart.toLowerCase())
-        );
-        if (target) {
-          closeIndex();
-          let refs = collectAllRefs(target);
-          let pillLabel = target.subject;
-          if (subSubjectPart && target.children) {
-            const child = target.children.find(
-              ch => stripAccents(ch.sub_subject.toLowerCase()) === stripAccents(subSubjectPart.toLowerCase())
-            );
-            if (child) {
-              refs = child.refs;
-              pillLabel = target.subject + ' — ' + child.sub_subject;
-            }
-          }
-          openSubjectPill({ subject: pillLabel, refs });
+        // Build the key to find the target element in the DOM
+        const targetKey = subSubjectPart
+          ? stripAccents(subjectPart.toLowerCase()) + '|' + stripAccents(subSubjectPart.toLowerCase())
+          : stripAccents(subjectPart.toLowerCase());
+        // Clear search filter so the target is visible
+        if ($indexSearch.value.trim()) {
+          $indexSearch.value = '';
+          $indexSearch.dispatchEvent(new Event('input'));
+        }
+        // Find the DOM element with matching data-subject-key
+        const targetEl = $indexContent.querySelector('[data-subject-key="' + CSS.escape(targetKey) + '"]');
+        if (targetEl) {
+          // Remove any previous highlights
+          $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
+          // Highlight and scroll to the target
+          targetEl.classList.add('vide-highlight');
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
-          // Try to filter the index to show the term
-          const $indexSearch = document.getElementById('index-search');
-          if ($indexSearch) {
-            $indexSearch.value = subjectPart;
-            $indexSearch.dispatchEvent(new Event('input'));
-          }
+          // Target not found — put in search bar
+          $indexSearch.value = subjectPart;
+          $indexSearch.dispatchEvent(new Event('input'));
         }
       });
       container.appendChild(link);
@@ -906,6 +903,7 @@
 
       const div = document.createElement('div');
       div.className = 'subj-entry';
+      div.dataset.subjectKey = stripAccents(entry.subject.toLowerCase());
       const title = document.createElement('div');
       title.className = 'subj-title';
       title.textContent = entry.subject;
@@ -952,6 +950,7 @@
           if (filter && !matchSelf && !textMatchesFilter(ch.sub_subject, filter)) continue;
           const subDiv = document.createElement('div');
           subDiv.className = 'subj-entry';
+          subDiv.dataset.subjectKey = stripAccents(entry.subject.toLowerCase()) + '|' + stripAccents(ch.sub_subject.toLowerCase());
           subDiv.style.paddingLeft = '16px';
           const subTitle = document.createElement('div');
           subTitle.className = 'subj-title';

@@ -635,7 +635,12 @@ mark {
 }
 
 /* Subject index */
-.subj-entry { margin-bottom: 10px; }
+.subj-entry { margin-bottom: 10px; border-radius: 6px; }
+.subj-entry.vide-highlight {
+  background: #fff8d6;
+  outline: 2px solid #e0c040;
+  padding: 4px 6px;
+}
 .subj-title {
   font-weight: 600;
   font-size: 14px;

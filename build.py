@@ -76,28 +76,35 @@ def _build_once(
 
     xlsx_path = Path(args.xlsx)
     law_mapping: dict[str, str] = {}
+    subject_index = None
     if xlsx_path.exists():
-        law_mapping = parse_law_mapping(xlsx_path)
-        if law_mapping:
-            print(f"      → {len(law_mapping)} normas mapeadas")
+        try:
+            law_mapping = parse_law_mapping(xlsx_path)
+            if law_mapping:
+                print(f"      → {len(law_mapping)} normas mapeadas")
 
-        from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
-        _fmt_errs = _validate_xlsx_fmt(xlsx_path, law_mapping)
-        if _fmt_errs:
-            print(f"\n⚠ {len(_fmt_errs)} problema(s) de formato na planilha remissivo.xlsx:")
-            for _e in _fmt_errs:
-                print(_e)
-            print()
+            from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
+            _fmt_errs = _validate_xlsx_fmt(xlsx_path, law_mapping)
+            if _fmt_errs:
+                print(f"\n⚠ {len(_fmt_errs)} problema(s) de formato na planilha remissivo.xlsx:")
+                for _e in _fmt_errs:
+                    print(_e)
+                print()
 
-        # Artigos letrados do DOCX (ex: "212-A") para expansão correta de ranges
-        import re as _re
-        known_lettered: set[str] = {
-            el.art_number for el in doc.elements
-            if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
-        }
-        subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
-        subject_list = subject_index.to_list()
-        print(f"      → {len(subject_list)} assuntos")
+            # Artigos letrados do DOCX (ex: "212-A") para expansão correta de ranges
+            import re as _re
+            known_lettered: set[str] = {
+                el.art_number for el in doc.elements
+                if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
+            }
+            subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
+            subject_list = subject_index.to_list()
+            print(f"      → {len(subject_list)} assuntos")
+        except PermissionError:
+            print("      ⚠ Não foi possível abrir remissivo.xlsx (arquivo em uso pelo Excel?)")
+            print("        Feche a planilha e rode o build novamente.")
+            print("        Continuando sem índice remissivo...")
+            subject_list = []
     else:
         print("      → XLSX não encontrado, índice remissivo vazio")
         subject_list = []

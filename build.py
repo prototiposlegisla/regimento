@@ -89,7 +89,13 @@ def _build_once(
                 print(_e)
             print()
 
-        subject_index = parse_xlsx(xlsx_path)
+        # Artigos letrados do DOCX (ex: "212-A") para expansão correta de ranges
+        import re as _re
+        known_lettered: set[str] = {
+            el.art_number for el in doc.elements
+            if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
+        }
+        subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
         subject_list = subject_index.to_list()
         print(f"      → {len(subject_list)} assuntos")
     else:

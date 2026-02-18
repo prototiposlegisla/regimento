@@ -32,8 +32,12 @@ def parse_law_mapping(path: str | Path) -> dict[str, str]:
     return mapping
 
 
-def parse_xlsx(path: str | Path) -> SubjectIndex:
-    """Parseia remissivo.xlsx e retorna SubjectIndex."""
+def parse_xlsx(path: str | Path, known_lettered: set[str] | None = None) -> SubjectIndex:
+    """Parseia remissivo.xlsx e retorna SubjectIndex.
+
+    known_lettered: conjunto de art_numbers letrados conhecidos (ex: {"212-A", "183-A"})
+    para incluir em expansões de range.
+    """
     import openpyxl
 
     path = Path(path)
@@ -64,7 +68,7 @@ def parse_xlsx(path: str | Path) -> SubjectIndex:
         if not assunto:
             continue
 
-        refs = _parse_dispositivos(dispositivos_raw)
+        refs = _parse_dispositivos(dispositivos_raw, known_lettered)
         vides = [v.strip() for v in vides_raw.split("\n") if v.strip()] if vides_raw else []
 
         entries.append(SubjectEntry(
@@ -77,7 +81,7 @@ def parse_xlsx(path: str | Path) -> SubjectIndex:
     return SubjectIndex(entries=entries)
 
 
-def _parse_dispositivos(raw: str) -> list[SubjectRef]:
+def _parse_dispositivos(raw: str, known_lettered: set[str] | None = None) -> list[SubjectRef]:
     """Converte string de dispositivos em lista de SubjectRef.
 
     Formatos aceitos:
@@ -119,6 +123,12 @@ def _parse_dispositivos(raw: str) -> list[SubjectRef]:
             end = int(range_m.group(2))
             for n in range(start, end + 1):
                 refs.append(SubjectRef(art=str(n), law_prefix=law_prefix, hint=hint))
+                # Inclui artigos letrados (ex: "212-A") cujo número base está no range
+                if known_lettered:
+                    for lettered in sorted(known_lettered):
+                        m = re.match(r"^(\d+)-[A-Za-z]", lettered)
+                        if m and int(m.group(1)) == n:
+                            refs.append(SubjectRef(art=lettered, law_prefix=law_prefix, hint=hint))
             continue
 
         # Single or with detail: "175,II" or "176,§10" or "176"

@@ -1350,11 +1350,15 @@
   let compactMode = false;
 
   function setCompactMode(on) {
-    preserveScroll(() => {
-      compactMode = on;
-      $cards.classList.toggle('compact', compactMode);
-      $btnCompact.classList.toggle('active', compactMode);
-    });
+    const card = selectedCard;
+    compactMode = on;
+    $cards.classList.toggle('compact', compactMode);
+    $btnCompact.classList.toggle('active', compactMode);
+    if (card && !card.classList.contains('filtered-out')) {
+      const rect = card.getBoundingClientRect();
+      const target = window.scrollY + rect.top - getReadingLineY();
+      window.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
+    }
     updateBreadcrumb();
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }

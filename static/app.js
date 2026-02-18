@@ -228,7 +228,7 @@
       span.addEventListener('click', (e) => {
         e.stopPropagation();
         const top = h.el.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+        window.scrollTo({ top: top - getReadingLineY(), behavior: 'smooth' });
       });
       $breadcrumb.appendChild(span);
     });
@@ -241,7 +241,7 @@
     artSpan.addEventListener('click', (e) => {
       e.stopPropagation();
       const top = card.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+      window.scrollTo({ top: top - getReadingLineY(), behavior: 'smooth' });
     });
     $breadcrumb.appendChild(artSpan);
 
@@ -264,7 +264,7 @@
     if (e.target.closest('.bc-item')) return;
     if (breadcrumbCard) {
       const top = breadcrumbCard.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: top - headerEl.offsetHeight - 8, behavior: 'smooth' });
+      window.scrollTo({ top: top - getReadingLineY(), behavior: 'smooth' });
     }
   });
 
@@ -808,7 +808,7 @@
   function navigateToSection(sectionId) {
     const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
     if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToReadingLine(card);
       selectCard(card, true);
     }
   }

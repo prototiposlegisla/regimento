@@ -8113,18 +8113,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   }
 
   function getCurrentSectionId() {
-    const headerBottom = headerEl.getBoundingClientRect().bottom;
-    const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
-    let card = null;
-    for (const a of articles) {
-      const rect = a.getBoundingClientRect();
-      if (rect.top > headerBottom) break;
-      card = a;
-    }
-    if (!card) card = articles[0];
+    const card = selectedCard;
     if (!card) return '';
     // Walk backwards — first heading found is the most specific (deepest)
-    let prev = card.previousElementSibling;
+    let prev = card.classList.contains('card-titulo') ? card : card.previousElementSibling;
     while (prev) {
       if (prev.classList.contains('card-titulo') && prev.dataset.section) {
         return prev.dataset.section;

@@ -524,9 +524,8 @@ mark {
   white-space: nowrap;
   line-height: 1.1;
   text-align: center;
-  opacity: .75;
 }
-.marker-btn:hover { transform: scale(1.05); opacity: 1; }
+.marker-btn:hover { transform: scale(1.05); }
 
 #marker-filter-btn {
   min-width: 28px; height: 28px;

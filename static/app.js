@@ -199,6 +199,8 @@
           if (isHidden || rect.bottom <= headerBottom) {
             headings.push({ el: prev, level });
           }
+          // Stop at law boundary — headings before this belong to a different law
+          if (level === 'norma') break;
         }
       }
       prev = prev.previousElementSibling;

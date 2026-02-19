@@ -8139,6 +8139,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     $indexOverlay.classList.add('open');
     $indexPanel.classList.add('open');
     renderIndex();
+    $indexSearch.focus();
   }
 
   function closeIndex() {
@@ -9076,6 +9077,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   updateSelection();
   updateBreadcrumb();
   initDiffToggles();
+  $searchInput.focus();
 
 })();
 

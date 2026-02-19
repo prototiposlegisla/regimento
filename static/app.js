@@ -707,6 +707,7 @@
     $indexOverlay.classList.add('open');
     $indexPanel.classList.add('open');
     renderIndex();
+    $indexSearch.focus();
   }
 
   function closeIndex() {
@@ -1644,5 +1645,6 @@
   updateSelection();
   updateBreadcrumb();
   initDiffToggles();
+  $searchInput.focus();
 
 })();

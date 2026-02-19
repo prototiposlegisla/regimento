@@ -95,6 +95,7 @@ class HTMLRenderer:
                 path = self._update_path_ctx(child, path_ctx)
                 parts.append(self._render_unit_as_p(
                     child, is_caput=False, path=path,
+                    art_number=art.art_number,
                 ))
 
         parts.append("  </div>")
@@ -125,9 +126,34 @@ class HTMLRenderer:
 
         return ",".join(part for part in ctx if part)
 
+    def _render_indent_path(self, art_number: str, path: str) -> str:
+        """Generate per-column indent-path spans for gutter ancestry hints."""
+        segments = path.split(",")
+        parent_segments = segments[:-1]  # all but current unit
+
+        # Column 0 = art number, columns 1+ = parent segments
+        items: list[tuple[int, str]] = []
+        if art_number:
+            items.append((0, art_number))
+        for i, seg in enumerate(parent_segments):
+            # "§ 1º" → "§1", keep "§ú" as is
+            compact = re.sub(r"§\s*(\d+)º", r"§\1", seg)
+            items.append((i + 1, compact))
+
+        parts: list[str] = []
+        for col, label in items:
+            escaped = html.escape(label)
+            parts.append(
+                f'<span class="indent-path" style="--col:{col}">'
+                f'{escaped}</span>'
+            )
+        return "".join(parts)
+
     def _render_unit_as_p(
         self, unit: DocumentUnit, is_caput: bool, path: str = "",
+        art_number: str = "",
     ) -> str:
+        depth = 0
         if is_caput:
             cls_style = ""
         else:
@@ -136,8 +162,13 @@ class HTMLRenderer:
             cls_style = f' class="art-para"{depth_style}'
         uid = html.escape(unit.uid)
 
+        # Build indent-path gutter hint for deep units
+        indent_html = ""
+        if depth >= 2 and path:
+            indent_html = self._render_indent_path(art_number, path)
+
         # Build inline content
-        inner = self._render_unit_id(unit, path=path)
+        inner = indent_html + self._render_unit_id(unit, path=path)
         inner += " — "
         inner += self._render_runs_after_identifier(unit)
 

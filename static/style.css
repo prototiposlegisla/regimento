@@ -228,6 +228,22 @@ body {
   position: relative;
 }
 
+/* Indent-path gutter hints — show ancestry in the indentation columns */
+.indent-path {
+  position: absolute;
+  top: 0;
+  left: calc(16px * var(--col, 0) * var(--zoom-scale));
+  width: calc(16px * var(--zoom-scale));
+  text-align: center;
+  font-size: calc(0.55rem * var(--zoom-scale));
+  line-height: calc(1.6rem * var(--zoom-scale));
+  color: #ccc;
+  pointer-events: none;
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+}
+
 /* Indentation guides — vertical lines connecting parent indent to children */
 .card-artigo .art-para[style*="--depth:2"]::before,
 .card-artigo .art-para[style*="--depth:3"]::before {

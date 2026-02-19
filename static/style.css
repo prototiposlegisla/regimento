@@ -637,11 +637,11 @@ mark {
 .sys-nivel-subsecao { background: #2e7d32; color: #fff; border-radius: 4px; padding: 2px 6px; }
 
 .sys-law {
-  background: #e8f4fd;
+  background: #222;
   border-radius: 4px;
   padding: 6px 8px;
   margin-top: 8px;
-  color: #1a73e8;
+  color: #fff;
 }
 
 /* Subject index */

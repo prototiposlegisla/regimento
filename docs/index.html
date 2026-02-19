@@ -645,11 +645,11 @@ mark {
 .sys-nivel-subsecao { background: #2e7d32; color: #fff; border-radius: 4px; padding: 2px 6px; }
 
 .sys-law {
-  background: #e8f4fd;
+  background: #222;
   border-radius: 4px;
   padding: 6px 8px;
   margin-top: 8px;
-  color: #1a73e8;
+  color: #fff;
 }
 
 /* Subject index */
@@ -8117,7 +8117,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       const title = document.createElement('div');
       const lvl = sysLevelClass(group.section_id);
       title.className = (isLaw ? 'sys-title sys-law' : 'sys-title') + (lvl ? ' ' + lvl : '');
-      title.textContent = isLaw ? '— ' + group.title : group.title;
+      title.textContent = group.title;
       if (group.art_range && (!group.children || !group.children.length)) {
         const rangeSpan = document.createElement('span');
         rangeSpan.className = 'sys-art-range';

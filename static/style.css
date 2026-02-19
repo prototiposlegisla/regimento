@@ -488,6 +488,24 @@ mark {
 }
 .marker-btn:hover { transform: scale(1.05); opacity: 1; }
 
+#marker-filter-btn {
+  min-width: 28px; height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: #666;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: transform .15s;
+}
+#marker-filter-btn:hover { transform: scale(1.1); }
+#marker-filter-btn.visible { display: flex; }
+#marker-filter-btn.active { background: var(--selected-border); }
+
 #marker-clear-all {
   min-width: 28px; height: 28px;
   border-radius: 6px;

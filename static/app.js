@@ -36,6 +36,7 @@
   let searchMatches = [];
   let searchIdx = 0;
   let currentRefCategory = 0;
+  let markerFilter = false;
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -346,6 +347,10 @@
       cards.forEach(c => c.classList.remove('filtered-out'));
     }
 
+    if (markerFilter && markersList.length > 0) {
+      applyMarkerFilter();
+    }
+
     if (!term) {
       $btnClearSearch.style.display = 'none';
       searchMatches = [];
@@ -495,14 +500,48 @@
     }
     saveMarkers();
     applyMarkers();
+    if (markerFilter) {
+      if (markersList.length === 0) markerFilter = false;
+      preserveScroll(() => doSearch(currentSearch));
+    }
     renderMarkerNav();
   }
 
   function clearAllMarkers() {
     markersList = [];
+    markerFilter = false;
     saveMarkers();
     applyMarkers();
     renderMarkerNav();
+    preserveScroll(() => doSearch(currentSearch));
+  }
+
+  function applyMarkerFilter() {
+    const markedUids = new Set(markersList.map(m => m.uid));
+    const markedCards = new Set();
+    for (const uid of markedUids) {
+      const el = $cards.querySelector(`.unit-id[data-uid="${uid}"]`);
+      if (el) {
+        const card = el.closest('.card-artigo');
+        if (card) markedCards.add(card);
+      }
+    }
+    const cards = getAllCards();
+    for (const card of cards) {
+      if (card.classList.contains('filtered-out')) continue;
+      if (card.classList.contains('card-titulo')) {
+        card.classList.add('filtered-out');
+      } else if (card.classList.contains('card-artigo') && !markedCards.has(card)) {
+        card.classList.add('filtered-out');
+      }
+    }
+    showContextHeadings();
+  }
+
+  function toggleMarkerFilter() {
+    markerFilter = !markerFilter;
+    renderMarkerNav();
+    preserveScroll(() => doSearch(currentSearch));
   }
 
   function applyMarkers() {
@@ -582,6 +621,14 @@
     }
 
     if (markersList.length > 0) {
+      const filterBtn = document.createElement('button');
+      filterBtn.id = 'marker-filter-btn';
+      filterBtn.className = markerFilter ? 'visible active' : 'visible';
+      filterBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h14L10 7v5l-4 2V7z"/></svg>';
+      filterBtn.title = 'Mostrar apenas artigos marcados';
+      filterBtn.addEventListener('click', toggleMarkerFilter);
+      $markerNav.appendChild(filterBtn);
+
       const clearBtn = document.createElement('button');
       clearBtn.id = 'marker-clear-all';
       clearBtn.className = 'visible';

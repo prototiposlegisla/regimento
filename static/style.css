@@ -372,6 +372,16 @@ body {
 #cards-container.compact .art-compact-label {
   display: inline;
   font-weight: 700;
+  cursor: pointer;
+  padding: 1px 5px;
+  border-radius: 4px;
+  transition: background-color .2s, color .2s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#cards-container.compact .art-compact-label:hover {
+  outline: 2px solid rgba(52,152,219,.4);
+  outline-offset: 1px;
 }
 
 #cards-container.compact .art-summary {

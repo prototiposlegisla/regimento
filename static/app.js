@@ -510,6 +510,10 @@
       el.style.backgroundColor = '';
       el.style.color = '';
     });
+    $cards.querySelectorAll('.art-compact-label').forEach(el => {
+      el.style.backgroundColor = '';
+      el.style.color = '';
+    });
 
     for (const marker of markersList) {
       const el = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
@@ -517,6 +521,15 @@
       const palette = MARKER_PALETTE[marker.colorIdx];
       el.style.backgroundColor = palette.bg;
       el.style.color = palette.text;
+      // Also color the compact label if this is the caput (first unit-id in the card)
+      const card = el.closest('.card-artigo');
+      if (card && card.querySelector('.unit-id') === el) {
+        const compactLabel = card.querySelector('.art-compact-label');
+        if (compactLabel) {
+          compactLabel.style.backgroundColor = palette.bg;
+          compactLabel.style.color = palette.text;
+        }
+      }
     }
   }
 
@@ -584,6 +597,17 @@
     if (unitId) {
       e.stopPropagation();
       toggleMarker(unitId.dataset.uid);
+      return;
+    }
+    // Compact mode: tap on article label to toggle marker on caput
+    const compactLabel = e.target.closest('.art-compact-label');
+    if (compactLabel && compactMode) {
+      e.stopPropagation();
+      const card = compactLabel.closest('.card-artigo');
+      if (card) {
+        const firstUid = card.querySelector('.unit-id');
+        if (firstUid) toggleMarker(firstUid.dataset.uid);
+      }
       return;
     }
   });
@@ -1383,6 +1407,13 @@
     compactMode = on;
     $cards.classList.toggle('compact', compactMode);
     $btnCompact.classList.toggle('active', compactMode);
+    if (on) {
+      $cards.querySelectorAll('.diff-open').forEach(el => {
+        el.classList.remove('diff-open');
+        const panel = el.nextElementSibling;
+        if (panel && panel.classList.contains('diff-panel')) panel.remove();
+      });
+    }
     if (card && !card.classList.contains('filtered-out')) {
       const rect = card.getBoundingClientRect();
       const target = window.scrollY + rect.top - getReadingLineY();

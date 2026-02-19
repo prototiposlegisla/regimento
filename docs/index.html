@@ -7715,11 +7715,27 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     if (!includeFootnotes) {
       clone.querySelectorAll('.footnote-box').forEach(el => el.remove());
     }
-    return stripAccents(clone.textContent.toLowerCase());
+    return stripAccents(clone.textContent.toLowerCase()).replace(/\xa0/g, ' ');
   }
 
-  function highlightText(node, terms, includeFootnotes) {
-    if (!terms.length) return;
+  function parseSearchTerms(input) {
+    const phrases = [];
+    const words = [];
+    const normalized = stripAccents(input.toLowerCase());
+    const re = /"([^"]+)"/g;
+    let match;
+    let remaining = normalized;
+    while ((match = re.exec(normalized)) !== null) {
+      const phrase = match[1].trim();
+      if (phrase) phrases.push(phrase);
+      remaining = remaining.replace(match[0], ' ');
+    }
+    remaining.split(/\s+/).filter(Boolean).forEach(w => words.push(w));
+    return { phrases, words };
+  }
+
+  function highlightText(node, phrases, words, includeFootnotes) {
+    if (!phrases.length && !words.length) return;
     const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
     const textNodes = [];
     while (walker.nextNode()) {
@@ -7727,7 +7743,12 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       if (walker.currentNode.parentElement.closest(skip)) continue;
       textNodes.push(walker.currentNode);
     }
-    const regex = new RegExp('(' + terms.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('|') + ')', 'gi');
+    // Phrases first (longer matches take priority in alternation)
+    const allPatterns = [
+      ...phrases.map(p => accentInsensitivePattern(p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).replace(/ +/g, '[\\s\\xa0]+')),
+      ...words.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+    ];
+    const regex = new RegExp('(' + allPatterns.join('|') + ')', 'gi');
     for (const tn of textNodes) {
       if (!regex.test(tn.textContent)) continue;
       regex.lastIndex = 0;
@@ -7791,15 +7812,15 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       return;
     }
 
-    const terms = stripAccents(term.toLowerCase()).split(/\s+/).filter(Boolean);
+    const { phrases, words } = parseSearchTerms(term);
     const articleCards = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
     const matchedCards = new Set();
 
     for (const card of articleCards) {
       const text = getCardText(card, includeFootnotes);
-      if (terms.every(t => text.includes(t))) {
+      if (phrases.every(p => text.includes(p)) && words.every(t => text.includes(t))) {
         matchedCards.add(card);
-        highlightText(card, terms, includeFootnotes);
+        highlightText(card, phrases, words, includeFootnotes);
         // Open footnote boxes that contain highlights
         if (includeFootnotes) {
           card.querySelectorAll('.footnote-box').forEach(box => {

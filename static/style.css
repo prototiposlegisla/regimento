@@ -459,8 +459,10 @@ body {
 mark {
   background: #ffe066;
   color: inherit;
-  padding: 0 2px;
   border-radius: 2px;
+}
+.art-summary mark {
+  color: #1e1e30;
 }
 
 /* ===== FOOTNOTES ===== */

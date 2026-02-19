@@ -464,6 +464,15 @@
     doSearch(e.target.value.trim());
   });
 
+  $searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      $searchInput.value = '';
+      preserveScroll(() => doSearch(''));
+      $searchInput.focus();
+    }
+  });
+
   $btnClearSearch.addEventListener('click', () => {
     $searchInput.value = '';
     preserveScroll(() => doSearch(''));

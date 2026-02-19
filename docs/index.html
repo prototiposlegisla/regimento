@@ -467,8 +467,10 @@ body {
 mark {
   background: #ffe066;
   color: inherit;
-  padding: 0 2px;
   border-radius: 2px;
+}
+.art-summary mark {
+  color: #1e1e30;
 }
 
 /* ===== FOOTNOTES ===== */
@@ -7894,6 +7896,15 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
   $searchInput.addEventListener('input', (e) => {
     doSearch(e.target.value.trim());
+  });
+
+  $searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      $searchInput.value = '';
+      preserveScroll(() => doSearch(''));
+      $searchInput.blur();
+    }
   });
 
   $btnClearSearch.addEventListener('click', () => {

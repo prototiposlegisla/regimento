@@ -233,6 +233,30 @@ body {
 .card-artigo .art-para {
   margin-top: calc(6px * var(--zoom-scale));
   padding-left: calc(16px * var(--depth, 1) * var(--zoom-scale));
+  position: relative;
+}
+
+/* Indentation guides — vertical lines connecting parent indent to children */
+.card-artigo .art-para[style*="--depth:2"]::before,
+.card-artigo .art-para[style*="--depth:3"]::before {
+  content: '';
+  position: absolute;
+  top: calc(-3px * var(--zoom-scale));
+  bottom: calc(-3px * var(--zoom-scale));
+  left: calc(16px * var(--zoom-scale));
+  width: 1px;
+  background: #ddd;
+  pointer-events: none;
+}
+.card-artigo .art-para[style*="--depth:3"]::after {
+  content: '';
+  position: absolute;
+  top: calc(-3px * var(--zoom-scale));
+  bottom: calc(-3px * var(--zoom-scale));
+  left: calc(32px * var(--zoom-scale));
+  width: 1px;
+  background: #ddd;
+  pointer-events: none;
 }
 
 /* ===== REVOKED / OLD VERSIONS ===== */

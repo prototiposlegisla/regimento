@@ -345,6 +345,105 @@ def _build_once(
     return report
 
 
+def _build_markdown(
+    *,
+    args: argparse.Namespace,
+    output_dir: Path,
+    label: str,
+) -> None:
+    """Gera 3 arquivos Markdown no diretório de saída."""
+
+    t0 = time.time()
+    print(f"\n{'═' * 60}")
+    print(f"  Build: {label}")
+    print(f"{'═' * 60}")
+
+    if not output_dir.exists():
+        print(f"  ⚠ Diretório não encontrado: {output_dir}")
+        print(f"    Verifique se o Google Drive está montado.")
+        return
+
+    # ── 1. Parse DOCX (sempre com notas privadas) ─────────────────
+    print("[1/5] Parseando DOCX...")
+    from src.parse_docx import parse_docx
+
+    doc = parse_docx(args.docx, include_private=True)
+    articles = [e for e in doc.elements if hasattr(e, "art_number")]
+    print(f"      → {len(articles)} artigos")
+
+    # ── 2. Resolve amendments ─────────────────────────────────────
+    print("[2/5] Resolvendo emendas...")
+    from src.resolve_amendments import resolve_amendments
+
+    doc = resolve_amendments(doc)
+
+    # ── 3. Parse XLSX ─────────────────────────────────────────────
+    print("[3/5] Parseando XLSX...")
+    from src.parse_xlsx import parse_xlsx, parse_law_mapping
+    import re as _re
+
+    xlsx_path = Path(args.xlsx)
+    law_mapping: dict[str, str] = {}
+    subject_list: list[dict] = []
+    if xlsx_path.exists():
+        try:
+            law_mapping = parse_law_mapping(xlsx_path)
+            known_lettered: set[str] = {
+                el.art_number for el in doc.elements
+                if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
+            }
+            subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
+            subject_list = subject_index.to_list()
+            print(f"      → {len(subject_list)} assuntos")
+        except PermissionError:
+            print("      ⚠ Não foi possível abrir remissivo.xlsx")
+    else:
+        print("      → XLSX não encontrado")
+
+    # Apply law prefixes
+    if law_mapping:
+        from src.models import ArticleBlock as _AB
+
+        for el in doc.elements:
+            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping:
+                el.law_prefix = law_mapping[el.law_name]
+
+    # ── 4. Parse referências ──────────────────────────────────────
+    print("[4/5] Parseando referências...")
+    from src.parse_referencias import parse_referencias
+
+    ref_path = Path(args.referencias)
+    referencias_data: list[dict] = []
+    if ref_path.exists():
+        referencias_data = parse_referencias(ref_path)
+        print(f"      → {len(referencias_data)} categorias")
+    else:
+        print("      → DOCX de referências não encontrado")
+
+    # ── 5. Render Markdown ────────────────────────────────────────
+    print("[5/5] Renderizando Markdown...")
+    from src.render_markdown import MarkdownRenderer
+
+    renderer = MarkdownRenderer()
+
+    regimento_md = renderer.render_document(doc)
+    (output_dir / "regimento.md").write_text(regimento_md, encoding="utf-8")
+    print(f"      → regimento.md ({len(regimento_md) / 1024:.0f} KB)")
+
+    if subject_list:
+        indice_md = renderer.render_subject_index(subject_list)
+        (output_dir / "indice-remissivo.md").write_text(indice_md, encoding="utf-8")
+        print(f"      → indice-remissivo.md ({len(indice_md) / 1024:.0f} KB)")
+
+    if referencias_data:
+        refs_md = renderer.render_referencias(referencias_data)
+        (output_dir / "referencias.md").write_text(refs_md, encoding="utf-8")
+        print(f"      → referencias.md ({len(refs_md) / 1024:.0f} KB)")
+
+    elapsed = time.time() - t0
+    print(f"\n✓ {label} pronto em {elapsed:.1f}s → {output_dir}")
+
+
 def _auto_commit_and_push() -> None:
     """Faz git add + commit + push de docs/index.html."""
     public_html = BASE_DIR / "docs" / "index.html"
@@ -391,6 +490,7 @@ def main() -> int:
     default_xlsx = sources.get("xlsx", str(BASE_DIR / "remissivo.xlsx"))
     default_refs = sources.get("referencias", str(BASE_DIR / "referencias.docx"))
     default_private = output_cfg.get("private", "")
+    default_gdrive = output_cfg.get("gdrive", "")
 
     parser = argparse.ArgumentParser(
         description="Gera index.html (versão pública e/ou privada) a partir do DOCX e XLSX"
@@ -428,6 +528,14 @@ def main() -> int:
         help="Gera apenas a versão privada",
     )
     parser.add_argument(
+        "--skip-markdown", action="store_true",
+        help="Pula a geração de Markdown para Google Drive",
+    )
+    parser.add_argument(
+        "--only-markdown", action="store_true",
+        help="Gera apenas os arquivos Markdown (pula HTML)",
+    )
+    parser.add_argument(
         "--strict", action="store_true",
         help="Trata avisos como erros (exit code 1 se houver qualquer problema)",
     )
@@ -435,12 +543,15 @@ def main() -> int:
 
     if args.only_public and args.only_private:
         parser.error("--only-public e --only-private são mutuamente exclusivos")
+    if args.skip_markdown and args.only_markdown:
+        parser.error("--skip-markdown e --only-markdown são mutuamente exclusivos")
 
-    build_public = not args.only_private
-    build_private = not args.only_public and bool(default_private)
+    build_public = not args.only_private and not args.only_markdown
+    build_private = not args.only_public and bool(default_private) and not args.only_markdown
+    build_markdown = not args.skip_markdown and bool(default_gdrive)
 
-    if not build_public and not build_private:
-        print("Nada a fazer. Configure [output] private em config.local.toml ou use --only-public.")
+    if not build_public and not build_private and not build_markdown:
+        print("Nada a fazer. Configure [output] em config.local.toml.")
         return 1
 
     t_total = time.time()
@@ -463,6 +574,13 @@ def main() -> int:
             label="Versão privada (com notas privadas)",
         )
         all_reports.append(r)
+
+    if build_markdown:
+        _build_markdown(
+            args=args,
+            output_dir=Path(default_gdrive),
+            label="Markdown para Google Drive",
+        )
 
     elapsed_total = time.time() - t_total
     print(f"\n{'═' * 60}")

@@ -7898,12 +7898,24 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     doSearch(e.target.value.trim());
   });
 
+  $searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && searchMatches.length) {
+      e.preventDefault();
+      navigateSearch(e.shiftKey ? -1 : 1);
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && $searchInput.value) {
       e.preventDefault();
       $searchInput.value = '';
       preserveScroll(() => doSearch(''));
       $searchInput.focus();
+    }
+    if (e.ctrlKey && e.key === 'f') {
+      e.preventDefault();
+      $searchInput.focus();
+      $searchInput.select();
     }
   });
 

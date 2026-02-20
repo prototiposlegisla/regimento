@@ -1,0 +1,6348 @@
+{
+  "total_articles": 460,
+  "articles": [
+    {
+      "art_number": "1",
+      "is_adt": false,
+      "uids": [
+        "art1",
+        "art1p1",
+        "art1p2",
+        "art1p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "2",
+      "is_adt": false,
+      "uids": [
+        "art2",
+        "art2pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "3",
+      "is_adt": false,
+      "uids": [
+        "art3",
+        "art3p1",
+        "art3_2",
+        "art3p2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "4",
+      "is_adt": false,
+      "uids": [
+        "art4",
+        "art4p1",
+        "art4p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "5",
+      "is_adt": false,
+      "uids": [
+        "art5",
+        "art5pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "6",
+      "is_adt": false,
+      "uids": [
+        "art6",
+        "art6I",
+        "art6II",
+        "art6III",
+        "art6IV",
+        "art6V"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "7",
+      "is_adt": false,
+      "uids": [
+        "art7",
+        "art7p1",
+        "art7p1I",
+        "art7p1II",
+        "art7p1III",
+        "art7p1IV",
+        "art7p1V",
+        "art7p1VI",
+        "art7p1VII",
+        "art7p2"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "8",
+      "is_adt": false,
+      "uids": [
+        "art8",
+        "art8pu",
+        "art8pu_2",
+        "art8pu_3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "9",
+      "is_adt": false,
+      "uids": [
+        "art9",
+        "art9p1",
+        "art9p1_2",
+        "art9p2",
+        "art9p2_2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "10",
+      "is_adt": false,
+      "uids": [
+        "art10",
+        "art10p1",
+        "art10p2",
+        "art10p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "11",
+      "is_adt": false,
+      "uids": [
+        "art11"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "12",
+      "is_adt": false,
+      "uids": [
+        "art12"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "13",
+      "is_adt": false,
+      "uids": [
+        "art13",
+        "art13I",
+        "art13Ia",
+        "art13Ib",
+        "art13Ibsub1",
+        "art13Ibsub2",
+        "art13Ibsub3",
+        "art13Ibsub4",
+        "art13Ic",
+        "art13Id",
+        "art13Ie",
+        "art13II",
+        "art13IIa",
+        "art13IIb",
+        "art13IIc",
+        "art13IId",
+        "art13IIe",
+        "art13IIf",
+        "art13IIg",
+        "art13IIh"
+      ],
+      "children_count": 19,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "14",
+      "is_adt": false,
+      "uids": [
+        "art14"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "15",
+      "is_adt": false,
+      "uids": [
+        "art15"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "16",
+      "is_adt": false,
+      "uids": [
+        "art16"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "17",
+      "is_adt": false,
+      "uids": [
+        "art17",
+        "art17I",
+        "art17Ia",
+        "art17Ib",
+        "art17Ic",
+        "art17Id",
+        "art17Ie",
+        "art17If",
+        "art17Ig",
+        "art17Ih",
+        "art17Ii",
+        "art17Ij",
+        "art17Il",
+        "art17Im",
+        "art17In",
+        "art17Io",
+        "art17Ip",
+        "art17Iq",
+        "art17Ir",
+        "art17II",
+        "art17IIa",
+        "art17IIb",
+        "art17IIc",
+        "art17IId",
+        "art17IIe",
+        "art17IIf",
+        "art17IIg",
+        "art17IIh",
+        "art17IIi",
+        "art17IIj",
+        "art17IIl",
+        "art17IIm",
+        "art17IIn",
+        "art17III",
+        "art17IIIa",
+        "art17IIIb",
+        "art17IIIc",
+        "art17IV",
+        "art17IVa",
+        "art17IVb",
+        "art17IVc",
+        "art17IVd",
+        "art17V",
+        "art17Va",
+        "art17Vb",
+        "art17Vc",
+        "art17Vd",
+        "art17Ve",
+        "art17VI",
+        "art17VIa",
+        "art17VIb",
+        "art17VIc",
+        "art17VId"
+      ],
+      "children_count": 52,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "18",
+      "is_adt": false,
+      "uids": [
+        "art18",
+        "art18I",
+        "art18II",
+        "art18III",
+        "art18IV",
+        "art18IV_2",
+        "art18V",
+        "art18VI",
+        "art18VII",
+        "art18VIII",
+        "art18IX",
+        "art18X",
+        "art18XI",
+        "art18XII",
+        "art18XIII",
+        "art18XIV"
+      ],
+      "children_count": 15,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "19",
+      "is_adt": false,
+      "uids": [
+        "art19",
+        "art19pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "20",
+      "is_adt": false,
+      "uids": [
+        "art20"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "21",
+      "is_adt": false,
+      "uids": [
+        "art21",
+        "art21pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "22",
+      "is_adt": false,
+      "uids": [
+        "art22"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "23",
+      "is_adt": false,
+      "uids": [
+        "art23"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "24",
+      "is_adt": false,
+      "uids": [
+        "art24",
+        "art24p1",
+        "art24p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "25",
+      "is_adt": false,
+      "uids": [
+        "art25"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "26",
+      "is_adt": false,
+      "uids": [
+        "art26",
+        "art26I",
+        "art26II",
+        "art26III",
+        "art26IV",
+        "art26V",
+        "art26VI",
+        "art26VII",
+        "art26VIII",
+        "art26pu"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "27",
+      "is_adt": false,
+      "uids": [
+        "art27",
+        "art27pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "28",
+      "is_adt": false,
+      "uids": [
+        "art28",
+        "art28I",
+        "art28II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "29",
+      "is_adt": false,
+      "uids": [
+        "art29"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "30",
+      "is_adt": false,
+      "uids": [
+        "art30",
+        "art30pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "31",
+      "is_adt": false,
+      "uids": [
+        "art31",
+        "art31p1",
+        "art31p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "32",
+      "is_adt": false,
+      "uids": [
+        "art32",
+        "art32p1",
+        "art32p2",
+        "art32p3",
+        "art32p4",
+        "art32p5"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "33",
+      "is_adt": false,
+      "uids": [
+        "art33",
+        "art33pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "34",
+      "is_adt": false,
+      "uids": [
+        "art34",
+        "art34I",
+        "art34II",
+        "art34p1",
+        "art34p2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "35",
+      "is_adt": false,
+      "uids": [
+        "art35",
+        "art35pu",
+        "art35puI",
+        "art35puII"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "36",
+      "is_adt": false,
+      "uids": [
+        "art36"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "37",
+      "is_adt": false,
+      "uids": [
+        "art37",
+        "art37pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "38",
+      "is_adt": false,
+      "uids": [
+        "art38",
+        "art38I",
+        "art38I_2",
+        "art38II",
+        "art38II_2",
+        "art38p1",
+        "art38p1_2",
+        "art38p1_3",
+        "art38p1_4",
+        "art38p1_5",
+        "art38p1_6",
+        "art38p1_7",
+        "art38p1_8",
+        "art38p1_9",
+        "art38p2",
+        "art38p2_2",
+        "art38p2_3",
+        "art38p2_4",
+        "art38p2_5",
+        "art38p2_6",
+        "art38p2_7",
+        "art38p2_8",
+        "art38p2_9",
+        "art38p3",
+        "art38p3_2",
+        "art38p3_3",
+        "art38p4",
+        "art38p4_2",
+        "art38p4_3",
+        "art38p4_4",
+        "art38p5",
+        "art38p6",
+        "art38p7",
+        "art38p8",
+        "art38p9",
+        "art38p10"
+      ],
+      "children_count": 35,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "39",
+      "is_adt": false,
+      "uids": [
+        "art39",
+        "art39I",
+        "art39I_2",
+        "art39II",
+        "art39II_2",
+        "art39III",
+        "art39IV",
+        "art39V",
+        "art39V_2",
+        "art39V_3",
+        "art39V_4",
+        "art39VI",
+        "art39VII",
+        "art39VII_2",
+        "art39VII_3"
+      ],
+      "children_count": 14,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "40",
+      "is_adt": false,
+      "uids": [
+        "art40",
+        "art40p1",
+        "art40p2",
+        "art40p3",
+        "art40p4",
+        "art40p5"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "41",
+      "is_adt": false,
+      "uids": [
+        "art41",
+        "art41p1",
+        "art41p2",
+        "art41p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "42",
+      "is_adt": false,
+      "uids": [
+        "art42",
+        "art42pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "43",
+      "is_adt": false,
+      "uids": [
+        "art43",
+        "art43p1",
+        "art43p2",
+        "art43p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "44",
+      "is_adt": false,
+      "uids": [
+        "art44",
+        "art44p1",
+        "art44p2",
+        "art44p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "45",
+      "is_adt": false,
+      "uids": [
+        "art45",
+        "art45pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "46",
+      "is_adt": false,
+      "uids": [
+        "art46",
+        "art46I",
+        "art46Ia",
+        "art46Ib",
+        "art46II",
+        "art46III",
+        "art46IV",
+        "art46V",
+        "art46VI",
+        "art46VII",
+        "art46VIII",
+        "art46IX",
+        "art46X",
+        "art46XI",
+        "art46XII",
+        "art46XIII",
+        "art46XIV",
+        "art46XV",
+        "art46XVI"
+      ],
+      "children_count": 18,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "47",
+      "is_adt": false,
+      "uids": [
+        "art47",
+        "art47I",
+        "art47I_2",
+        "art47Ia",
+        "art47Ia_2",
+        "art47Ib",
+        "art47Ib_2",
+        "art47Ic",
+        "art47Id",
+        "art47Ie",
+        "art47II",
+        "art47IIa",
+        "art47IIb",
+        "art47IIc",
+        "art47IId",
+        "art47IIe",
+        "art47IIf",
+        "art47III",
+        "art47IIIa",
+        "art47IIIaitem1",
+        "art47IIIaitem2",
+        "art47IIIaitem3",
+        "art47IIIaitem4",
+        "art47IIIaitem5",
+        "art47IIIaitem6",
+        "art47_2",
+        "art47IIIb",
+        "art47IV",
+        "art47IVa",
+        "art47IVaitem1",
+        "art47IVaitem2",
+        "art47IVaitem3",
+        "art47IVaitem4",
+        "art47V",
+        "art47V_2",
+        "art47Va",
+        "art47Vaitem1",
+        "art47Vaitem2",
+        "art47Vaitem3",
+        "art47Vaitem4",
+        "art47Vaitem5",
+        "art47V_3",
+        "art47Va_2",
+        "art47Vaitem1_2",
+        "art47Vaitem2_2",
+        "art47Vaitem3_2",
+        "art47Vaitem4_2",
+        "art47Vaitem5_2",
+        "art47Vb",
+        "art47Vc",
+        "art47_3",
+        "art47Ve",
+        "art47Vf",
+        "art47V_4",
+        "art47Va_3",
+        "art47Vaitem1_3",
+        "art47Vaitem2_3",
+        "art47Vaitem3_3",
+        "art47Vaitem4_3",
+        "art47Vaitem5_3",
+        "art47VI",
+        "art47VIa",
+        "art47VIaitem1",
+        "art47VIaitem2",
+        "art47VIaitem3",
+        "art47VIaitem4",
+        "art47VIaitem5",
+        "art47VIaitem6",
+        "art47VIaitem7",
+        "art47VII",
+        "art47VII_2",
+        "art47VIIa",
+        "art47VIIaitem1",
+        "art47VIIaitem2",
+        "art47VIIaitem3",
+        "art47VIIaitem4",
+        "art47VIIb",
+        "art47VIIc",
+        "art47VIId",
+        "art47VIIe",
+        "art47VIIf",
+        "art47VIIg",
+        "art47VIIi",
+        "art47VIIj",
+        "art47VIIk",
+        "art47VIIl",
+        "art47VIIm",
+        "art47VII_3",
+        "art47VIIa_2",
+        "art47VIIaitem1_2",
+        "art47VIIaitem2_2",
+        "art47VIIaitem3_2",
+        "art47VIIaitem4_2",
+        "art47VIIb_2",
+        "art47VIIc_2",
+        "art47VIId_2",
+        "art47VIIe_2",
+        "art47VIIf_2",
+        "art47VIIf_3",
+        "art47VIIg_2",
+        "art47VIII",
+        "art47VIIIa",
+        "art47VIIIb",
+        "art47VIIIc",
+        "art47VIIId",
+        "art47VIII_2",
+        "art47VIIIa_2",
+        "art47VIIIb_2",
+        "art47VIIIc_2",
+        "art47VIIId_2",
+        "art47VIIIe",
+        "art47VIIIf",
+        "art47VIIIg",
+        "art47VIIIh",
+        "art47VIIIi",
+        "art47VIIIj",
+        "art47VIIIk",
+        "art47VIIIl",
+        "art47VIIIm",
+        "art47VIIIn",
+        "art47VIII_3",
+        "art47VIIIa_3",
+        "art47VIIIb_3",
+        "art47VIIIc_3",
+        "art47VIIId_3",
+        "art47VIIIe_2",
+        "art47VIIIf_2",
+        "art47VIIIg_2",
+        "art47VIII_4",
+        "art47VIIIa_4",
+        "art47VIIIb_4",
+        "art47VIIIc_4",
+        "art47VIIId_4",
+        "art47IX",
+        "art47IXa",
+        "art47IXb",
+        "art47IXc",
+        "art47IXd",
+        "art47IXe",
+        "art47IX_2",
+        "art47IXa_2",
+        "art47IXb_2",
+        "art47IXc_2",
+        "art47IXd_2",
+        "art47IXe_2",
+        "art47IXf",
+        "art47IXg",
+        "art47IXh",
+        "art47IXi",
+        "art47IXi_2",
+        "art47X",
+        "art47Xa",
+        "art47Xb",
+        "art47Xc",
+        "art47Xd",
+        "art47Xe",
+        "art47X_2",
+        "art47Xa_2",
+        "art47Xb_2",
+        "art47Xc_2",
+        "art47Xd_2",
+        "art47Xe_2",
+        "art47Xf",
+        "art47XI",
+        "art47XIa",
+        "art47XIb",
+        "art47XIc",
+        "art47XId",
+        "art47XI_2",
+        "art47XI_3",
+        "art47XIa_2",
+        "art47XIb_2",
+        "art47XIc_2",
+        "art47XId_2",
+        "art47XIe",
+        "art47XIf",
+        "art47XIg",
+        "art47XIh",
+        "art47XIi",
+        "art47XIj",
+        "art47XIk",
+        "art47XII",
+        "art47XIIa",
+        "art47XIIb",
+        "art47XIIc",
+        "art47XII_2",
+        "art47XIIa_2",
+        "art47XIIb_2",
+        "art47XIIc_2",
+        "art47XIId",
+        "art47XIIe",
+        "art47XIIf",
+        "art47XIIg",
+        "art47XIIh",
+        "art47XIIi",
+        "art47XIII",
+        "art47XIIIa",
+        "art47XIIIb",
+        "art47XIIIc",
+        "art47XIIId",
+        "art47XIIIe",
+        "art47XIIIf",
+        "art47XIII_2",
+        "art47XIIIa_2",
+        "art47XIIIb_2",
+        "art47XIIIc_2",
+        "art47XIIId_2",
+        "art47XIIIe_2",
+        "art47XIIIf_2",
+        "art47XIIIg",
+        "art47XIIIh",
+        "art47XIIIi",
+        "art47XIV",
+        "art47XIVa",
+        "art47XIVb",
+        "art47XIVc",
+        "art47XIVd",
+        "art47XIVe",
+        "art47XIVf",
+        "art47XIVg",
+        "art47XIV_2",
+        "art47XIV_3",
+        "art47I_3",
+        "art47Ia_3",
+        "art47II_2",
+        "art47IIb_2",
+        "art47III_2",
+        "art47IIIc",
+        "art47IV_2",
+        "art47IVd",
+        "art47V_5",
+        "art47Ve_2",
+        "art47XV",
+        "art47XVa",
+        "art47XVb",
+        "art47XVc",
+        "art47XVd",
+        "art47XVe",
+        "art47XV_2",
+        "art47XVa_2",
+        "art47XVb_2",
+        "art47XVc_2",
+        "art47XVd_2",
+        "art47XVe_2"
+      ],
+      "children_count": 243,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "48",
+      "is_adt": false,
+      "uids": [
+        "art48"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "49",
+      "is_adt": false,
+      "uids": [
+        "art49"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "50",
+      "is_adt": false,
+      "uids": [
+        "art50",
+        "art50I",
+        "art50II",
+        "art50III",
+        "art50IV",
+        "art50V",
+        "art50VI",
+        "art50VII",
+        "art50VIII",
+        "art50IX",
+        "art50X",
+        "art50XI",
+        "art50XII",
+        "art50XIII",
+        "art50XIV",
+        "art50XV",
+        "art50XVI",
+        "art50XVII",
+        "art50XVIII",
+        "art50XIX",
+        "art50XX",
+        "art50pu"
+      ],
+      "children_count": 21,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "51",
+      "is_adt": false,
+      "uids": [
+        "art51"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "52",
+      "is_adt": false,
+      "uids": [
+        "art52",
+        "art52I",
+        "art52II",
+        "art52III",
+        "art52pu"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "53",
+      "is_adt": false,
+      "uids": [
+        "art53"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "54",
+      "is_adt": false,
+      "uids": [
+        "art54"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "55",
+      "is_adt": false,
+      "uids": [
+        "art55",
+        "art55I",
+        "art55II",
+        "art55p1",
+        "art55p2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "56",
+      "is_adt": false,
+      "uids": [
+        "art56"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "57",
+      "is_adt": false,
+      "uids": [
+        "art57",
+        "art57I",
+        "art57I_2",
+        "art57I_3",
+        "art57II",
+        "art57p1",
+        "art57p2",
+        "art57p3"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "58",
+      "is_adt": false,
+      "uids": [
+        "art58",
+        "art58pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "59",
+      "is_adt": false,
+      "uids": [
+        "art59",
+        "art59pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "60",
+      "is_adt": false,
+      "uids": [
+        "art60",
+        "art60pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "61",
+      "is_adt": false,
+      "uids": [
+        "art61",
+        "art61pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "62",
+      "is_adt": false,
+      "uids": [
+        "art62",
+        "art62pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "63",
+      "is_adt": false,
+      "uids": [
+        "art63",
+        "art63p1",
+        "art63p2",
+        "art63p3",
+        "art63p4",
+        "art63p5",
+        "art63p6"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "64",
+      "is_adt": false,
+      "uids": [
+        "art64"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "65",
+      "is_adt": false,
+      "uids": [
+        "art65",
+        "art65pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "66",
+      "is_adt": false,
+      "uids": [
+        "art66",
+        "art66pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "67",
+      "is_adt": false,
+      "uids": [
+        "art67",
+        "art67pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "68",
+      "is_adt": false,
+      "uids": [
+        "art68",
+        "art68p1",
+        "art68p2",
+        "art68p3",
+        "art68p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "69",
+      "is_adt": false,
+      "uids": [
+        "art69"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "70",
+      "is_adt": false,
+      "uids": [
+        "art70"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "71",
+      "is_adt": false,
+      "uids": [
+        "art71",
+        "art71pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "72",
+      "is_adt": false,
+      "uids": [
+        "art72"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "73",
+      "is_adt": false,
+      "uids": [
+        "art73"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "74",
+      "is_adt": false,
+      "uids": [
+        "art74",
+        "art74pu",
+        "art74puI",
+        "art74puII",
+        "art74puIII"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "75",
+      "is_adt": false,
+      "uids": [
+        "art75",
+        "art75p1",
+        "art75p2",
+        "art75p3",
+        "art75p4",
+        "art75p5",
+        "art75p6"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "76",
+      "is_adt": false,
+      "uids": [
+        "art76",
+        "art76I",
+        "art76II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "77",
+      "is_adt": false,
+      "uids": [
+        "art77",
+        "art77I",
+        "art77II",
+        "art77III",
+        "art77p1",
+        "art77p2",
+        "art77p3"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "78",
+      "is_adt": false,
+      "uids": [
+        "art78"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "79",
+      "is_adt": false,
+      "uids": [
+        "art79",
+        "art79pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "80",
+      "is_adt": false,
+      "uids": [
+        "art80"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "81",
+      "is_adt": false,
+      "uids": [
+        "art81",
+        "art81I",
+        "art81II",
+        "art81III",
+        "art81IV",
+        "art81pu"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "82",
+      "is_adt": false,
+      "uids": [
+        "art82",
+        "art82p1",
+        "art82p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "83",
+      "is_adt": false,
+      "uids": [
+        "art83",
+        "art83p1",
+        "art83p2",
+        "art83p3",
+        "art83p4",
+        "art83p5"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "84",
+      "is_adt": false,
+      "uids": [
+        "art84",
+        "art84I",
+        "art84II",
+        "art84pu"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "85",
+      "is_adt": false,
+      "uids": [
+        "art85",
+        "art85I",
+        "art85II",
+        "art85III",
+        "art85IV",
+        "art85pu",
+        "art85p1",
+        "art85p2",
+        "art85p3"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "86",
+      "is_adt": false,
+      "uids": [
+        "art86",
+        "art86I",
+        "art86II",
+        "art86III",
+        "art86p1",
+        "art86p2",
+        "art86p3",
+        "art86p4",
+        "art86p5",
+        "art86p6"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "87",
+      "is_adt": false,
+      "uids": [
+        "art87",
+        "art87I",
+        "art87II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "88",
+      "is_adt": false,
+      "uids": [
+        "art88",
+        "art88p1",
+        "art88p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "89",
+      "is_adt": false,
+      "uids": [
+        "art89",
+        "art89I",
+        "art89II",
+        "art89III"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "90",
+      "is_adt": false,
+      "uids": [
+        "art90"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "91",
+      "is_adt": false,
+      "uids": [
+        "art91",
+        "art91p1",
+        "art91p1_2",
+        "art91p1_3",
+        "art91p2",
+        "art91p2_2",
+        "art91p2I",
+        "art91p2II",
+        "art91p3",
+        "art91p3_2",
+        "art91p4"
+      ],
+      "children_count": 10,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "92",
+      "is_adt": false,
+      "uids": [
+        "art92",
+        "art92I",
+        "art92II",
+        "art92III"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "93",
+      "is_adt": false,
+      "uids": [
+        "art93",
+        "art93I",
+        "art93II",
+        "art93III",
+        "art93III_2",
+        "art93III_3",
+        "art93p1",
+        "art93p2"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "94",
+      "is_adt": false,
+      "uids": [
+        "art94",
+        "art94pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "95",
+      "is_adt": false,
+      "uids": [
+        "art95",
+        "art95pu"
+      ],
+      "children_count": 1,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "96",
+      "is_adt": false,
+      "uids": [
+        "art96"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "97",
+      "is_adt": false,
+      "uids": [
+        "art97",
+        "art97pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "98",
+      "is_adt": false,
+      "uids": [
+        "art98",
+        "art98pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "99",
+      "is_adt": false,
+      "uids": [
+        "art99",
+        "art99p1",
+        "art99p1_2",
+        "art99p2",
+        "art99p2_2",
+        "art99p3",
+        "art99p4"
+      ],
+      "children_count": 6,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "100",
+      "is_adt": false,
+      "uids": [
+        "art100",
+        "art100pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "101",
+      "is_adt": false,
+      "uids": [
+        "art101"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "102",
+      "is_adt": false,
+      "uids": [
+        "art102",
+        "art102I",
+        "art102II",
+        "art102III",
+        "art102IV",
+        "art102p1",
+        "art102p2",
+        "art102p3",
+        "art102p4",
+        "art102p5"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "103",
+      "is_adt": false,
+      "uids": [
+        "art103",
+        "art103I",
+        "art103Ia",
+        "art103Ib",
+        "art103Ic",
+        "art103Id",
+        "art103Ie",
+        "art103If",
+        "art103Ig",
+        "art103Ih",
+        "art103Ii",
+        "art103Ij",
+        "art103Il",
+        "art103Im",
+        "art103In",
+        "art103Io",
+        "art103Ip",
+        "art103Iq",
+        "art103Ir",
+        "art103Is",
+        "art103It",
+        "art103II",
+        "art103IIa",
+        "art103IIb",
+        "art103III",
+        "art103IIIa",
+        "art103IIIb",
+        "art103IIIc",
+        "art103IIId"
+      ],
+      "children_count": 28,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "104",
+      "is_adt": false,
+      "uids": [
+        "art104"
+      ],
+      "children_count": 0,
+      "versions_count": 4,
+      "has_summary": true
+    },
+    {
+      "art_number": "105",
+      "is_adt": false,
+      "uids": [
+        "art105",
+        "art105I",
+        "art105II",
+        "art105III",
+        "art105IV",
+        "art105V",
+        "art105VI",
+        "art105VII",
+        "art105VIII",
+        "art105IX",
+        "art105X",
+        "art105XI",
+        "art105XII",
+        "art105XIII",
+        "art105XIV",
+        "art105XV",
+        "art105XVI",
+        "art105XVII",
+        "art105XVIII",
+        "art105XIX",
+        "art105XX",
+        "art105XXI",
+        "art105XXII",
+        "art105XXIII",
+        "art105XXIV",
+        "art105XXV",
+        "art105XXVI",
+        "art105XXVII",
+        "art105XXVIII",
+        "art105XXIX",
+        "art105XXX",
+        "art105XXXI",
+        "art105XXXII",
+        "art105XXXIII",
+        "art105XXXIV"
+      ],
+      "children_count": 34,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "106",
+      "is_adt": false,
+      "uids": [
+        "art106",
+        "art106p1",
+        "art106p2",
+        "art106p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "107",
+      "is_adt": false,
+      "uids": [
+        "art107"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "108",
+      "is_adt": false,
+      "uids": [
+        "art108"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "109",
+      "is_adt": false,
+      "uids": [
+        "art109",
+        "art109I",
+        "art109II",
+        "art109II_2",
+        "art109III",
+        "art109IV",
+        "art109V",
+        "art109VI",
+        "art109VII",
+        "art109VIII"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "110",
+      "is_adt": false,
+      "uids": [
+        "art110"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "111",
+      "is_adt": false,
+      "uids": [
+        "art111",
+        "art111p1",
+        "art111p2"
+      ],
+      "children_count": 2,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "112",
+      "is_adt": false,
+      "uids": [
+        "art112",
+        "art112I",
+        "art112II",
+        "art112III",
+        "art112IV",
+        "art112p1",
+        "art112p2",
+        "art112p3",
+        "art112p3a",
+        "art112p3b",
+        "art112p3b_2",
+        "art112p3c",
+        "art112p3d"
+      ],
+      "children_count": 12,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "113",
+      "is_adt": false,
+      "uids": [
+        "art113"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "114",
+      "is_adt": false,
+      "uids": [
+        "art114"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "115",
+      "is_adt": false,
+      "uids": [
+        "art115"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "116",
+      "is_adt": false,
+      "uids": [
+        "art116"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "117",
+      "is_adt": false,
+      "uids": [
+        "art117"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "118",
+      "is_adt": false,
+      "uids": [
+        "art118",
+        "art118pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "119",
+      "is_adt": false,
+      "uids": [
+        "art119",
+        "art119p1",
+        "art119p2",
+        "art119p3",
+        "art119p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "120",
+      "is_adt": false,
+      "uids": [
+        "art120",
+        "art120I",
+        "art120II",
+        "art120III",
+        "art120IV",
+        "art120V"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "121",
+      "is_adt": false,
+      "uids": [
+        "art121"
+      ],
+      "children_count": 0,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "122",
+      "is_adt": false,
+      "uids": [
+        "art122",
+        "art122pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "123",
+      "is_adt": false,
+      "uids": [
+        "art123"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "124",
+      "is_adt": false,
+      "uids": [
+        "art124"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "125",
+      "is_adt": false,
+      "uids": [
+        "art125",
+        "art125I",
+        "art125II",
+        "art125III",
+        "art125IV",
+        "art125V",
+        "art125VI",
+        "art125p1",
+        "art125p2",
+        "art125p3"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "126",
+      "is_adt": false,
+      "uids": [
+        "art126",
+        "art126I",
+        "art126II",
+        "art126III"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "127",
+      "is_adt": false,
+      "uids": [
+        "art127"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "128",
+      "is_adt": false,
+      "uids": [
+        "art128"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "129",
+      "is_adt": false,
+      "uids": [
+        "art129",
+        "art129I",
+        "art129II",
+        "art129p1",
+        "art129p2",
+        "art129p3"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "130",
+      "is_adt": false,
+      "uids": [
+        "art130",
+        "art130pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "131",
+      "is_adt": false,
+      "uids": [
+        "art131"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "132",
+      "is_adt": false,
+      "uids": [
+        "art132",
+        "art132I",
+        "art132II",
+        "art132III",
+        "art132IV",
+        "art132I_2",
+        "art132II_2",
+        "art132III_2",
+        "art132IV_2",
+        "art132V",
+        "art132pu",
+        "art132p1",
+        "art132p2",
+        "art132p3"
+      ],
+      "children_count": 13,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "133",
+      "is_adt": false,
+      "uids": [
+        "art133"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "134",
+      "is_adt": false,
+      "uids": [
+        "art134",
+        "art134pu",
+        "art134p1",
+        "art134p2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "135",
+      "is_adt": false,
+      "uids": [
+        "art135",
+        "art135pu",
+        "art135p1",
+        "art135p2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "136",
+      "is_adt": false,
+      "uids": [
+        "art136"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "137",
+      "is_adt": false,
+      "uids": [
+        "art137",
+        "art137pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "138",
+      "is_adt": false,
+      "uids": [
+        "art138",
+        "art138pu"
+      ],
+      "children_count": 1,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "139",
+      "is_adt": false,
+      "uids": [
+        "art139",
+        "art139I",
+        "art139II",
+        "art139III",
+        "art139IV",
+        "art139V",
+        "art139VI",
+        "art139VII"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "140",
+      "is_adt": false,
+      "uids": [
+        "art140",
+        "art140I",
+        "art140II",
+        "art140III",
+        "art140IV",
+        "art140V",
+        "art140VI",
+        "art140VII",
+        "art140VIII",
+        "art140IX",
+        "art140X",
+        "art140XI",
+        "art140XII",
+        "art140XIII",
+        "art140XIV"
+      ],
+      "children_count": 14,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "141",
+      "is_adt": false,
+      "uids": [
+        "art141",
+        "art141I",
+        "art141II",
+        "art141III",
+        "art141IV",
+        "art141pu"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "142",
+      "is_adt": false,
+      "uids": [
+        "art142",
+        "art142I",
+        "art142II",
+        "art142III"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "143",
+      "is_adt": false,
+      "uids": [
+        "art143",
+        "art143p1",
+        "art143p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "144",
+      "is_adt": false,
+      "uids": [
+        "art144",
+        "art144p1",
+        "art144p2",
+        "art144p3",
+        "art144p4",
+        "art144p5",
+        "art144p6"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "145",
+      "is_adt": false,
+      "uids": [
+        "art145"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "146",
+      "is_adt": false,
+      "uids": [
+        "art146"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "147",
+      "is_adt": false,
+      "uids": [
+        "art147",
+        "art147p1",
+        "art147p2",
+        "art147p3",
+        "art147p4",
+        "art147p5",
+        "art147p6",
+        "art147p7"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "148",
+      "is_adt": false,
+      "uids": [
+        "art148"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "149",
+      "is_adt": false,
+      "uids": [
+        "art149"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "150",
+      "is_adt": false,
+      "uids": [
+        "art150",
+        "art150pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "151",
+      "is_adt": false,
+      "uids": [
+        "art151"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "152",
+      "is_adt": false,
+      "uids": [
+        "art152",
+        "art152I",
+        "art152II",
+        "art152III",
+        "art152IV",
+        "art152V"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "153",
+      "is_adt": false,
+      "uids": [
+        "art153",
+        "art153p1",
+        "art153p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "154",
+      "is_adt": false,
+      "uids": [
+        "art154"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "155",
+      "is_adt": false,
+      "uids": [
+        "art155"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "156",
+      "is_adt": false,
+      "uids": [
+        "art156"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "157",
+      "is_adt": false,
+      "uids": [
+        "art157",
+        "art157p1",
+        "art157p2",
+        "art157p3",
+        "art157p4",
+        "art157p5",
+        "art157p6"
+      ],
+      "children_count": 6,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "158",
+      "is_adt": false,
+      "uids": [
+        "art158"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "159",
+      "is_adt": false,
+      "uids": [
+        "art159"
+      ],
+      "children_count": 0,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "160",
+      "is_adt": false,
+      "uids": [
+        "art160",
+        "art160p1",
+        "art160p2",
+        "art160p3",
+        "art160p4",
+        "art160p5",
+        "art160p6",
+        "art160p7",
+        "art160p8"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "161",
+      "is_adt": false,
+      "uids": [
+        "art161"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "162",
+      "is_adt": false,
+      "uids": [
+        "art162"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "is_revoked": true
+    },
+    {
+      "art_number": "163",
+      "is_adt": false,
+      "uids": [
+        "art163"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "164",
+      "is_adt": false,
+      "uids": [
+        "art164",
+        "art164I",
+        "art164II",
+        "art164III",
+        "art164IIIa",
+        "art164IIIb",
+        "art164IIIc",
+        "art164IIId",
+        "art164IV",
+        "art164p1",
+        "art164p2",
+        "art164p3"
+      ],
+      "children_count": 11,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "165",
+      "is_adt": false,
+      "uids": [
+        "art165"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "166",
+      "is_adt": false,
+      "uids": [
+        "art166",
+        "art166p1",
+        "art166p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "167",
+      "is_adt": false,
+      "uids": [
+        "art167",
+        "art167p1",
+        "art167p2",
+        "art167p3",
+        "art167p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "168",
+      "is_adt": false,
+      "uids": [
+        "art168",
+        "art168pu"
+      ],
+      "children_count": 1,
+      "versions_count": 2,
+      "has_summary": true
+    },
+    {
+      "art_number": "169",
+      "is_adt": false,
+      "uids": [
+        "art169",
+        "art169pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "170",
+      "is_adt": false,
+      "uids": [
+        "art170",
+        "art170pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "171",
+      "is_adt": false,
+      "uids": [
+        "art171",
+        "art171I",
+        "art171II",
+        "art171III",
+        "art171IV",
+        "art171V",
+        "art171VI",
+        "art171VII",
+        "art171VIIa",
+        "art171VIIb",
+        "art171VIIc",
+        "art171p1",
+        "art171p1I",
+        "art171p1II",
+        "art171p1III",
+        "art171p1IV",
+        "art171p2",
+        "art171p2I",
+        "art171p2II",
+        "art171p2III",
+        "art171p2IV",
+        "art171p3",
+        "art171p4"
+      ],
+      "children_count": 22,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "172",
+      "is_adt": false,
+      "uids": [
+        "art172",
+        "art172I",
+        "art172II",
+        "art172III",
+        "art172IV",
+        "art172V",
+        "art172VI"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "173",
+      "is_adt": false,
+      "uids": [
+        "art173",
+        "art173p1",
+        "art173p2",
+        "art173p3",
+        "art173p4",
+        "art173p5"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "174",
+      "is_adt": false,
+      "uids": [
+        "art174",
+        "art174p1",
+        "art174p2",
+        "art174p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "175",
+      "is_adt": false,
+      "uids": [
+        "art175",
+        "art175I",
+        "art175II",
+        "art175III",
+        "art175IV",
+        "art175pu"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "176",
+      "is_adt": false,
+      "uids": [
+        "art176",
+        "art176p1",
+        "art176p2",
+        "art176p3",
+        "art176p4",
+        "art176p5",
+        "art176p6",
+        "art176p7",
+        "art176p8",
+        "art176p9",
+        "art176p10",
+        "art176p11"
+      ],
+      "children_count": 11,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "177",
+      "is_adt": false,
+      "uids": [
+        "art177",
+        "art177I",
+        "art177II",
+        "art177pu"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "178",
+      "is_adt": false,
+      "uids": [
+        "art178"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "179",
+      "is_adt": false,
+      "uids": [
+        "art179"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "180",
+      "is_adt": false,
+      "uids": [
+        "art180",
+        "art180pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "181",
+      "is_adt": false,
+      "uids": [
+        "art181"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "182",
+      "is_adt": false,
+      "uids": [
+        "art182"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "183",
+      "is_adt": false,
+      "uids": [
+        "art183",
+        "art183I",
+        "art183I_2",
+        "art183II",
+        "art183III",
+        "art183p1",
+        "art183p2",
+        "art183p3"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "183-A",
+      "is_adt": false,
+      "uids": [
+        "art183-A",
+        "art183-AI",
+        "art183-AII",
+        "art183-AIII",
+        "art183-AIV",
+        "art183-Ap1",
+        "art183-Ap2",
+        "art183-Ap3",
+        "art183-Ap4",
+        "art183-Ap5",
+        "art183-Ap6",
+        "art183-Ap7",
+        "art183-Ap8",
+        "art183-Ap9",
+        "art183-Ap10",
+        "art183-Ap11",
+        "art183-Ap12",
+        "art183-Ap13"
+      ],
+      "children_count": 17,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "184",
+      "is_adt": false,
+      "uids": [
+        "art184",
+        "art184pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "185",
+      "is_adt": false,
+      "uids": [
+        "art185"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "186",
+      "is_adt": false,
+      "uids": [
+        "art186",
+        "art186pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "187",
+      "is_adt": false,
+      "uids": [
+        "art187"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "188",
+      "is_adt": false,
+      "uids": [
+        "art188"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "189",
+      "is_adt": false,
+      "uids": [
+        "art189",
+        "art189p1",
+        "art189p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "190",
+      "is_adt": false,
+      "uids": [
+        "art190"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "191",
+      "is_adt": false,
+      "uids": [
+        "art191",
+        "art191I",
+        "art191II",
+        "art191III",
+        "art191IV"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "192",
+      "is_adt": false,
+      "uids": [
+        "art192",
+        "art192I",
+        "art192II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "193",
+      "is_adt": false,
+      "uids": [
+        "art193"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "194",
+      "is_adt": false,
+      "uids": [
+        "art194"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "195",
+      "is_adt": false,
+      "uids": [
+        "art195"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "196",
+      "is_adt": false,
+      "uids": [
+        "art196"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "197",
+      "is_adt": false,
+      "uids": [
+        "art197"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "198",
+      "is_adt": false,
+      "uids": [
+        "art198"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "199",
+      "is_adt": false,
+      "uids": [
+        "art199"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "200",
+      "is_adt": false,
+      "uids": [
+        "art200"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "201",
+      "is_adt": false,
+      "uids": [
+        "art201"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "202",
+      "is_adt": false,
+      "uids": [
+        "art202"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "203",
+      "is_adt": false,
+      "uids": [
+        "art203"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "204",
+      "is_adt": false,
+      "uids": [
+        "art204"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "205",
+      "is_adt": false,
+      "uids": [
+        "art205",
+        "art205pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "206",
+      "is_adt": false,
+      "uids": [
+        "art206"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "207",
+      "is_adt": false,
+      "uids": [
+        "art207",
+        "art207p1",
+        "art207p2",
+        "art207p3",
+        "art207p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "208",
+      "is_adt": false,
+      "uids": [
+        "art208",
+        "art208pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "209",
+      "is_adt": false,
+      "uids": [
+        "art209",
+        "art209p1",
+        "art209p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "210",
+      "is_adt": false,
+      "uids": [
+        "art210"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "211",
+      "is_adt": false,
+      "uids": [
+        "art211",
+        "art211I",
+        "art211II",
+        "art211III",
+        "art211IV",
+        "art211V",
+        "art211VI",
+        "art211VII",
+        "art211VIII",
+        "art211pu"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "212",
+      "is_adt": false,
+      "uids": [
+        "art212",
+        "art212I",
+        "art212II",
+        "art212III",
+        "art212IV",
+        "art212p1",
+        "art212p2"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "212-A",
+      "is_adt": false,
+      "uids": [
+        "art212-A",
+        "art212-Ap1",
+        "art212-Ap2",
+        "art212-Ap3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "213",
+      "is_adt": false,
+      "uids": [
+        "art213"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "214",
+      "is_adt": false,
+      "uids": [
+        "art214",
+        "art214pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "215",
+      "is_adt": false,
+      "uids": [
+        "art215"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "216",
+      "is_adt": false,
+      "uids": [
+        "art216"
+      ],
+      "children_count": 0,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "217",
+      "is_adt": false,
+      "uids": [
+        "art217",
+        "art217p1",
+        "art217p2",
+        "art217p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "218",
+      "is_adt": false,
+      "uids": [
+        "art218"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "219",
+      "is_adt": false,
+      "uids": [
+        "art219",
+        "art219pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "220",
+      "is_adt": false,
+      "uids": [
+        "art220"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "221",
+      "is_adt": false,
+      "uids": [
+        "art221",
+        "art221I",
+        "art221Ia",
+        "art221Ib",
+        "art221II",
+        "art221IIa",
+        "art221IIb",
+        "art221III",
+        "art221IIIa",
+        "art221IIIb",
+        "art221IIIc"
+      ],
+      "children_count": 10,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "222",
+      "is_adt": false,
+      "uids": [
+        "art222"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "223",
+      "is_adt": false,
+      "uids": [
+        "art223",
+        "art223I",
+        "art223II",
+        "art223III",
+        "art223IV",
+        "art223V",
+        "art223VI",
+        "art223VII",
+        "art223VIII",
+        "art223IX",
+        "art223X",
+        "art223XI",
+        "art223XII",
+        "art223XIII",
+        "art223pu",
+        "art223puXIV",
+        "art223puXV",
+        "art223p1",
+        "art223p2",
+        "art223p2_2"
+      ],
+      "children_count": 19,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "224",
+      "is_adt": false,
+      "uids": [
+        "art224"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "225",
+      "is_adt": false,
+      "uids": [
+        "art225",
+        "art225I",
+        "art225II",
+        "art225III",
+        "art225IV",
+        "art225V",
+        "art225VI",
+        "art225VII",
+        "art225VIII",
+        "art225VIII_2",
+        "art225VIII_3",
+        "art225IX",
+        "art225X",
+        "art225p1",
+        "art225p1_2",
+        "art225p1_3",
+        "art225p2",
+        "art225p3"
+      ],
+      "children_count": 17,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "226",
+      "is_adt": false,
+      "uids": [
+        "art226",
+        "art226I",
+        "art226I_2",
+        "art226II",
+        "art226II_2",
+        "art226III",
+        "art226III_2",
+        "art226IV",
+        "art226IV_2",
+        "art226V",
+        "art226V_2",
+        "art226VI",
+        "art226VII",
+        "art226pu",
+        "art226p1",
+        "art226p2",
+        "art226pu_2"
+      ],
+      "children_count": 16,
+      "versions_count": 2,
+      "has_summary": true
+    },
+    {
+      "art_number": "227",
+      "is_adt": false,
+      "uids": [
+        "art227"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "228",
+      "is_adt": false,
+      "uids": [
+        "art228",
+        "art228pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "229",
+      "is_adt": false,
+      "uids": [
+        "art229"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "230",
+      "is_adt": false,
+      "uids": [
+        "art230"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "231",
+      "is_adt": false,
+      "uids": [
+        "art231"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "232",
+      "is_adt": false,
+      "uids": [
+        "art232",
+        "art232I",
+        "art232II",
+        "art232III",
+        "art232IV"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "233",
+      "is_adt": false,
+      "uids": [
+        "art233",
+        "art233p1",
+        "art233p2",
+        "art233p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "234",
+      "is_adt": false,
+      "uids": [
+        "art234",
+        "art234p1",
+        "art234p1I",
+        "art234p1II",
+        "art234p1III",
+        "art234p1IV",
+        "art234p1V",
+        "art234p2"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "235",
+      "is_adt": false,
+      "uids": [
+        "art235",
+        "art235pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "236",
+      "is_adt": false,
+      "uids": [
+        "art236",
+        "art236pu",
+        "art236puI",
+        "art236puII"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "237",
+      "is_adt": false,
+      "uids": [
+        "art237",
+        "art237pu",
+        "art237puI",
+        "art237puII",
+        "art237puIII",
+        "art237puIV",
+        "art237puV",
+        "art237puVI"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "238",
+      "is_adt": false,
+      "uids": [
+        "art238",
+        "art238I",
+        "art238II",
+        "art238III",
+        "art238IV",
+        "art238V",
+        "art238VI"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "239",
+      "is_adt": false,
+      "uids": [
+        "art239",
+        "art239p1",
+        "art239p2",
+        "art239p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "240",
+      "is_adt": false,
+      "uids": [
+        "art240",
+        "art240pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "241",
+      "is_adt": false,
+      "uids": [
+        "art241"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "242",
+      "is_adt": false,
+      "uids": [
+        "art242",
+        "art242pu",
+        "art242p1",
+        "art242p2",
+        "art242p2_2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "243",
+      "is_adt": false,
+      "uids": [
+        "art243",
+        "art243pu",
+        "art243puI",
+        "art243puII",
+        "art243puIII",
+        "art243puIV",
+        "art243puV",
+        "art243puVI",
+        "art243puVII",
+        "art243puVIII",
+        "art243puIX",
+        "art243puX"
+      ],
+      "children_count": 11,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "244",
+      "is_adt": false,
+      "uids": [
+        "art244"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "245",
+      "is_adt": false,
+      "uids": [
+        "art245",
+        "art245p1",
+        "art245p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "246",
+      "is_adt": false,
+      "uids": [
+        "art246"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "247",
+      "is_adt": false,
+      "uids": [
+        "art247",
+        "art247p1",
+        "art247p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "248",
+      "is_adt": false,
+      "uids": [
+        "art248"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "249",
+      "is_adt": false,
+      "uids": [
+        "art249"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "250",
+      "is_adt": false,
+      "uids": [
+        "art250"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "251",
+      "is_adt": false,
+      "uids": [
+        "art251",
+        "art251pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "252",
+      "is_adt": false,
+      "uids": [
+        "art252",
+        "art252p1",
+        "art252p2",
+        "art252p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "253",
+      "is_adt": false,
+      "uids": [
+        "art253",
+        "art253p1",
+        "art253p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "254",
+      "is_adt": false,
+      "uids": [
+        "art254"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "255",
+      "is_adt": false,
+      "uids": [
+        "art255",
+        "art255pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "256",
+      "is_adt": false,
+      "uids": [
+        "art256"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "257",
+      "is_adt": false,
+      "uids": [
+        "art257"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "258",
+      "is_adt": false,
+      "uids": [
+        "art258"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "259",
+      "is_adt": false,
+      "uids": [
+        "art259",
+        "art259pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "260",
+      "is_adt": false,
+      "uids": [
+        "art260"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "261",
+      "is_adt": false,
+      "uids": [
+        "art261",
+        "art261p1",
+        "art261p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "262",
+      "is_adt": false,
+      "uids": [
+        "art262",
+        "art262p1",
+        "art262p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "263",
+      "is_adt": false,
+      "uids": [
+        "art263"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "264",
+      "is_adt": false,
+      "uids": [
+        "art264"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "265",
+      "is_adt": false,
+      "uids": [
+        "art265",
+        "art265pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "266",
+      "is_adt": false,
+      "uids": [
+        "art266",
+        "art266p1",
+        "art266p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "267",
+      "is_adt": false,
+      "uids": [
+        "art267"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "268",
+      "is_adt": false,
+      "uids": [
+        "art268"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "269",
+      "is_adt": false,
+      "uids": [
+        "art269",
+        "art269p1",
+        "art269p2",
+        "art269p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "270",
+      "is_adt": false,
+      "uids": [
+        "art270",
+        "art270p1",
+        "art270p2",
+        "art270p3",
+        "art270p4",
+        "art270p5",
+        "art270p6"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "271",
+      "is_adt": false,
+      "uids": [
+        "art271",
+        "art271pu",
+        "art271p1",
+        "art271p2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "272",
+      "is_adt": false,
+      "uids": [
+        "art272",
+        "art272p1",
+        "art272p2",
+        "art272p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "273",
+      "is_adt": false,
+      "uids": [
+        "art273",
+        "art273pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "274",
+      "is_adt": false,
+      "uids": [
+        "art274",
+        "art274I",
+        "art274II",
+        "art274III",
+        "art274IIIa",
+        "art274IIIb",
+        "art274IIIc"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "275",
+      "is_adt": false,
+      "uids": [
+        "art275",
+        "art275p1",
+        "art275p2",
+        "art275p3",
+        "art275p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "276",
+      "is_adt": false,
+      "uids": [
+        "art276"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "277",
+      "is_adt": false,
+      "uids": [
+        "art277",
+        "art277p1",
+        "art277p2",
+        "art277p3",
+        "art277p4",
+        "art277p5",
+        "art277p6"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "278",
+      "is_adt": false,
+      "uids": [
+        "art278",
+        "art278I",
+        "art278II",
+        "art278III",
+        "art278IV"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "279",
+      "is_adt": false,
+      "uids": [
+        "art279",
+        "art279p1",
+        "art279p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "280",
+      "is_adt": false,
+      "uids": [
+        "art280",
+        "art280pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "281",
+      "is_adt": false,
+      "uids": [
+        "art281",
+        "art281I",
+        "art281II",
+        "art281III",
+        "art281IV",
+        "art281V",
+        "art281pu"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "282",
+      "is_adt": false,
+      "uids": [
+        "art282"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "283",
+      "is_adt": false,
+      "uids": [
+        "art283",
+        "art283I",
+        "art283II",
+        "art283III",
+        "art283IV",
+        "art283IV_2",
+        "art283V",
+        "art283p1",
+        "art283p2",
+        "art283p3"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "284",
+      "is_adt": false,
+      "uids": [
+        "art284",
+        "art284I",
+        "art284II",
+        "art284III",
+        "art284IV",
+        "art284p1",
+        "art284p1_2",
+        "art284p1_3",
+        "art284p1_4",
+        "art284p2",
+        "art284p2_2",
+        "art284p2_3",
+        "art284p3"
+      ],
+      "children_count": 12,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "285",
+      "is_adt": false,
+      "uids": [
+        "art285"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "286",
+      "is_adt": false,
+      "uids": [
+        "art286"
+      ],
+      "children_count": 0,
+      "versions_count": 2,
+      "has_summary": true
+    },
+    {
+      "art_number": "287",
+      "is_adt": false,
+      "uids": [
+        "art287",
+        "art287p1",
+        "art287p2",
+        "art287p3",
+        "art287p4",
+        "art287p4I",
+        "art287p4II"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "288",
+      "is_adt": false,
+      "uids": [
+        "art288",
+        "art288pu",
+        "art288p1",
+        "art288p2",
+        "art288p2I",
+        "art288p2II",
+        "art288p2III",
+        "art288p3",
+        "art288p4"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "289",
+      "is_adt": false,
+      "uids": [
+        "art289",
+        "art289pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "290",
+      "is_adt": false,
+      "uids": [
+        "art290",
+        "art290pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "291",
+      "is_adt": false,
+      "uids": [
+        "art291"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "292",
+      "is_adt": false,
+      "uids": [
+        "art292"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "293",
+      "is_adt": false,
+      "uids": [
+        "art293",
+        "art293I",
+        "art293II",
+        "art293II_2",
+        "art293III",
+        "art293pu"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "294",
+      "is_adt": false,
+      "uids": [
+        "art294",
+        "art294pu",
+        "art294p1",
+        "art294p2",
+        "art294p3"
+      ],
+      "children_count": 4,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "295",
+      "is_adt": false,
+      "uids": [
+        "art295",
+        "art295pu",
+        "art295puI",
+        "art295puII",
+        "art295puIII",
+        "art295puIV",
+        "art295puV",
+        "art295puVI",
+        "art295pu_2",
+        "art295puI_2",
+        "art295puII_2",
+        "art295puIII_2",
+        "art295puIV_2",
+        "art295puV_2",
+        "art295puVI_2",
+        "art295puVII",
+        "art295puVIII",
+        "art295puIX"
+      ],
+      "children_count": 17,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "296",
+      "is_adt": false,
+      "uids": [
+        "art296",
+        "art296p1",
+        "art296p2",
+        "art296p3",
+        "art296p4",
+        "art296p5",
+        "art296p5_2",
+        "art296p6"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "297",
+      "is_adt": false,
+      "uids": [
+        "art297"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "is_revoked": true
+    },
+    {
+      "art_number": "298",
+      "is_adt": false,
+      "uids": [
+        "art298",
+        "art298p1",
+        "art298p2",
+        "art298p2I",
+        "art298p2II",
+        "art298p2III"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "is_revoked": true
+    },
+    {
+      "art_number": "299",
+      "is_adt": false,
+      "uids": [
+        "art299"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "300",
+      "is_adt": false,
+      "uids": [
+        "art300"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "301",
+      "is_adt": false,
+      "uids": [
+        "art301",
+        "art301p1_2",
+        "art301p2_2",
+        "art301p3_2",
+        "art301p4_2"
+      ],
+      "children_count": 4,
+      "versions_count": 6,
+      "has_summary": true
+    },
+    {
+      "art_number": "302",
+      "is_adt": false,
+      "uids": [
+        "art302"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "303",
+      "is_adt": false,
+      "uids": [
+        "art303",
+        "art303pu",
+        "art303puI",
+        "art303puII",
+        "art303puIII"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "304",
+      "is_adt": false,
+      "uids": [
+        "art304"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "305",
+      "is_adt": false,
+      "uids": [
+        "art305",
+        "art305pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "306",
+      "is_adt": false,
+      "uids": [
+        "art306",
+        "art306I",
+        "art306II",
+        "art306III",
+        "art306IV",
+        "art306V",
+        "art306Va",
+        "art306Vb",
+        "art306Vc",
+        "art306Vd",
+        "art306Ve",
+        "art306Vf",
+        "art306Vg",
+        "art306Vh",
+        "art306Vi",
+        "art306Vj",
+        "art306Vjitem1",
+        "art306VI",
+        "art306VII",
+        "art306VIII",
+        "art306IX",
+        "art306X",
+        "art306XI"
+      ],
+      "children_count": 22,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "307",
+      "is_adt": false,
+      "uids": [
+        "art307",
+        "art307I",
+        "art307II",
+        "art307III",
+        "art307IV",
+        "art307V",
+        "art307VI",
+        "art307VII",
+        "art307pu",
+        "art307puI",
+        "art307puII",
+        "art307puIII",
+        "art307puIV",
+        "art307puV"
+      ],
+      "children_count": 13,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "308",
+      "is_adt": false,
+      "uids": [
+        "art308"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "309",
+      "is_adt": false,
+      "uids": [
+        "art309"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "310",
+      "is_adt": false,
+      "uids": [
+        "art310"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "311",
+      "is_adt": false,
+      "uids": [
+        "art311",
+        "art311pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "312",
+      "is_adt": false,
+      "uids": [
+        "art312",
+        "art312p1",
+        "art312p2",
+        "art312p3",
+        "art312p4",
+        "art312p5"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "313",
+      "is_adt": false,
+      "uids": [
+        "art313",
+        "art313p1",
+        "art313p2",
+        "art313p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "314",
+      "is_adt": false,
+      "uids": [
+        "art314"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "315",
+      "is_adt": false,
+      "uids": [
+        "art315"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "316",
+      "is_adt": false,
+      "uids": [
+        "art316",
+        "art316I",
+        "art316II",
+        "art316III",
+        "art316IV",
+        "art316V"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "317",
+      "is_adt": false,
+      "uids": [
+        "art317",
+        "art317I",
+        "art317II",
+        "art317III",
+        "art317p1",
+        "art317p2"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "318",
+      "is_adt": false,
+      "uids": [
+        "art318",
+        "art318p1",
+        "art318p2",
+        "art318p3",
+        "art318p3I",
+        "art318p3II",
+        "art318p4",
+        "art318p5"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "319",
+      "is_adt": false,
+      "uids": [
+        "art319",
+        "art319p1",
+        "art319p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "320",
+      "is_adt": false,
+      "uids": [
+        "art320",
+        "art320p1",
+        "art320p2",
+        "art320p2I",
+        "art320p2II",
+        "art320p2III",
+        "art320p2IV"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "321",
+      "is_adt": false,
+      "uids": [
+        "art321",
+        "art321pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "322",
+      "is_adt": false,
+      "uids": [
+        "art322",
+        "art322p1",
+        "art322p2",
+        "art322p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "323",
+      "is_adt": false,
+      "uids": [
+        "art323"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "324",
+      "is_adt": false,
+      "uids": [
+        "art324",
+        "art324I",
+        "art324II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "325",
+      "is_adt": false,
+      "uids": [
+        "art325"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "326",
+      "is_adt": false,
+      "uids": [
+        "art326",
+        "art326p1",
+        "art326p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "327",
+      "is_adt": false,
+      "uids": [
+        "art327",
+        "art327pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "328",
+      "is_adt": false,
+      "uids": [
+        "art328"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "329",
+      "is_adt": false,
+      "uids": [
+        "art329",
+        "art329I",
+        "art329II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "330",
+      "is_adt": false,
+      "uids": [
+        "art330",
+        "art330pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "331",
+      "is_adt": false,
+      "uids": [
+        "art331"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "332",
+      "is_adt": false,
+      "uids": [
+        "art332"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "333",
+      "is_adt": false,
+      "uids": [
+        "art333",
+        "art333I",
+        "art333II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "334",
+      "is_adt": false,
+      "uids": [
+        "art334"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "335",
+      "is_adt": false,
+      "uids": [
+        "art335",
+        "art335pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "336",
+      "is_adt": false,
+      "uids": [
+        "art336"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "337",
+      "is_adt": false,
+      "uids": [
+        "art337",
+        "art337p1",
+        "art337p1_2",
+        "art337p2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "338",
+      "is_adt": false,
+      "uids": [
+        "art338",
+        "art338pu",
+        "art338puI",
+        "art338puII",
+        "art338puIII",
+        "art338puIV"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "339",
+      "is_adt": false,
+      "uids": [
+        "art339"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "340",
+      "is_adt": false,
+      "uids": [
+        "art340",
+        "art340pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "341",
+      "is_adt": false,
+      "uids": [
+        "art341",
+        "art341p1",
+        "art341p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "342",
+      "is_adt": false,
+      "uids": [
+        "art342"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "343",
+      "is_adt": false,
+      "uids": [
+        "art343"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "344",
+      "is_adt": false,
+      "uids": [
+        "art344"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "345",
+      "is_adt": false,
+      "uids": [
+        "art345"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "346",
+      "is_adt": false,
+      "uids": [
+        "art346"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "347",
+      "is_adt": false,
+      "uids": [
+        "art347",
+        "art347p1",
+        "art347p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "348",
+      "is_adt": false,
+      "uids": [
+        "art348",
+        "art348pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "349",
+      "is_adt": false,
+      "uids": [
+        "art349",
+        "art349pu",
+        "art349pu_2",
+        "art349pu_3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "350",
+      "is_adt": false,
+      "uids": [
+        "art350",
+        "art350pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "351",
+      "is_adt": false,
+      "uids": [
+        "art351",
+        "art351p1",
+        "art351p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "352",
+      "is_adt": false,
+      "uids": [
+        "art352"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "353",
+      "is_adt": false,
+      "uids": [
+        "art353"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "354",
+      "is_adt": false,
+      "uids": [
+        "art354",
+        "art354pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "355",
+      "is_adt": false,
+      "uids": [
+        "art355"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "356",
+      "is_adt": false,
+      "uids": [
+        "art356",
+        "art356pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "357",
+      "is_adt": false,
+      "uids": [
+        "art357"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "358",
+      "is_adt": false,
+      "uids": [
+        "art358",
+        "art358p1",
+        "art358p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "359",
+      "is_adt": false,
+      "uids": [
+        "art359"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "360",
+      "is_adt": false,
+      "uids": [
+        "art360",
+        "art360pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "361",
+      "is_adt": false,
+      "uids": [
+        "art361",
+        "art361pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "362",
+      "is_adt": false,
+      "uids": [
+        "art362",
+        "art362p1",
+        "art362p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "363",
+      "is_adt": false,
+      "uids": [
+        "art363",
+        "art363I",
+        "art363II",
+        "art363III",
+        "art363pu"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "364",
+      "is_adt": false,
+      "uids": [
+        "art364"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "365",
+      "is_adt": false,
+      "uids": [
+        "art365"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "366",
+      "is_adt": false,
+      "uids": [
+        "art366",
+        "art366pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "367",
+      "is_adt": false,
+      "uids": [
+        "art367",
+        "art367pu",
+        "art367pu_2"
+      ],
+      "children_count": 2,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "368",
+      "is_adt": false,
+      "uids": [
+        "art368",
+        "art368p1",
+        "art368p1_2",
+        "art368p2",
+        "art368p3"
+      ],
+      "children_count": 4,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "369",
+      "is_adt": false,
+      "uids": [
+        "art369"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "370",
+      "is_adt": false,
+      "uids": [
+        "art370",
+        "art370I",
+        "art370II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "371",
+      "is_adt": false,
+      "uids": [
+        "art371"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "is_revoked": true
+    },
+    {
+      "art_number": "372",
+      "is_adt": false,
+      "uids": [
+        "art372",
+        "art372pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "373",
+      "is_adt": false,
+      "uids": [
+        "art373",
+        "art373pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "374",
+      "is_adt": false,
+      "uids": [
+        "art374",
+        "art374pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "375",
+      "is_adt": false,
+      "uids": [
+        "art375"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "376",
+      "is_adt": false,
+      "uids": [
+        "art376"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "377",
+      "is_adt": false,
+      "uids": [
+        "art377"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "378",
+      "is_adt": false,
+      "uids": [
+        "art378",
+        "art378p1",
+        "art378p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "379",
+      "is_adt": false,
+      "uids": [
+        "art379",
+        "art379pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "380",
+      "is_adt": false,
+      "uids": [
+        "art380"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "381",
+      "is_adt": false,
+      "uids": [
+        "art381",
+        "art381p1",
+        "art381p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "382",
+      "is_adt": false,
+      "uids": [
+        "art382"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "383",
+      "is_adt": false,
+      "uids": [
+        "art383",
+        "art383p1",
+        "art383p2",
+        "art383p3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "384",
+      "is_adt": false,
+      "uids": [
+        "art384"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "385",
+      "is_adt": false,
+      "uids": [
+        "art385"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "386",
+      "is_adt": false,
+      "uids": [
+        "art386",
+        "art386p1",
+        "art386p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "387",
+      "is_adt": false,
+      "uids": [
+        "art387"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "388",
+      "is_adt": false,
+      "uids": [
+        "art388",
+        "art388pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "389",
+      "is_adt": false,
+      "uids": [
+        "art389"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "390",
+      "is_adt": false,
+      "uids": [
+        "art390",
+        "art390p1",
+        "art390p2",
+        "art390p3",
+        "art390p4",
+        "art390p5",
+        "art390p6",
+        "art390p7",
+        "art390p8",
+        "art390p9"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "391",
+      "is_adt": false,
+      "uids": [
+        "art391"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "392",
+      "is_adt": false,
+      "uids": [
+        "art392"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "393",
+      "is_adt": false,
+      "uids": [
+        "art393",
+        "art393I",
+        "art393II",
+        "art393III",
+        "art393pu",
+        "art393pu_2"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "394",
+      "is_adt": false,
+      "uids": [
+        "art394"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "395",
+      "is_adt": false,
+      "uids": [
+        "art395"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT1",
+      "is_adt": true,
+      "uids": [
+        "artADT1"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT2",
+      "is_adt": true,
+      "uids": [
+        "artADT2"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT3",
+      "is_adt": true,
+      "uids": [
+        "artADT3"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4",
+      "is_adt": true,
+      "uids": [
+        "artADT4"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-A",
+      "is_adt": true,
+      "uids": [
+        "artADT4-A"
+      ],
+      "children_count": 0,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-B",
+      "is_adt": true,
+      "uids": [
+        "artADT4-B"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-C",
+      "is_adt": true,
+      "uids": [
+        "artADT4-C"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-D",
+      "is_adt": true,
+      "uids": [
+        "artADT4-D"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-E",
+      "is_adt": true,
+      "uids": [
+        "artADT4-E"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-F",
+      "is_adt": true,
+      "uids": [
+        "artADT4-F",
+        "artADT4-Fp1",
+        "artADT4-Fp2",
+        "artADT4-Fp3",
+        "artADT4-Fp4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-G",
+      "is_adt": true,
+      "uids": [
+        "artADT4-G"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT4-H",
+      "is_adt": true,
+      "uids": [
+        "artADT4-H",
+        "artADT4-Hpu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT5",
+      "is_adt": true,
+      "uids": [
+        "artADT5"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "ADT6",
+      "is_adt": true,
+      "uids": [
+        "artADT6"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "12",
+      "is_adt": false,
+      "uids": [
+        "art12"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "13",
+      "is_adt": false,
+      "uids": [
+        "art13",
+        "art13I_2",
+        "art13II_2",
+        "art13III",
+        "art13IV",
+        "art13V",
+        "art13VI",
+        "art13VII",
+        "art13VIII",
+        "art13IX",
+        "art13X",
+        "art13X_2",
+        "art13XI",
+        "art13XII",
+        "art13XIII",
+        "art13XIV",
+        "art13XV",
+        "art13XVI",
+        "art13XVII",
+        "art13XVII_2",
+        "art13XVIII",
+        "art13XIX",
+        "art13XX",
+        "art13XXI"
+      ],
+      "children_count": 23,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "14",
+      "is_adt": false,
+      "uids": [
+        "art14",
+        "art14I",
+        "art14II",
+        "art14III",
+        "art14IV",
+        "art14V",
+        "art14VI",
+        "art14VI_2",
+        "art14VI_3",
+        "art14VI_4",
+        "art14VII",
+        "art14VIII",
+        "art14IX",
+        "art14IX_2",
+        "art14X",
+        "art14XI",
+        "art14XII",
+        "art14XIII",
+        "art14XIV",
+        "art14XV",
+        "art14XVI",
+        "art14XVII",
+        "art14XVIII",
+        "art14XIX",
+        "art14XX",
+        "art14XXI",
+        "art14XXII"
+      ],
+      "children_count": 26,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "15",
+      "is_adt": false,
+      "uids": [
+        "art15",
+        "art15p1",
+        "art15p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "16",
+      "is_adt": false,
+      "uids": [
+        "art16",
+        "art16pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "17",
+      "is_adt": false,
+      "uids": [
+        "art17",
+        "art17I_2",
+        "art17Ia_2",
+        "art17Ib_2",
+        "art17II_2",
+        "art17IIa_2",
+        "art17IIb_2",
+        "art17IIc_2",
+        "art17IId_2"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "18",
+      "is_adt": false,
+      "uids": [
+        "art18",
+        "art18I_2",
+        "art18II_2",
+        "art18III_2",
+        "art18IV_3",
+        "art18V_2",
+        "art18VI_2",
+        "art18p1",
+        "art18p2",
+        "art18p3",
+        "art18p4",
+        "art18p4_2"
+      ],
+      "children_count": 11,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "19",
+      "is_adt": false,
+      "uids": [
+        "art19"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "20",
+      "is_adt": false,
+      "uids": [
+        "art20",
+        "art20I",
+        "art20II",
+        "art20III",
+        "art20IV",
+        "art20IV_2",
+        "art20p1",
+        "art20p1I",
+        "art20p1II",
+        "art20p2"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "21",
+      "is_adt": false,
+      "uids": [
+        "art21"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "22",
+      "is_adt": false,
+      "uids": [
+        "art22",
+        "art22p1",
+        "art22p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "23",
+      "is_adt": false,
+      "uids": [
+        "art23"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "24",
+      "is_adt": false,
+      "uids": [
+        "art24",
+        "art24pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "25",
+      "is_adt": false,
+      "uids": [
+        "art25",
+        "art25pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "26",
+      "is_adt": false,
+      "uids": [
+        "art26",
+        "art26pu_2"
+      ],
+      "children_count": 1,
+      "versions_count": 2,
+      "has_summary": true
+    },
+    {
+      "art_number": "27",
+      "is_adt": false,
+      "uids": [
+        "art27",
+        "art27I",
+        "art27II",
+        "art27III",
+        "art27IV",
+        "art27V",
+        "art27VI",
+        "art27VI_2",
+        "art27VI_3",
+        "art27VII",
+        "art27VIII"
+      ],
+      "children_count": 10,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "28",
+      "is_adt": false,
+      "uids": [
+        "art28"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "29",
+      "is_adt": false,
+      "uids": [
+        "art29",
+        "art29p1",
+        "art29p2",
+        "art29p3",
+        "art29p4",
+        "art29p5"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "30",
+      "is_adt": false,
+      "uids": [
+        "art30"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "31",
+      "is_adt": false,
+      "uids": [
+        "art31",
+        "art31I",
+        "art31II",
+        "art31p1_2",
+        "art31p2_2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "32",
+      "is_adt": false,
+      "uids": [
+        "art32",
+        "art32p1_2",
+        "art32p2_2",
+        "art32p2I",
+        "art32p2II",
+        "art32p2III",
+        "art32p2IV",
+        "art32p2V",
+        "art32p2VI",
+        "art32p2VII",
+        "art32p2VIII",
+        "art32p2IX",
+        "art32p2X",
+        "art32p2XI",
+        "art32p2XII",
+        "art32p2XIII",
+        "art32p3_2",
+        "art32p4_2"
+      ],
+      "children_count": 17,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "33",
+      "is_adt": false,
+      "uids": [
+        "art33",
+        "art33p1",
+        "art33p1I",
+        "art33p1II",
+        "art33p2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "34",
+      "is_adt": false,
+      "uids": [
+        "art34",
+        "art34I_2",
+        "art34II_2",
+        "art34III",
+        "art34IV"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "35",
+      "is_adt": false,
+      "uids": [
+        "art35",
+        "art35I",
+        "art35II",
+        "art35III"
+      ],
+      "children_count": 3,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "36",
+      "is_adt": false,
+      "uids": [
+        "art36",
+        "art36I",
+        "art36II",
+        "art36III",
+        "art36p1",
+        "art36p2",
+        "art36p2_2",
+        "art36p3",
+        "art36p4"
+      ],
+      "children_count": 8,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "37",
+      "is_adt": false,
+      "uids": [
+        "art37",
+        "art37p1",
+        "art37p2",
+        "art37p2I",
+        "art37p2II",
+        "art37p2III",
+        "art37p2IV",
+        "art37p2IV_2",
+        "art37p2V"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "38",
+      "is_adt": false,
+      "uids": [
+        "art38",
+        "art38p1_10",
+        "art38p2_10"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "39",
+      "is_adt": false,
+      "uids": [
+        "art39"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "40",
+      "is_adt": false,
+      "uids": [
+        "art40",
+        "art40p1_2",
+        "art40p2_2",
+        "art40p3_2",
+        "art40p3I",
+        "art40p3II",
+        "art40p3III",
+        "art40p3IV",
+        "art40p3V",
+        "art40p3VI",
+        "art40p3VII",
+        "art40p3VIII",
+        "art40p3IX",
+        "art40p3X",
+        "art40p3XI",
+        "art40p3XII",
+        "art40p3XIII",
+        "art40p3XIV",
+        "art40p3XV",
+        "art40p3XVI",
+        "art40p3XVII",
+        "art40p3XVIII",
+        "art40p3XIX",
+        "art40p4_2",
+        "art40p4I",
+        "art40p4I_2",
+        "art40p4II",
+        "art40p4III",
+        "art40p5_2",
+        "art40p5I",
+        "art40p5II",
+        "art40p5III",
+        "art40p5IV",
+        "art40p5V"
+      ],
+      "children_count": 33,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "41",
+      "is_adt": false,
+      "uids": [
+        "art41",
+        "art41I",
+        "art41II",
+        "art41III",
+        "art41IV",
+        "art41V",
+        "art41VI",
+        "art41VI_2",
+        "art41VII",
+        "art41VIII",
+        "art41IX",
+        "art41X",
+        "art41XI",
+        "art41XI_2",
+        "art41p1_2",
+        "art41p2_2"
+      ],
+      "children_count": 15,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "42",
+      "is_adt": false,
+      "uids": [
+        "art42",
+        "art42p1",
+        "art42p1_2",
+        "art42p2",
+        "art42p3",
+        "art42p4",
+        "art42p5",
+        "art42p6",
+        "art42p7"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "43",
+      "is_adt": false,
+      "uids": [
+        "art43"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "44",
+      "is_adt": false,
+      "uids": [
+        "art44",
+        "art44I",
+        "art44II",
+        "art44p1_2",
+        "art44p2_2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "45",
+      "is_adt": false,
+      "uids": [
+        "art45"
+      ],
+      "children_count": 0,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "46",
+      "is_adt": false,
+      "uids": [
+        "art46",
+        "art46p1",
+        "art46p2",
+        "art46p2a",
+        "art46p2b"
+      ],
+      "children_count": 4,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "47",
+      "is_adt": false,
+      "uids": [
+        "art47",
+        "art47p1",
+        "art47p2",
+        "art47p2_2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "48",
+      "is_adt": false,
+      "uids": [
+        "art48",
+        "art48I",
+        "art48I_2",
+        "art48II",
+        "art48III",
+        "art48IV",
+        "art48IVa",
+        "art48IVb",
+        "art48V",
+        "art48VI",
+        "art48VII",
+        "art48VIII",
+        "art48IX",
+        "art48X",
+        "art48XI",
+        "art48XII",
+        "art48p1",
+        "art48p2",
+        "art48p3",
+        "art48p4",
+        "art48p5",
+        "art48p6",
+        "art48p6_2"
+      ],
+      "children_count": 22,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "49",
+      "is_adt": false,
+      "uids": [
+        "art49",
+        "art49pu",
+        "art49puI",
+        "art49puII",
+        "art49puIII",
+        "art49puIV",
+        "art49puV"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "50",
+      "is_adt": false,
+      "uids": [
+        "art50",
+        "art50I_2",
+        "art50II_2",
+        "art50p1",
+        "art50p2",
+        "art50p3"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "51",
+      "is_adt": false,
+      "uids": [
+        "art51"
+      ],
+      "children_count": 0,
+      "versions_count": 0
+    },
+    {
+      "art_number": "52",
+      "is_adt": false,
+      "uids": [
+        "art52",
+        "art52p1",
+        "art52p2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "53",
+      "is_adt": false,
+      "uids": [
+        "art53",
+        "art53I",
+        "art53II",
+        "art53III",
+        "art53IV",
+        "art53V",
+        "art53p1",
+        "art53p2"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "54",
+      "is_adt": false,
+      "uids": [
+        "art54"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "55",
+      "is_adt": false,
+      "uids": [
+        "art55",
+        "art55I_2",
+        "art55II_2",
+        "art55III",
+        "art55_2",
+        "art55_3"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "55-A",
+      "is_adt": false,
+      "uids": [
+        "art55-A",
+        "art55-Ap1",
+        "art55-Ap2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "29",
+      "is_adt": false,
+      "uids": [
+        "art29",
+        "art29I",
+        "art29II",
+        "art29II_2",
+        "art29III",
+        "art29IV",
+        "art29IVa",
+        "art29IVb",
+        "art29IVc",
+        "art29IV_2",
+        "art29IVa_2",
+        "art29IVb_2",
+        "art29IVc_2",
+        "art29IVd",
+        "art29IVe",
+        "art29IVf",
+        "art29IVg",
+        "art29IVh",
+        "art29IVi",
+        "art29IVj",
+        "art29IVk",
+        "art29IVl",
+        "art29IVm",
+        "art29IVn",
+        "art29IVo",
+        "art29IVp",
+        "art29IVq",
+        "art29IVr",
+        "art29IVs",
+        "art29IVt",
+        "art29IVu",
+        "art29IVv",
+        "art29IVw",
+        "art29IVx",
+        "art29V",
+        "art29V_2",
+        "art29VI",
+        "art29VI_2",
+        "art29VI_3",
+        "art29VIa",
+        "art29VIb",
+        "art29VIc",
+        "art29VId",
+        "art29VIe",
+        "art29VIf",
+        "art29VII",
+        "art29VIII",
+        "art29IX",
+        "art29X",
+        "art29XI",
+        "art29XII",
+        "art29XIII",
+        "art29XIV"
+      ],
+      "children_count": 52,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "29-A",
+      "is_adt": false,
+      "uids": [
+        "art29-A",
+        "art29-AI",
+        "art29-AI_2",
+        "art29-AII",
+        "art29-AII_2",
+        "art29-AIII",
+        "art29-AIII_2",
+        "art29-AIV",
+        "art29-AIV_2",
+        "art29-AV",
+        "art29-AVI",
+        "art29-Ap1",
+        "art29-Ap2",
+        "art29-Ap2I",
+        "art29-Ap2II",
+        "art29-Ap2III",
+        "art29-Ap3"
+      ],
+      "children_count": 16,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "art_number": "30",
+      "is_adt": false,
+      "uids": [
+        "art30",
+        "art30I",
+        "art30II",
+        "art30III",
+        "art30IV",
+        "art30V",
+        "art30VI",
+        "art30VI_2",
+        "art30VII",
+        "art30VIII",
+        "art30IX"
+      ],
+      "children_count": 10,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "art_number": "31",
+      "is_adt": false,
+      "uids": [
+        "art31",
+        "art31p1_3",
+        "art31p2_3",
+        "art31p3",
+        "art31p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    }
+  ]
+}

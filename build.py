@@ -56,6 +56,7 @@ class ValidationReport:
             by_cat.setdefault(issue.category, []).append(issue)
 
         cat_labels = {
+            "docx": "Formatação do DOCX",
             "formato": "Formato da planilha",
             "ref_cruzada": "Referências cruzadas (XLSX → DOCX)",
             "vide": "Vides apontando para assuntos inexistentes",
@@ -127,6 +128,7 @@ def _build_once(
     """Executa o pipeline completo uma vez e salva em output_path."""
 
     t0 = time.time()
+    report = ValidationReport()
     print(f"\n{'═' * 60}")
     print(f"  Build: {label}")
     print(f"{'═' * 60}")
@@ -140,6 +142,18 @@ def _build_once(
     headings = [e for e in doc.elements if hasattr(e, "level")]
     articles = [e for e in doc.elements if hasattr(e, "art_number")]
     print(f"      → {len(headings)} headings, {len(articles)} artigos")
+
+    # ── 1b. Validação do DOCX ─────────────────────────────────────────
+    from validate import get_paragraphs as _get_paras, run_checks as _run_checks, CODE_LABELS
+
+    _raw_paras = _get_paras(args.docx)
+    _docx_issues = _run_checks(_raw_paras)
+    if _docx_issues:
+        for iss in _docx_issues:
+            report.add("docx", "aviso", f"[{iss['code']}] {iss['desc']}", iss["context"])
+        print(f"      → {len(_docx_issues)} aviso(s) de formatação no DOCX")
+    else:
+        print(f"      → DOCX sem problemas de formatação")
 
     # ── 2. Resolve amendments ──────────────────────────────────────────
     print("[2/7] Resolvendo emendas...")
@@ -161,7 +175,6 @@ def _build_once(
     xlsx_path = Path(args.xlsx)
     law_mapping: dict[str, str] = {}
     subject_index = None
-    report = ValidationReport()
     if xlsx_path.exists():
         try:
             law_mapping = parse_law_mapping(xlsx_path)

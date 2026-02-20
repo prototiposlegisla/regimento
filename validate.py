@@ -91,8 +91,9 @@ def _indent_left(p_el: ET.Element) -> int:
         return 0
 
 
-def get_paragraphs() -> list[dict]:
-    with zipfile.ZipFile(DOCX_PATH) as zf:
+def get_paragraphs(path: str | Path | None = None) -> list[dict]:
+    docx = Path(path) if path else DOCX_PATH
+    with zipfile.ZipFile(docx) as zf:
         data = zf.read("word/document.xml")
     root = ET.fromstring(data)
     body = root.find(f"{{{W}}}body")

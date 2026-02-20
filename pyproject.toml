@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: testes de lógica pura, sem DOCX",
+    "integration: requer DOCX real",
+    "snapshot: comparação com golden file",
+]
+addopts = "-m unit --tb=short -q"

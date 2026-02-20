@@ -937,6 +937,37 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 #zoom-indicator.show { display: block; }
 
+/* ===== SEARCH SCROLLBAR TICKS ===== */
+#search-ticks {
+  position: fixed;
+  top: var(--header-h);
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  z-index: 180;
+  pointer-events: none;
+}
+#search-ticks .tick {
+  position: absolute;
+  right: 0;
+  width: 8px;
+  height: 3px;
+  background: #ff922b;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+#search-ticks .tick:hover {
+  height: 5px;
+  margin-top: -1px;
+  background: #e67700;
+}
+#search-ticks .tick.current {
+  background: #e03131;
+  height: 5px;
+  margin-top: -1px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
   #cards-container { padding: 8px; }
@@ -5848,6 +5879,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   </div>
 </div>
 
+<!-- SEARCH SCROLLBAR TICKS -->
+<div id="search-ticks"></div>
+
 <!-- ZOOM INDICATOR -->
 <div id="zoom-indicator"></div>
 
@@ -7492,6 +7526,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   const $searchNav = document.getElementById('search-nav');
   const $searchCounter = document.getElementById('search-counter');
   const $breadcrumb = document.getElementById('breadcrumb');
+  const $searchTicks = document.getElementById('search-ticks');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -7814,6 +7849,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       searchIdx = 0;
       $searchNav.classList.remove('open');
       $searchInput.classList.remove('has-nav');
+      updateSearchTicks();
       return;
     }
 
@@ -7886,11 +7922,13 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       $searchNav.classList.add('open');
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
+      updateSearchTicks();
       searchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
       selectCard(searchMatches[0], true);
     } else {
       $searchNav.classList.remove('open');
       $searchInput.classList.remove('has-nav');
+      updateSearchTicks();
     }
   }
 
@@ -7934,13 +7972,54 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     $searchCounter.textContent = (searchIdx + 1) + ' / ' + searchMatches.length;
   }
 
+  function updateSearchTicks() {
+    $searchTicks.innerHTML = '';
+    if (!searchMatches.length) return;
+    const docH = document.documentElement.scrollHeight;
+    const vpH = window.innerHeight;
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 56;
+    const trackH = vpH - headerH;
+    const frag = document.createDocumentFragment();
+    searchMatches.forEach((card, i) => {
+      const pct = card.offsetTop / docH;
+      const tick = document.createElement('div');
+      tick.className = 'tick' + (i === searchIdx ? ' current' : '');
+      tick.style.top = (headerH + pct * trackH) + 'px';
+      tick.addEventListener('click', () => {
+        searchIdx = i;
+        updateSearchCounter();
+        updateTickCurrent();
+        searchMatches[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectCard(searchMatches[i], true);
+      });
+      frag.appendChild(tick);
+    });
+    $searchTicks.appendChild(frag);
+  }
+
+  function updateTickCurrent() {
+    const ticks = $searchTicks.children;
+    for (let i = 0; i < ticks.length; i++) {
+      ticks[i].classList.toggle('current', i === searchIdx);
+    }
+  }
+
   function navigateSearch(delta) {
     if (!searchMatches.length) return;
     searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
     updateSearchCounter();
+    updateTickCurrent();
     searchMatches[searchIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
     selectCard(searchMatches[searchIdx], true);
   }
+
+  let tickResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(tickResizeTimer);
+    tickResizeTimer = setTimeout(() => {
+      if (searchMatches.length) updateSearchTicks();
+    }, 150);
+  });
 
   document.getElementById('search-prev').addEventListener('click', () => navigateSearch(-1));
   document.getElementById('search-next').addEventListener('click', () => navigateSearch(1));
@@ -8963,6 +9042,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       window.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
     }
     updateBreadcrumb();
+    if (searchMatches.length) updateSearchTicks();
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 

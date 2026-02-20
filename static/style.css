@@ -929,6 +929,37 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 #zoom-indicator.show { display: block; }
 
+/* ===== SEARCH SCROLLBAR TICKS ===== */
+#search-ticks {
+  position: fixed;
+  top: var(--header-h);
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  z-index: 180;
+  pointer-events: none;
+}
+#search-ticks .tick {
+  position: absolute;
+  right: 0;
+  width: 8px;
+  height: 3px;
+  background: #ff922b;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+#search-ticks .tick:hover {
+  height: 5px;
+  margin-top: -1px;
+  background: #e67700;
+}
+#search-ticks .tick.current {
+  background: #e03131;
+  height: 5px;
+  margin-top: -1px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
   #cards-container { padding: 8px; }

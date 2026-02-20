@@ -58,6 +58,7 @@
   const $searchNav = document.getElementById('search-nav');
   const $searchCounter = document.getElementById('search-counter');
   const $breadcrumb = document.getElementById('breadcrumb');
+  const $searchTicks = document.getElementById('search-ticks');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -380,6 +381,7 @@
       searchIdx = 0;
       $searchNav.classList.remove('open');
       $searchInput.classList.remove('has-nav');
+      updateSearchTicks();
       return;
     }
 
@@ -452,11 +454,13 @@
       $searchNav.classList.add('open');
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
+      updateSearchTicks();
       searchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
       selectCard(searchMatches[0], true);
     } else {
       $searchNav.classList.remove('open');
       $searchInput.classList.remove('has-nav');
+      updateSearchTicks();
     }
   }
 
@@ -500,13 +504,54 @@
     $searchCounter.textContent = (searchIdx + 1) + ' / ' + searchMatches.length;
   }
 
+  function updateSearchTicks() {
+    $searchTicks.innerHTML = '';
+    if (!searchMatches.length) return;
+    const docH = document.documentElement.scrollHeight;
+    const vpH = window.innerHeight;
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 56;
+    const trackH = vpH - headerH;
+    const frag = document.createDocumentFragment();
+    searchMatches.forEach((card, i) => {
+      const pct = card.offsetTop / docH;
+      const tick = document.createElement('div');
+      tick.className = 'tick' + (i === searchIdx ? ' current' : '');
+      tick.style.top = (headerH + pct * trackH) + 'px';
+      tick.addEventListener('click', () => {
+        searchIdx = i;
+        updateSearchCounter();
+        updateTickCurrent();
+        searchMatches[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        selectCard(searchMatches[i], true);
+      });
+      frag.appendChild(tick);
+    });
+    $searchTicks.appendChild(frag);
+  }
+
+  function updateTickCurrent() {
+    const ticks = $searchTicks.children;
+    for (let i = 0; i < ticks.length; i++) {
+      ticks[i].classList.toggle('current', i === searchIdx);
+    }
+  }
+
   function navigateSearch(delta) {
     if (!searchMatches.length) return;
     searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
     updateSearchCounter();
+    updateTickCurrent();
     searchMatches[searchIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
     selectCard(searchMatches[searchIdx], true);
   }
+
+  let tickResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(tickResizeTimer);
+    tickResizeTimer = setTimeout(() => {
+      if (searchMatches.length) updateSearchTicks();
+    }, 150);
+  });
 
   document.getElementById('search-prev').addEventListener('click', () => navigateSearch(-1));
   document.getElementById('search-next').addEventListener('click', () => navigateSearch(1));
@@ -1529,6 +1574,7 @@
       window.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
     }
     updateBreadcrumb();
+    if (searchMatches.length) updateSearchTicks();
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 

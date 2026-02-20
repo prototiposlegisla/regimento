@@ -464,8 +464,8 @@
     doSearch(e.target.value.trim());
   });
 
-  $searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && $searchInput.value) {
       e.preventDefault();
       $searchInput.value = '';
       preserveScroll(() => doSearch(''));

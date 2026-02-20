@@ -715,6 +715,13 @@
   function openIndex() {
     $indexOverlay.classList.add('open');
     $indexPanel.classList.add('open');
+    // Pre-fill sidebar search with main search term (light integration)
+    const mainTerm = $searchInput.value.trim();
+    if (mainTerm && !mainTerm.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i)) {
+      const cleanTerm = mainTerm.replace(/^r\s+/i, '');
+      $indexSearch.value = cleanTerm;
+      $btnClearIndexSearch.style.display = 'flex';
+    }
     renderIndex();
     $indexSearch.focus();
   }
@@ -913,6 +920,11 @@
   function navigateToSection(sectionId) {
     const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
     if (card) {
+      if (card.classList.contains('filtered-out')) {
+        searchFilter = false;
+        $btnFilter.classList.remove('active');
+        doSearch($searchInput.value.trim());
+      }
       scrollToReadingLine(card);
       selectCard(card, true);
     }
@@ -1273,6 +1285,11 @@
     $subjectPill.classList.add('open');
     document.body.classList.add('pill-open');
     $pillLabel.textContent = entry.subject;
+    if (searchFilter) {
+      searchFilter = false;
+      $btnFilter.classList.remove('active');
+      doSearch($searchInput.value.trim());
+    }
     updatePill();
     applySubjectFilter();
     highlightAllSubjectDetails();

@@ -9,6 +9,7 @@ import json
 import subprocess
 import sys
 import time
+from dataclasses import dataclass, field
 from pathlib import Path
 
 # Fix Windows console encoding
@@ -18,6 +19,89 @@ if sys.stdout.encoding != "utf-8":
     )
 
 BASE_DIR = Path(__file__).parent
+
+
+# ── Validation report ────────────────────────────────────────────────────
+
+@dataclass
+class ValidationIssue:
+    category: str   # "formato", "ref_cruzada", "vide"
+    severity: str   # "erro", "aviso"
+    message: str
+    context: str = ""
+
+
+@dataclass
+class ValidationReport:
+    issues: list[ValidationIssue] = field(default_factory=list)
+
+    def add(self, category: str, severity: str, message: str, context: str = "") -> None:
+        self.issues.append(ValidationIssue(category, severity, message, context))
+
+    @property
+    def errors(self) -> list[ValidationIssue]:
+        return [i for i in self.issues if i.severity == "erro"]
+
+    @property
+    def warnings(self) -> list[ValidationIssue]:
+        return [i for i in self.issues if i.severity == "aviso"]
+
+    def print_report(self) -> None:
+        if not self.issues:
+            print("\n✓ Validação: nenhum problema encontrado")
+            return
+
+        by_cat: dict[str, list[ValidationIssue]] = {}
+        for issue in self.issues:
+            by_cat.setdefault(issue.category, []).append(issue)
+
+        cat_labels = {
+            "formato": "Formato da planilha",
+            "ref_cruzada": "Referências cruzadas (XLSX → DOCX)",
+            "vide": "Vides apontando para assuntos inexistentes",
+        }
+
+        print(f"\n{'─' * 60}")
+        print(f"  Relatório de validação")
+        print(f"{'─' * 60}")
+
+        for cat, items in by_cat.items():
+            label = cat_labels.get(cat, cat)
+            errs = sum(1 for i in items if i.severity == "erro")
+            warns = sum(1 for i in items if i.severity == "aviso")
+            parts = []
+            if errs:
+                parts.append(f"{errs} erro(s)")
+            if warns:
+                parts.append(f"{warns} aviso(s)")
+            print(f"\n  [{label}] — {', '.join(parts)}")
+            for item in items:
+                icon = "✗" if item.severity == "erro" else "·"
+                line = f"    {icon} {item.message}"
+                if item.context:
+                    line += f"  ({item.context})"
+                print(line)
+
+        n_err = len(self.errors)
+        n_warn = len(self.warnings)
+        parts = []
+        if n_err:
+            parts.append(f"{n_err} erro(s)")
+        if n_warn:
+            parts.append(f"{n_warn} aviso(s)")
+        print(f"\n  Total: {', '.join(parts)}")
+        print(f"{'─' * 60}")
+
+    def to_json(self) -> list[dict]:
+        return [
+            {
+                "category": i.category,
+                "severity": i.severity,
+                "message": i.message,
+                **({"context": i.context} if i.context else {}),
+            }
+            for i in self.issues
+        ]
 
 
 def _load_config() -> dict:
@@ -39,7 +123,7 @@ def _build_once(
     include_private: bool,
     output_path: Path,
     label: str,
-) -> None:
+) -> ValidationReport:
     """Executa o pipeline completo uma vez e salva em output_path."""
 
     t0 = time.time()
@@ -77,6 +161,7 @@ def _build_once(
     xlsx_path = Path(args.xlsx)
     law_mapping: dict[str, str] = {}
     subject_index = None
+    report = ValidationReport()
     if xlsx_path.exists():
         try:
             law_mapping = parse_law_mapping(xlsx_path)
@@ -85,11 +170,8 @@ def _build_once(
 
             from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
             _fmt_errs = _validate_xlsx_fmt(xlsx_path, law_mapping)
-            if _fmt_errs:
-                print(f"\n⚠ {len(_fmt_errs)} problema(s) de formato na planilha remissivo.xlsx:")
-                for _e in _fmt_errs:
-                    print(_e)
-                print()
+            for _e in _fmt_errs:
+                report.add("formato", "aviso", _e.strip())
 
             # Artigos letrados do DOCX (ex: "212-A") para expansão correta de ranges
             import re as _re
@@ -117,29 +199,17 @@ def _build_once(
                 prefix = law_mapping.get(getattr(el, "law_name", None) or "", "")
                 docx_arts.add(f"{prefix}:{el.art_number}" if prefix else el.art_number)
 
-        missing: list[str] = []
+        seen_refs: set[str] = set()
         for entry in subject_index.entries:
             for ref in entry.refs:
                 key = f"{ref.law_prefix}:{ref.art}" if ref.law_prefix else ref.art
-                if key not in docx_arts:
-                    label = f"Art. {ref.law_prefix}:{ref.art}" if ref.law_prefix else f"Art. {ref.art}"
+                if key not in docx_arts and key not in seen_refs:
+                    seen_refs.add(key)
+                    art_label = f"Art. {ref.law_prefix}:{ref.art}" if ref.law_prefix else f"Art. {ref.art}"
                     ctx = entry.subject
                     if entry.sub_subject:
                         ctx += f" > {entry.sub_subject}"
-                    missing.append(f"  {label}  (assunto: {ctx})")
-
-        if missing:
-            # Deduplicate preserving order
-            seen: set[str] = set()
-            unique: list[str] = []
-            for m in missing:
-                if m not in seen:
-                    seen.add(m)
-                    unique.append(m)
-            print(f"\n⚠ {len(unique)} referência(s) na planilha não encontrada(s) no DOCX:")
-            for m in unique:
-                print(m)
-            print()
+                    report.add("ref_cruzada", "erro", art_label, f"assunto: {ctx}")
 
     # Cross-reference: vides pointing to non-existent index entries
     if subject_list:
@@ -149,29 +219,16 @@ def _build_once(
             if entry.sub_subject:
                 known_subjects.add(f"{entry.subject} — {entry.sub_subject}".lower())
 
-        bad_vides: list[str] = []
+        seen_vides: set[str] = set()
         for entry in subject_index.entries:
             for v in entry.vides:
-                # Vides podem usar "Assunto|Sub-assunto"; normaliza para o mesmo
-                # formato que known_subjects usa ("Assunto — Sub-assunto")
                 v_key = v.replace("|", " — ").lower()
-                if v_key not in known_subjects:
+                if v_key not in known_subjects and v_key not in seen_vides:
+                    seen_vides.add(v_key)
                     ctx = entry.subject
                     if entry.sub_subject:
                         ctx += f" > {entry.sub_subject}"
-                    bad_vides.append(f"  \"{v}\"  (assunto: {ctx})")
-
-        if bad_vides:
-            seen_v: set[str] = set()
-            unique_v: list[str] = []
-            for m in bad_vides:
-                if m not in seen_v:
-                    seen_v.add(m)
-                    unique_v.append(m)
-            print(f"\n⚠ {len(unique_v)} vide(s) referenciando assuntos inexistentes:")
-            for m in unique_v:
-                print(m)
-            print()
+                    report.add("vide", "aviso", f"\"{v}\"", f"assunto: {ctx}")
 
     # Apply law prefixes to articles based on law_name ↔ mapping
     if law_mapping:
@@ -244,6 +301,9 @@ def _build_once(
     size_kb = output_path.stat().st_size / 1024
     print(f"\n✓ {label} pronto em {elapsed:.1f}s → {output_path} ({size_kb:.0f} KB)")
 
+    # ── Validation report ────────────────────────────────────────────
+    report.print_report()
+
     # ── Debug output ───────────────────────────────────────────────────
     if args.debug:
         print("\nSalvando JSONs de debug...")
@@ -274,6 +334,15 @@ def _build_once(
             encoding="utf-8",
         )
         print(f"  → {debug_dir / 'referencias_index.json'}")
+
+        if report.issues:
+            (debug_dir / "validation_report.json").write_text(
+                json.dumps(report.to_json(), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(f"  → {debug_dir / 'validation_report.json'}")
+
+    return report
 
 
 def _auto_commit_and_push() -> None:
@@ -312,7 +381,7 @@ def _auto_commit_and_push() -> None:
     print("  git push ✓")
 
 
-def main() -> None:
+def main() -> int:
     config = _load_config()
     sources = config.get("sources", {})
     output_cfg = config.get("output", {})
@@ -358,6 +427,10 @@ def main() -> None:
         "--only-private", action="store_true",
         help="Gera apenas a versão privada",
     )
+    parser.add_argument(
+        "--strict", action="store_true",
+        help="Trata avisos como erros (exit code 1 se houver qualquer problema)",
+    )
     args = parser.parse_args()
 
     if args.only_public and args.only_private:
@@ -368,25 +441,28 @@ def main() -> None:
 
     if not build_public and not build_private:
         print("Nada a fazer. Configure [output] private em config.local.toml ou use --only-public.")
-        sys.exit(1)
+        return 1
 
     t_total = time.time()
+    all_reports: list[ValidationReport] = []
 
     if build_public:
-        _build_once(
+        r = _build_once(
             args=args,
             include_private=False,
             output_path=Path(args.output),
             label="Versão pública (sem notas privadas)",
         )
+        all_reports.append(r)
 
     if build_private:
-        _build_once(
+        r = _build_once(
             args=args,
             include_private=True,
             output_path=Path(default_private),
             label="Versão privada (com notas privadas)",
         )
+        all_reports.append(r)
 
     elapsed_total = time.time() - t_total
     print(f"\n{'═' * 60}")
@@ -397,7 +473,15 @@ def main() -> None:
     if args.push and build_public:
         _auto_commit_and_push()
 
+    # Exit code based on validation results
+    total_errors = sum(len(r.errors) for r in all_reports)
+    total_warnings = sum(len(r.warnings) for r in all_reports)
+    if total_errors or (args.strict and total_warnings):
+        return 1
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    code = main()
     input("\nPressione Enter para fechar...")
+    sys.exit(code)

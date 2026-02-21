@@ -2,7 +2,6 @@
 
 Checks implementados:
   PARA_PERIOD       – § N. (ponto sem ordinal) → mismatch com pill do remissivo
-  PARA_DOT_ORDINAL  – § N.º (ponto + ordinal redundante)
   PARA_UNMATCHED    – linha começa com § mas não bate no regex de parágrafo
   ART_UNMATCHED     – linha começa com "Art." mas não bate no regex de artigo
   ART_NO_ORDINAL    – Art. N sem marca ordinal (N ≤ 9)
@@ -195,14 +194,6 @@ def run_checks(paras: list[dict]) -> list[dict]:
                     f"esperado pelo remissivo={expected_ident!r} → pill não vai grifar",
                     current_art, text,
                 ))
-            elif "." in group2:
-                # ── CHECK: PARA_DOT_ORDINAL ────────────────────────────────
-                issues.append(_issue(
-                    "PARA_DOT_ORDINAL",
-                    f"Sufixo incomum: identificador produzido={produced_ident!r}, "
-                    f"esperado pelo remissivo={expected_ident!r}",
-                    current_art, text,
-                ))
             continue
 
         # ─────────────────────────────────────────────────────────────────
@@ -233,7 +224,6 @@ def _issue(code: str, desc: str, context: str, text: str) -> dict:
 
 CODES_ORDER = [
     "PARA_PERIOD",
-    "PARA_DOT_ORDINAL",
     "PARA_UNMATCHED",
     "ART_UNMATCHED",
     "ART_NO_ORDINAL",
@@ -242,7 +232,6 @@ CODES_ORDER = [
 
 CODE_LABELS = {
     "PARA_PERIOD":       "§ N. (ponto sem ordinal) — normalizado para § Nº pelo parser",
-    "PARA_DOT_ORDINAL":  "§ N.º (ponto + ordinal, padrão Lei Orgânica) — normalizado para § Nº pelo parser",
     "PARA_UNMATCHED":    "§ não identificado como parágrafo",
     "ART_UNMATCHED":     "Art. não identificado como artigo",
     "ART_NO_ORDINAL":    "Art. N sem ordinal para N ≤ 9",

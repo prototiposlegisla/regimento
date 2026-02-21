@@ -780,7 +780,7 @@
       $btnClearIndexSearch.style.display = 'flex';
     }
     renderIndex();
-    $indexSearch.focus();
+    if (window.innerWidth > 768) $indexSearch.focus();
   }
 
   function closeIndex() {
@@ -1729,6 +1729,6 @@
   updateSelection();
   updateBreadcrumb();
   initDiffToggles();
-  $searchInput.focus();
+  if (window.innerWidth > 768) $searchInput.focus();
 
 })();

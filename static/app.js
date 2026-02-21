@@ -1794,25 +1794,7 @@
       ctx.fillStyle = color;
       ctx.fillRect(pad, y, barW, ch);
 
-      if (card.classList.contains('card-titulo')) {
-        const isDark = color !== '#fdd835';
-        headings.push({
-          y, h: ch, color,
-          textColor: isDark ? '#fff' : '#333',
-          label: getHeadingShortTitle(card),
-        });
-      } else if (card.classList.contains('card-artigo')) {
-        const artNum = card.dataset.art || '';
-        const lawPrefix = card.dataset.law;
-        const key = lawPrefix ? lawPrefix + ':' + artNum : artNum;
-        const summary = SUMMARIES_MAP[key] || '';
-        const prefix = (lawPrefix ? lawPrefix + ' ' : '') + 'Art. ' + artNum;
-        headings.push({
-          y, h: ch, color: '#555',
-          textColor: '#fff',
-          label: summary ? prefix + ' — ' + summary : prefix,
-        });
-      }
+      headings.push({ y, h: ch, card });
     }
 
     minimapHeadings = headings;
@@ -1874,10 +1856,90 @@
       minimapDragging = false;
     });
 
-    // Tooltip on hover over heading stripes
+    // Tooltip breadcrumb on hover
+    const MINIMAP_COLORS = {
+      norma:   { bg: '#222',    text: '#fff' },
+      tit:     { bg: '#b71c1c', text: '#fff' },
+      cap:     { bg: '#f57c00', text: '#fff' },
+      sec:     { bg: '#fdd835', text: '#333' },
+      subsec:  { bg: '#2e7d32', text: '#fff' },
+      article: { bg: '#555',    text: '#fff' },
+    };
+
+    let lastTooltipCard = null;
+
+    function buildTooltipBreadcrumb(card) {
+      $minimapTooltip.innerHTML = '';
+
+      // Collect ancestor headings (same logic as updateBreadcrumb)
+      const levelOrder = ['norma', 'tit', 'cap', 'sec', 'subsec'];
+      const foundLevels = new Set();
+      const ancestors = [];
+      let prev = card.classList.contains('card-titulo') ? card.previousElementSibling : card.previousElementSibling;
+      // If card IS a heading, include itself first
+      if (card.classList.contains('card-titulo')) {
+        const sec = card.dataset.section || '';
+        let level = '';
+        if (sec.startsWith('norma')) level = 'norma';
+        else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+        else if (sec.startsWith('cap')) level = 'cap';
+        else if (sec.startsWith('subsec')) level = 'subsec';
+        else if (sec.startsWith('sec')) level = 'sec';
+        if (level) {
+          foundLevels.add(level);
+          ancestors.push({ el: card, level });
+        }
+        prev = card.previousElementSibling;
+      }
+      while (prev && foundLevels.size < levelOrder.length) {
+        if (prev.classList.contains('card-titulo')) {
+          const sec = prev.dataset.section || '';
+          let level = '';
+          if (sec.startsWith('norma')) level = 'norma';
+          else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+          else if (sec.startsWith('cap')) level = 'cap';
+          else if (sec.startsWith('subsec')) level = 'subsec';
+          else if (sec.startsWith('sec')) level = 'sec';
+          if (level && !foundLevels.has(level)) {
+            foundLevels.add(level);
+            ancestors.push({ el: prev, level });
+            if (level === 'norma') break;
+          }
+        }
+        prev = prev.previousElementSibling;
+      }
+      ancestors.reverse();
+
+      for (const a of ancestors) {
+        const chip = document.createElement('div');
+        chip.className = 'mm-chip';
+        const c = MINIMAP_COLORS[a.level];
+        chip.style.background = c.bg;
+        chip.style.color = c.text;
+        chip.textContent = getHeadingShortTitle(a.el);
+        $minimapTooltip.appendChild(chip);
+      }
+
+      // Article chip at the bottom
+      if (card.classList.contains('card-artigo')) {
+        const artNum = card.dataset.art || '';
+        const lawPrefix = card.dataset.law;
+        const key = lawPrefix ? lawPrefix + ':' + artNum : artNum;
+        const summary = SUMMARIES_MAP[key] || '';
+        const prefix = (lawPrefix ? lawPrefix + ' ' : '') + 'Art. ' + artNum;
+        const chip = document.createElement('div');
+        chip.className = 'mm-chip';
+        chip.style.background = MINIMAP_COLORS.article.bg;
+        chip.style.color = MINIMAP_COLORS.article.text;
+        chip.textContent = summary ? prefix + ' — ' + summary : prefix;
+        $minimapTooltip.appendChild(chip);
+      }
+    }
+
     $minimap.addEventListener('mousemove', (e) => {
       if (minimapDragging) {
         $minimapTooltip.style.display = 'none';
+        lastTooltipCard = null;
         return;
       }
       const rect = $minimap.getBoundingClientRect();
@@ -1890,18 +1952,27 @@
         }
       }
       if (hit) {
-        $minimapTooltip.textContent = hit.label;
-        $minimapTooltip.style.background = hit.color;
-        $minimapTooltip.style.color = hit.textColor;
-        $minimapTooltip.style.top = hit.y + hit.h / 2 + 'px';
-        $minimapTooltip.style.display = 'block';
+        if (hit.card !== lastTooltipCard) {
+          lastTooltipCard = hit.card;
+          buildTooltipBreadcrumb(hit.card);
+        }
+        // Show offscreen to measure, then position so last chip aligns with mouse Y
+        $minimapTooltip.style.top = '0px';
+        $minimapTooltip.style.display = 'flex';
+        const lastChip = $minimapTooltip.lastElementChild;
+        const chipMidY = lastChip
+          ? lastChip.offsetTop + lastChip.offsetHeight / 2
+          : $minimapTooltip.offsetHeight / 2;
+        $minimapTooltip.style.top = (my - chipMidY) + 'px';
       } else {
         $minimapTooltip.style.display = 'none';
+        lastTooltipCard = null;
       }
     });
 
     $minimap.addEventListener('mouseleave', () => {
       $minimapTooltip.style.display = 'none';
+      lastTooltipCard = null;
     });
   }
 

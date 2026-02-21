@@ -1042,11 +1042,14 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  white-space: nowrap;
   pointer-events: none;
   z-index: 171;
   box-shadow: 0 2px 8px rgba(0,0,0,.18);
   transform: translateY(-50%);
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (min-width: 1024px) {

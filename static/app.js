@@ -1790,17 +1790,27 @@
       if (card.classList.contains('filtered-out')) continue;
       const y = card.offsetTop * scale;
       const ch = Math.max(1, card.offsetHeight * scale);
-      if (!card.classList.contains('card-titulo')) continue;
       const color = getMinimapColor(card);
       ctx.fillStyle = color;
       ctx.fillRect(pad, y, barW, ch);
 
-      {
+      if (card.classList.contains('card-titulo')) {
         const isDark = color !== '#fdd835';
         headings.push({
           y, h: ch, color,
           textColor: isDark ? '#fff' : '#333',
           label: getHeadingShortTitle(card),
+        });
+      } else if (card.classList.contains('card-artigo')) {
+        const artNum = card.dataset.art || '';
+        const lawPrefix = card.dataset.law;
+        const key = lawPrefix ? lawPrefix + ':' + artNum : artNum;
+        const summary = SUMMARIES_MAP[key] || '';
+        const prefix = (lawPrefix ? lawPrefix + ' ' : '') + 'Art. ' + artNum;
+        headings.push({
+          y, h: ch, color: '#555',
+          textColor: '#fff',
+          label: summary ? prefix + ' — ' + summary : prefix,
         });
       }
     }

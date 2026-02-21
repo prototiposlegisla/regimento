@@ -10,6 +10,8 @@
 
   const SUMMARIES_MAP = /*__SUMMARIES_MAP__*/{};
 
+  const INFO_HTML = /*__INFO_HTML__*/"";
+
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
   const MARKER_PALETTE = [
     { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
@@ -792,13 +794,26 @@
   $btnIndex.addEventListener('click', openIndex);
   $indexOverlay.addEventListener('click', closeIndex);
 
+  const $btnInfoTab = document.getElementById('btn-info-tab');
+  const $indexSearchWrapper = document.getElementById('index-search-wrapper');
+
   document.querySelectorAll('.index-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
+      $btnInfoTab.classList.remove('active');
       tab.classList.add('active');
       currentIndexTab = tab.dataset.tab;
+      $indexSearchWrapper.style.display = '';
       renderIndex();
     });
+  });
+
+  $btnInfoTab.addEventListener('click', () => {
+    document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
+    $btnInfoTab.classList.add('active');
+    currentIndexTab = 'info';
+    $indexSearchWrapper.style.display = 'none';
+    renderIndex();
   });
 
   const $btnClearIndexSearch = document.getElementById('btn-clear-index-search');
@@ -824,7 +839,10 @@
     const filter = $indexSearch.value.trim().toLowerCase();
     $indexContent.innerHTML = '';
 
-    if (currentIndexTab === 'systematic') {
+    if (currentIndexTab === 'info') {
+      $indexContent.innerHTML = '<div class="info-content">' + INFO_HTML + '</div>';
+      return;
+    } else if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
       if (!filter) syncSystematicToScroll();
     } else if (currentIndexTab === 'references') {

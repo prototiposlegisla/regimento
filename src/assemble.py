@@ -12,6 +12,7 @@ def assemble(
     subject_index: list[dict],
     referencias_index: list[dict],
     summaries_map: dict[str, str],
+    info_html: str,
     base_dir: Path,
     output_path: Path,
 ) -> None:
@@ -34,6 +35,9 @@ def assemble(
     js = js.replace("/*__SUBJECT_INDEX__*/[]", subj_json)
     js = js.replace("/*__REFERENCIAS_INDEX__*/[]", ref_json)
     js = js.replace("/*__SUMMARIES_MAP__*/{}", summaries_json)
+
+    info_json = json.dumps(info_html, ensure_ascii=False)
+    js = js.replace("/*__INFO_HTML__*/\"\"", info_json)
 
     # Assemble final HTML
     final = template.replace("{{CSS}}", css)

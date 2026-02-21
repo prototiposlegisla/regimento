@@ -134,7 +134,7 @@ def _build_once(
     print(f"{'═' * 60}")
 
     # ── 1. Parse DOCX ──────────────────────────────────────────────────
-    print("[1/7] Parseando DOCX...")
+    print("[1/8] Parseando DOCX...")
     from src.parse_docx import parse_docx
 
     doc = parse_docx(args.docx, include_private=include_private)
@@ -156,7 +156,7 @@ def _build_once(
         print(f"      → DOCX sem problemas de formatação")
 
     # ── 2. Resolve amendments ──────────────────────────────────────────
-    print("[2/7] Resolvendo emendas...")
+    print("[2/8] Resolvendo emendas...")
     from src.resolve_amendments import resolve_amendments
 
     doc = resolve_amendments(doc)
@@ -169,7 +169,7 @@ def _build_once(
     print(f"      → {version_count} versões anteriores detectadas")
 
     # ── 3. Parse XLSX ──────────────────────────────────────────────────
-    print("[3/7] Parseando XLSX...")
+    print("[3/8] Parseando XLSX...")
     from src.parse_xlsx import parse_xlsx, parse_law_mapping
 
     xlsx_path = Path(args.xlsx)
@@ -258,7 +258,7 @@ def _build_once(
                     v.uid = v.uid.replace("art", f"art{lp}", 1)
 
     # ── 4. Parse referencias DOCX ────────────────────────────────────
-    print("[4/7] Parseando referências...")
+    print("[4/8] Parseando referências...")
     from src.parse_referencias import parse_referencias
 
     ref_path = Path(args.referencias)
@@ -272,22 +272,34 @@ def _build_once(
         print("      → DOCX de referências não encontrado, aba vazia")
         referencias_data = []
 
-    # ── 5. Build systematic index ──────────────────────────────────────
-    print("[5/7] Gerando índice sistemático...")
+    # ── 5. Parse informacoes DOCX ─────────────────────────────────────
+    print("[5/8] Parseando informações...")
+    from src.parse_informacoes import parse_informacoes
+
+    info_path = Path(args.informacoes)
+    if info_path.exists():
+        info_html = parse_informacoes(info_path)
+        print(f"      → {len(info_html)} caracteres de HTML")
+    else:
+        print("      → DOCX de informações não encontrado, aba vazia")
+        info_html = ""
+
+    # ── 6. Build systematic index ──────────────────────────────────────
+    print("[6/8] Gerando índice sistemático...")
     from src.build_index import build_systematic_index
 
     systematic_index = build_systematic_index(doc)
     print(f"      → {len(systematic_index)} nós raiz")
 
-    # ── 6. Render HTML cards ───────────────────────────────────────────
-    print("[6/7] Renderizando cards HTML...")
+    # ── 7. Render HTML cards ───────────────────────────────────────────
+    print("[7/8] Renderizando cards HTML...")
     from src.render_html import render_cards
 
     cards_html = render_cards(doc)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
-    # ── 7. Assemble ────────────────────────────────────────────────────
-    print("[7/7] Montando HTML final...")
+    # ── 8. Assemble ────────────────────────────────────────────────────
+    print("[8/8] Montando HTML final...")
     from src.assemble import assemble
 
     # Build summaries map: {art_number: summary} for fallback hints
@@ -306,6 +318,7 @@ def _build_once(
         subject_index=subject_list,
         referencias_index=referencias_data,
         summaries_map=summaries_map,
+        info_html=info_html,
         base_dir=BASE_DIR,
         output_path=output_path,
     )
@@ -502,6 +515,7 @@ def main() -> int:
     default_docx = sources.get("docx", str(BASE_DIR / "regimentoInterno.docx"))
     default_xlsx = sources.get("xlsx", str(BASE_DIR / "remissivo.xlsx"))
     default_refs = sources.get("referencias", str(BASE_DIR / "referencias.docx"))
+    default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.docx"))
     default_private = output_cfg.get("private", "")
     default_gdrive = output_cfg.get("gdrive", "")
 
@@ -523,6 +537,10 @@ def main() -> int:
     parser.add_argument(
         "--referencias", default=default_refs,
         help="Caminho do DOCX de referências",
+    )
+    parser.add_argument(
+        "--informacoes", default=default_info,
+        help="Caminho do DOCX de informações",
     )
     parser.add_argument(
         "--output", default=str(BASE_DIR / "docs" / "index.html"),

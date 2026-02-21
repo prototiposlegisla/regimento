@@ -605,10 +605,17 @@ mark {
   border-bottom: 1px solid #eee;
 }
 
+#index-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 #index-tabs {
   display: flex;
+  flex: 1;
   gap: 0;
-  margin-bottom: 8px;
 }
 
 .index-tab {
@@ -623,6 +630,37 @@ mark {
 .index-tab:first-child { border-radius: 6px 0 0 6px; }
 .index-tab:last-child { border-radius: 0 6px 6px 0; }
 .index-tab.active { background: var(--selected-border); color: #fff; }
+
+#btn-info-tab {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#btn-info-tab.active { background: var(--selected-border); color: #fff; }
+
+.info-content { line-height: 1.6; }
+.info-content h3 {
+  font-size: 15px;
+  margin: 18px 0 6px;
+  color: #333;
+}
+.info-content h3:first-child { margin-top: 4px; }
+.info-content p {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 8px;
+}
 
 #index-search-wrapper {
   position: relative;

@@ -613,10 +613,17 @@ mark {
   border-bottom: 1px solid #eee;
 }
 
+#index-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 #index-tabs {
   display: flex;
+  flex: 1;
   gap: 0;
-  margin-bottom: 8px;
 }
 
 .index-tab {
@@ -631,6 +638,37 @@ mark {
 .index-tab:first-child { border-radius: 6px 0 0 6px; }
 .index-tab:last-child { border-radius: 0 6px 6px 0; }
 .index-tab.active { background: var(--selected-border); color: #fff; }
+
+#btn-info-tab {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#btn-info-tab.active { background: var(--selected-border); color: #fff; }
+
+.info-content { line-height: 1.6; }
+.info-content h3 {
+  font-size: 15px;
+  margin: 18px 0 6px;
+  color: #333;
+}
+.info-content h3:first-child { margin-top: 4px; }
+.info-content p {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 8px;
+}
 
 #index-search-wrapper {
   position: relative;
@@ -5851,10 +5889,13 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 <!-- INDEX PANEL -->
 <div id="index-panel">
   <div id="index-header">
-    <div id="index-tabs">
-      <button class="index-tab active" data-tab="systematic">Sistemático</button>
-      <button class="index-tab" data-tab="subject">Remissivo</button>
-      <button class="index-tab" data-tab="references">Referências</button>
+    <div id="index-tabs-row">
+      <div id="index-tabs">
+        <button class="index-tab active" data-tab="systematic">Sistemático</button>
+        <button class="index-tab" data-tab="subject">Remissivo</button>
+        <button class="index-tab" data-tab="references">Referências</button>
+      </div>
+      <button id="btn-info-tab" data-tab="info" title="Informações">i</button>
     </div>
     <div id="index-search-wrapper">
       <input id="index-search" type="text" placeholder="Pesquisar no índice...">
@@ -7478,6 +7519,8 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
   const SUMMARIES_MAP = {"1": "Sede da Câmara", "2": "Legislatura e Sessão Legislativa", "3": "Instalação da Câmara", "4": "Eleição da Mesa na instalação", "5": "Composição da Mesa", "6": "Cessação das funções da Mesa", "7": "Vacância na Mesa", "8": "Vedação de Comissão a membros da Mesa", "9": "Renovação da Mesa", "10": "Processo de eleição da Mesa", "11": "Voto secreto na eleição da Mesa", "12": "Composição da Mesa publicada", "13": "Atribuições da Mesa", "14": "Reuniões da Mesa", "15": "Contratos da Câmara", "16": "Representação da Câmara pelo Presidente", "17": "Atribuições do Presidente", "18": "Demais competências do Presidente", "19": "Licença do Presidente", "20": "Afastamento para debate", "21": "Impedimento de presidência em matéria própria", "22": "Quórum e presença do Presidente", "23": "Uso da palavra pelo Presidente em exercício", "24": "Substituição do Presidente", "25": "Atribuições dos Vice-Presidentes", "26": "Atribuições do 1º Secretário", "27": "Suplentes da Mesa", "28": "Prestação de contas da Mesa", "29": "Publicação dos balancetes", "30": "Renúncia de cargo na Mesa", "31": "Destituição de membro da Mesa", "32": "Processo de destituição", "33": "Apreciação do parecer processante", "34": "Votação por improcedência das acusações", "35": "Resolução de destituição", "36": "Impedimento do acusado durante processo", "37": "Tempo de debate no processo", "38": "Tipos de Comissões", "39": "Comissões Permanentes e composição", "40": "Proporcionalidade partidária nas Comissões", "41": "Mandatos dos membros de Comissão", "42": "Publicação da composição das Comissões", "43": "Eleição de dirigentes de Comissão", "44": "Destituição por ausência", "45": "Substituição de membro de Comissão", "46": "Competência das Comissões Permanentes", "47": "Competência específica de cada Comissão", "48": "Vedações às Comissões Permanentes", "49": "Eleição de Presidente de Comissão", "50": "Atribuições do Presidente de Comissão", "51": "Recurso contra ato do Presidente", "52": "Atribuições do Vice-Presidente de Comissão", "53": "Substituição na ausência dos dirigentes", "54": "Vacância na presidência de Comissão", "55": "Subcomissões", "56": "Relatório das Subcomissões", "57": "Reuniões das Comissões Permanentes", "58": "Local e quórum das reuniões", "59": "Publicidade das reuniões de Comissão", "60": "Convite de técnicos para reuniões", "61": "Atas das reuniões de Comissão", "62": "Deliberações das Comissões", "63": "Prazo para emissão de parecer", "64": "Devolução do processo após prazo", "65": "Dependência de outro processo", "66": "Dependência de audiências públicas", "67": "Inclusão na Ordem do Dia após prazos", "68": "Pedido de informações ao Executivo", "69": "Recesso e suspensão de prazos", "70": "Distribuição a mais de uma Comissão", "71": "Reunião conjunta de Comissões", "72": "Nova manifestação de Comissão", "73": "Inaplicabilidade a proposituras populares", "74": "Conceito e forma do parecer", "75": "Aprovação do parecer pela Comissão", "76": "Contagem de votos nas Comissões", "77": "Voto em separado", "78": "Parecer verbal", "79": "Efeito do parecer de inconstitucionalidade", "80": "Rejeição por pareceres contrários", "81": "Deliberação conclusiva pelas Comissões", "82": "Competência reservada ao Plenário", "83": "Pareceres divergentes", "84": "Aprovação conclusiva pela Comissão", "85": "Audiências públicas obrigatórias", "86": "Normas para audiências obrigatórias", "87": "Audiências por requerimento", "88": "Atas de audiências públicas", "89": "Tipos de Comissões Temporárias", "90": "Comissão Parlamentar de Inquérito", "91": "Criação de CPI", "92": "Poderes da CPI", "93": "Requisitos do requerimento de CPI", "94": "Membros da CPI", "95": "Relatório da CPI", "96": "Projetos resultantes da CPI", "97": "Extinção por prazo da CPI", "98": "Comissão de Representação", "99": "Comissão de Estudos", "100": "Comissões Especiais", "101": "Conceito de Plenário", "102": "Modalidades de deliberação", "103": "Matérias e quóruns de deliberação", "104": "Votação aberta no Plenário", "105": "Atribuições do Plenário", "106": "Posse dos Vereadores", "107": "Imunidade parlamentar", "108": "Afastamento de servidor eleito", "109": "Deveres dos Vereadores", "110": "Viagens ao exterior", "111": "Faltas dos Vereadores", "112": "Licenças dos Vereadores", "113": "Licença por incapacidade física", "114": "Prorrogação de licença", "115": "Licença automática por função executiva", "116": "Remuneração durante licença", "117": "Convocação de Suplente", "118": "Procedimento de convocação de Suplente", "119": "Representações partidárias e Blocos", "120": "Prerrogativas dos Líderes", "121": "Liderança do Prefeito", "122": "Fixação de remuneração dos Vereadores", "123": "Verba de representação do Presidente", "124": "Desconto por falta injustificada", "125": "Perda do mandato do Vereador", "126": "Extinção do mandato do Vereador", "127": "Declaração de extinção do mandato", "128": "Irretratabilidade da renúncia", "129": "Início do processo de cassação", "130": "Instauração do processo de cassação", "131": "Cassação do mandato", "132": "Tipos de sessões da Câmara", "133": "Presidência na ausência da Mesa", "134": "Quórum para abertura de sessão", "135": "Verificação de presença", "136": "Falta de quórum inicial", "137": "Abertura solene da sessão", "138": "Traje e acesso ao Plenário", "139": "Hipóteses de uso da palavra", "140": "Regras gerais do uso da palavra", "141": "Suspensão da sessão", "142": "Encerramento antecipado da sessão", "143": "Prorrogação da sessão", "144": "Requerimentos de prorrogação", "145": "Limite horário das sessões", "146": "Ata das sessões", "147": "Aprovação da ata", "148": "Correção de publicações com erros", "149": "Publicação sem revisão", "150": "Prazo de revisão de discursos", "151": "Dias e duração das sessões ordinárias", "152": "Partes da sessão ordinária", "153": "Recesso e suspensão de sessões", "154": "Expediente sem sessão", "155": "Não organização de sessão a requerimento", "156": "Limite de cópias de pronunciamentos", "157": "Pequeno Expediente", "158": "Encaminhamento de discurso no Pequeno Expediente", "159": "Grande Expediente", "160": "Uso da palavra no Grande Expediente", "161": "Encaminhamento de discurso no Grande Expediente", "163": "Prolongamento do Expediente", "164": "Destino do Prolongamento do Expediente", "165": "Ordem taxativa do Prolongamento", "166": "Proposições para o Prolongamento", "167": "Requerimentos de urgência no Prolongamento", "168": "Tempo de discussão dos requerimentos", "169": "Falta de quórum no Prolongamento", "170": "Ordem do Dia", "171": "Organização da pauta", "172": "Interrupção da Ordem do Dia", "173": "Urgência na pauta", "174": "Inversão de pauta", "175": "Destaque, adiamento e retirada", "176": "Adiamento de discussão ou votação", "177": "Retirada de proposição da pauta", "178": "Esgotamento da pauta", "179": "Explicação Pessoal", "180": "Conteúdo da Explicação Pessoal", "181": "Inscrição para Explicação Pessoal", "182": "Vedação de prorrogação para Explicação Pessoal", "183": "Convocação de sessão extraordinária", "183-A": "Sessões virtuais", "184": "Antecedência da convocação extraordinária", "185": "Publicação da convocação", "186": "Comunicação da convocação", "187": "Quórum para sessão extraordinária", "188": "Pauta exclusiva em sessão extraordinária", "189": "Falta de quórum em sessão extraordinária", "190": "Organização da pauta extraordinária", "191": "Alterações na pauta extraordinária", "192": "Normas aplicáveis às sessões extraordinárias", "193": "Sessões solenes", "194": "Convocação de sessão solene", "195": "Sessões secretas", "196": "Instalação de sessão secreta", "197": "Acesso nas sessões secretas", "198": "Quórum para sessão secreta", "199": "Ata da sessão secreta", "200": "Discursos na sessão secreta", "201": "Publicidade do assunto da sessão secreta", "202": "Sessão permanente", "203": "Instalação da sessão permanente", "204": "Funcionamento da sessão permanente", "205": "Exclusividade da sessão permanente", "206": "Sessão permanente durante outra sessão", "207": "Tribuna Popular", "208": "Ordem da Tribuna Popular", "209": "Tempo na Tribuna Popular", "210": "Publicação da pauta da Tribuna Popular", "211": "Tipos de proposições", "212": "Devolução de proposições", "212-A": "Anexação de proposições correlatas", "213": "Recebimento obrigatório da CCJ", "214": "Autoria da proposição", "215": "Renovação de projetos rejeitados", "216": "Publicação dos projetos", "217": "Proposição de Vereador afastado", "218": "Encaminhamento de proposições", "219": "Indicação", "220": "Requerimento", "221": "Classificação dos requerimentos", "222": "Vedação de emenda a requerimento", "223": "Requerimentos despachados pelo Presidente", "224": "Requerimentos de informação", "225": "Requerimentos sem discussão no Plenário", "226": "Requerimentos com discussão no Plenário", "227": "Tempo para discutir requerimentos", "228": "Moção", "229": "Tramitação da moção", "230": "Vedação de emenda a moção", "231": "Tempo para discussão de moção", "232": "Instrumentos legislativos da Câmara", "233": "Emenda à Lei Orgânica", "234": "Projeto de lei", "235": "Iniciativa privativa do Prefeito", "236": "Decreto legislativo", "237": "Resolução", "238": "Requisitos formais dos projetos", "239": "Leitura, publicação e distribuição", "240": "Publicação prévia obrigatória", "241": "Impressão e entrega dos avulsos", "242": "Duas discussões e votações obrigatórias", "243": "Discussão em bloco", "244": "Arquivamento de projetos rejeitados", "245": "Urgência dos projetos do Executivo", "246": "Comunicação após deliberação em urgência", "247": "Projeto de resolução criando cargos", "248": "Início da primeira discussão", "249": "Tempo na primeira discussão", "250": "Votação em bloco na primeira discussão", "251": "Votação de substitutivos", "252": "Votação de emendas na primeira discussão", "253": "Redação do texto aprovado", "254": "Tempo na segunda discussão", "255": "Votação na segunda discussão", "256": "Emendas na segunda discussão", "257": "Envio à sanção sem emendas", "258": "Redação final com emendas", "259": "Redação final", "260": "Dúvida sobre vontade legislativa", "261": "Prazo para emendas à redação final", "262": "Apreciação do parecer de redação final", "263": "Tempo de discussão da redação final", "264": "Rejeição do parecer de reabertura", "265": "Reabertura de discussão", "266": "Emendas na reabertura", "267": "Admissibilidade de emendas à redação final", "268": "Encaminhamento após redação final", "269": "Substitutivo", "270": "Tramitação dos substitutivos", "271": "Emenda", "272": "Votação das emendas", "273": "Impertinência de emendas", "274": "Retirada de proposição", "275": "Arquivamento no início de legislatura", "276": "Conceito de discussão", "277": "Inscrição e ordem dos oradores", "278": "Preferência na ordem de oratórias", "279": "Tempo extra para autores e relatores", "280": "Ausência e reinscrição do orador", "281": "Limitações à interrupção do orador", "282": "Aparte", "283": "Vedação de apartes", "284": "Encerramento da discussão", "285": "Discussão não encerrada com adiamento pendente", "286": "Reapresentação do pedido de encerramento", "287": "Votação plenária", "288": "Modalidades de voto", "289": "Voto do Presidente", "290": "Encaminhamento da votação", "291": "Preferência dos Líderes no encaminhamento", "292": "Unicidade do encaminhamento", "293": "Processos de votação", "294": "Votação simbólica", "295": "Votação nominal", "296": "Procedimento da votação nominal", "299": "Dúvidas sobre resultado proclamado", "300": "Publicação do Boletim de Apuração", "301": "Verificação nominal de votação", "302": "Declaração de voto", "303": "Momento da declaração de voto", "304": "Tempo para declaração de voto", "305": "Controle do tempo de uso da palavra", "306": "Tempos regimentais", "307": "Fala pela ordem", "308": "Publicação de questão de ordem", "309": "Tempo pela ordem", "310": "Resposta a questão de ordem", "311": "Recurso contra decisão do Presidente", "312": "Tramitação do recurso", "313": "Precedentes regimentais", "314": "Consolidação dos precedentes", "315": "Tramitação especial das proposituras populares", "316": "Direito de iniciativa popular", "317": "Requisitos da iniciativa popular", "318": "Protocolo da propositura popular", "319": "Distribuição da propositura popular", "320": "Audiência pública para propositura popular", "321": "Deliberação sobre propositura popular", "322": "Comunicação do parecer às entidades", "323": "Resultado da deliberação popular", "324": "Convocação extraordinária no recesso", "325": "Conteúdo da convocação", "326": "Procedimento após convocação", "327": "Sessões no período extraordinário", "328": "Normas do período extraordinário", "329": "Prazos dos projetos orçamentários", "330": "Recebimento dos projetos orçamentários", "331": "Créditos adicionais", "332": "Modificações nos projetos orçamentários", "333": "Sessão ordinária com projeto orçamentário", "334": "Vedação de vista dos projetos orçamentários", "335": "Tramitação na Comissão de Finanças", "336": "Inclusão na pauta após parecer", "337": "Segunda discussão e emendas orçamentárias", "338": "Parecer sobre emendas orçamentárias", "339": "Pauta após parecer sobre emendas", "340": "Votação de emendas por grupos", "341": "Redação final e sanção orçamentária", "342": "Inclusão da redação final na pauta", "343": "Encaminhamento à sanção", "344": "Orçamento em atraso", "345": "Recursos sem dotação designada", "346": "Normas gerais para o orçamento", "347": "Concessão de título honorífico", "348": "Requisitos do projeto de título honorífico", "349": "Responsabilidade dos signatários", "350": "Discussão de título honorífico", "351": "Entrega do título honorífico", "352": "Indicação para o TCM", "353": "Mensagem para o TCM", "354": "Projeto de decreto para o TCM", "355": "Prazo da CCJ para indicação ao TCM", "356": "Arguição do indicado ao TCM", "357": "Inclusão na pauta após arguição", "358": "Votação do indicado ao TCM", "359": "Normas gerais para deliberação sobre TCM", "360": "Envio do projeto aprovado ao Prefeito", "361": "Veto do Prefeito", "362": "Prazo para deliberação sobre veto", "363": "Distribuição do veto às Comissões", "364": "Veto com múltiplos aspectos", "365": "Inclusão do veto na pauta", "366": "Discussão e votação do veto", "367": "Votação em bloco do veto", "368": "Rejeição do veto", "369": "Promulgação pelo Presidente da Câmara", "370": "Promulgação e publicação de atos", "372": "Secretaria da Câmara", "373": "Interpelações sobre a Secretaria", "374": "Policiamento do edifício", "375": "Cuidados do policiamento", "376": "Acesso ao Plenário", "377": "Proibição de armas no edifício", "378": "Vedação de manifestações de espectadores", "379": "Comparecimento do Prefeito à Câmara", "380": "Assento do Prefeito na Mesa", "381": "Convocação de Secretários Municipais", "382": "Prazo de atendimento à convocação", "383": "Sessão para ouvir Secretário", "384": "Encerramento da sessão de interpelação", "385": "Envio das contas ao TCM", "386": "Votação do parecer sobre contas", "387": "Prazo para apreciação das contas", "388": "Rejeição das contas", "389": "Crimes do Prefeito", "390": "Infrações administrativas do Prefeito", "391": "Perda do mandato do Prefeito", "392": "Reforma do Regimento por resolução", "393": "Iniciativa e aprovação da reforma", "394": "Publicação do Regimento reformado", "395": "Vigência do Regimento", "ADT1": "Disposições transitórias na entrada em vigor", "ADT2": "Tramitação das proposituras anteriores", "ADT3": "Matérias em Ordem do Dia durante a transição", "ADT4": "Requerimentos de transcrição anteriores", "ADT4-A": "Sessões ordinárias durante a transição", "ADT4-B": "Sessões solenes durante a transição", "ADT4-C": "CPIs na vigência da alteração", "ADT4-D": "Tramitação virtual durante emergência", "ADT4-E": "Covid como motivo justo para falta", "ADT4-F": "Suspensão de sessões durante Covid", "ADT4-G": "Suspensão de prazos de CPI", "ADT4-H": "Votação nominal virtual", "ADT5": "Promulgação do ADT", "ADT6": "Revogação das disposições anteriores", "LOM:12": "Poder Legislativo Municipal", "LOM:13": "Competências da Câmara com sanção", "LOM:14": "Competências exclusivas da Câmara", "LOM:15": "Instalação e posse dos Vereadores", "LOM:16": "Imunidade dos Vereadores", "LOM:17": "Vedações aos Vereadores", "LOM:18": "Perda de mandato do Vereador", "LOM:19": "Código de Ética dos Vereadores", "LOM:20": "Licenças dos Vereadores", "LOM:21": "Licença automática por função", "LOM:22": "Suplentes e vacância", "LOM:23": "Acesso do Vereador a repartições", "LOM:24": "Eleição da Mesa", "LOM:25": "Renovação da Mesa", "LOM:26": "Mandato da Mesa", "LOM:27": "Atribuições da Mesa", "LOM:28": "Matéria rejeitada em outra sessão", "LOM:29": "Sessão legislativa ordinária", "LOM:30": "Publicidade das sessões", "LOM:31": "Convocação extraordinária no recesso", "LOM:32": "Comissões permanentes e temporárias", "LOM:33": "CPI Municipal", "LOM:34": "Processo Legislativo", "LOM:35": "Voto aberto nas deliberações", "LOM:36": "Emenda à Lei Orgânica", "LOM:37": "Iniciativa das leis", "LOM:38": "Urgência dos projetos do Prefeito", "LOM:39": "Decreto legislativo e resolução", "LOM:40": "Quórum e maioria nas deliberações", "LOM:41": "Audiências públicas obrigatórias", "LOM:42": "Sanção e veto", "LOM:43": "Rejeição por pareceres contrários", "LOM:44": "Iniciativa popular", "LOM:45": "Plebiscito e referendo", "LOM:46": "Plano Diretor e zoneamento", "LOM:47": "Fiscalização financeira", "LOM:48": "Controle externo pelo TCM", "LOM:49": "Tribunal de Contas do Município", "LOM:50": "Escolha dos conselheiros do TCM", "LOM:52": "Despesas não autorizadas", "LOM:53": "Controle interno integrado", "LOM:54": "Conselhos de Representantes", "LOM:55": "Competências dos Conselhos de Representantes", "LOM:55-A": "Procuradoria-Geral da Câmara", "CF:29": "Lei Orgânica Municipal", "CF:29-A": "Limite de gastos do Legislativo Municipal", "CF:30": "Competências municipais", "CF:31": "Fiscalização municipal"};
 
+  const INFO_HTML = "<p>Esse é um Regimento referenciado.</p>\n<h3>Pesquisa</h3>\n<p>É possível usar prefixo a. Exemplo: a123</p>\n<h3>Marcadores</h3>\n<p>É possível criar marcadores.</p>";
+
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
   const MARKER_PALETTE = [
     { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
@@ -8260,13 +8303,26 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   $btnIndex.addEventListener('click', openIndex);
   $indexOverlay.addEventListener('click', closeIndex);
 
+  const $btnInfoTab = document.getElementById('btn-info-tab');
+  const $indexSearchWrapper = document.getElementById('index-search-wrapper');
+
   document.querySelectorAll('.index-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
+      $btnInfoTab.classList.remove('active');
       tab.classList.add('active');
       currentIndexTab = tab.dataset.tab;
+      $indexSearchWrapper.style.display = '';
       renderIndex();
     });
+  });
+
+  $btnInfoTab.addEventListener('click', () => {
+    document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
+    $btnInfoTab.classList.add('active');
+    currentIndexTab = 'info';
+    $indexSearchWrapper.style.display = 'none';
+    renderIndex();
   });
 
   const $btnClearIndexSearch = document.getElementById('btn-clear-index-search');
@@ -8292,7 +8348,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     const filter = $indexSearch.value.trim().toLowerCase();
     $indexContent.innerHTML = '';
 
-    if (currentIndexTab === 'systematic') {
+    if (currentIndexTab === 'info') {
+      $indexContent.innerHTML = '<div class="info-content">' + INFO_HTML + '</div>';
+      return;
+    } else if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
       if (!filter) syncSystematicToScroll();
     } else if (currentIndexTab === 'references') {

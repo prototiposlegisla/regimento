@@ -1946,7 +1946,7 @@
       const my = e.clientY - rect.top;
       let hit = null;
       for (const entry of minimapHeadings) {
-        if (my >= entry.y && my <= entry.y + entry.h + 4) {
+        if (my >= entry.y - 1 && my <= entry.y + entry.h + 1) {
           hit = entry;
           break;
         }
@@ -1956,14 +1956,15 @@
           lastTooltipCard = hit.card;
           buildTooltipBreadcrumb(hit.card);
         }
-        // Show offscreen to measure, then position so last chip aligns with mouse Y
+        // Position so last chip aligns with the stripe center
+        const stripeCenter = hit.y + hit.h / 2;
         $minimapTooltip.style.top = '0px';
         $minimapTooltip.style.display = 'flex';
         const lastChip = $minimapTooltip.lastElementChild;
         const chipMidY = lastChip
           ? lastChip.offsetTop + lastChip.offsetHeight / 2
           : $minimapTooltip.offsetHeight / 2;
-        $minimapTooltip.style.top = (my - chipMidY) + 'px';
+        $minimapTooltip.style.top = (stripeCenter - chipMidY) + 'px';
       } else {
         $minimapTooltip.style.display = 'none';
         lastTooltipCard = null;

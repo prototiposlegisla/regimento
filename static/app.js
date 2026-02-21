@@ -1790,11 +1790,12 @@
       if (card.classList.contains('filtered-out')) continue;
       const y = card.offsetTop * scale;
       const ch = Math.max(1, card.offsetHeight * scale);
+      if (!card.classList.contains('card-titulo')) continue;
       const color = getMinimapColor(card);
       ctx.fillStyle = color;
       ctx.fillRect(pad, y, barW, ch);
 
-      if (card.classList.contains('card-titulo')) {
+      {
         const isDark = color !== '#fdd835';
         headings.push({
           y, h: ch, color,

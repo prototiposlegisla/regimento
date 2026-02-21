@@ -1755,7 +1755,7 @@
       if (card.classList.contains('nivel-subsecao')) return '#2e7d32';
       return '#999';
     }
-    if (card.classList.contains('card-artigo')) return '#ddd';
+    if (card.classList.contains('card-artigo')) return '#fff';
     return '#eee';
   }
 

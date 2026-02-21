@@ -1007,10 +1007,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   bottom: 0;
   width: 48px;
   z-index: 170;
-  background: rgba(255,255,255,0.85);
+  background: rgba(200,200,200,0.6);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  border-left: 1px solid #e0e0e0;
+  border-left: 1px solid #ccc;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;

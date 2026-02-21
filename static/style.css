@@ -1034,6 +1034,21 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   transition: top 0.05s linear;
 }
 
+#minimap-tooltip {
+  display: none;
+  position: absolute;
+  right: 52px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 171;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  transform: translateY(-50%);
+}
+
 @media (min-width: 1024px) {
   #minimap { display: block; }
   #marker-nav { right: 56px; }

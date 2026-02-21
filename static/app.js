@@ -64,6 +64,7 @@
   const $minimap = document.getElementById('minimap');
   const $minimapCanvas = document.getElementById('minimap-canvas');
   const $minimapViewport = document.getElementById('minimap-viewport');
+  const $minimapTooltip = document.getElementById('minimap-tooltip');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -1743,6 +1744,7 @@
 
   // ===== MINIMAP =====
   let minimapRafId = null;
+  let minimapHeadings = []; // { y, h, color, textColor, label } for tooltip on hover
 
   function getMinimapColor(card) {
     if (card.classList.contains('card-titulo')) {
@@ -1782,15 +1784,27 @@
     const cards = getAllCards();
     const pad = 2;
     const barW = w - pad * 2;
+    const headings = [];
 
     for (const card of cards) {
       if (card.classList.contains('filtered-out')) continue;
       const y = card.offsetTop * scale;
       const ch = Math.max(1, card.offsetHeight * scale);
-      ctx.fillStyle = getMinimapColor(card);
+      const color = getMinimapColor(card);
+      ctx.fillStyle = color;
       ctx.fillRect(pad, y, barW, ch);
+
+      if (card.classList.contains('card-titulo')) {
+        const isDark = color !== '#fdd835';
+        headings.push({
+          y, h: ch, color,
+          textColor: isDark ? '#fff' : '#333',
+          label: getHeadingShortTitle(card),
+        });
+      }
     }
 
+    minimapHeadings = headings;
     updateMinimapViewport();
   }
 
@@ -1847,6 +1861,36 @@
 
     window.addEventListener('mouseup', () => {
       minimapDragging = false;
+    });
+
+    // Tooltip on hover over heading stripes
+    $minimap.addEventListener('mousemove', (e) => {
+      if (minimapDragging) {
+        $minimapTooltip.style.display = 'none';
+        return;
+      }
+      const rect = $minimap.getBoundingClientRect();
+      const my = e.clientY - rect.top;
+      let hit = null;
+      for (const entry of minimapHeadings) {
+        if (my >= entry.y && my <= entry.y + entry.h + 4) {
+          hit = entry;
+          break;
+        }
+      }
+      if (hit) {
+        $minimapTooltip.textContent = hit.label;
+        $minimapTooltip.style.background = hit.color;
+        $minimapTooltip.style.color = hit.textColor;
+        $minimapTooltip.style.top = hit.y + hit.h / 2 + 'px';
+        $minimapTooltip.style.display = 'block';
+      } else {
+        $minimapTooltip.style.display = 'none';
+      }
+    });
+
+    $minimap.addEventListener('mouseleave', () => {
+      $minimapTooltip.style.display = 'none';
     });
   }
 

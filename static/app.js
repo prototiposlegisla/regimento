@@ -61,6 +61,9 @@
   const $searchCounter = document.getElementById('search-counter');
   const $breadcrumb = document.getElementById('breadcrumb');
   const $searchTicks = document.getElementById('search-ticks');
+  const $minimap = document.getElementById('minimap');
+  const $minimapCanvas = document.getElementById('minimap-canvas');
+  const $minimapViewport = document.getElementById('minimap-viewport');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -282,6 +285,7 @@
       manualSelect = false;
       updateSelection();
       updateBreadcrumb();
+      updateMinimapViewport();
       scrollTick = false;
     });
   });
@@ -464,6 +468,7 @@
       $searchInput.classList.remove('has-nav');
       updateSearchTicks();
     }
+    scheduleMinimap();
   }
 
   $searchInput.addEventListener('input', (e) => {
@@ -1381,6 +1386,7 @@
       getAllCards().forEach(c => c.classList.remove('filtered-out'));
       if (currentSearch) doSearch(currentSearch);
     });
+    scheduleMinimap();
   }
 
   function updatePill() {
@@ -1519,6 +1525,7 @@
     $zoomIndicator.classList.add('show');
     clearTimeout(zoomTimeout);
     zoomTimeout = setTimeout(() => $zoomIndicator.classList.remove('show'), 800);
+    scheduleMinimap();
 
     try { localStorage.setItem('regimento-zoom', zoomScale); } catch (e) {}
   }
@@ -1593,6 +1600,7 @@
     }
     updateBreadcrumb();
     if (searchMatches.length) updateSearchTicks();
+    scheduleMinimap();
     try { localStorage.setItem('regimento-compact', compactMode ? '1' : '0'); } catch (e) {}
   }
 
@@ -1733,6 +1741,120 @@
     }
   });
 
+  // ===== MINIMAP =====
+  let minimapRafId = null;
+
+  function getMinimapColor(card) {
+    if (card.classList.contains('card-titulo')) {
+      if (card.classList.contains('nivel-norma'))    return '#222';
+      if (card.classList.contains('nivel-titulo'))   return '#b71c1c';
+      if (card.classList.contains('nivel-capitulo')) return '#f57c00';
+      if (card.classList.contains('nivel-secao'))    return '#fdd835';
+      if (card.classList.contains('nivel-subsecao')) return '#2e7d32';
+      return '#999';
+    }
+    if (card.classList.contains('card-artigo')) return '#ddd';
+    return '#eee';
+  }
+
+  function buildMinimap() {
+    if (!$minimap || !$minimap.offsetWidth) return;
+
+    const canvas = $minimapCanvas;
+    const rect = $minimap.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = rect.width;
+    const h = rect.height;
+
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    const docH = document.documentElement.scrollHeight;
+    if (docH <= 0) return;
+
+    const scale = h / docH;
+    const cards = getAllCards();
+    const pad = 2;
+    const barW = w - pad * 2;
+
+    for (const card of cards) {
+      if (card.classList.contains('filtered-out')) continue;
+      const y = card.offsetTop * scale;
+      const ch = Math.max(1, card.offsetHeight * scale);
+      ctx.fillStyle = getMinimapColor(card);
+      ctx.fillRect(pad, y, barW, ch);
+    }
+
+    updateMinimapViewport();
+  }
+
+  function updateMinimapViewport() {
+    if (!$minimap || !$minimap.offsetWidth) return;
+    const mapH = $minimap.getBoundingClientRect().height;
+    const docH = document.documentElement.scrollHeight;
+    if (docH <= 0) return;
+    const scale = mapH / docH;
+    const top = window.scrollY * scale;
+    const vpH = Math.max(12, window.innerHeight * scale);
+    $minimapViewport.style.top = top + 'px';
+    $minimapViewport.style.height = vpH + 'px';
+  }
+
+  function scheduleMinimap() {
+    if (minimapRafId) return;
+    minimapRafId = requestAnimationFrame(() => {
+      minimapRafId = null;
+      buildMinimap();
+    });
+  }
+
+  // Click on minimap → scroll to proportional position
+  if ($minimap) {
+    $minimap.addEventListener('click', (e) => {
+      if (e.target === $minimapViewport) return;
+      const rect = $minimap.getBoundingClientRect();
+      const pct = (e.clientY - rect.top) / rect.height;
+      const docH = document.documentElement.scrollHeight;
+      const target = pct * docH - window.innerHeight / 2;
+      window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+    });
+
+    // Drag on minimap for continuous scrolling
+    let minimapDragging = false;
+
+    $minimap.addEventListener('mousedown', (e) => {
+      minimapDragging = true;
+      e.preventDefault();
+      const rect = $minimap.getBoundingClientRect();
+      const pct = (e.clientY - rect.top) / rect.height;
+      const docH = document.documentElement.scrollHeight;
+      window.scrollTo({ top: Math.max(0, pct * docH - window.innerHeight / 2), behavior: 'instant' });
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!minimapDragging) return;
+      const rect = $minimap.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+      const docH = document.documentElement.scrollHeight;
+      window.scrollTo({ top: Math.max(0, pct * docH - window.innerHeight / 2), behavior: 'instant' });
+    });
+
+    window.addEventListener('mouseup', () => {
+      minimapDragging = false;
+    });
+  }
+
+  // Resize → rebuild minimap
+  window.addEventListener('resize', () => {
+    scheduleMinimap();
+  });
+
   // ===== INIT =====
   try {
     const savedZoom = localStorage.getItem('regimento-zoom');
@@ -1747,6 +1869,7 @@
   updateSelection();
   updateBreadcrumb();
   initDiffToggles();
+  scheduleMinimap();
   if (window.innerWidth > 768) $searchInput.focus();
 
 })();

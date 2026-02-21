@@ -65,6 +65,7 @@
   const $minimapCanvas = document.getElementById('minimap-canvas');
   const $minimapViewport = document.getElementById('minimap-viewport');
   const $minimapTooltip = document.getElementById('minimap-tooltip');
+  const $minimapHighlight = document.getElementById('minimap-highlight');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -1939,6 +1940,7 @@
     $minimap.addEventListener('mousemove', (e) => {
       if (minimapDragging) {
         $minimapTooltip.style.display = 'none';
+        $minimapHighlight.style.display = 'none';
         lastTooltipCard = null;
         return;
       }
@@ -1965,14 +1967,20 @@
           ? lastChip.offsetTop + lastChip.offsetHeight / 2
           : $minimapTooltip.offsetHeight / 2;
         $minimapTooltip.style.top = (stripeCenter - chipMidY) + 'px';
+        // Highlight stripe
+        $minimapHighlight.style.top = hit.y + 'px';
+        $minimapHighlight.style.height = hit.h + 'px';
+        $minimapHighlight.style.display = 'block';
       } else {
         $minimapTooltip.style.display = 'none';
+        $minimapHighlight.style.display = 'none';
         lastTooltipCard = null;
       }
     });
 
     $minimap.addEventListener('mouseleave', () => {
       $minimapTooltip.style.display = 'none';
+      $minimapHighlight.style.display = 'none';
       lastTooltipCard = null;
     });
   }

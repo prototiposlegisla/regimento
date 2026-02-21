@@ -1034,6 +1034,19 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   transition: top 0.05s linear;
 }
 
+#minimap-highlight {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  box-shadow: 0 0 6px 2px rgba(52,152,219,0.5);
+  border-top: 1.5px solid rgba(52,152,219,0.7);
+  border-bottom: 1.5px solid rgba(52,152,219,0.7);
+  background: rgba(52,152,219,0.1);
+  min-height: 2px;
+}
+
 #minimap-tooltip {
   display: none;
   position: absolute;

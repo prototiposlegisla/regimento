@@ -1042,6 +1042,19 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   transition: top 0.05s linear;
 }
 
+#minimap-highlight {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  box-shadow: 0 0 6px 2px rgba(52,152,219,0.5);
+  border-top: 1.5px solid rgba(52,152,219,0.7);
+  border-bottom: 1.5px solid rgba(52,152,219,0.7);
+  background: rgba(52,152,219,0.1);
+  min-height: 2px;
+}
+
 #minimap-tooltip {
   display: none;
   position: absolute;
@@ -5989,6 +6002,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 <div id="minimap">
   <canvas id="minimap-canvas"></canvas>
   <div id="minimap-viewport"></div>
+  <div id="minimap-highlight"></div>
   <div id="minimap-tooltip"></div>
 </div>
 
@@ -7646,6 +7660,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   const $minimapCanvas = document.getElementById('minimap-canvas');
   const $minimapViewport = document.getElementById('minimap-viewport');
   const $minimapTooltip = document.getElementById('minimap-tooltip');
+  const $minimapHighlight = document.getElementById('minimap-highlight');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -9520,6 +9535,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     $minimap.addEventListener('mousemove', (e) => {
       if (minimapDragging) {
         $minimapTooltip.style.display = 'none';
+        $minimapHighlight.style.display = 'none';
         lastTooltipCard = null;
         return;
       }
@@ -9546,14 +9562,20 @@ body.pill-open #cards-container { padding-bottom: 300px; }
           ? lastChip.offsetTop + lastChip.offsetHeight / 2
           : $minimapTooltip.offsetHeight / 2;
         $minimapTooltip.style.top = (stripeCenter - chipMidY) + 'px';
+        // Highlight stripe
+        $minimapHighlight.style.top = hit.y + 'px';
+        $minimapHighlight.style.height = hit.h + 'px';
+        $minimapHighlight.style.display = 'block';
       } else {
         $minimapTooltip.style.display = 'none';
+        $minimapHighlight.style.display = 'none';
         lastTooltipCard = null;
       }
     });
 
     $minimap.addEventListener('mouseleave', () => {
       $minimapTooltip.style.display = 'none';
+      $minimapHighlight.style.display = 'none';
       lastTooltipCard = null;
     });
   }

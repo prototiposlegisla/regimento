@@ -211,6 +211,13 @@ def _build_once(
             if hasattr(el, "art_number"):
                 prefix = law_mapping.get(getattr(el, "law_name", None) or "", "")
                 docx_arts.add(f"{prefix}:{el.art_number}" if prefix else el.art_number)
+                # ADT articles: also register without ADT prefix (4-A, 4-B, etc.)
+                if el.art_number.startswith("ADT"):
+                    docx_arts.add(el.art_number[3:])
+                # Lettered articles from other laws: also register plain art_number
+                # so range-expanded refs (e.g. 39-88 → 55-A) can match
+                if prefix:
+                    docx_arts.add(el.art_number)
 
         seen_refs: set[str] = set()
         for entry in subject_index.entries:

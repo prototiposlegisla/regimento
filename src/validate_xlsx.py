@@ -44,6 +44,9 @@ def _validate_detail(detail: str) -> str | None:
             return None  # alínea,item ✓
         if _ALINEA_RE.match(p0) and _ALINEA_RE.match(p1):
             return f"múltiplas alíneas na mesma linha — use linhas separadas"
+        # §ú,inciso ou §N,inciso (parágrafo com inciso) ✓
+        if re.match(r"^§(\d+|ú|u)$", p0) and _ROMAN_RE.match(p1):
+            return None
         return f"estrutura de detalhe inválida: '{d}'"
 
     if len(parts) == 3:

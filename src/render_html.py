@@ -134,7 +134,8 @@ class HTMLRenderer:
         # Column 0 = art number, columns 1+ = parent segments
         items: list[tuple[int, str]] = []
         if art_number:
-            items.append((0, art_number))
+            display_num = art_number.removeprefix("ADT")
+            items.append((0, display_num))
         for i, seg in enumerate(parent_segments):
             # "§ 1º" → "§1", keep "§ú" as is
             compact = re.sub(r"§\s*(\d+)º", r"§\1", seg)

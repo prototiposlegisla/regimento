@@ -1,7 +1,6 @@
 """validate.py — Levanta desvios de padrão no regimentoInterno.docx.
 
 Checks implementados:
-  PARA_PERIOD       – § N. (ponto sem ordinal) → mismatch com pill do remissivo
   PARA_UNMATCHED    – linha começa com § mas não bate no regex de parágrafo
   ART_UNMATCHED     – linha começa com "Art." mas não bate no regex de artigo
   ART_NO_ORDINAL    – Art. N sem marca ordinal (N ≤ 9)
@@ -176,24 +175,8 @@ def run_checks(paras: list[dict]) -> list[dict]:
             continue
 
         if m_para:
-            num    = m_para.group(1)
-            group2 = m_para.group(2) or ""
-
-            # identifier que o parser vai produzir
-            produced_suffix = group2 if group2 else "º"
-            produced_ident  = f"§ {num}{produced_suffix}"
-
-            # identifier que o remissivo vai esperar
-            expected_ident  = f"§ {num}º"
-
-            if group2 == ".":
-                # ── CHECK: PARA_PERIOD ─────────────────────────────────────
-                issues.append(_issue(
-                    "PARA_PERIOD",
-                    f"Ponto em vez de ordinal: identificador produzido={produced_ident!r}, "
-                    f"esperado pelo remissivo={expected_ident!r} → pill não vai grifar",
-                    current_art, text,
-                ))
+            # O parser normaliza ponto → ordinal (§ 10. → § 10º),
+            # então não há mismatch real com o remissivo.
             continue
 
         # ─────────────────────────────────────────────────────────────────
@@ -223,7 +206,6 @@ def _issue(code: str, desc: str, context: str, text: str) -> dict:
 # ── Relatório ──────────────────────────────────────────────────────────────────
 
 CODES_ORDER = [
-    "PARA_PERIOD",
     "PARA_UNMATCHED",
     "ART_UNMATCHED",
     "ART_NO_ORDINAL",
@@ -231,7 +213,6 @@ CODES_ORDER = [
 ]
 
 CODE_LABELS = {
-    "PARA_PERIOD":       "§ N. (ponto sem ordinal) — normalizado para § Nº pelo parser",
     "PARA_UNMATCHED":    "§ não identificado como parágrafo",
     "ART_UNMATCHED":     "Art. não identificado como artigo",
     "ART_NO_ORDINAL":    "Art. N sem ordinal para N ≤ 9",

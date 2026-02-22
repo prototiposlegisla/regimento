@@ -137,7 +137,13 @@ def _build_once(
     print("[1/8] Parseando DOCX...")
     from src.parse_docx import parse_docx
 
-    doc = parse_docx(args.docx, include_private=include_private)
+    try:
+        doc = parse_docx(args.docx, include_private=include_private)
+    except PermissionError:
+        print(f"\n⚠  Não foi possível abrir o DOCX: {args.docx}")
+        print("   O arquivo pode estar aberto no Word. Feche-o e tente novamente.")
+        input("\nPressione Enter para fechar...")
+        sys.exit(1)
 
     headings = [e for e in doc.elements if hasattr(e, "level")]
     articles = [e for e in doc.elements if hasattr(e, "art_number")]

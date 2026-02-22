@@ -48,6 +48,10 @@ RE_ADT_MARKER = re.compile(
     r"ATO\s+D[AO]S?\s+DISPOSI[ÇC][ÕO]ES\s+TRANSIT[ÓO]RIAS",
     re.IGNORECASE,
 )
+RE_DGT_MARKER = re.compile(
+    r"DISPOSI[ÇC][ÕO]ES\s+GERAIS\s+E\s+TRANSIT[ÓO]RIAS",
+    re.IGNORECASE,
+)
 RE_AMENDMENT = re.compile(
     r"\((Reda[çc][ãa]o\s+dada|Revogad[oa]|Reda[çc][ãa]o\s+reestabelecida|"
     r"Acrescentad[oa]|Renumerad[oa]|Inclu[ií]d[oa])",
@@ -406,7 +410,8 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
             num = m2.group(1) if m2 else ""
             raw_suffix = m2.group(2) if m2 and m2.group(2) else ""
             # Normaliza: remove ponto antes de ordinal (§ 1.º → § 1º, § 10. → § 10º)
-            suffix = raw_suffix.lstrip(".") or "º"
+            # e converte degree sign ° (U+00B0) → ordinal º (U+00BA)
+            suffix = raw_suffix.lstrip(".").replace("\u00b0", "\u00ba") or "º"
             ut = UnitType.PARAGRAFO_NUM
             ident = f"§ {num}{suffix}"
         elif RE_INCISO.match(text):
@@ -522,6 +527,21 @@ def _build_document(
                 level=UnitType.TITULO,
                 text="ATO DAS DISPOSIÇÕES TRANSITÓRIAS",
                 data_section="adt",
+            )
+            doc.elements.append(heading)
+            i += 1
+            continue
+
+        # Detect DGT marker (Disposições Gerais e Transitórias da Lei Orgânica)
+        if cp.is_centered and RE_DGT_MARKER.search(cp.text):
+            in_adt = True
+            if current_article:
+                doc.elements.append(current_article)
+                current_article = None
+            heading = SectionHeading(
+                level=UnitType.TITULO,
+                text="DISPOSIÇÕES GERAIS E TRANSITÓRIAS",
+                data_section="dgt",
             )
             doc.elements.append(heading)
             i += 1

@@ -195,7 +195,7 @@
         const sec = prev.dataset.section || '';
         let level = '';
         if (sec.startsWith('norma')) level = 'norma';
-        else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+        else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
         else if (sec.startsWith('cap')) level = 'cap';
         else if (sec.startsWith('subsec')) level = 'subsec';
         else if (sec.startsWith('sec')) level = 'sec';
@@ -881,7 +881,7 @@
   function sysLevelClass(sectionId) {
     if (!sectionId) return '';
     if (sectionId.startsWith('norma')) return 'sys-nivel-norma';
-    if (sectionId === 'adt')           return 'sys-nivel-titulo';
+    if (sectionId === 'adt' || sectionId === 'dgt') return 'sys-nivel-titulo';
     if (sectionId.startsWith('tit'))   return 'sys-nivel-titulo';
     if (sectionId.startsWith('cap'))   return 'sys-nivel-capitulo';
     if (sectionId.startsWith('subsec')) return 'sys-nivel-subsecao';
@@ -1279,7 +1279,7 @@
           const sec = prev.dataset.section || '';
           let level = '';
           if (sec.startsWith('norma')) level = 'norma';
-          else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+          else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
           else if (sec.startsWith('cap')) level = 'cap';
           else if (sec.startsWith('subsec')) level = 'subsec';
           else if (sec.startsWith('sec')) level = 'sec';
@@ -1882,7 +1882,7 @@
         const sec = card.dataset.section || '';
         let level = '';
         if (sec.startsWith('norma')) level = 'norma';
-        else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+        else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
         else if (sec.startsWith('cap')) level = 'cap';
         else if (sec.startsWith('subsec')) level = 'subsec';
         else if (sec.startsWith('sec')) level = 'sec';
@@ -1897,7 +1897,7 @@
           const sec = prev.dataset.section || '';
           let level = '';
           if (sec.startsWith('norma')) level = 'norma';
-          else if (sec.startsWith('tit') || sec === 'adt') level = 'tit';
+          else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
           else if (sec.startsWith('cap')) level = 'cap';
           else if (sec.startsWith('subsec')) level = 'subsec';
           else if (sec.startsWith('sec')) level = 'sec';

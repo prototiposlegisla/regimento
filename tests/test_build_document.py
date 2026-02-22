@@ -162,6 +162,21 @@ class TestBuildDocumentSpecial:
         assert art.art_number == "ADT1"
         assert art.is_adt is True
 
+    def test_dgt_marker(self):
+        """DISPOSIÇÕES GERAIS E TRANSITÓRIAS → heading + artigos ADT."""
+        classified = [
+            _cp(UnitType.SUBTITLE, "DISPOSIÇÕES GERAIS E TRANSITÓRIAS",
+                 identifier="DISPOSIÇÕES GERAIS E TRANSITÓRIAS", is_centered=True),
+            _cp(UnitType.ARTIGO, "Art. 1º - Texto DGT", identifier="Art. 1º", art_number="1"),
+        ]
+        doc = _build_document(classified)
+        assert isinstance(doc.elements[0], SectionHeading)
+        assert doc.elements[0].data_section == "dgt"
+        art = doc.elements[1]
+        assert isinstance(art, ArticleBlock)
+        assert art.art_number == "ADT1"
+        assert art.is_adt is True
+
     def test_norma_marker(self):
         classified = [
             _cp(UnitType.OTHER, "NORMA: Lei Orgânica do Município",

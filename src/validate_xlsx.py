@@ -8,7 +8,7 @@ from pathlib import Path
 _ROMAN_RE = re.compile(r"^[IVXLC]+$")
 _ALINEA_RE = re.compile(r"^[a-z]$")
 _ITEM_RE = re.compile(r"^\d+$")
-_ART_RE = re.compile(r"^\d+[-A-Za-z]*$")
+_ART_RE = re.compile(r"^(?:ADT)?\d+[-A-Za-z]*$")
 _RANGE_RE = re.compile(r"^\d+\s*[-\u2013\u2014]\s*\d+$")
 _LAW_PREFIX_LINE_RE = re.compile(r"^([A-Za-z]{2,})\s*:\s*(.+)$")
 _HINT_RE = re.compile(r"\(([^)]+)\)\s*$")

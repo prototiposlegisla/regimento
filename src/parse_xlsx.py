@@ -135,7 +135,7 @@ def _parse_dispositivos(raw: str, known_lettered: set[str] | None = None) -> lis
         parts = line.split(",", 1)
         art = parts[0].strip()
 
-        if not re.match(r"^\d+[-A-Za-z]*$", art):
+        if not re.match(r"^(?:ADT)?\d+[-A-Za-z]*$", art):
             # Not a valid article reference, skip
             continue
 

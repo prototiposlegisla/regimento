@@ -199,6 +199,21 @@ def _build_once(
                 if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
             }
             subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
+
+            # Normalizar refs de ADT letrados: "4-C" → "ADT4-C"
+            # Apenas artigos com sufixo de letra (ex: 4-C, 4-F) pois números puros
+            # (ex: 4, 15) podem ser artigos regulares do Regimento.
+            known_adt_lettered: set[str] = {
+                el.art_number[3:] for el in doc.elements
+                if hasattr(el, "art_number") and el.art_number.startswith("ADT")
+                and _re.search(r"-[A-Za-z]", el.art_number)
+            }
+            if known_adt_lettered:
+                for entry in subject_index.entries:
+                    for ref in entry.refs:
+                        if not ref.law_prefix and not ref.art.startswith("ADT") and ref.art in known_adt_lettered:
+                            ref.art = f"ADT{ref.art}"
+
             subject_list = subject_index.to_list()
             print(f"      → {len(subject_list)} assuntos")
         except PermissionError:
@@ -217,9 +232,6 @@ def _build_once(
             if hasattr(el, "art_number"):
                 prefix = law_mapping.get(getattr(el, "law_name", None) or "", "")
                 docx_arts.add(f"{prefix}:{el.art_number}" if prefix else el.art_number)
-                # ADT articles: also register without ADT prefix (4-A, 4-B, etc.)
-                if el.art_number.startswith("ADT"):
-                    docx_arts.add(el.art_number[3:])
                 # Lettered articles from other laws: also register plain art_number
                 # so range-expanded refs (e.g. 39-88 → 55-A) can match
                 if prefix:
@@ -432,6 +444,19 @@ def _build_markdown(
                 if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
             }
             subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
+
+            # Normalizar refs de ADT letrados: "4-C" → "ADT4-C"
+            known_adt_lettered: set[str] = {
+                el.art_number[3:] for el in doc.elements
+                if hasattr(el, "art_number") and el.art_number.startswith("ADT")
+                and _re.search(r"-[A-Za-z]", el.art_number)
+            }
+            if known_adt_lettered:
+                for entry in subject_index.entries:
+                    for ref in entry.refs:
+                        if not ref.law_prefix and not ref.art.startswith("ADT") and ref.art in known_adt_lettered:
+                            ref.art = f"ADT{ref.art}"
+
             subject_list = subject_index.to_list()
             print(f"      → {len(subject_list)} assuntos")
         except PermissionError:

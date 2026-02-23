@@ -865,7 +865,7 @@
 
   function highlightIndexContent(filter) {
     const terms = filter.split(/\s+/).filter(Boolean);
-    const regex = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+    const regex = new RegExp('(' + terms.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('|') + ')', 'gi');
     const walker = document.createTreeWalker($indexContent, NodeFilter.SHOW_TEXT, null);
     const textNodes = [];
     while (walker.nextNode()) textNodes.push(walker.currentNode);

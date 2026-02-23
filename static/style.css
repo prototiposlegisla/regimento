@@ -406,8 +406,15 @@ body {
 #cards-container.compact .card-artigo > p,
 #cards-container.compact .card-artigo > .art-para,
 #cards-container.compact .old-version,
-#cards-container.compact .footnote-box,
-#cards-container.compact .law-badge { display: none; }
+#cards-container.compact .footnote-box { display: none; }
+
+#cards-container.compact .law-badge {
+  position: static;
+  display: inline;
+  font-size: calc(.65rem * var(--zoom-scale));
+  margin-left: 6px;
+  vertical-align: middle;
+}
 
 #cards-container.compact .art-compact-label {
   display: inline;

@@ -400,6 +400,7 @@ def _build_markdown(
     *,
     args: argparse.Namespace,
     output_dir: Path,
+    include_private: bool,
     label: str,
 ) -> None:
     """Gera 3 arquivos Markdown no diretório de saída."""
@@ -418,7 +419,7 @@ def _build_markdown(
     print("[1/5] Parseando DOCX...")
     from src.parse_docx import parse_docx
 
-    doc = parse_docx(args.docx, include_private=True)
+    doc = parse_docx(args.docx, include_private=include_private)
     articles = [e for e in doc.elements if hasattr(e, "art_number")]
     print(f"      → {len(articles)} artigos")
 
@@ -556,6 +557,7 @@ def main() -> int:
     default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.docx"))
     default_private = output_cfg.get("private", "")
     default_gdrive = output_cfg.get("gdrive", "")
+    default_gdrive_a = output_cfg.get("gdrive_a", "")
 
     parser = argparse.ArgumentParser(
         description="Gera index.html (versão pública e/ou privada) a partir do DOCX e XLSX"
@@ -617,7 +619,7 @@ def main() -> int:
 
     build_public = not args.only_private and not args.only_markdown
     build_private = not args.only_public and bool(default_private) and not args.only_markdown
-    build_markdown = not args.skip_markdown and bool(default_gdrive)
+    build_markdown = not args.skip_markdown and (bool(default_gdrive) or bool(default_gdrive_a))
 
     if not build_public and not build_private and not build_markdown:
         print("Nada a fazer. Configure [output] em config.local.toml.")
@@ -645,11 +647,20 @@ def main() -> int:
         all_reports.append(r)
 
     if build_markdown:
-        _build_markdown(
-            args=args,
-            output_dir=Path(default_gdrive),
-            label="Markdown para Google Drive",
-        )
+        if default_gdrive:
+            _build_markdown(
+                args=args,
+                output_dir=Path(default_gdrive),
+                include_private=True,
+                label="Markdown B para Google Drive (com notas privadas)",
+            )
+        if default_gdrive_a:
+            _build_markdown(
+                args=args,
+                output_dir=Path(default_gdrive_a),
+                include_private=False,
+                label="Markdown A para Google Drive (sem notas privadas)",
+            )
 
     elapsed_total = time.time() - t_total
     print(f"\n{'═' * 60}")

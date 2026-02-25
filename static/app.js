@@ -39,6 +39,7 @@
   let searchIdx = 0;
   let currentRefCategory = 0;
   let markerFilter = false;
+  let markerTooltipTimer = null;
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -66,6 +67,7 @@
   const $minimapViewport = document.getElementById('minimap-viewport');
   const $minimapTooltip = document.getElementById('minimap-tooltip');
   const $minimapHighlight = document.getElementById('minimap-highlight');
+  const $markerTooltip = document.getElementById('marker-tooltip');
 
   function getAllCards() {
     return Array.from($cards.querySelectorAll('.card'));
@@ -683,6 +685,7 @@
   }
 
   function renderMarkerNav() {
+    hideMarkerTooltip();
     $markerNav.innerHTML = '';
 
     for (const marker of markersList) {
@@ -718,6 +721,7 @@
       btn.textContent = label;
       btn.title = 'Ir para ' + label;
       btn.addEventListener('click', () => {
+        hideMarkerTooltip();
         const target = $cards.querySelector(`.unit-id[data-uid="${marker.uid}"]`);
         if (target) {
           const card = target.closest('.card');
@@ -727,6 +731,19 @@
           }
         }
       });
+      // Tooltip listeners
+      ((uid, pal) => {
+        btn.addEventListener('mouseenter', () => showMarkerTooltip(btn, uid, pal));
+        btn.addEventListener('mouseleave', () => hideMarkerTooltip());
+        btn.addEventListener('touchstart', (e) => {
+          markerTooltipTimer = setTimeout(() => {
+            e.preventDefault();
+            showMarkerTooltip(btn, uid, pal);
+          }, 500);
+        }, { passive: false });
+        btn.addEventListener('touchend', () => hideMarkerTooltip());
+        btn.addEventListener('touchmove', () => hideMarkerTooltip());
+      })(marker.uid, palette);
       $markerNav.appendChild(btn);
     }
 
@@ -746,6 +763,97 @@
       clearBtn.title = 'Remover todos os marcadores';
       clearBtn.addEventListener('click', clearAllMarkers);
       $markerNav.appendChild(clearBtn);
+    }
+  }
+
+  // ===== MARKER TOOLTIP =====
+  function buildMarkerTooltip(uid, palette) {
+    $markerTooltip.innerHTML = '';
+    const span = $cards.querySelector(`.unit-id[data-uid="${uid}"]`);
+    if (!span) return false;
+    const card = span.closest('.card-artigo');
+    if (!card || card.classList.contains('filtered-out')) return false;
+
+    const path = span.dataset.path || '';
+    // Build ancestor chain: e.g. path "I,a" → ['', 'I', 'I,a']
+    const parts = path ? path.split(',') : [];
+    const chain = [''];
+    for (let i = 0; i < parts.length; i++) {
+      chain.push(parts.slice(0, i + 1).join(','));
+    }
+
+    for (let i = 0; i < chain.length; i++) {
+      const segPath = chain[i];
+      let p;
+      if (segPath === '') {
+        // Caput: first <p> child of card (skip old versions)
+        p = card.querySelector(':scope > p:not(.old-version)');
+      } else {
+        // Find the unit-id with this path, then its parent <p>/<div>
+        const seg = card.querySelector(`.unit-id[data-path="${segPath}"]`);
+        if (seg) p = seg.closest('.art-para') || seg.parentElement;
+      }
+      if (!p) continue;
+
+      // Extract clean text: clone, remove .indent-path elements, get textContent
+      const clone = p.cloneNode(true);
+      clone.querySelectorAll('.indent-path').forEach(el => el.remove());
+      let text = clone.textContent.trim();
+
+      // Split label from rest: e.g. "Art. 13 —" or "I —" or "a)"
+      let label = '';
+      let rest = text;
+      const dashIdx = text.indexOf('\u00a0\u2014');
+      const dashIdx2 = text.indexOf(' \u2014');
+      const splitIdx = dashIdx >= 0 ? dashIdx : dashIdx2;
+      if (splitIdx >= 0 && splitIdx < 40) {
+        label = text.slice(0, splitIdx);
+        rest = text.slice(splitIdx);
+      }
+
+      const chip = document.createElement('div');
+      chip.className = 'mtt-chip' + (i === chain.length - 1 ? ' mtt-target' : '');
+      if (i === chain.length - 1) {
+        chip.style.borderLeftColor = palette.bg;
+      }
+      if (label) {
+        chip.innerHTML = '<b>' + escapeHtml(label) + '</b>' + escapeHtml(rest);
+      } else {
+        chip.textContent = rest;
+      }
+      $markerTooltip.appendChild(chip);
+    }
+    return $markerTooltip.children.length > 0;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function showMarkerTooltip(btn, uid, palette) {
+    if (!buildMarkerTooltip(uid, palette)) return;
+    $markerTooltip.classList.add('visible');
+    // Position to the left of the button, vertically centered
+    const br = btn.getBoundingClientRect();
+    const tr = $markerTooltip.getBoundingClientRect();
+    let left = br.left - tr.width - 8;
+    let top = br.top + br.height / 2 - tr.height / 2;
+    // Clamp to viewport
+    if (left < 4) left = 4;
+    if (top < 4) top = 4;
+    if (top + tr.height > window.innerHeight - 4) {
+      top = window.innerHeight - 4 - tr.height;
+    }
+    $markerTooltip.style.left = left + 'px';
+    $markerTooltip.style.top = top + 'px';
+  }
+
+  function hideMarkerTooltip() {
+    $markerTooltip.classList.remove('visible');
+    $markerTooltip.innerHTML = '';
+    if (markerTooltipTimer) {
+      clearTimeout(markerTooltipTimer);
+      markerTooltipTimer = null;
     }
   }
 

@@ -39430,6 +39430,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       $searchNav.classList.remove('open');
       $searchInput.classList.remove('has-nav');
       updateSearchTicks();
+      scheduleMinimap();
       return;
     }
 
@@ -39680,6 +39681,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     markerFilter = !markerFilter;
     renderMarkerNav();
     preserveScroll(() => doSearch(currentSearch));
+    scheduleMinimap();
   }
 
   function applyMarkers() {
@@ -40416,6 +40418,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     applySubjectFilter();
     highlightAllSubjectDetails();
     navigateToSubjectRef(0);
+    scheduleMinimap();
   }
 
   function closeSubjectPill() {
@@ -40543,6 +40546,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       highlightAllSubjectDetails();
       if (currentSearch) doSearch(currentSearch);
     });
+    scheduleMinimap();
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);

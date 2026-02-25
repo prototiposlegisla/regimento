@@ -400,6 +400,7 @@
       $searchNav.classList.remove('open');
       $searchInput.classList.remove('has-nav');
       updateSearchTicks();
+      scheduleMinimap();
       return;
     }
 
@@ -650,6 +651,7 @@
     markerFilter = !markerFilter;
     renderMarkerNav();
     preserveScroll(() => doSearch(currentSearch));
+    scheduleMinimap();
   }
 
   function applyMarkers() {
@@ -1386,6 +1388,7 @@
     applySubjectFilter();
     highlightAllSubjectDetails();
     navigateToSubjectRef(0);
+    scheduleMinimap();
   }
 
   function closeSubjectPill() {
@@ -1513,6 +1516,7 @@
       highlightAllSubjectDetails();
       if (currentSearch) doSearch(currentSearch);
     });
+    scheduleMinimap();
   });
 
   document.getElementById('pill-close').addEventListener('click', closeSubjectPill);

@@ -533,6 +533,8 @@ mark {
   white-space: nowrap;
   line-height: 1.1;
   text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .marker-btn:hover { transform: scale(1.05); }
 
@@ -592,6 +594,8 @@ mark {
   font-size: 12px;
   line-height: 1.4;
   box-shadow: 0 1px 6px rgba(0,0,0,.12);
+  user-select: none;
+  -webkit-user-select: none;
 }
 .mtt-chip.mtt-target {
   border-left-width: 5px;

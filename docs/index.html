@@ -39117,6 +39117,16 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     });
   }
 
+  function scrollToFirstMark(card, behavior = 'smooth') {
+    const mark = card.querySelector('mark');
+    const el = mark || card;
+    requestAnimationFrame(() => {
+      const rect = el.getBoundingClientRect();
+      const target = window.scrollY + rect.top - getReadingLineY();
+      window.scrollTo({ top: Math.max(0, target), behavior });
+    });
+  }
+
   function updateSelection() {
     if (manualSelect) return;
     const lineY = getReadingLineY();
@@ -39493,7 +39503,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
       updateSearchTicks();
-      searchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToFirstMark(searchMatches[0]);
       selectCard(searchMatches[0], true);
     } else {
       $searchNav.classList.remove('open');
@@ -39560,7 +39570,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
         searchIdx = i;
         updateSearchCounter();
         updateTickCurrent();
-        searchMatches[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollToFirstMark(searchMatches[i]);
         selectCard(searchMatches[i], true);
       });
       frag.appendChild(tick);
@@ -39580,7 +39590,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
     updateSearchCounter();
     updateTickCurrent();
-    searchMatches[searchIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    scrollToFirstMark(searchMatches[searchIdx]);
     selectCard(searchMatches[searchIdx], true);
   }
 

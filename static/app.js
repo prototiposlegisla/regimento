@@ -87,6 +87,16 @@
     });
   }
 
+  function scrollToFirstMark(card, behavior = 'smooth') {
+    const mark = card.querySelector('mark');
+    const el = mark || card;
+    requestAnimationFrame(() => {
+      const rect = el.getBoundingClientRect();
+      const target = window.scrollY + rect.top - getReadingLineY();
+      window.scrollTo({ top: Math.max(0, target), behavior });
+    });
+  }
+
   function updateSelection() {
     if (manualSelect) return;
     const lineY = getReadingLineY();
@@ -463,7 +473,7 @@
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
       updateSearchTicks();
-      searchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToFirstMark(searchMatches[0]);
       selectCard(searchMatches[0], true);
     } else {
       $searchNav.classList.remove('open');
@@ -530,7 +540,7 @@
         searchIdx = i;
         updateSearchCounter();
         updateTickCurrent();
-        searchMatches[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollToFirstMark(searchMatches[i]);
         selectCard(searchMatches[i], true);
       });
       frag.appendChild(tick);
@@ -550,7 +560,7 @@
     searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
     updateSearchCounter();
     updateTickCurrent();
-    searchMatches[searchIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    scrollToFirstMark(searchMatches[searchIdx]);
     selectCard(searchMatches[searchIdx], true);
   }
 

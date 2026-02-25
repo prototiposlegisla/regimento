@@ -536,7 +536,7 @@
       const pct = card.offsetTop / docH;
       const tick = document.createElement('div');
       tick.className = 'tick' + (i === searchIdx ? ' current' : '');
-      tick.style.top = (headerH + pct * trackH) + 'px';
+      tick.style.top = (pct * trackH) + 'px';
       tick.addEventListener('click', () => {
         searchIdx = i;
         updateSearchCounter();

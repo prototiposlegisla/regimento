@@ -1073,6 +1073,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   border-top: 1px solid rgba(0,0,0,.12);
   margin: 2px 0;
 }
+#search-tick-tooltip .mtt-chip.mtt-old {
+  text-decoration: line-through;
+}
 #search-tick-tooltip .mtt-chip mark {
   background: #ffe066;
   color: inherit;
@@ -40049,19 +40052,21 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     const marks = card.querySelectorAll('mark');
     if (!marks.length) return;
 
-    // Collect unique matched paths
+    // Collect unique matched paragraphs
     const matchedPaths = [];
     const seenPaths = new Set();
     for (const m of marks) {
-      // Skip marks inside footnotes or old versions
-      if (m.closest('.footnote-box') || m.closest('.old-version')) continue;
+      // Skip marks inside footnotes
+      if (m.closest('.footnote-box')) continue;
+      const oldVer = m.closest('.old-version');
       const p = m.closest('.art-para') || m.closest('p');
       if (!p) continue;
+      // Use element identity for old-version (no data-path), path string otherwise
       const uid = p.querySelector('.unit-id');
-      const path = uid ? (uid.dataset.path || '') : '';
-      if (!seenPaths.has(path)) {
-        seenPaths.add(path);
-        matchedPaths.push({ path, p });
+      const key = oldVer ? 'old:' + (p.dataset.ident || '') + ':' + p.textContent.slice(0, 40) : (uid ? (uid.dataset.path || '') : '');
+      if (!seenPaths.has(key)) {
+        seenPaths.add(key);
+        matchedPaths.push({ path: uid ? (uid.dataset.path || '') : '', p, isOld: !!oldVer });
       }
     }
 
@@ -40082,7 +40087,46 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     // Build chain of ancestor + target chips, deduplicating
     const renderedPaths = new Set();
 
-    for (const { path, p } of matchedPaths) {
+    for (const { path, p, isOld } of matchedPaths) {
+      // Old-version paragraphs: show caput ancestor, then strikethrough chip
+      if (isOld) {
+        // Render caput as ancestor if not already shown
+        if (!renderedPaths.has('')) {
+          renderedPaths.add('');
+          const caputP = card.querySelector(':scope > p:not(.old-version)');
+          if (caputP) {
+            const caputChip = document.createElement('div');
+            caputChip.className = 'mtt-chip';
+            const uidSpan = caputP.querySelector('.unit-id');
+            const clone = caputP.cloneNode(true);
+            clone.querySelectorAll('.indent-path').forEach(el => el.remove());
+            clone.querySelectorAll('.unit-id').forEach(el => el.remove());
+            const caputLabel = uidSpan ? uidSpan.textContent : '';
+            const caputRest = clone.textContent.trim();
+            if (caputLabel) {
+              caputChip.innerHTML = '<b>' + escapeHtml(caputLabel) + '</b> ' + escapeHtml(caputRest);
+            } else {
+              caputChip.textContent = caputRest;
+            }
+            $searchTickTooltip.appendChild(caputChip);
+          }
+        }
+        const chip = document.createElement('div');
+        chip.className = 'mtt-chip mtt-target mtt-old';
+        const rawHtml = extractTextWithMarks(p);
+        // Try to split label (e.g. "Art. 38 -") from rest
+        const text = p.textContent.trim();
+        const dashIdx = text.indexOf(' - ');
+        if (dashIdx >= 0 && dashIdx < 40) {
+          const label = text.slice(0, dashIdx);
+          chip.innerHTML = '<b>' + escapeHtml(label) + '</b>' + rawHtml.slice(rawHtml.indexOf(escapeHtml(label)) + escapeHtml(label).length);
+        } else {
+          chip.innerHTML = rawHtml;
+        }
+        $searchTickTooltip.appendChild(chip);
+        continue;
+      }
+
       const parts = path ? path.split(',') : [];
       const chain = [''];
       for (let i = 0; i < parts.length; i++) {

@@ -1065,6 +1065,9 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   border-top: 1px solid rgba(0,0,0,.12);
   margin: 2px 0;
 }
+#search-tick-tooltip .mtt-chip.mtt-old {
+  text-decoration: line-through;
+}
 #search-tick-tooltip .mtt-chip mark {
   background: #ffe066;
   color: inherit;

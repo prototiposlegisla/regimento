@@ -430,7 +430,8 @@
               || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
       }
       if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const targetY = target.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
         selectCard(target, true);
       }
       searchMatches = [];

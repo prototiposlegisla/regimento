@@ -12,6 +12,16 @@
 
   const INFO_HTML = /*__INFO_HTML__*/"";
 
+  // ===== MINIMAP / TOOLTIP COLORS =====
+  const MINIMAP_COLORS = {
+    norma:   { bg: '#222',    text: '#fff' },
+    tit:     { bg: '#b71c1c', text: '#fff' },
+    cap:     { bg: '#f57c00', text: '#fff' },
+    sec:     { bg: '#fdd835', text: '#333' },
+    subsec:  { bg: '#2e7d32', text: '#fff' },
+    article: { bg: '#555',    text: '#fff' },
+  };
+
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
   const MARKER_PALETTE = [
     { name: 'coral',    bg: '#ff6b6b', bgLight: '#ffe0e0', text: '#fff' },
@@ -62,6 +72,7 @@
   const $searchCounter = document.getElementById('search-counter');
   const $breadcrumb = document.getElementById('breadcrumb');
   const $searchTicks = document.getElementById('search-ticks');
+  const $searchTickTooltip = document.getElementById('search-tick-tooltip');
   const $minimap = document.getElementById('minimap');
   const $minimapCanvas = document.getElementById('minimap-canvas');
   const $minimapViewport = document.getElementById('minimap-viewport');
@@ -534,6 +545,8 @@
 
   function updateSearchTicks() {
     $searchTicks.innerHTML = '';
+    $searchTickTooltip.classList.remove('visible');
+    $searchTickTooltip.innerHTML = '';
     if (!searchMatches.length) return;
     const docH = document.documentElement.scrollHeight;
     const vpH = window.innerHeight;
@@ -551,6 +564,22 @@
         updateTickCurrent();
         scrollToFirstMark(searchMatches[i]);
         selectCard(searchMatches[i], true);
+      });
+      tick.addEventListener('mouseenter', () => {
+        buildSearchTickTooltip(searchMatches[i]);
+        $searchTickTooltip.classList.add('visible');
+        // Position: show tooltip, measure, then center on tick
+        $searchTickTooltip.style.top = '0px';
+        const tickRect = tick.getBoundingClientRect();
+        const ttRect = $searchTickTooltip.getBoundingClientRect();
+        let top = tickRect.top + tickRect.height / 2 - ttRect.height / 2;
+        // Clamp to viewport
+        if (top < 4) top = 4;
+        if (top + ttRect.height > vpH - 4) top = vpH - 4 - ttRect.height;
+        $searchTickTooltip.style.top = top + 'px';
+      });
+      tick.addEventListener('mouseleave', () => {
+        $searchTickTooltip.classList.remove('visible');
       });
       frag.appendChild(tick);
     });
@@ -834,6 +863,179 @@
 
   function escapeHtml(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ===== SEARCH TICK TOOLTIP HELPERS =====
+  function extractTextWithMarks(node) {
+    let html = '';
+    for (const child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        html += escapeHtml(child.textContent);
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        if (child.tagName === 'MARK') {
+          html += '<mark>' + escapeHtml(child.textContent) + '</mark>';
+        } else if (child.classList.contains('indent-path') || child.classList.contains('unit-id')) {
+          continue;
+        } else {
+          html += extractTextWithMarks(child);
+        }
+      }
+    }
+    return html;
+  }
+
+  function collectAncestorHeadings(card) {
+    const levelOrder = ['norma', 'tit', 'cap', 'sec', 'subsec'];
+    const foundLevels = new Set();
+    const ancestors = [];
+    let prev = card.previousElementSibling;
+    while (prev && foundLevels.size < levelOrder.length) {
+      if (prev.classList.contains('card-titulo')) {
+        const sec = prev.dataset.section || '';
+        let level = '';
+        if (sec.startsWith('norma')) level = 'norma';
+        else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
+        else if (sec.startsWith('cap')) level = 'cap';
+        else if (sec.startsWith('subsec')) level = 'subsec';
+        else if (sec.startsWith('sec')) level = 'sec';
+        if (level && !foundLevels.has(level)) {
+          foundLevels.add(level);
+          ancestors.push({ el: prev, level });
+          if (level === 'norma') break;
+        }
+      }
+      prev = prev.previousElementSibling;
+    }
+    ancestors.reverse();
+    return ancestors;
+  }
+
+  function buildSearchTickTooltip(card) {
+    $searchTickTooltip.innerHTML = '';
+    if (!card) return;
+
+    // --- Part 1: Breadcrumb chips (heading ancestors + article) ---
+    const ancestors = collectAncestorHeadings(card);
+    for (const a of ancestors) {
+      const chip = document.createElement('div');
+      chip.className = 'mm-chip';
+      const c = MINIMAP_COLORS[a.level];
+      chip.style.background = c.bg;
+      chip.style.color = c.text;
+      chip.textContent = getHeadingShortTitle(a.el);
+      $searchTickTooltip.appendChild(chip);
+    }
+
+    // Article chip
+    if (card.classList.contains('card-artigo')) {
+      const artNum = card.dataset.art || '';
+      const lawPrefix = card.dataset.law;
+      const key = lawPrefix ? lawPrefix + ':' + artNum : artNum;
+      const summary = SUMMARIES_MAP[key] || '';
+      const prefix = (lawPrefix ? lawPrefix + ' ' : '') + 'Art. ' + artNum;
+      const chip = document.createElement('div');
+      chip.className = 'mm-chip';
+      chip.style.background = MINIMAP_COLORS.article.bg;
+      chip.style.color = MINIMAP_COLORS.article.text;
+      chip.textContent = summary ? prefix + ' \u2014 ' + summary : prefix;
+      $searchTickTooltip.appendChild(chip);
+    }
+
+    // --- Part 2: Match unit chips ---
+    const marks = card.querySelectorAll('mark');
+    if (!marks.length) return;
+
+    // Collect unique matched paths
+    const matchedPaths = [];
+    const seenPaths = new Set();
+    for (const m of marks) {
+      // Skip marks inside footnotes or old versions
+      if (m.closest('.footnote-box') || m.closest('.old-version')) continue;
+      const p = m.closest('.art-para') || m.closest('p');
+      if (!p) continue;
+      const uid = p.querySelector('.unit-id');
+      const path = uid ? (uid.dataset.path || '') : '';
+      if (!seenPaths.has(path)) {
+        seenPaths.add(path);
+        matchedPaths.push({ path, p });
+      }
+    }
+
+    if (!matchedPaths.length) return;
+
+    // Sort by depth (caput first)
+    matchedPaths.sort((a, b) => {
+      const da = a.path ? a.path.split(',').length : 0;
+      const db = b.path ? b.path.split(',').length : 0;
+      return da - db;
+    });
+
+    // Divider between breadcrumb and match chips
+    const divider = document.createElement('div');
+    divider.className = 'stt-divider';
+    $searchTickTooltip.appendChild(divider);
+
+    // Build chain of ancestor + target chips, deduplicating
+    const renderedPaths = new Set();
+
+    for (const { path, p } of matchedPaths) {
+      const parts = path ? path.split(',') : [];
+      const chain = [''];
+      for (let i = 0; i < parts.length; i++) {
+        chain.push(parts.slice(0, i + 1).join(','));
+      }
+
+      for (let i = 0; i < chain.length; i++) {
+        const segPath = chain[i];
+        if (renderedPaths.has(segPath)) continue;
+        renderedPaths.add(segPath);
+
+        const isTarget = segPath === path;
+        let segP;
+        if (segPath === '') {
+          segP = card.querySelector(':scope > p:not(.old-version)');
+        } else {
+          const seg = card.querySelector('.unit-id[data-path="' + segPath + '"]');
+          if (seg) segP = seg.closest('.art-para') || seg.parentElement;
+        }
+        if (!segP) continue;
+
+        const chip = document.createElement('div');
+        chip.className = 'mtt-chip' + (isTarget ? ' mtt-target' : '');
+
+        if (isTarget) {
+          // Label comes from .unit-id; rest from extractTextWithMarks (which skips .unit-id)
+          const uidSpan = segP.querySelector('.unit-id');
+          const label = uidSpan ? uidSpan.textContent : '';
+          const rawHtml = extractTextWithMarks(segP);
+          if (label) {
+            chip.innerHTML = '<b>' + escapeHtml(label) + '</b>' + rawHtml;
+          } else {
+            chip.innerHTML = rawHtml;
+          }
+        } else {
+          // Plain text for ancestor segments
+          const clone = segP.cloneNode(true);
+          clone.querySelectorAll('.indent-path').forEach(el => el.remove());
+          const text = clone.textContent.trim();
+          let label = '', rest = text;
+          const dashIdx = text.indexOf('\u00a0\u2014');
+          const dashIdx2 = text.indexOf(' \u2014');
+          const splitIdx = dashIdx >= 0 ? dashIdx : dashIdx2;
+          if (splitIdx >= 0 && splitIdx < 40) {
+            label = text.slice(0, splitIdx);
+            rest = text.slice(splitIdx);
+          }
+          if (label) {
+            chip.innerHTML = '<b>' + escapeHtml(label) + '</b>' + escapeHtml(rest);
+          } else {
+            chip.textContent = rest;
+          }
+        }
+
+        $searchTickTooltip.appendChild(chip);
+      }
+    }
   }
 
   function showMarkerTooltip(btn, uid, palette) {
@@ -1986,15 +2188,6 @@
     });
 
     // Tooltip breadcrumb on hover
-    const MINIMAP_COLORS = {
-      norma:   { bg: '#222',    text: '#fff' },
-      tit:     { bg: '#b71c1c', text: '#fff' },
-      cap:     { bg: '#f57c00', text: '#fff' },
-      sec:     { bg: '#fdd835', text: '#333' },
-      subsec:  { bg: '#2e7d32', text: '#fff' },
-      article: { bg: '#555',    text: '#fff' },
-    };
-
     let lastTooltipCard = null;
 
     function buildTooltipBreadcrumb(card) {

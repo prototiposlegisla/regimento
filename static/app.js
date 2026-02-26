@@ -772,7 +772,7 @@
     const span = $cards.querySelector(`.unit-id[data-uid="${uid}"]`);
     if (!span) return false;
     const card = span.closest('.card-artigo');
-    if (!card || card.classList.contains('filtered-out')) return false;
+    if (!card) return false;
 
     const path = span.dataset.path || '';
     // Build ancestor chain: e.g. path "I,a" → ['', 'I', 'I,a']

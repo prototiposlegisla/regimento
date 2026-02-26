@@ -50,6 +50,7 @@
   let currentRefCategory = 0;
   let markerFilter = false;
   let markerTooltipTimer = null;
+  let scrollRafId = null;
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -93,7 +94,9 @@
   }
 
   function scrollToReadingLine(card, behavior = 'smooth') {
-    requestAnimationFrame(() => {
+    if (scrollRafId) cancelAnimationFrame(scrollRafId);
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = null;
       const rect = card.getBoundingClientRect();
       const target = window.scrollY + rect.top - getReadingLineY();
       window.scrollTo({ top: Math.max(0, target), behavior });
@@ -103,7 +106,9 @@
   function scrollToFirstMark(card, behavior = 'smooth') {
     const mark = card.querySelector('mark');
     const el = mark || card;
-    requestAnimationFrame(() => {
+    if (scrollRafId) cancelAnimationFrame(scrollRafId);
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = null;
       const rect = el.getBoundingClientRect();
       const target = window.scrollY + rect.top - getReadingLineY();
       window.scrollTo({ top: Math.max(0, target), behavior });
@@ -392,6 +397,7 @@
   }
 
   function doSearch(term) {
+    if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
     currentSearch = term;
     clearHighlights();
     const cards = getAllCards();

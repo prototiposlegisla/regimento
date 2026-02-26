@@ -433,6 +433,11 @@
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         selectCard(target, true);
       }
+      searchMatches = [];
+      searchIdx = 0;
+      $searchNav.classList.remove('open');
+      $searchInput.classList.remove('has-nav');
+      updateSearchTicks();
       return;
     }
 

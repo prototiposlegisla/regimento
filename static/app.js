@@ -515,10 +515,12 @@
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && $searchInput.value) {
+    if (e.key === 'Escape') {
       e.preventDefault();
-      $searchInput.value = '';
-      preserveScroll(() => doSearch(''));
+      if ($searchInput.value) {
+        $searchInput.value = '';
+        preserveScroll(() => doSearch(''));
+      }
       $searchInput.focus();
     }
     if (e.ctrlKey && e.key === 'f') {

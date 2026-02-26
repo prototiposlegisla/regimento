@@ -412,7 +412,6 @@ def _build_markdown(
 
     if not output_dir.exists():
         print(f"  ⚠ Diretório não encontrado: {output_dir}")
-        print(f"    Verifique se o Google Drive está montado.")
         return
 
     # ── 1. Parse DOCX (sempre com notas privadas) ─────────────────
@@ -556,8 +555,7 @@ def main() -> int:
     default_refs = sources.get("referencias", str(BASE_DIR / "referencias.docx"))
     default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.docx"))
     default_private = output_cfg.get("private", "")
-    default_gdrive = output_cfg.get("gdrive", "")
-    default_gdrive_a = output_cfg.get("gdrive_a", "")
+    default_chatbot = output_cfg.get("chatbot", "")
 
     parser = argparse.ArgumentParser(
         description="Gera index.html (versão pública e/ou privada) a partir do DOCX e XLSX"
@@ -600,7 +598,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--skip-markdown", action="store_true",
-        help="Pula a geração de Markdown para Google Drive",
+        help="Pula a geração de Markdown para chatbot",
     )
     parser.add_argument(
         "--only-markdown", action="store_true",
@@ -619,7 +617,7 @@ def main() -> int:
 
     build_public = not args.only_private and not args.only_markdown
     build_private = not args.only_public and bool(default_private) and not args.only_markdown
-    build_markdown = not args.skip_markdown and (bool(default_gdrive) or bool(default_gdrive_a))
+    build_markdown = not args.skip_markdown and bool(default_chatbot)
 
     if not build_public and not build_private and not build_markdown:
         print("Nada a fazer. Configure [output] em config.local.toml.")
@@ -647,20 +645,12 @@ def main() -> int:
         all_reports.append(r)
 
     if build_markdown:
-        if default_gdrive:
-            _build_markdown(
-                args=args,
-                output_dir=Path(default_gdrive),
-                include_private=True,
-                label="Markdown B para Google Drive (com notas privadas)",
-            )
-        if default_gdrive_a:
-            _build_markdown(
-                args=args,
-                output_dir=Path(default_gdrive_a),
-                include_private=False,
-                label="Markdown A para Google Drive (sem notas privadas)",
-            )
+        _build_markdown(
+            args=args,
+            output_dir=Path(default_chatbot),
+            include_private=True,
+            label="Markdown B para chatbot (com notas privadas)",
+        )
 
     elapsed_total = time.time() - t_total
     print(f"\n{'═' * 60}")

@@ -809,6 +809,19 @@
     const card = span.closest('.card-artigo');
     if (!card) return false;
 
+    // Heading ancestor chips (título, capítulo, seção…)
+    const ancestors = collectAncestorHeadings(card);
+    for (const a of ancestors) {
+      const chip = document.createElement('div');
+      chip.className = 'mtt-chip';
+      const c = MINIMAP_COLORS[a.level];
+      chip.style.background = c.bg;
+      chip.style.color = c.text;
+      chip.style.borderLeftColor = c.bg;
+      chip.textContent = getHeadingShortTitle(a.el);
+      $markerTooltip.appendChild(chip);
+    }
+
     const path = span.dataset.path || '';
     // Build ancestor chain: e.g. path "I,a" → ['', 'I', 'I,a']
     const parts = path ? path.split(',') : [];

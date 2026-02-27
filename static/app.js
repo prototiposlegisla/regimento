@@ -1171,13 +1171,6 @@
   function openIndex() {
     $indexOverlay.classList.add('open');
     $indexPanel.classList.add('open');
-    // Pre-fill sidebar search with main search term (light integration)
-    const mainTerm = $searchInput.value.trim();
-    if (mainTerm && !mainTerm.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i)) {
-      const cleanTerm = mainTerm.replace(/^r\s+/i, '');
-      $indexSearch.value = cleanTerm;
-      $btnClearIndexSearch.style.display = 'flex';
-    }
     renderIndex();
     if (window.innerWidth > 768) $indexSearch.focus();
   }

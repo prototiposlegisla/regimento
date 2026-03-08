@@ -2102,17 +2102,25 @@
   function extractPlainText(el) {
     // Get text content excluding amendment-note spans
     const clone = el.cloneNode(true);
-    clone.querySelectorAll('.amendment-note, .diff-toggle').forEach(n => n.remove());
+    clone.querySelectorAll('.amendment-note, .diff-toggle, .footnote-ref, .footnote-box').forEach(n => n.remove());
     return clone.textContent.trim();
   }
 
-  function findCurrentVersion(oldEl) {
+  function findNextVersion(oldEl) {
     const ident = oldEl.dataset.ident || '';
-    // Walk forward through siblings to find matching current version
+    // Walk forward through siblings to find the next version (old or current)
     let sib = oldEl.nextElementSibling;
     while (sib) {
+      // Skip diff panels
+      if (sib.classList.contains('diff-panel')) {
+        sib = sib.nextElementSibling;
+        continue;
+      }
       if (sib.classList.contains('old-version')) {
-        // Another old version — skip
+        // Another old version — return it if same ident (sequential diff)
+        const sibIdent = sib.dataset.ident || '';
+        if (ident === sibIdent) return sib;
+        // Different ident — skip
         sib = sib.nextElementSibling;
         continue;
       }
@@ -2146,13 +2154,11 @@
       return;
     }
 
-    const currentEl = findCurrentVersion(oldEl);
-    if (!currentEl) return;
+    const nextEl = findNextVersion(oldEl);
+    if (!nextEl) return;
 
     const oldText = extractPlainText(oldEl);
-    const currentClone = currentEl.cloneNode(true);
-    currentClone.querySelectorAll('.footnote-ref, .footnote-box').forEach(n => n.remove());
-    const newText = currentClone.textContent.trim();
+    const newText = extractPlainText(nextEl);
 
     const diff = wordDiff(oldText, newText);
 
@@ -2184,11 +2190,11 @@
   function initDiffToggles() {
     $cards.querySelectorAll('.old-version').forEach(el => {
       if (el.querySelector('.diff-toggle')) return;
-      if (!findCurrentVersion(el)) return;
+      if (!findNextVersion(el)) return;
       const btn = document.createElement('span');
       btn.className = 'diff-toggle';
       btn.textContent = '\u21C4';
-      btn.title = 'Comparar com versão atual';
+      btn.title = 'Comparar com versão seguinte';
       el.appendChild(btn);
     });
   }

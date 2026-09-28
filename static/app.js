@@ -83,11 +83,68 @@
   const $markerTooltip = document.getElementById('marker-tooltip');
   const $footnoteTooltip = document.getElementById('footnote-tooltip');
 
+  // Cards never get added or removed after load: query them once.
+  // Callers must not mutate these arrays.
+  const ALL_CARDS = Array.from($cards.querySelectorAll('.card'));
+  const ARTICLE_CARDS = Array.from($cards.querySelectorAll('.card-artigo'));
   function getAllCards() {
-    return Array.from($cards.querySelectorAll('.card'));
+    return ALL_CARDS;
   }
   function getArticleCards() {
-    return Array.from($cards.querySelectorAll('.card-artigo'));
+    return ARTICLE_CARDS;
+  }
+  function visibleOnly(cards) {
+    return cards.filter(c => !c.classList.contains('filtered-out'));
+  }
+
+  const whenIdle = window.requestIdleCallback || (cb => setTimeout(() => {
+    const start = performance.now();
+    cb({ timeRemaining: () => Math.max(0, 10 - (performance.now() - start)) });
+  }, 50));
+
+  // Heading level of a .card-titulo: 'norma' | 'tit' | 'cap' | 'sec' | 'subsec' | ''
+  function headingLevel(card) {
+    const sec = card.dataset.section || '';
+    if (sec.startsWith('norma')) return 'norma';
+    if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') return 'tit';
+    if (sec.startsWith('cap')) return 'cap';
+    if (sec.startsWith('subsec')) return 'subsec';
+    if (sec.startsWith('sec')) return 'sec';
+    return '';
+  }
+
+  // Programmatic smooth scrolls across very long distances animate for ~1.5s
+  // through 100k+ px of content and stall slow machines; jump instead.
+  const FAR_SCROLL_SCREENS = 3;
+  let scrollToYCall = 0;
+  let smoothScrolling = false; // a smooth scrollToY that moves may still be animating
+  window.addEventListener('scrollend', () => { smoothScrolling = false; });
+
+  function cancelScrollCorrection() {
+    scrollToYCall++;
+  }
+
+  function scrollToY(top, behavior) {
+    const call = ++scrollToYCall;
+    if (behavior === 'smooth' && Math.abs(top - window.scrollY) > FAR_SCROLL_SCREENS * window.innerHeight) {
+      behavior = 'instant';
+    }
+    const racesSmoothScroll = smoothScrolling;
+    // Only a smooth scroll that actually moves ends with a 'scrollend'
+    const root = document.documentElement;
+    const dest = Math.max(0, Math.min(top, root.scrollHeight - root.clientHeight));
+    smoothScrolling = behavior === 'smooth' && Math.abs(dest - window.scrollY) >= 1;
+    window.scrollTo({ top, behavior });
+    if (behavior !== 'instant' || !racesSmoothScroll) return;
+    // A jump made while an earlier smooth scroll is still animating lands one
+    // animation step past the target (Chrome): put it back
+    const landed = window.scrollY;
+    let frames = 3;
+    requestAnimationFrame(function keep() {
+      if (call !== scrollToYCall) return;
+      if (Math.abs(window.scrollY - landed) >= 1) window.scrollTo({ top: landed, behavior: 'instant' });
+      if (--frames) requestAnimationFrame(keep);
+    });
   }
 
   // ===== SCROLL SELECTION =====
@@ -101,40 +158,57 @@
       scrollRafId = null;
       const rect = card.getBoundingClientRect();
       const target = window.scrollY + rect.top - getReadingLineY();
-      window.scrollTo({ top: Math.max(0, target), behavior });
+      scrollToY(Math.max(0, target), behavior);
     });
   }
 
   function scrollToFirstMark(card, behavior = 'smooth') {
-    const mark = card.querySelector('mark');
-    const el = mark || card;
     if (scrollRafId) cancelAnimationFrame(scrollRafId);
     scrollRafId = requestAnimationFrame(() => {
       scrollRafId = null;
-      const rect = el.getBoundingClientRect();
+      // First highlight that is actually rendered (hits inside hidden
+      // elements, e.g. the compact-mode label, have no box)
+      let rect = null;
+      for (const hit of getCardHits(card)) {
+        if (hitHasBox(hit)) { rect = hitRect(hit); break; }
+      }
+      if (!rect) rect = card.getBoundingClientRect();
       const target = window.scrollY + rect.top - getReadingLineY();
-      window.scrollTo({ top: Math.max(0, target), behavior });
+      scrollToY(Math.max(0, target), behavior);
+      registerNearbyHits();
     });
+  }
+
+  // Index of the first card whose rect satisfies pred, assuming cards are in
+  // document order (visible cards stack vertically, so tops/bottoms increase).
+  function firstCardWhere(cards, pred) {
+    let lo = 0, hi = cards.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (pred(cards[mid].getBoundingClientRect())) hi = mid;
+      else lo = mid + 1;
+    }
+    return lo;
+  }
+
+  // Card under the reading line, or the nearest one (earlier card wins ties)
+  function findSelectionCard() {
+    const lineY = getReadingLineY();
+    const cards = visibleOnly(ALL_CARDS);
+    const i = firstCardWhere(cards, r => r.bottom >= lineY);
+    const next = cards[i];
+    if (next && next.getBoundingClientRect().top <= lineY) return next;
+    const prev = cards[i - 1];
+    if (!prev) return next || null;
+    if (!next) return prev;
+    const distPrev = lineY - prev.getBoundingClientRect().bottom;
+    const distNext = next.getBoundingClientRect().top - lineY;
+    return distNext < distPrev ? next : prev;
   }
 
   function updateSelection() {
     if (manualSelect) return;
-    const lineY = getReadingLineY();
-    const cards = getAllCards().filter(c => !c.classList.contains('filtered-out'));
-    let best = null;
-    let bestDist = Infinity;
-    for (const card of cards) {
-      const rect = card.getBoundingClientRect();
-      if (rect.top <= lineY && rect.bottom >= lineY) {
-        best = card;
-        break;
-      }
-      const dist = Math.min(Math.abs(rect.top - lineY), Math.abs(rect.bottom - lineY));
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = card;
-      }
-    }
+    const best = findSelectionCard();
     if (best && best !== selectedCard) {
       selectCard(best, false);
     }
@@ -144,6 +218,7 @@
     if (selectedCard) selectedCard.classList.remove('selected');
     selectedCard = card;
     if (card) card.classList.add('selected');
+    if (resultsActive) markCurrentResult(card);
     if (manual) {
       manualSelect = true;
       setTimeout(() => { manualSelect = false; }, 50);
@@ -151,6 +226,7 @@
   }
 
   function preserveScroll(fn) {
+    cancelScrollCorrection();
     const card = selectedCard;
     const topBefore = card ? card.getBoundingClientRect().top : null;
     fn();
@@ -181,29 +257,17 @@
     return num || mainText;
   }
 
-  function updateBreadcrumb() {
-    if (compactMode) {
-      $breadcrumb.classList.remove('visible');
-      return;
-    }
+  // Reads only (no DOM writes): what the breadcrumb should show, or null
+  function computeBreadcrumb() {
+    if (compactMode) return null;
 
     // Find the last article card whose top is at or above the header bottom.
     // Using "last above" (instead of "straddles") ensures the breadcrumb stays
     // visible even when a gap or a title card sits exactly at the header line.
     const headerBottom = headerEl.getBoundingClientRect().bottom;
-    const articles = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
-    let card = null;
-
-    for (const a of articles) {
-      const rect = a.getBoundingClientRect();
-      if (rect.top > headerBottom) break;
-      card = a;
-    }
-
-    if (!card) {
-      $breadcrumb.classList.remove('visible');
-      return;
-    }
+    const articles = visibleOnly(ARTICLE_CARDS);
+    const card = articles[firstCardWhere(articles, r => r.top > headerBottom) - 1];
+    if (!card) return null;
 
     // Find the last unit-id hidden behind the header
     const unitIds = card.querySelectorAll('.unit-id[data-path]');
@@ -215,41 +279,42 @@
       }
     }
 
-    // Collect ancestor heading cards in reverse DOM order (most recent first)
-    const levelOrder = ['norma', 'tit', 'cap', 'sec', 'subsec'];
-    const foundLevels = new Set();
-    const headings = [];
-    let prev = card.previousElementSibling;
-    while (prev && foundLevels.size < levelOrder.length) {
-      if (prev.classList.contains('card-titulo')) {
-        const sec = prev.dataset.section || '';
-        let level = '';
-        if (sec.startsWith('norma')) level = 'norma';
-        else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
-        else if (sec.startsWith('cap')) level = 'cap';
-        else if (sec.startsWith('subsec')) level = 'subsec';
-        else if (sec.startsWith('sec')) level = 'sec';
-        if (level && !foundLevels.has(level)) {
-          foundLevels.add(level);
-          // Include if filtered-out (display:none, definitely above) or scrolled above header
-          const isHidden = prev.classList.contains('filtered-out');
-          const rect = prev.getBoundingClientRect();
-          if (isHidden || rect.bottom <= headerBottom) {
-            headings.push({ el: prev, level });
-          }
-          // Stop at law boundary — headings before this belong to a different law
-          if (level === 'norma') break;
-        }
-      }
-      prev = prev.previousElementSibling;
-    }
-    headings.reverse(); // restore DOM order: título → capítulo → seção → …
+    // Ancestor headings out of view: filtered-out (display:none, definitely
+    // above) or scrolled above header
+    const headings = collectAncestorHeadings(card).filter(h =>
+      h.el.classList.contains('filtered-out') || h.el.getBoundingClientRect().bottom <= headerBottom);
 
     // Only show breadcrumb when at least one ancestor title is out of view
-    if (headings.length === 0) {
+    if (headings.length === 0) return null;
+
+    return { card, headings, path: currentUnit ? currentUnit.dataset.path : '' };
+  }
+
+  let breadcrumbShown = null; // content currently built in $breadcrumb
+
+  function sameBreadcrumb(a, b) {
+    return !!(a && b && a.card === b.card && a.path === b.path &&
+      a.headings.length === b.headings.length &&
+      a.headings.every((h, i) => h.el === b.headings[i].el));
+  }
+
+  function updateBreadcrumb() {
+    applyBreadcrumb(computeBreadcrumb());
+  }
+
+  function applyBreadcrumb(bc) {
+    if (!bc) {
       $breadcrumb.classList.remove('visible');
       return;
     }
+    const { card, headings } = bc;
+    // Rebuild only when the content changes (scroll fires every frame)
+    if (sameBreadcrumb(bc, breadcrumbShown)) {
+      $breadcrumb.classList.add('visible');
+      breadcrumbCard = card;
+      return;
+    }
+    breadcrumbShown = bc;
 
     // Build breadcrumb DOM
     $breadcrumb.innerHTML = '';
@@ -269,7 +334,7 @@
       span.addEventListener('click', (e) => {
         e.stopPropagation();
         const top = h.el.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: top - getReadingLineY(), behavior: 'smooth' });
+        scrollToY(top - getReadingLineY(), 'smooth');
       });
       $breadcrumb.appendChild(span);
     });
@@ -282,12 +347,12 @@
     artSpan.addEventListener('click', (e) => {
       e.stopPropagation();
       const top = card.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: top - getReadingLineY(), behavior: 'smooth' });
+      scrollToY(top - getReadingLineY(), 'smooth');
     });
     $breadcrumb.appendChild(artSpan);
 
-    if (currentUnit && currentUnit.dataset.path) {
-      const parts = currentUnit.dataset.path.split(',');
+    if (bc.path) {
+      const parts = bc.path.split(',');
       addSep();
       const pathSpan = document.createElement('span');
       pathSpan.className = 'bc-path';
@@ -305,19 +370,30 @@
     if (e.target.closest('.bc-item')) return;
     if (breadcrumbCard) {
       const top = breadcrumbCard.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: top - getReadingLineY(), behavior: 'smooth' });
+      scrollToY(top - getReadingLineY(), 'smooth');
     }
   });
+
+  // Selection, breadcrumb, minimap viewport and nearby search highlights for
+  // the current scroll position. Reads all geometry before writing anything,
+  // so the frame lays out once.
+  function syncToScroll() {
+    manualSelect = false;
+    const viewport = readMinimapViewport();
+    const best = findSelectionCard();
+    const bc = computeBreadcrumb();
+    registerNearbyHits();
+    if (best && best !== selectedCard) selectCard(best, false);
+    applyBreadcrumb(bc);
+    applyMinimapViewport(viewport);
+  }
 
   let scrollTick = false;
   window.addEventListener('scroll', () => {
     if (scrollTick) return;
     scrollTick = true;
     requestAnimationFrame(() => {
-      manualSelect = false;
-      updateSelection();
-      updateBreadcrumb();
-      updateMinimapViewport();
+      syncToScroll();
       scrollTick = false;
     });
   });
@@ -342,20 +418,190 @@
     return str.replace(/[a-z]/gi, ch => map[ch.toLowerCase()] || ch);
   }
 
-  function clearHighlights() {
-    $cards.querySelectorAll('mark').forEach(m => {
-      const parent = m.parentNode;
-      parent.replaceChild(document.createTextNode(m.textContent), m);
-      parent.normalize();
+  // ===== SEARCH HIGHLIGHTS =====
+  // Matches are painted with the CSS Custom Highlight API, which doesn't touch
+  // the DOM: no relayout of the whole document per keystroke and nothing to
+  // undo. StaticRange (not Range) because thousands of live ranges slow down
+  // every later DOM mutation. <mark> elements are used instead:
+  //  - in browsers without the API, and in forced-colors mode (::highlight
+  //    gets the text-selection colors there, <mark> gets Mark/MarkText);
+  //  - inside user-select:none text, where WebKit doesn't paint highlights
+  //    (and paints the next selectable text instead).
+  const HIGHLIGHT_API = !!(window.CSS && CSS.highlights && typeof Highlight === 'function'
+    && typeof StaticRange === 'function')
+    && !(window.matchMedia && matchMedia('(forced-colors: active)').matches);
+  // Card text with -webkit-user-select:none in style.css (.art-compact-label
+  // only in compact mode); keep in sync
+  const UNSELECTABLE_TEXT = '.art-summary, .art-compact-label, .diff-toggle, .footnote-ref';
+  const searchHighlight = HIGHLIGHT_API ? new Highlight() : null;
+  if (HIGHLIGHT_API) CSS.highlights.set('search', searchHighlight);
+
+  let cardHits = new Map();       // card → hits in document order (StaticRange or <mark>)
+  let textNodeHits = new Map();   // text node → [[start, end], ...] of its StaticRange hits
+  let markedTextNodes = [];       // [original text node, first, last node that replaced it]
+  let rangeTargets = new Map();   // observed element → its StaticRange hits
+  let cardTargets = new Map();    // card → its observed elements
+
+  // Chrome redoes work for every registered range on each frame that changes
+  // style or layout (scrolling, hover...), so only ranges within
+  // HIGHLIGHT_MARGIN_SCREENS of the visible area are registered. They are
+  // tracked per card, or per block (child of the card) in cards with more
+  // than MAX_RANGES_PER_CARD_TARGET ranges.
+  const HIGHLIGHT_MARGIN_SCREENS = 1;
+  const MAX_RANGES_PER_CARD_TARGET = 64;
+  const highlightObserver = HIGHLIGHT_API
+    ? new IntersectionObserver(applyHighlightEntries, { rootMargin: HIGHLIGHT_MARGIN_SCREENS * 100 + '% 0px' })
+    : null;
+
+  function applyHighlightEntries(entries) {
+    for (const entry of entries) {
+      for (const range of rangeTargets.get(entry.target) || []) {
+        if (entry.isIntersecting) searchHighlight.add(range);
+        else searchHighlight.delete(range);
+      }
+    }
+  }
+
+  function trackRanges(card, ranges) {
+    const targets = [];
+    const perBlock = ranges.length > MAX_RANGES_PER_CARD_TARGET;
+    for (const range of ranges) {
+      let target = card;
+      if (perBlock) {
+        target = range.startContainer.parentElement;
+        while (target !== card && target.parentElement !== card) target = target.parentElement;
+      }
+      let list = rangeTargets.get(target);
+      if (!list) {
+        rangeTargets.set(target, list = []);
+        targets.push(target);
+        highlightObserver.observe(target);
+      }
+      list.push(range);
+    }
+    cardTargets.set(card, targets);
+  }
+
+  // The observer reports after the frame is painted, and not at all while the
+  // main thread is busy: register what is near the viewport right away. The
+  // band must not exceed the observer's, or it never reports them leaving.
+  function registerNearbyHits() {
+    if (!HIGHLIGHT_API || !searchMatches.length) return;
+    applyHighlightEntries(highlightObserver.takeRecords());
+    const vh = window.innerHeight;
+    const bandTop = -HIGHLIGHT_MARGIN_SCREENS * vh;
+    const bandBottom = (1 + HIGHLIGHT_MARGIN_SCREENS) * vh;
+    // A subject filter opened afterwards (search filter off) hides matches
+    // without searching again; the binary search needs visible cards
+    const matches = visibleOnly(searchMatches);
+    for (let i = firstCardWhere(matches, r => r.bottom >= bandTop); i < matches.length; i++) {
+      const card = matches[i];
+      if (card.getBoundingClientRect().top > bandBottom) break;
+      for (const target of cardTargets.get(card) || []) {
+        const r = target.getBoundingClientRect();
+        if (!r.height || r.bottom < bandTop || r.top > bandBottom) continue;
+        for (const range of rangeTargets.get(target)) {
+          if (!searchHighlight.has(range)) searchHighlight.add(range);
+        }
+      }
+    }
+  }
+
+  if (HIGHLIGHT_API) {
+    // Printing lays out the whole document at once: register every range
+    // while it lasts, then observe again (the observer reports each target's
+    // current state, trimming back to the viewport)
+    window.addEventListener('beforeprint', () => {
+      highlightObserver.disconnect();
+      for (const ranges of rangeTargets.values()) {
+        for (const range of ranges) searchHighlight.add(range);
+      }
+    });
+    window.addEventListener('afterprint', () => {
+      for (const target of rangeTargets.keys()) highlightObserver.observe(target);
     });
   }
 
-  function getCardText(card, includeFootnotes) {
-    const clone = card.cloneNode(true);
-    if (!includeFootnotes) {
-      clone.querySelectorAll('.footnote-box').forEach(el => el.remove());
+  function getCardHits(card) {
+    return cardHits.get(card) || [];
+  }
+
+  function isMarkHit(hit) {
+    return hit.nodeType === Node.ELEMENT_NODE;
+  }
+
+  // Element containing a hit (for .closest() lookups)
+  function hitElement(hit) {
+    return isMarkHit(hit) ? hit : hit.startContainer.parentElement;
+  }
+
+  function hitBox(hit) {
+    if (isMarkHit(hit)) return hit;
+    const range = document.createRange();
+    range.setStart(hit.startContainer, hit.startOffset);
+    range.setEnd(hit.endContainer, hit.endOffset);
+    return range;
+  }
+
+  function hitHasBox(hit) {
+    return hitBox(hit).getClientRects().length > 0;
+  }
+
+  function hitRect(hit) {
+    return hitBox(hit).getBoundingClientRect();
+  }
+
+  function clearHighlights() {
+    if (HIGHLIGHT_API) {
+      highlightObserver.takeRecords();
+      highlightObserver.disconnect();
+      searchHighlight.clear();
     }
-    return stripAccents(clone.textContent.toLowerCase()).replace(/\xa0/g, ' ');
+    // Put back the exact text nodes that <mark>s replaced
+    for (const [textNode, first, last] of markedTextNodes) {
+      const parent = first.parentNode;
+      if (!parent) continue;
+      parent.insertBefore(textNode, first);
+      for (let n = first, next; n; n = next) {
+        next = n === last ? null : n.nextSibling;
+        parent.removeChild(n);
+      }
+    }
+    markedTextNodes = [];
+    cardHits = new Map();
+    textNodeHits = new Map();
+    rangeTargets = new Map();
+    cardTargets = new Map();
+  }
+
+  // Text nodes of a card, skipping footnote boxes unless requested
+  function cardTextWalker(card, includeFootnotes) {
+    return document.createTreeWalker(card, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.nodeType === Node.TEXT_NODE ? NodeFilter.FILTER_ACCEPT
+        : (!includeFootnotes && n.classList.contains('footnote-box') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP),
+    });
+  }
+
+  // Normalized text per card, [without footnotes, with footnotes]. Built on
+  // first use (and warmed when idle); a card's text only changes when a diff
+  // panel opens or closes, which calls invalidateCardText.
+  const cardTextCache = new Map();
+
+  function getCardText(card, includeFootnotes) {
+    let entry = cardTextCache.get(card);
+    if (!entry) cardTextCache.set(card, entry = [null, null]);
+    const i = includeFootnotes ? 1 : 0;
+    if (entry[i] === null) {
+      let text = '';
+      const walker = cardTextWalker(card, includeFootnotes);
+      while (walker.nextNode()) text += walker.currentNode.data;
+      entry[i] = stripAccents(text.toLowerCase()).replace(/\xa0/g, ' ');
+    }
+    return entry[i];
+  }
+
+  function invalidateCardText(card) {
+    if (card) cardTextCache.delete(card);
   }
 
   function parseSearchTerms(input) {
@@ -374,35 +620,115 @@
     return { phrases, words };
   }
 
-  function highlightText(node, phrases, words, includeFootnotes) {
-    if (!phrases.length && !words.length) return;
-    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
-    const textNodes = [];
-    while (walker.nextNode()) {
-      const skip = includeFootnotes ? '.art-head' : '.footnote-box, .art-head';
-      if (walker.currentNode.parentElement.closest(skip)) continue;
-      textNodes.push(walker.currentNode);
+  // Terms of a single character match nearly every article, so they don't
+  // trigger a text search (typing "a222" goes through "a" first)
+  const MIN_TERM_LENGTH = 2;
+
+  // What doSearch will do with a term:
+  //  'empty' → clear; 'nav' → go to an article (a43, a44, aADT1, aLO23...);
+  //  'short' → no term reaches MIN_TERM_LENGTH; 'text' → text search.
+  // A "r " prefix includes footnotes in the search.
+  function classifyQuery(term) {
+    if (!term) return { kind: 'empty' };
+    let includeFootnotes = false;
+    const footnoteMatch = term.match(/^r\s+(.+)$/i);
+    if (footnoteMatch) {
+      includeFootnotes = true;
+      term = footnoteMatch[1];
     }
+    const artMatch = term.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i);
+    if (artMatch) return { kind: 'nav', artMatch };
+    const { phrases, words } = parseSearchTerms(term);
+    let longest = 0;
+    for (const t of phrases.concat(words)) longest = Math.max(longest, t.length);
+    if (longest < MIN_TERM_LENGTH) return { kind: 'short' };
+    return { kind: 'text', includeFootnotes, phrases, words, longest };
+  }
+
+  function buildHighlightRegex(phrases, words) {
     // Phrases first (longer matches take priority in alternation)
     const allPatterns = [
       ...phrases.map(p => accentInsensitivePattern(p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).replace(/ +/g, '[\\s\\xa0]+')),
       ...words.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
     ];
-    const regex = new RegExp('(' + allPatterns.join('|') + ')', 'gi');
-    for (const tn of textNodes) {
-      if (!regex.test(tn.textContent)) continue;
+    return new RegExp('(' + allPatterns.join('|') + ')', 'gi');
+  }
+
+  function highlightText(card, regex, includeFootnotes) {
+    const found = []; // [text node, [[start, end], ...]]
+    const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const tn = walker.currentNode;
+      let spans = null;
+      let m;
       regex.lastIndex = 0;
-      const span = document.createElement('span');
-      span.innerHTML = tn.textContent.replace(regex, '<mark>$1</mark>');
-      tn.parentNode.replaceChild(span, tn);
+      while ((m = regex.exec(tn.data)) !== null) {
+        if (!m[0].length) { regex.lastIndex++; continue; }
+        (spans || (spans = [])).push([m.index, m.index + m[0].length]);
+      }
+      if (!spans) continue;
+      if (!includeFootnotes && tn.parentElement.closest('.footnote-box')) continue;
+      found.push([tn, spans]);
     }
+    if (!found.length) return;
+
+    const hits = [];
+    const ranges = [];
+    for (const [tn, spans] of found) {
+      if (HIGHLIGHT_API && !tn.parentElement.closest(UNSELECTABLE_TEXT)) {
+        textNodeHits.set(tn, spans);
+        for (const [start, end] of spans) {
+          const range = new StaticRange({ startContainer: tn, startOffset: start, endContainer: tn, endOffset: end });
+          hits.push(range);
+          ranges.push(range);
+        }
+        continue;
+      }
+      const data = tn.data;
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      for (const [start, end] of spans) {
+        if (start > last) frag.appendChild(document.createTextNode(data.slice(last, start)));
+        const mark = document.createElement('mark');
+        mark.textContent = data.slice(start, end);
+        frag.appendChild(mark);
+        hits.push(mark);
+        last = end;
+      }
+      if (last < data.length) frag.appendChild(document.createTextNode(data.slice(last)));
+      markedTextNodes.push([tn, frag.firstChild, frag.lastChild]);
+      tn.parentNode.replaceChild(frag, tn);
+    }
+    cardHits.set(card, hits);
+    if (ranges.length) trackRanges(card, ranges);
+  }
+
+  function resetSearchNav() {
+    hideResults();
+    searchMatches = [];
+    searchIdx = 0;
+    $searchNav.classList.remove('open');
+    $searchInput.classList.remove('has-nav');
+    updateSearchTicks();
+    scheduleMinimap();
+  }
+
+  // Selection and breadcrumb normally follow scroll events; after un-filtering
+  // without a scroll (no scroll anchoring in WebKit) they must be refreshed
+  function refreshScrollState() {
+    requestAnimationFrame(syncToScroll);
   }
 
   function doSearch(term) {
+    // A run for the input's current value supersedes the pending one; runs
+    // for an older term (currentSearch, from marker/subject filters) leave it
+    // pending so the newer term still applies
+    if (term === $searchInput.value.trim()) cancelPendingSearch();
     if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
     currentSearch = term;
     clearHighlights();
     const cards = getAllCards();
+    const hiddenBefore = cards.filter(c => c.classList.contains('filtered-out'));
 
     if (activeSubject && subjectFilter) {
       applySubjectFilter();
@@ -414,32 +740,18 @@
       applyMarkerFilter();
     }
 
-    if (!term) {
-      $btnClearSearch.style.display = 'none';
-      searchMatches = [];
-      searchIdx = 0;
-      $searchNav.classList.remove('open');
-      $searchInput.classList.remove('has-nav');
-      updateSearchTicks();
-      scheduleMinimap();
+    const query = classifyQuery(term);
+    $btnClearSearch.style.display = query.kind === 'empty' ? 'none' : 'flex';
+
+    if (query.kind === 'empty' || query.kind === 'short') {
+      resetSearchNav();
+      if (hiddenBefore.some(c => !c.classList.contains('filtered-out'))) refreshScrollState();
       return;
     }
 
-    $btnClearSearch.style.display = 'flex';
-
-    // Prefix "r " → include footnotes in search
-    let includeFootnotes = false;
-    const footnoteMatch = term.match(/^r\s+(.+)$/i);
-    if (footnoteMatch) {
-      includeFootnotes = true;
-      term = footnoteMatch[1];
-    }
-
-    // Article navigation: a43, a44, aADT1, aLO23, etc
-    const artMatch = term.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i);
-    if (artMatch) {
-      const lawPrefix = artMatch[1] ? artMatch[1].toUpperCase() : '';
-      const artNum = artMatch[2];
+    if (query.kind === 'nav') {
+      const lawPrefix = query.artMatch[1] ? query.artMatch[1].toUpperCase() : '';
+      const artNum = query.artMatch[2];
       let target;
       if (lawPrefix) {
         target = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
@@ -450,31 +762,29 @@
       }
       if (target) {
         const targetY = target.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25;
-        window.scrollTo({ top: targetY, behavior: 'smooth' });
+        scrollToY(targetY, 'smooth');
         selectCard(target, true);
       }
-      searchMatches = [];
-      searchIdx = 0;
-      $searchNav.classList.remove('open');
-      $searchInput.classList.remove('has-nav');
-      updateSearchTicks();
+      resetSearchNav();
       return;
     }
 
-    const { phrases, words } = parseSearchTerms(term);
-    const articleCards = getArticleCards().filter(c => !c.classList.contains('filtered-out'));
+    const { phrases, words, includeFootnotes } = query;
+    const regex = buildHighlightRegex(phrases, words);
+    const articleCards = visibleOnly(getArticleCards());
     const matchedCards = new Set();
 
     for (const card of articleCards) {
       const text = getCardText(card, includeFootnotes);
       if (phrases.every(p => text.includes(p)) && words.every(t => text.includes(t))) {
         matchedCards.add(card);
-        highlightText(card, phrases, words, includeFootnotes);
+        highlightText(card, regex, includeFootnotes);
         // Open footnote boxes that contain highlights
         if (includeFootnotes) {
-          card.querySelectorAll('.footnote-box').forEach(box => {
-            if (box.querySelector('mark')) box.classList.add('open');
-          });
+          for (const hit of getCardHits(card)) {
+            const box = hitElement(hit).closest('.footnote-box');
+            if (box) box.classList.add('open');
+          }
         }
       }
     }
@@ -495,6 +805,7 @@
 
     searchMatches = articleCards.filter(c => matchedCards.has(c));
     searchIdx = 0;
+    showResults();
 
     if (searchMatches.length > 0) {
       $searchNav.classList.add('open');
@@ -511,12 +822,42 @@
     scheduleMinimap();
   }
 
+  // Text search waits for a pause in typing: intermediate terms ("p", "pr",
+  // "pre"...) are the expensive ones and the next key throws them away.
+  // Clearing and article navigation stay immediate.
+  const SEARCH_DELAY_MS = 200;
+  const SHORT_TERM_SEARCH_DELAY_MS = 400; // terms of up to 3 characters
+  let searchTimer = null;
+
+  function cancelPendingSearch() {
+    if (searchTimer) {
+      clearTimeout(searchTimer);
+      searchTimer = null;
+    }
+  }
+
+  function flushPendingSearch() {
+    if (searchTimer) doSearch($searchInput.value.trim());
+  }
+
   $searchInput.addEventListener('input', (e) => {
-    doSearch(e.target.value.trim());
+    const term = e.target.value.trim();
+    cancelPendingSearch();
+    const query = classifyQuery(term);
+    if (query.kind !== 'text') {
+      doSearch(term);
+      return;
+    }
+    searchTimer = setTimeout(() => {
+      searchTimer = null;
+      doSearch($searchInput.value.trim());
+    }, query.longest <= 3 ? SHORT_TERM_SEARCH_DELAY_MS : SEARCH_DELAY_MS);
   });
 
   $searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && searchMatches.length) {
+    if (e.key !== 'Enter') return;
+    flushPendingSearch();
+    if (searchMatches.length) {
       e.preventDefault();
       navigateSearch(e.shiftKey ? -1 : 1);
     }
@@ -569,6 +910,8 @@
       tick.className = 'tick' + (i === searchIdx ? ' current' : '');
       tick.style.top = (pct * trackH) + 'px';
       tick.addEventListener('click', () => {
+        // While a search is pending, ticks belong to the previous term
+        if (searchTimer) { flushPendingSearch(); return; }
         searchIdx = i;
         updateSearchCounter();
         updateTickCurrent();
@@ -576,6 +919,7 @@
         selectCard(searchMatches[i], true);
       });
       tick.addEventListener('mouseenter', () => {
+        if (searchTimer) return;
         buildSearchTickTooltip(searchMatches[i]);
         $searchTickTooltip.classList.add('visible');
         // Position: show tooltip, measure, then center on tick
@@ -604,6 +948,7 @@
   }
 
   function navigateSearch(delta) {
+    flushPendingSearch();
     if (!searchMatches.length) return;
     searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
     updateSearchCounter();
@@ -622,6 +967,388 @@
 
   document.getElementById('search-prev').addEventListener('click', () => navigateSearch(-1));
   document.getElementById('search-next').addEventListener('click', () => navigateSearch(1));
+
+  // ===== RESULTS LIST =====
+  // Every matched dispositivo with just the text around its matches, grouped
+  // by article: a sidebar on wide screens, a drawer (opened from the counter
+  // or the index panel) on small ones. Groups get their entries only when they
+  // come near the visible part of the list.
+  const $resultsList = document.getElementById('results-list');
+  const $resultsSummary = document.getElementById('results-summary');
+  const $indexResultsLink = document.getElementById('index-results-link');
+  const resultsWide = window.matchMedia('(min-width: 1100px)');
+  const RESULT_UNITS_SHOWN = 3;     // per article; the rest behind "+N trechos"
+  const SNIPPET_CONTEXT = 70;       // characters around each match
+  const SNIPPET_WHOLE_UNDER = 240;  // shorter texts are shown whole
+  const SNIPPET_WINDOWS = 3;
+  // Not part of a dispositivo's text in a snippet
+  const SNIPPET_SKIP = '.unit-id, .indent-path, .footnote-ref, .diff-toggle, .footnote-close, .footnote-box > strong';
+
+  let resultsActive = false;        // a text search is showing its results
+  let resultsBuiltFor = null;       // the searchMatches array the list shows
+  let resultsBuildPending = false;
+  let resultsDrawerOpen = false;
+  let resultsHidden = false;        // sidebar closed by the user (remembered)
+  try { resultsHidden = localStorage.getItem('regimento-results-hidden') === '1'; } catch (e) {}
+  let resultGroups = new Map();     // card → its group element in the list
+  let resultsAppended = 0;          // searchMatches with a group in the list so far
+  let resultsLaw = null;            // law of the last appended group
+  let currentResultGroup = null;
+
+  const resultsFillObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) fillResultGroup(entry.target.resultCard);
+    }
+  }, { root: $resultsList, rootMargin: '100% 0px' });
+
+  function resultsShown() {
+    return resultsActive && (resultsDrawerOpen || (resultsWide.matches && !resultsHidden));
+  }
+
+  function showResults() {
+    resultsActive = true;
+    updateResultsVisibility();
+  }
+
+  function hideResults() {
+    resultsActive = false;
+    resultsDrawerOpen = false;
+    updateResultsVisibility();
+  }
+
+  function updateResultsVisibility() {
+    document.body.classList.toggle('results-open', resultsActive && resultsWide.matches && !resultsHidden);
+    document.body.classList.toggle('results-drawer-open', resultsDrawerOpen);
+    $indexOverlay.classList.toggle('open', resultsDrawerOpen || $indexPanel.classList.contains('open'));
+    $indexResultsLink.hidden = !resultsActive;
+    if (resultsActive) $indexResultsLink.textContent = 'Lista de resultados da busca (' + searchMatches.length + ') ›';
+    if (resultsShown() && resultsBuiltFor !== searchMatches) scheduleResultsBuild();
+    else if (resultsShown() && resultsAppended < searchMatches.length) whenIdle(appendResultGroupsWhenIdle);
+  }
+
+  // Built after the search result is painted, so typing stays responsive
+  function scheduleResultsBuild() {
+    if (resultsBuildPending) return;
+    resultsBuildPending = true;
+    requestAnimationFrame(() => setTimeout(() => {
+      resultsBuildPending = false;
+      if (resultsShown() && resultsBuiltFor !== searchMatches) buildResultsList();
+    }, 0));
+  }
+
+  function openResults() {
+    if (resultsWide.matches) {
+      setResultsHidden(false);
+    } else {
+      resultsDrawerOpen = true;
+      updateResultsVisibility();
+    }
+  }
+
+  function closeResults() {
+    if (resultsDrawerOpen) {
+      resultsDrawerOpen = false;
+      updateResultsVisibility();
+    } else {
+      setResultsHidden(true);
+    }
+  }
+
+  function setResultsHidden(hidden) {
+    resultsHidden = hidden;
+    try { localStorage.setItem('regimento-results-hidden', hidden ? '1' : '0'); } catch (e) {}
+    preserveScroll(updateResultsVisibility);
+  }
+
+  function buildResultsList() {
+    resultsBuiltFor = searchMatches;
+    resultsFillObserver.disconnect();
+    resultGroups = new Map();
+    currentResultGroup = null;
+    $resultsList.textContent = '';
+    $resultsList.scrollTop = 0;
+
+    let hits = 0;
+    for (const card of searchMatches) hits += getCardHits(card).length;
+    $resultsSummary.textContent = searchMatches.length
+      ? searchMatches.length + (searchMatches.length === 1 ? ' artigo' : ' artigos')
+        + ' · ' + hits + (hits === 1 ? ' ocorrência' : ' ocorrências')
+      : '';
+    if (!searchMatches.length) {
+      const empty = document.createElement('div');
+      empty.className = 'res-empty';
+      empty.textContent = 'Nenhum resultado para “' + currentSearch + '”';
+      $resultsList.appendChild(empty);
+      return;
+    }
+
+    resultsAppended = 0;
+    resultsLaw = null;
+    appendResultGroups(searchMatches.length, performance.now() + 8);
+    // The top of the list shows filled right away (the observer reports later)
+    for (const card of searchMatches.slice(0, 12)) fillResultGroup(card);
+    markCurrentResult(selectedCard);
+    if (resultsAppended < searchMatches.length) whenIdle(appendResultGroupsWhenIdle);
+  }
+
+  // Appends groups for searchMatches[resultsAppended, until), stopping early
+  // at the deadline (performance.now() time)
+  function appendResultGroups(until, deadline = Infinity) {
+    const frag = document.createDocumentFragment();
+    while (resultsAppended < until && performance.now() < deadline) {
+      const card = searchMatches[resultsAppended++];
+      const norma = collectAncestorHeadings(card).find(a => a.level === 'norma');
+      const lawTitle = norma ? getHeadingShortTitle(norma.el) : '';
+      if (lawTitle !== resultsLaw) {
+        resultsLaw = lawTitle;
+        if (lawTitle) {
+          const sep = document.createElement('div');
+          sep.className = 'res-law';
+          sep.textContent = lawTitle;
+          frag.appendChild(sep);
+        }
+      }
+      const group = buildResultGroup(card);
+      resultGroups.set(card, group);
+      frag.appendChild(group);
+      resultsFillObserver.observe(group);
+    }
+    $resultsList.appendChild(frag);
+  }
+
+  function appendResultGroupsWhenIdle(idle) {
+    if (resultsBuiltFor !== searchMatches || !resultsShown()) return;
+    appendResultGroups(searchMatches.length, performance.now() + Math.min(8, idle.timeRemaining()));
+    if (resultsAppended < searchMatches.length) whenIdle(appendResultGroupsWhenIdle);
+  }
+
+  function buildResultGroup(card) {
+    const group = document.createElement('div');
+    group.className = 'res-group';
+    group.resultCard = card;
+    const head = document.createElement('button');
+    head.className = 'res-head';
+    const lawPrefix = card.dataset.law;
+    if (lawPrefix) {
+      const tag = document.createElement('span');
+      tag.className = 'res-law-tag';
+      tag.textContent = lawPrefix;
+      head.appendChild(tag);
+    }
+    head.appendChild(document.createTextNode('Art. ' + card.dataset.art));
+    const summary = card.querySelector('.art-summary');
+    if (summary) {
+      const sum = document.createElement('span');
+      sum.className = 'res-sum';
+      if (summary.querySelector('mark')) {
+        const { text, spans } = unitTextAndMatches(summary);
+        sum.innerHTML = ' — ' + markSpans(text, 0, text.length, spans);
+      } else {
+        sum.textContent = ' — ' + summary.textContent;
+      }
+      head.appendChild(sum);
+    }
+    head.addEventListener('click', () => goToResult(card, null));
+    group.appendChild(head);
+    return group;
+  }
+
+  function fillResultGroup(card) {
+    const group = resultGroups.get(card);
+    if (!group || group.resultFilled) return;
+    group.resultFilled = true;
+    resultsFillObserver.unobserve(group);
+    const units = resultUnits(card);
+    const shown = units.slice(0, RESULT_UNITS_SHOWN);
+    for (const unit of shown) group.appendChild(buildResultEntry(card, unit));
+    if (units.length > shown.length) {
+      const more = document.createElement('button');
+      more.className = 'res-expand';
+      const rest = units.length - shown.length;
+      more.textContent = '+ ' + rest + (rest === 1 ? ' trecho' : ' trechos');
+      more.addEventListener('click', () => {
+        for (const unit of units.slice(RESULT_UNITS_SHOWN)) group.insertBefore(buildResultEntry(card, unit), more);
+        more.remove();
+      });
+      group.appendChild(more);
+    }
+  }
+
+  // Dispositivos (paragraphs, notes) of a card with matches, in order. The
+  // summary is shown in the group header instead.
+  function resultUnits(card) {
+    const units = [];
+    const seen = new Set();
+    for (const hit of getCardHits(card)) {
+      const el = hitElement(hit);
+      if (el.closest('.art-summary, .art-compact-label, .law-badge, .diff-panel')) continue;
+      const unit = el.closest('.footnote-box') || el.closest('.art-para') || el.closest('p');
+      if (!unit || !card.contains(unit) || seen.has(unit)) continue;
+      seen.add(unit);
+      units.push(unit);
+    }
+    return units;
+  }
+
+  function buildResultEntry(card, unit) {
+    const entry = document.createElement('button');
+    entry.className = 'res-entry' + (unit.classList.contains('old-version') ? ' res-old' : '');
+    const label = document.createElement('span');
+    label.className = 'res-label';
+    label.textContent = unitLabel(unit);
+    const text = document.createElement('span');
+    text.className = 'res-text';
+    const { text: unitText, spans } = unitTextAndMatches(unit);
+    text.innerHTML = snippetHtml(unitText, spans);
+    entry.append(label, text);
+    entry.addEventListener('click', () => goToResult(card, unit));
+    return entry;
+  }
+
+  function formatUnitPath(path) {
+    return path.split(',').map(p => p === '§ú' ? 'Parágrafo único' : p).join(' › ');
+  }
+
+  function unitLabel(unit) {
+    if (unit.classList.contains('footnote-box')) return 'Nota ' + (unit.dataset.note || '');
+    if (unit.classList.contains('old-version')) {
+      return 'redação anterior' + (unit.dataset.ident ? ' · ' + unit.dataset.ident : '');
+    }
+    const uid = unit.querySelector('.unit-id[data-path]');
+    if (uid) return formatUnitPath(uid.dataset.path);
+    if (!unit.classList.contains('art-para')) return 'caput';
+    // Continuation of the dispositivo above (e.g. a quoted oath)
+    for (let p = unit.previousElementSibling; p; p = p.previousElementSibling) {
+      if (p.tagName !== 'P' || p.classList.contains('old-version')) continue;
+      const prev = p.querySelector('.unit-id[data-path]');
+      if (prev) return formatUnitPath(prev.dataset.path);
+      if (!p.classList.contains('art-para')) return 'caput';
+    }
+    return '';
+  }
+
+  // Text of a dispositivo (without its label) and where its matches are
+  function unitTextAndMatches(unit) {
+    let text = '';
+    const spans = [];
+    const walker = document.createTreeWalker(unit, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.nodeType === Node.TEXT_NODE ? NodeFilter.FILTER_ACCEPT
+        : (n.matches(SNIPPET_SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP),
+    });
+    while (walker.nextNode()) {
+      const tn = walker.currentNode;
+      const base = text.length;
+      if (tn.parentElement.tagName === 'MARK') {
+        spans.push([base, base + tn.data.length]);
+      } else {
+        for (const [s, e] of textNodeHits.get(tn) || []) spans.push([base + s, base + e]);
+      }
+      text += tn.data;
+    }
+    return { text, spans };
+  }
+
+  // The text around the matches: whole if short, else up to SNIPPET_WINDOWS
+  // excerpts of SNIPPET_CONTEXT characters on each side
+  function snippetHtml(text, spans) {
+    const start = /^[\s—–-]*/.exec(text)[0].length; // the " — " after the label
+    const end = text.trimEnd().length;
+    const windows = [];
+    if (end - start <= SNIPPET_WHOLE_UNDER) {
+      windows.push([start, end]);
+    } else if (!spans.length) {
+      windows.push([start, start + SNIPPET_WHOLE_UNDER]);
+    } else {
+      for (const [s, e] of spans) {
+        let a = Math.max(start, s - SNIPPET_CONTEXT);
+        let b = Math.min(end, e + SNIPPET_CONTEXT);
+        while (a > start && !/\s/.test(text[a - 1])) a--;
+        while (b < end && !/\s/.test(text[b])) b++;
+        const last = windows[windows.length - 1];
+        if (last && a <= last[1] + 1) last[1] = Math.max(last[1], b);
+        else windows.push([a, b]);
+      }
+    }
+    const shown = windows.slice(0, SNIPPET_WINDOWS);
+    let html = shown[0][0] > start ? '… ' : '';
+    shown.forEach(([a, b], i) => {
+      if (i) html += ' … ';
+      html += markSpans(text, a, b, spans);
+    });
+    if (shown[shown.length - 1][1] < end) html += ' …';
+    if (windows.length > shown.length) {
+      html += ' <span class="res-more-matches">(+' + (windows.length - shown.length) + ')</span>';
+    }
+    return html;
+  }
+
+  // text[a, b) as HTML, with the spans inside it as <mark>
+  function markSpans(text, a, b, spans) {
+    const plain = s => escapeHtml(s.replace(/\s+/g, ' '));
+    let html = '';
+    let pos = a;
+    for (const [s, e] of spans) {
+      if (e <= pos || s >= b) continue;
+      const ms = Math.max(s, pos);
+      const me = Math.min(e, b);
+      html += plain(text.slice(pos, ms)) + '<mark>' + plain(text.slice(ms, me)) + '</mark>';
+      pos = me;
+    }
+    return html + plain(text.slice(pos, b));
+  }
+
+  function goToResult(card, unit) {
+    const i = searchMatches.indexOf(card);
+    if (i >= 0) {
+      searchIdx = i;
+      updateSearchCounter();
+      updateTickCurrent();
+    }
+    if (resultsDrawerOpen) {
+      resultsDrawerOpen = false;
+      updateResultsVisibility();
+    }
+    if (unit && unit.getClientRects().length) scrollToReadingLine(unit);
+    else scrollToFirstMark(card);
+    selectCard(card, true);
+  }
+
+  // Highlights the group of the selected card and keeps it in view (unless
+  // the pointer is on the list)
+  function markCurrentResult(card) {
+    if (resultsBuiltFor !== searchMatches || !card) return;
+    if (!resultGroups.has(card) && resultsAppended < searchMatches.length) {
+      const i = searchMatches.indexOf(card);
+      if (i >= resultsAppended) appendResultGroups(i + 1);
+    }
+    const group = resultGroups.get(card);
+    if (!group || group === currentResultGroup) return;
+    if (currentResultGroup) currentResultGroup.classList.remove('current');
+    currentResultGroup = group;
+    group.classList.add('current');
+    if (!resultsShown() || $resultsList.matches(':hover')) return;
+    fillResultGroup(card);
+    const top = group.offsetTop;
+    const bottom = top + group.offsetHeight;
+    const view = $resultsList.clientHeight;
+    if (top < $resultsList.scrollTop || bottom > $resultsList.scrollTop + view) {
+      $resultsList.scrollTop = Math.max(0, top - view / 3);
+    }
+  }
+
+  $searchCounter.addEventListener('click', () => {
+    if (resultsShown()) closeResults();
+    else openResults();
+  });
+  document.getElementById('results-close').addEventListener('click', closeResults);
+  $indexResultsLink.addEventListener('click', () => {
+    closeIndex();
+    openResults();
+  });
+  resultsWide.addEventListener('change', () => {
+    resultsDrawerOpen = false;
+    preserveScroll(updateResultsVisibility);
+  });
 
   // ===== MARKERS (click-on-identifier system) =====
   function loadMarkers() {
@@ -889,11 +1616,42 @@
   }
 
   // ===== SEARCH TICK TOOLTIP HELPERS =====
+  // Text node as HTML, with search highlights (highlight API) as <mark>
+  function textWithMarks(textNode) {
+    const text = textNode.textContent;
+    const spans = textNodeHits.get(textNode);
+    if (!spans) return escapeHtml(text);
+    let html = '';
+    let last = 0;
+    for (const [start, end] of spans) {
+      html += escapeHtml(text.slice(last, start)) + '<mark>' + escapeHtml(text.slice(start, end)) + '</mark>';
+      last = end;
+    }
+    return html + escapeHtml(text.slice(last));
+  }
+
+  // A clone doesn't carry the StaticRange highlights of the original: turn
+  // them into <mark>s (same structure, so the text nodes pair up)
+  function markHighlightsInClone(original, clone) {
+    if (!textNodeHits.size) return;
+    const originals = document.createTreeWalker(original, NodeFilter.SHOW_TEXT);
+    const copies = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT);
+    const pairs = [];
+    while (originals.nextNode() && copies.nextNode()) {
+      if (textNodeHits.has(originals.currentNode)) pairs.push([originals.currentNode, copies.currentNode]);
+    }
+    for (const [textNode, copy] of pairs) {
+      const tpl = document.createElement('template');
+      tpl.innerHTML = textWithMarks(textNode);
+      copy.parentNode.replaceChild(tpl.content, copy);
+    }
+  }
+
   function extractTextWithMarks(node) {
     let html = '';
     for (const child of node.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
-        html += escapeHtml(child.textContent);
+        html += textWithMarks(child);
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         if (child.tagName === 'MARK') {
           html += '<mark>' + escapeHtml(child.textContent) + '</mark>';
@@ -907,20 +1665,21 @@
     return html;
   }
 
+  // Nearest preceding heading card of each level, in DOM order. Depends only
+  // on the (static) card order, so it's computed once per card. Callers must
+  // not mutate the returned array.
+  const ancestorHeadingsCache = new Map();
+
   function collectAncestorHeadings(card) {
+    const cached = ancestorHeadingsCache.get(card);
+    if (cached) return cached;
     const levelOrder = ['norma', 'tit', 'cap', 'sec', 'subsec'];
     const foundLevels = new Set();
     const ancestors = [];
     let prev = card.previousElementSibling;
     while (prev && foundLevels.size < levelOrder.length) {
       if (prev.classList.contains('card-titulo')) {
-        const sec = prev.dataset.section || '';
-        let level = '';
-        if (sec.startsWith('norma')) level = 'norma';
-        else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
-        else if (sec.startsWith('cap')) level = 'cap';
-        else if (sec.startsWith('subsec')) level = 'subsec';
-        else if (sec.startsWith('sec')) level = 'sec';
+        const level = headingLevel(prev);
         if (level && !foundLevels.has(level)) {
           foundLevels.add(level);
           ancestors.push({ el: prev, level });
@@ -930,6 +1689,7 @@
       prev = prev.previousElementSibling;
     }
     ancestors.reverse();
+    ancestorHeadingsCache.set(card, ancestors);
     return ancestors;
   }
 
@@ -965,13 +1725,14 @@
     }
 
     // --- Part 2: Match unit chips ---
-    const marks = card.querySelectorAll('mark');
-    if (!marks.length) return;
+    const hits = getCardHits(card);
+    if (!hits.length) return;
 
     // Collect unique matched paragraphs
     const matchedPaths = [];
     const seenPaths = new Set();
-    for (const m of marks) {
+    for (const hit of hits) {
+      const m = hitElement(hit);
       // Skip marks inside footnotes
       if (m.closest('.footnote-box')) continue;
       const oldVer = m.closest('.old-version');
@@ -1177,6 +1938,7 @@
     if (!box) return;
     // Clone content without the close button
     const clone = box.cloneNode(true);
+    markHighlightsInClone(box, clone);
     const closeBtn = clone.querySelector('.footnote-close');
     if (closeBtn) closeBtn.remove();
     $footnoteTooltip.innerHTML = clone.innerHTML;
@@ -1258,7 +2020,10 @@
   }
 
   $btnIndex.addEventListener('click', openIndex);
-  $indexOverlay.addEventListener('click', closeIndex);
+  $indexOverlay.addEventListener('click', () => {
+    closeIndex();
+    if (resultsDrawerOpen) closeResults();
+  });
 
   const $btnInfoTab = document.getElementById('btn-info-tab');
   const $indexSearchWrapper = document.getElementById('index-search-wrapper');
@@ -1725,36 +2490,22 @@
   }
 
   function showContextHeadings() {
-    // For each visible article, show its ancestor heading cards for context
-    const cards = getAllCards();
-    const visibleArts = cards.filter(c =>
-      c.classList.contains('card-artigo') && !c.classList.contains('filtered-out')
-    );
-    for (const art of visibleArts) {
-      const found = {}; // level → true
-      let prev = art.previousElementSibling;
-      while (prev) {
-        if (prev.classList.contains('card-titulo')) {
-          const sec = prev.dataset.section || '';
-          let level = '';
-          if (sec.startsWith('norma')) level = 'norma';
-          else if (sec.startsWith('tit') || sec === 'adt' || sec === 'dgt') level = 'tit';
-          else if (sec.startsWith('cap')) level = 'cap';
-          else if (sec.startsWith('subsec')) level = 'subsec';
-          else if (sec.startsWith('sec')) level = 'sec';
-          if (level && !found[level]) {
-            found[level] = true;
-            prev.classList.remove('filtered-out');
-            // Mark all lower levels as found so we don't pick up
-            // headings from other branches (e.g. a capítulo from
-            // a previous título that isn't an ancestor of this article)
-            const hierarchy = ['norma', 'tit', 'cap', 'sec', 'subsec'];
-            const idx = hierarchy.indexOf(level);
-            for (let i = idx + 1; i < hierarchy.length; i++) found[hierarchy[i]] = true;
-          }
-          if (level === 'norma') break;
+    // For each visible article, show its ancestor heading cards for context.
+    // Single pass in document order keeping the current heading of each level;
+    // a heading resets the levels below it, so headings from other branches
+    // (e.g. a capítulo from a previous título) are never picked up.
+    const hierarchy = ['norma', 'tit', 'cap', 'sec', 'subsec'];
+    const current = [null, null, null, null, null];
+    for (const card of getAllCards()) {
+      if (card.classList.contains('card-titulo')) {
+        const idx = hierarchy.indexOf(headingLevel(card));
+        if (idx < 0) continue;
+        current[idx] = card;
+        for (let i = idx + 1; i < hierarchy.length; i++) current[i] = null;
+      } else if (card.classList.contains('card-artigo') && !card.classList.contains('filtered-out')) {
+        for (const heading of current) {
+          if (heading) heading.classList.remove('filtered-out');
         }
-        prev = prev.previousElementSibling;
       }
     }
   }
@@ -2045,6 +2796,7 @@
   let compactMode = false;
 
   function setCompactMode(on) {
+    cancelScrollCorrection();
     const card = selectedCard;
     compactMode = on;
     $cards.classList.toggle('compact', compactMode);
@@ -2052,6 +2804,7 @@
     if (on) {
       $cards.querySelectorAll('.diff-open').forEach(el => {
         el.classList.remove('diff-open');
+        invalidateCardText(el.closest('.card'));
         const panel = el.nextElementSibling;
         if (panel && panel.classList.contains('diff-panel')) panel.remove();
       });
@@ -2144,6 +2897,8 @@
   }
 
   function toggleDiff(oldEl) {
+    // The diff panel's text is part of the card's searchable text
+    invalidateCardText(oldEl.closest('.card'));
     // If already open, close
     if (oldEl.classList.contains('diff-open')) {
       oldEl.classList.remove('diff-open');
@@ -2270,15 +3025,22 @@
   }
 
   function updateMinimapViewport() {
-    if (!$minimap || !$minimap.offsetWidth) return;
+    applyMinimapViewport(readMinimapViewport());
+  }
+
+  function readMinimapViewport() {
+    if (!$minimap || !$minimap.offsetWidth) return null;
     const mapH = $minimap.getBoundingClientRect().height;
     const docH = document.documentElement.scrollHeight;
-    if (docH <= 0) return;
+    if (docH <= 0) return null;
     const scale = mapH / docH;
-    const top = window.scrollY * scale;
-    const vpH = Math.max(12, window.innerHeight * scale);
-    $minimapViewport.style.top = top + 'px';
-    $minimapViewport.style.height = vpH + 'px';
+    return { top: window.scrollY * scale, height: Math.max(12, window.innerHeight * scale) };
+  }
+
+  function applyMinimapViewport(vp) {
+    if (!vp) return;
+    $minimapViewport.style.top = vp.top + 'px';
+    $minimapViewport.style.height = vp.height + 'px';
   }
 
   function scheduleMinimap() {
@@ -2297,13 +3059,14 @@
       const pct = (e.clientY - rect.top) / rect.height;
       const docH = document.documentElement.scrollHeight;
       const target = pct * docH - window.innerHeight / 2;
-      window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+      scrollToY(Math.max(0, target), 'smooth');
     });
 
     // Drag on minimap for continuous scrolling
     let minimapDragging = false;
 
     $minimap.addEventListener('mousedown', (e) => {
+      cancelScrollCorrection();
       minimapDragging = true;
       e.preventDefault();
       const rect = $minimap.getBoundingClientRect();
@@ -2464,5 +3227,15 @@
   initDiffToggles();
   scheduleMinimap();
   if (window.innerWidth > 768) $searchInput.focus();
+
+  // Build the search text cache in idle time, so the first search doesn't pay for it
+  let textCacheWarmed = 0;
+  whenIdle(function warmCardText(deadline) {
+    const sliceEnd = performance.now() + 8;
+    while (textCacheWarmed < ARTICLE_CARDS.length && deadline.timeRemaining() > 1 && performance.now() < sliceEnd) {
+      getCardText(ARTICLE_CARDS[textCacheWarmed++], false);
+    }
+    if (textCacheWarmed < ARTICLE_CARDS.length) whenIdle(warmCardText);
+  });
 
 })();

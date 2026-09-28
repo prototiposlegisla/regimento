@@ -462,7 +462,10 @@ body {
   line-height: 1.3;
 }
 
-/* Search highlight */
+/* Search highlight (::highlight = CSS Custom Highlight API; mark = fallback and unselectable text) */
+::highlight(search) {
+  background-color: #ffe066;
+}
 mark {
   background: #ffe066;
   color: inherit;
@@ -470,6 +473,13 @@ mark {
 }
 .art-summary mark {
   color: #1e1e30;
+}
+@media print {
+  /* ::highlight prints even without "background graphics"; keep <mark> alike */
+  mark {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 /* ===== FOOTNOTES ===== */
@@ -1166,6 +1176,189 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: 0 1px 4px rgba(0,0,0,.15);
+}
+
+/* ===== SEARCH RESULTS LIST ===== */
+#search-counter {
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 2px 4px;
+}
+#search-counter:hover { background: #eee; }
+
+#index-results-link {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #fff3bf;
+  color: #5c4a00;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+#index-results-link:hover { background: #ffe8a3; }
+#index-results-link[hidden] { display: none; }
+
+#results-panel {
+  display: none;
+  position: fixed;
+  z-index: 160;
+  flex-direction: column;
+  background: #fff;
+  font-size: 13px;
+  contain: strict;
+}
+
+#results-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 10px 14px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+#results-title { font-weight: 700; font-size: 14px; }
+#results-summary {
+  flex: 1;
+  min-width: 0;
+  color: #777;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#results-close {
+  width: 26px; height: 26px;
+  flex-shrink: 0;
+  border: none; background: none; cursor: pointer;
+  border-radius: 50%;
+  font-size: 18px; color: #999;
+  display: flex; align-items: center; justify-content: center;
+}
+#results-close:hover { background: #eee; color: #333; }
+
+#results-list {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 8px 24px;
+}
+
+.res-law {
+  margin: 10px 4px 6px;
+  padding: 3px 8px;
+  background: #222;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.res-law:first-child { margin-top: 2px; }
+
+.res-group {
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  padding: 3px 4px 5px;
+  margin-bottom: 2px;
+}
+.res-group.current {
+  border-left-color: var(--selected-border);
+  background: #eef6fd;
+}
+
+.res-head, .res-entry, .res-expand {
+  display: block;
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.res-head:hover, .res-entry:hover { background: rgba(52,152,219,.1); }
+.res-head { padding: 3px 5px; font-weight: 700; line-height: 1.4; }
+.res-head .res-law-tag {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 0 5px;
+  background: #555;
+  color: #fff;
+  border-radius: 3px;
+  font-size: 10px;
+  vertical-align: 1px;
+}
+.res-head .res-sum { font-weight: 400; color: #666; }
+.res-entry { padding: 3px 5px 3px 14px; line-height: 1.45; color: #333; }
+.res-label { font-weight: 600; color: #2c6fa6; margin-right: 4px; }
+.res-entry.res-old .res-text { text-decoration: line-through; color: #888; }
+.res-more-matches { color: #999; font-size: 11px; }
+.res-expand { padding: 2px 5px 2px 14px; color: var(--selected-border); font-size: 12px; }
+.res-expand:hover { text-decoration: underline; }
+.res-empty { padding: 20px 8px; color: #888; text-align: center; }
+#results-list mark {
+  background: #ffe066;
+  color: inherit;
+  border-radius: 2px;
+}
+
+/* Wide screens: sidebar in the space left of the cards (cards move right
+   when that space is too narrow) */
+@media (min-width: 1100px) {
+  /* On :root, not toggled with the class: a changed inherited custom
+     property would restyle every element of the page */
+  :root {
+    --results-w: clamp(260px, calc((100vw - 720px) / 2 - 36px), 460px);
+    --cards-left: max(calc(var(--results-w) + 24px), calc((100vw - 720px) / 2));
+  }
+  body.results-open #results-panel {
+    display: flex;
+    top: calc(var(--header-h) + 12px);
+    bottom: 12px;
+    left: 12px;
+    width: var(--results-w);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  body.results-open #cards-container {
+    margin-left: max(calc(var(--results-w) + 24px), calc((100% - 720px) / 2));
+  }
+  body.results-open #breadcrumb,
+  body.results-open #zoom-indicator {
+    left: calc(var(--cards-left) + 360px);
+  }
+  body.results-open #subject-pill {
+    left: calc(var(--cards-left) + 360px);
+    right: auto;
+    margin: 0;
+    max-width: 688px;
+    transform: translateX(-50%);
+  }
+}
+
+/* Small screens: drawer, like the index panel */
+@media (max-width: 1099.98px) {
+  body.results-drawer-open #results-panel {
+    display: flex;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(380px, 90vw);
+    z-index: 500;
+    box-shadow: 2px 0 12px rgba(0,0,0,.2);
+  }
+}
+
+@media print {
+  #results-panel { display: none !important; }
 }
 
 @media (min-width: 1024px) {

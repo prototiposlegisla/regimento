@@ -17,7 +17,7 @@
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: a43 para ir ao Art. 43)" autocomplete="off">
     <div id="search-nav">
-      <span id="search-counter"></span>
+      <span id="search-counter" title="Lista de resultados"></span>
       <button class="search-arrow" id="search-prev">&#8249;</button>
       <button class="search-arrow" id="search-next">&#8250;</button>
     </div>
@@ -49,6 +49,7 @@
 <!-- INDEX PANEL -->
 <div id="index-panel">
   <div id="index-header">
+    <button id="index-results-link" hidden></button>
     <div id="index-tabs-row">
       <div id="index-tabs">
         <button class="index-tab active" data-tab="systematic">Sistemático</button>
@@ -63,6 +64,16 @@
     </div>
   </div>
   <div id="index-content"></div>
+</div>
+
+<!-- SEARCH RESULTS LIST (sidebar on wide screens, drawer on small ones) -->
+<div id="results-panel">
+  <div id="results-header">
+    <span id="results-title">Resultados</span>
+    <span id="results-summary"></span>
+    <button id="results-close" title="Fechar lista de resultados">&times;</button>
+  </div>
+  <div id="results-list"></div>
 </div>
 
 <!-- SUBJECT PILL -->

@@ -1180,11 +1180,15 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
 /* ===== SEARCH RESULTS LIST ===== */
 #search-counter {
+  border: none;
+  background: none;
+  font-family: inherit;
   cursor: pointer;
   border-radius: 10px;
   padding: 2px 4px;
 }
 #search-counter:hover { background: #eee; }
+.card:focus { outline: none; } /* focused after a results-list click */
 
 #index-results-link {
   display: block;
@@ -1215,23 +1219,22 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
 #results-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 2px 8px;
   padding: 10px 10px 10px 14px;
   border-bottom: 1px solid #eee;
   flex-shrink: 0;
 }
-#results-title { font-weight: 700; font-size: 14px; }
+#results-title { flex: 1; font-weight: 700; font-size: 14px; }
 #results-summary {
-  flex: 1;
-  min-width: 0;
+  order: 3;
+  flex-basis: 100%;
   color: #777;
   font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 #results-close {
+  order: 2;
   width: 26px; height: 26px;
   flex-shrink: 0;
   border: none; background: none; cursor: pointer;
@@ -1298,7 +1301,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 .res-head .res-sum { font-weight: 400; color: #666; }
 .res-entry { padding: 3px 5px 3px 14px; line-height: 1.45; color: #333; }
-.res-label { font-weight: 600; color: #2c6fa6; margin-right: 4px; }
+.res-label { font-weight: 600; color: #2c6fa6; }
 .res-entry.res-old .res-text { text-decoration: line-through; color: #888; }
 .res-more-matches { color: #999; font-size: 11px; }
 .res-expand { padding: 2px 5px 2px 14px; color: var(--selected-border); font-size: 12px; }
@@ -1309,15 +1312,27 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   color: inherit;
   border-radius: 2px;
 }
+#results-list .res-law-tag mark { color: #222; }
+@media (forced-colors: active) {
+  .res-group { border-left-color: Canvas; }
+  .res-group.current {
+    border-left-color: Highlight;
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
 
 /* Wide screens: sidebar in the space left of the cards (cards move right
-   when that space is too narrow) */
-@media (min-width: 1100px) {
+   when that space is too narrow). Breakpoint in sync with app.js; 720px and
+   360px are the width and half width of #cards-container. */
+@media screen and (min-width: 1180px) {
   /* On :root, not toggled with the class: a changed inherited custom
-     property would restyle every element of the page */
+     property would restyle every element of the page. % (not vw, which
+     includes the scrollbar) resolves at each use: against the viewport for
+     fixed elements, against the body for the cards. */
   :root {
-    --results-w: clamp(260px, calc((100vw - 720px) / 2 - 36px), 460px);
-    --cards-left: max(calc(var(--results-w) + 24px), calc((100vw - 720px) / 2));
+    --results-w: clamp(260px, calc((100% - 720px) / 2 - 36px), 460px);
+    --cards-left: max(calc(var(--results-w) + 24px), calc((100% - 720px) / 2));
   }
   body.results-open #results-panel {
     display: flex;
@@ -1329,12 +1344,14 @@ body.pill-open #cards-container { padding-bottom: 300px; }
     box-shadow: 0 1px 4px rgba(0,0,0,.08);
   }
   body.results-open #cards-container {
-    margin-left: max(calc(var(--results-w) + 24px), calc((100% - 720px) / 2));
+    margin-left: var(--cards-left);
   }
   body.results-open #breadcrumb,
   body.results-open #zoom-indicator {
     left: calc(var(--cards-left) + 360px);
   }
+  /* Wrapping inside the cards column instead of over the sidebar */
+  body.results-open #breadcrumb { max-width: 720px; }
   body.results-open #subject-pill {
     left: calc(var(--cards-left) + 360px);
     right: auto;
@@ -1345,7 +1362,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 
 /* Small screens: drawer, like the index panel */
-@media (max-width: 1099.98px) {
+@media screen and (max-width: 1179.98px) {
   body.results-drawer-open #results-panel {
     display: flex;
     top: 0;
@@ -1371,6 +1388,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
+  #search-counter { padding: 6px 4px; }
   #cards-container { padding: 8px; }
   .card { border-radius: 6px; }
   #header { padding: 8px; gap: 6px; }

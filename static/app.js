@@ -574,10 +574,12 @@
     cardTargets = new Map();
   }
 
-  // Text nodes of a card, skipping footnote boxes unless requested
+  // Text nodes of a card, skipping footnote boxes unless requested and the
+  // indent hints ("7§1I", decoration repeating the dispositivo's path)
   function cardTextWalker(card, includeFootnotes) {
     return document.createTreeWalker(card, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
       acceptNode: n => n.nodeType === Node.TEXT_NODE ? NodeFilter.FILTER_ACCEPT
+        : n.classList.contains('indent-path') ? NodeFilter.FILTER_REJECT
         : (!includeFootnotes && n.classList.contains('footnote-box') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP),
     });
   }
@@ -668,6 +670,7 @@
       }
       if (!spans) continue;
       if (!includeFootnotes && tn.parentElement.closest('.footnote-box')) continue;
+      if (tn.parentElement.closest('.indent-path')) continue;
       found.push([tn, spans]);
     }
     if (!found.length) return;
@@ -844,6 +847,13 @@
     const term = e.target.value.trim();
     cancelPendingSearch();
     const query = classifyQuery(term);
+    if (query.kind === 'empty' || query.kind === 'short') {
+      // Like Esc and the clear button: the cards shown again above must not
+      // move the article being read (closing the results sidebar at the same
+      // time defeats the browser's scroll anchoring)
+      preserveScroll(() => doSearch(term));
+      return;
+    }
     if (query.kind !== 'text') {
       doSearch(term);
       return;
@@ -971,35 +981,81 @@
   // ===== RESULTS LIST =====
   // Every matched dispositivo with just the text around its matches, grouped
   // by article: a sidebar on wide screens, a drawer (opened from the counter
-  // or the index panel) on small ones. Groups get their entries only when they
-  // come near the visible part of the list.
+  // or the index panel) on small ones. Groups are appended as the list is
+  // scrolled towards its end, and get their entries when they come near its
+  // visible part.
+  const $resultsPanel = document.getElementById('results-panel');
   const $resultsList = document.getElementById('results-list');
   const $resultsSummary = document.getElementById('results-summary');
+  const $resultsClose = document.getElementById('results-close');
   const $indexResultsLink = document.getElementById('index-results-link');
-  const resultsWide = window.matchMedia('(min-width: 1100px)');
-  const RESULT_UNITS_SHOWN = 3;     // per article; the rest behind "+N trechos"
-  const SNIPPET_CONTEXT = 70;       // characters around each match
-  const SNIPPET_WHOLE_UNDER = 240;  // shorter texts are shown whole
+  // Sidebar breakpoint: keep in sync with style.css
+  const resultsWide = window.matchMedia('(min-width: 1180px)');
+  const RESULT_UNITS_SHOWN = 3;       // per article; the rest behind "+N trechos"
+  const RESULTS_FILLED_UPFRONT = 12;  // groups filled when the list is built
+  const RESULTS_SLICE_MS = 8;         // appending groups in one go
+  const RESULTS_END_SLICE_MS = 50;    // the same, with the end of the list in view,
+  const RESULTS_END_SLICE_MAX = 300;  // and at most these groups (they're laid out
+                                      // and filled in the same frame)
+  const REVEAL_SETTLE_MS = 1500;      // keeps the current group in view while neighbors fill
+  const SNIPPET_CONTEXT = 70;         // characters around each match
+  const SNIPPET_WHOLE_UNDER = 240;    // shorter texts are shown whole
   const SNIPPET_WINDOWS = 3;
-  // Not part of a dispositivo's text in a snippet
-  const SNIPPET_SKIP = '.unit-id, .indent-path, .footnote-ref, .diff-toggle, .footnote-close, .footnote-box > strong';
+  // Matches there don't make entries nor count as occurrences
+  const RESULT_NOISE = '.art-compact-label, .indent-path, .footnote-ref, .diff-toggle, .footnote-close, .diff-panel';
+  // Not part of a dispositivo's text in a snippet (the entry's label shows
+  // the .unit-id and "Nota N:" ones)
+  const SNIPPET_SKIP = RESULT_NOISE + ', .unit-id, .footnote-box > strong';
 
   let resultsActive = false;        // a text search is showing its results
   let resultsBuiltFor = null;       // the searchMatches array the list shows
   let resultsBuildPending = false;
+  let resultsPanelShown = false;
   let resultsDrawerOpen = false;
   let resultsHidden = false;        // sidebar closed by the user (remembered)
   try { resultsHidden = localStorage.getItem('regimento-results-hidden') === '1'; } catch (e) {}
   let resultGroups = new Map();     // card → its group element in the list
+  const groupCards = new WeakMap(); // group element → card
+  const filledGroups = new WeakSet();
   let resultsAppended = 0;          // searchMatches with a group in the list so far
   let resultsLaw = null;            // law of the last appended group
+  let cardLawTitles = null;         // card → title of its law
   let currentResultGroup = null;
+  let revealGroup = null;           // group kept in view until revealUntil
+  let revealUntil = 0;
+  let revealPending = false;        // a reveal was skipped (list hidden, mouse on it)
+  let mouseOnResults = false;
 
+  // Entries of the groups near the visible part of the list
   const resultsFillObserver = new IntersectionObserver(entries => {
+    let filled = false;
     for (const entry of entries) {
-      if (entry.isIntersecting) fillResultGroup(entry.target.resultCard);
+      if (entry.isIntersecting && fillResultGroup(groupCards.get(entry.target))) filled = true;
     }
+    if (filled) keepRevealedGroupInView();
   }, { root: $resultsList, rootMargin: '100% 0px' });
+
+  // More groups when the end of the list comes near. With the end itself in
+  // view after a scroll (a drag or fling to the end), bigger slices: fewer
+  // rounds of appending and filling what was appended.
+  const resultsMoreObserver = new IntersectionObserver(entries => {
+    if (!entries.some(e => e.isIntersecting) || resultsBuiltFor !== searchMatches) return;
+    const last = entries[entries.length - 1];
+    // rootBounds includes the 200% margins: the list's own bottom is 2/5 up
+    const endInView = $resultsList.scrollTop > 0 && last.rootBounds !== null
+      && last.boundingClientRect.top < last.rootBounds.bottom - last.rootBounds.height * 2 / 5;
+    const until = endInView
+      ? Math.min(searchMatches.length, resultsAppended + RESULTS_END_SLICE_MAX)
+      : searchMatches.length;
+    appendResultGroups(until, performance.now() + (endInView ? RESULTS_END_SLICE_MS : RESULTS_SLICE_MS));
+    observeLastResultGroup();
+  }, { root: $resultsList, rootMargin: '200% 0px' });
+
+  function observeLastResultGroup() {
+    resultsMoreObserver.disconnect();
+    const last = $resultsList.lastElementChild;
+    if (last && resultsAppended < searchMatches.length) resultsMoreObserver.observe(last);
+  }
 
   function resultsShown() {
     return resultsActive && (resultsDrawerOpen || (resultsWide.matches && !resultsHidden));
@@ -1014,6 +1070,20 @@
     resultsActive = false;
     resultsDrawerOpen = false;
     updateResultsVisibility();
+    clearResultsList();
+  }
+
+  function clearResultsList() {
+    if (!resultsBuiltFor) return;
+    resultsFillObserver.disconnect();
+    resultsMoreObserver.disconnect();
+    resultsBuiltFor = null;
+    resultGroups = new Map();
+    resultsAppended = 0;
+    currentResultGroup = null;
+    revealGroup = null;
+    $resultsList.textContent = '';
+    $resultsSummary.textContent = '';
   }
 
   function updateResultsVisibility() {
@@ -1022,8 +1092,24 @@
     $indexOverlay.classList.toggle('open', resultsDrawerOpen || $indexPanel.classList.contains('open'));
     $indexResultsLink.hidden = !resultsActive;
     if (resultsActive) $indexResultsLink.textContent = 'Lista de resultados da busca (' + searchMatches.length + ') ›';
-    if (resultsShown() && resultsBuiltFor !== searchMatches) scheduleResultsBuild();
-    else if (resultsShown() && resultsAppended < searchMatches.length) whenIdle(appendResultGroupsWhenIdle);
+    const shown = resultsShown();
+    $searchCounter.setAttribute('aria-expanded', shown ? 'true' : 'false');
+    const becameShown = shown && !resultsPanelShown;
+    resultsPanelShown = shown;
+    if (!shown) {
+      // Hidden (and emptied) under a still mouse, the list gets no pointerleave
+      mouseOnResults = false;
+      // A hidden list of an older search would flash when shown again
+      if (resultsBuiltFor && resultsBuiltFor !== searchMatches) clearResultsList();
+      return;
+    }
+    if (resultsBuiltFor !== searchMatches) {
+      scheduleResultsBuild();
+    } else if (becameShown) {
+      observeLastResultGroup();
+      markCurrentResult(selectedCard);
+      revealCurrentResult(true);
+    }
   }
 
   // Built after the search result is painted, so typing stays responsive
@@ -1042,15 +1128,23 @@
     } else {
       resultsDrawerOpen = true;
       updateResultsVisibility();
+      $resultsClose.focus({ preventScroll: true });
     }
   }
 
-  function closeResults() {
+  // byKeyboard: the x activated by a key. A click focuses the x too, but a
+  // mouse user's next Space should scroll the page, not reopen the list.
+  function closeResults(byKeyboard) {
+    const hadFocus = byKeyboard === true && $resultsPanel.contains(document.activeElement);
     if (resultsDrawerOpen) {
       resultsDrawerOpen = false;
       updateResultsVisibility();
     } else {
       setResultsHidden(true);
+    }
+    // The counter is hidden when there are no results
+    if (hadFocus) {
+      ($searchNav.classList.contains('open') ? $searchCounter : $searchInput).focus({ preventScroll: true });
     }
   }
 
@@ -1061,15 +1155,21 @@
   }
 
   function buildResultsList() {
+    clearResultsList();
     resultsBuiltFor = searchMatches;
-    resultsFillObserver.disconnect();
-    resultGroups = new Map();
-    currentResultGroup = null;
-    $resultsList.textContent = '';
+    resultsLaw = null;
     $resultsList.scrollTop = 0;
 
     let hits = 0;
-    for (const card of searchMatches) hits += getCardHits(card).length;
+    const noisy = new Map(); // element → inside RESULT_NOISE
+    for (const card of searchMatches) {
+      for (const hit of getCardHits(card)) {
+        const el = hitElement(hit);
+        let noise = noisy.get(el);
+        if (noise === undefined) noisy.set(el, noise = el.closest(RESULT_NOISE) !== null);
+        if (!noise) hits++;
+      }
+    }
     $resultsSummary.textContent = searchMatches.length
       ? searchMatches.length + (searchMatches.length === 1 ? ' artigo' : ' artigos')
         + ' · ' + hits + (hits === 1 ? ' ocorrência' : ' ocorrências')
@@ -1082,23 +1182,20 @@
       return;
     }
 
-    resultsAppended = 0;
-    resultsLaw = null;
-    appendResultGroups(searchMatches.length, performance.now() + 8);
+    appendResultGroups(searchMatches.length, performance.now() + RESULTS_SLICE_MS);
     // The top of the list shows filled right away (the observer reports later)
-    for (const card of searchMatches.slice(0, 12)) fillResultGroup(card);
+    for (const card of searchMatches.slice(0, RESULTS_FILLED_UPFRONT)) fillResultGroup(card);
+    observeLastResultGroup();
     markCurrentResult(selectedCard);
-    if (resultsAppended < searchMatches.length) whenIdle(appendResultGroupsWhenIdle);
   }
 
   // Appends groups for searchMatches[resultsAppended, until), stopping early
-  // at the deadline (performance.now() time)
+  // at the deadline (a performance.now() time)
   function appendResultGroups(until, deadline = Infinity) {
     const frag = document.createDocumentFragment();
     while (resultsAppended < until && performance.now() < deadline) {
       const card = searchMatches[resultsAppended++];
-      const norma = collectAncestorHeadings(card).find(a => a.level === 'norma');
-      const lawTitle = norma ? getHeadingShortTitle(norma.el) : '';
+      const lawTitle = resultLawTitle(card);
       if (lawTitle !== resultsLaw) {
         resultsLaw = lawTitle;
         if (lawTitle) {
@@ -1116,23 +1213,34 @@
     $resultsList.appendChild(frag);
   }
 
-  function appendResultGroupsWhenIdle(idle) {
-    if (resultsBuiltFor !== searchMatches || !resultsShown()) return;
-    appendResultGroups(searchMatches.length, performance.now() + Math.min(8, idle.timeRemaining()));
-    if (resultsAppended < searchMatches.length) whenIdle(appendResultGroupsWhenIdle);
+  // Title of the law (norma heading) an article belongs to
+  function resultLawTitle(card) {
+    if (!cardLawTitles) {
+      cardLawTitles = new Map();
+      let title = '';
+      for (const c of ALL_CARDS) {
+        if (c.classList.contains('card-titulo')) {
+          if (headingLevel(c) === 'norma') title = getHeadingShortTitle(c);
+        } else {
+          cardLawTitles.set(c, title);
+        }
+      }
+    }
+    return cardLawTitles.get(card) || '';
   }
 
   function buildResultGroup(card) {
     const group = document.createElement('div');
     group.className = 'res-group';
-    group.resultCard = card;
+    groupCards.set(group, card);
     const head = document.createElement('button');
     head.className = 'res-head';
     const lawPrefix = card.dataset.law;
     if (lawPrefix) {
       const tag = document.createElement('span');
       tag.className = 'res-law-tag';
-      tag.textContent = lawPrefix;
+      const matched = getCardHits(card).some(hit => hitElement(hit).closest('.law-badge'));
+      tag.innerHTML = matched ? '<mark>' + escapeHtml(lawPrefix) + '</mark>' : escapeHtml(lawPrefix);
       head.appendChild(tag);
     }
     head.appendChild(document.createTextNode('Art. ' + card.dataset.art));
@@ -1148,15 +1256,16 @@
       }
       head.appendChild(sum);
     }
-    head.addEventListener('click', () => goToResult(card, null));
+    head.addEventListener('click', e => goToResult(card, null, e));
     group.appendChild(head);
     return group;
   }
 
+  // Returns whether the group got its entries now
   function fillResultGroup(card) {
     const group = resultGroups.get(card);
-    if (!group || group.resultFilled) return;
-    group.resultFilled = true;
+    if (!group || filledGroups.has(group)) return false;
+    filledGroups.add(group);
     resultsFillObserver.unobserve(group);
     const units = resultUnits(card);
     const shown = units.slice(0, RESULT_UNITS_SHOWN);
@@ -1172,16 +1281,17 @@
       });
       group.appendChild(more);
     }
+    return true;
   }
 
   // Dispositivos (paragraphs, notes) of a card with matches, in order. The
-  // summary is shown in the group header instead.
+  // summary and the law badge are shown in the group header instead.
   function resultUnits(card) {
     const units = [];
     const seen = new Set();
     for (const hit of getCardHits(card)) {
       const el = hitElement(hit);
-      if (el.closest('.art-summary, .art-compact-label, .law-badge, .diff-panel')) continue;
+      if (el.closest('.art-summary, .law-badge, ' + RESULT_NOISE)) continue;
       const unit = el.closest('.footnote-box') || el.closest('.art-para') || el.closest('p');
       if (!unit || !card.contains(unit) || seen.has(unit)) continue;
       seen.add(unit);
@@ -1195,13 +1305,13 @@
     entry.className = 'res-entry' + (unit.classList.contains('old-version') ? ' res-old' : '');
     const label = document.createElement('span');
     label.className = 'res-label';
-    label.textContent = unitLabel(unit);
+    label.innerHTML = unitLabelHtml(unit);
     const text = document.createElement('span');
     text.className = 'res-text';
     const { text: unitText, spans } = unitTextAndMatches(unit);
     text.innerHTML = snippetHtml(unitText, spans);
-    entry.append(label, text);
-    entry.addEventListener('click', () => goToResult(card, unit));
+    entry.append(label, ' ', text);
+    entry.addEventListener('click', e => goToResult(card, unit, e));
     return entry;
   }
 
@@ -1227,23 +1337,43 @@
     return '';
   }
 
+  // The label as HTML. When the card's own label (.unit-id, "Nota N:") has
+  // matches, its last part is that label with them highlighted.
+  function unitLabelHtml(unit) {
+    const label = unitLabel(unit);
+    const own = unit.classList.contains('footnote-box') ? unit.querySelector(':scope > strong')
+      : unit.classList.contains('old-version') ? null : unit.querySelector('.unit-id');
+    const { text, spans } = own ? unitTextAndMatches(own) : { text: '', spans: [] };
+    if (!spans.length) return escapeHtml(label);
+    const parts = label.split(' › ');
+    parts.pop();
+    const ownHtml = markSpans(text, 0, text.replace(/[\s:]+$/, '').length, spans);
+    return parts.map(escapeHtml).concat(ownHtml).join(' › ');
+  }
+
   // Text of a dispositivo (without its label) and where its matches are
   function unitTextAndMatches(unit) {
     let text = '';
     const spans = [];
     const walker = document.createTreeWalker(unit, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
       acceptNode: n => n.nodeType === Node.TEXT_NODE ? NodeFilter.FILTER_ACCEPT
-        : (n.matches(SNIPPET_SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP),
+        : n.matches(SNIPPET_SKIP) ? NodeFilter.FILTER_REJECT
+        : /^(BR|DIV|P)$/.test(n.tagName) ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_SKIP,
     });
     while (walker.nextNode()) {
-      const tn = walker.currentNode;
-      const base = text.length;
-      if (tn.parentElement.tagName === 'MARK') {
-        spans.push([base, base + tn.data.length]);
-      } else {
-        for (const [s, e] of textNodeHits.get(tn) || []) spans.push([base + s, base + e]);
+      const n = walker.currentNode;
+      if (n.nodeType !== Node.TEXT_NODE) {
+        text += ' '; // line breaks and blocks (notes)
+        continue;
       }
-      text += tn.data;
+      const base = text.length;
+      if (n.parentElement.tagName === 'MARK') {
+        spans.push([base, base + n.data.length]);
+      } else {
+        for (const [s, e] of textNodeHits.get(n) || []) spans.push([base + s, base + e]);
+      }
+      text += n.data;
     }
     return { text, spans };
   }
@@ -1254,7 +1384,7 @@
     const start = /^[\s—–-]*/.exec(text)[0].length; // the " — " after the label
     const end = text.trimEnd().length;
     const windows = [];
-    if (end - start <= SNIPPET_WHOLE_UNDER) {
+    if (text.slice(start, end).replace(/\s+/g, ' ').length <= SNIPPET_WHOLE_UNDER) {
       windows.push([start, end]);
     } else if (!spans.length) {
       windows.push([start, start + SNIPPET_WHOLE_UNDER]);
@@ -1297,7 +1427,8 @@
     return html + plain(text.slice(pos, b));
   }
 
-  function goToResult(card, unit) {
+  function goToResult(card, unit, event) {
+    const fromDrawer = resultsDrawerOpen;
     const i = searchMatches.indexOf(card);
     if (i >= 0) {
       searchIdx = i;
@@ -1308,39 +1439,121 @@
       resultsDrawerOpen = false;
       updateResultsVisibility();
     }
+    if (unit && unit.classList.contains('footnote-box')) unit.classList.add('open');
     if (unit && unit.getClientRects().length) scrollToReadingLine(unit);
     else scrollToFirstMark(card);
     selectCard(card, true);
+    // A click: the user sees that group, nothing to reveal when the mouse leaves
+    if (event && event.detail > 0) revealPending = false;
+    // After a click or tap, PageDown and the arrows should scroll the page,
+    // not the list. Keyboard activation keeps the focus on the sidebar list
+    // (the drawer closes).
+    if (fromDrawer || (event && event.detail > 0)) {
+      card.tabIndex = -1;
+      card.focus({ preventScroll: true });
+    }
   }
 
-  // Highlights the group of the selected card and keeps it in view (unless
-  // the pointer is on the list)
+  // Highlights the group of the selected card and scrolls the list to it
   function markCurrentResult(card) {
     if (resultsBuiltFor !== searchMatches || !card) return;
-    if (!resultGroups.has(card) && resultsAppended < searchMatches.length) {
-      const i = searchMatches.indexOf(card);
-      if (i >= resultsAppended) appendResultGroups(i + 1);
+    if (!resultsShown()) {
+      // Nothing appended nor measured in a hidden list: it's revealed when shown
+      const group = resultGroups.get(card);
+      if (group) setCurrentResultGroup(group);
+      return;
+    }
+    if (resultsAppended < searchMatches.length) {
+      const want = Math.min(searchMatches.length, searchMatches.indexOf(card) + 1 + 20);
+      if (want > resultsAppended) {
+        appendResultGroups(want);
+        observeLastResultGroup();
+      }
     }
     const group = resultGroups.get(card);
     if (!group || group === currentResultGroup) return;
+    setCurrentResultGroup(group);
+    revealCurrentResult(false);
+  }
+
+  function setCurrentResultGroup(group) {
     if (currentResultGroup) currentResultGroup.classList.remove('current');
     currentResultGroup = group;
     group.classList.add('current');
-    if (!resultsShown() || $resultsList.matches(':hover')) return;
-    fillResultGroup(card);
-    const top = group.offsetTop;
-    const bottom = top + group.offsetHeight;
+  }
+
+  // Scrolls the list to the current group, unless the mouse is on it (then
+  // it waits for the mouse to leave)
+  function revealCurrentResult(force) {
+    const group = currentResultGroup;
+    if (!group || !resultsShown()) {
+      revealPending = true;
+      return;
+    }
+    if (mouseOnResults && !force) {
+      revealPending = !groupInView(group);
+      return;
+    }
+    revealPending = false;
+    // Groups above it that the observer fills later would push it out of view:
+    // fill them now, and keep it in view for a while
+    fillResultGroup(groupCards.get(group));
     const view = $resultsList.clientHeight;
-    if (top < $resultsList.scrollTop || bottom > $resultsList.scrollTop + view) {
-      $resultsList.scrollTop = Math.max(0, top - view / 3);
+    let top = group;
+    for (let g = group.previousElementSibling; g && group.offsetTop - top.offsetTop < 2 * view;) {
+      for (let i = 0; g && i < 8; i++, g = g.previousElementSibling) {
+        const card = groupCards.get(g);
+        if (card) fillResultGroup(card);
+        top = g;
+      }
+    }
+    revealGroup = group;
+    revealUntil = performance.now() + REVEAL_SETTLE_MS;
+    scrollListToGroup(group);
+  }
+
+  function keepRevealedGroupInView() {
+    if (!revealGroup) return;
+    if (performance.now() > revealUntil) {
+      revealGroup = null;
+      return;
+    }
+    scrollListToGroup(revealGroup);
+  }
+
+  // Its top, and up to half the list's height of it, in the visible part
+  function groupInView(group) {
+    const top = group.offsetTop;
+    const view = $resultsList.clientHeight;
+    const scrollTop = $resultsList.scrollTop;
+    return top >= scrollTop && top + Math.min(group.offsetHeight, view / 2) <= scrollTop + view;
+  }
+
+  function scrollListToGroup(group) {
+    if (!groupInView(group)) {
+      $resultsList.scrollTop = Math.max(0, group.offsetTop - $resultsList.clientHeight / 3);
     }
   }
+
+  // Scrolling the list stops keeping the current group in view
+  for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+    $resultsList.addEventListener(type, () => { revealGroup = null; }, { passive: type === 'wheel' || type === 'touchstart' });
+  }
+  // The mouse on the list (touch leaves :hover stuck, so not :hover)
+  $resultsList.addEventListener('pointerenter', e => {
+    if (e.pointerType === 'mouse') mouseOnResults = true;
+  });
+  $resultsList.addEventListener('pointerleave', e => {
+    if (e.pointerType !== 'mouse') return;
+    mouseOnResults = false;
+    if (revealPending) revealCurrentResult(false);
+  });
 
   $searchCounter.addEventListener('click', () => {
     if (resultsShown()) closeResults();
     else openResults();
   });
-  document.getElementById('results-close').addEventListener('click', closeResults);
+  $resultsClose.addEventListener('click', e => closeResults(e.detail === 0));
   $indexResultsLink.addEventListener('click', () => {
     closeIndex();
     openResults();
@@ -2580,8 +2793,8 @@
     if (searchFilter) {
       searchFilter = false;
       $btnFilter.classList.remove('active');
-      doSearch($searchInput.value.trim());
     }
+    doSearch($searchInput.value.trim());
     updatePill();
     applySubjectFilter();
     highlightAllSubjectDetails();
@@ -3227,6 +3440,21 @@
   initDiffToggles();
   scheduleMinimap();
   if (window.innerWidth > 768) $searchInput.focus();
+
+  // Warm what the first results list needs (law titles, fonts and styles of
+  // its entries), so its first build is not a long task
+  whenIdle(() => {
+    resultLawTitle(ALL_CARDS[0]);
+    const warm = document.createElement('div');
+    warm.style.cssText = 'position:absolute;left:-9999px;top:0;width:300px;visibility:hidden';
+    warm.innerHTML = '<div class="res-law">x</div><div class="res-group"><button class="res-head">'
+      + '<span class="res-law-tag">x</span>Art. 1<span class="res-sum"> — x</span></button>'
+      + '<button class="res-entry"><span class="res-label">x</span> <span class="res-text">x <mark>x</mark>'
+      + '</span></button><button class="res-expand">x</button></div>';
+    document.body.appendChild(warm);
+    void warm.offsetHeight;
+    warm.remove();
+  });
 
   // Build the search text cache in idle time, so the first search doesn't pay for it
   let textCacheWarmed = 0;

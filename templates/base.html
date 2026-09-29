@@ -17,7 +17,7 @@
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: a43 para ir ao Art. 43)" autocomplete="off">
     <div id="search-nav">
-      <span id="search-counter" title="Lista de resultados"></span>
+      <button id="search-counter" type="button" title="Lista de resultados" aria-controls="results-panel" aria-expanded="false"></button>
       <button class="search-arrow" id="search-prev">&#8249;</button>
       <button class="search-arrow" id="search-next">&#8250;</button>
     </div>
@@ -67,11 +67,11 @@
 </div>
 
 <!-- SEARCH RESULTS LIST (sidebar on wide screens, drawer on small ones) -->
-<div id="results-panel">
+<div id="results-panel" role="region" aria-label="Resultados da busca">
   <div id="results-header">
     <span id="results-title">Resultados</span>
     <span id="results-summary"></span>
-    <button id="results-close" title="Fechar lista de resultados">&times;</button>
+    <button id="results-close" title="Fechar lista de resultados" aria-label="Fechar lista de resultados">&times;</button>
   </div>
   <div id="results-list"></div>
 </div>

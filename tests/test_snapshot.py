@@ -27,12 +27,16 @@ def _build_summary(resolved_doc) -> dict:
             uids.append(child.uid)
 
         entry = {
+            "law": el.law_name or "",
             "art_number": el.art_number,
             "is_adt": el.is_adt,
             "uids": uids,
             "children_count": len(el.children),
             "versions_count": len(el.all_versions),
         }
+        old = [c.uid for c in el.children if c.is_old_version]
+        if old:
+            entry["old_versions"] = old
         if el.is_revoked:
             entry["is_revoked"] = True
         if el.summary:
@@ -62,8 +66,11 @@ class TestSnapshot:
             f"Total de artigos mudou: {golden['total_articles']} → {summary['total_articles']}"
         )
 
-        golden_arts = {a["art_number"]: a for a in golden["articles"]}
-        summary_arts = {a["art_number"]: a for a in summary["articles"]}
+        def key(a):
+            return f'{a.get("law", "")} {a["art_number"]}'
+
+        golden_arts = {key(a): a for a in golden["articles"]}
+        summary_arts = {key(a): a for a in summary["articles"]}
 
         # Artigos adicionados ou removidos
         added = set(summary_arts) - set(golden_arts)

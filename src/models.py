@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from typing import Optional
+from urllib.parse import quote, unquote
 
 
 class UnitType(str, Enum):
@@ -34,6 +36,20 @@ class TextRun:
     strike: bool = False
     hyperlink_url: Optional[str] = None
     hyperlink_anchor: Optional[str] = None
+
+    @property
+    def link_url(self) -> Optional[str]:
+        """URL do hyperlink com a âncora do Word (ex.: ...#art369), para abrir no artigo.
+
+        A página do PLP também tem âncoras de texto livre ("seção IX", "Art. 40");
+        uma âncora que não existe no destino só abre a página no topo.
+        """
+        if not self.hyperlink_url:
+            return None
+        a = unquote(self.hyperlink_anchor or "")  # o Word às vezes grava "art40%C2%A74"
+        if a and "#" not in self.hyperlink_url:
+            return f"{self.hyperlink_url}#{quote(a, safe='')}"
+        return self.hyperlink_url
 
 
 @dataclass

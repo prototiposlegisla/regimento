@@ -6,6 +6,7 @@ import html
 import re
 from typing import Optional
 
+from .parse_docx import note_tail_spans
 from .models import (
     ArticleBlock, DocumentUnit, Footnote, FootnotePara,
     ParsedDocument, SectionHeading, TextRun, UnitType,
@@ -78,9 +79,14 @@ class HTMLRenderer:
             badge = html.escape(art.law_prefix)
             parts.append(f'    <span class="law-badge">{badge}</span>')
 
-        # Old caputs from full-article rewrites (in DOCX order)
+        # Old caputs from full-article rewrites (in DOCX order), with their children
+        v_ctx = ["", "", "", ""]
         for v in art.all_versions:
-            parts.append(self._render_old_version(v))
+            if v.unit_type == UnitType.ARTIGO:
+                v_ctx = ["", "", "", ""]
+                parts.append(self._render_old_version(v))
+            else:
+                parts.append(self._render_old_version(v, path=self._update_path_ctx(v, v_ctx)))
 
         # Current caput
         if art.caput:
@@ -88,9 +94,11 @@ class HTMLRenderer:
 
         # Children in document order (old versions interleaved)
         path_ctx = ["", "", "", ""]  # [para, inciso, alinea, sub]
+        all_ctx = ["", "", "", ""]   # same, also moved by old versions (their data-path)
         for child in art.children:
+            all_path = self._update_path_ctx(child, all_ctx)
             if child.is_old_version:
-                parts.append(self._render_old_version(child, is_child=True))
+                parts.append(self._render_old_version(child, is_child=True, path=all_path))
             else:
                 path = self._update_path_ctx(child, path_ctx)
                 parts.append(self._render_unit_as_p(
@@ -201,17 +209,17 @@ class HTMLRenderer:
 
         # Find where the identifier ends in the text
         # Pattern: "Art. 43  - text" or "§ 1º - text" or "I - text"
-        # Remove identifier + separator from start
-        escaped = re.escape(ident)
+        # Remove identifier + separator from start (tolerating leading spaces and
+        # \xa0 inside the identifier: "  Art.\xa029. O Município...")
+        escaped = r"\s*" + re.escape(ident).replace(r"\ ", r"\s*")
         patterns = [
             escaped + r"\s*[-–—.]\s*",
             escaped + r"\s+",
         ]
-        # Aceita ponto antes de marca ordinal no texto do DOCX (§ 1.º com identificador § 1º)
+        # Aceita variações da marca ordinal no texto do DOCX (identificador normalizado § 1º)
         if any(c in ident for c in "ºª°"):
-            flex = escaped
-            for c in "ºª°":
-                flex = flex.replace(c, r"\.?" + c)
+            # Also "§ 1.º", "§ 1°" (degree sign), "§ 10" (no ordinal) and "§ 1 o A..." (CF)
+            flex = re.sub("[ºª°]", lambda _: r"\s*\.?\s*(?:[ºª°]|(?-i:o)(?=\s))?", escaped)
             patterns += [flex + r"\s*[-–—.]\s*", flex + r"\s+"]
         skip_chars = 0
         for pat in patterns:
@@ -245,7 +253,7 @@ class HTMLRenderer:
             escaped = html.escape(text)
 
             if run.hyperlink_url:
-                url = html.escape(run.hyperlink_url)
+                url = html.escape(run.link_url)
                 escaped = f'<a href="{url}" target="_blank" rel="noopener">{escaped}</a>'
             elif run.hyperlink_anchor:
                 # Internal link — generate navigation
@@ -279,9 +287,10 @@ class HTMLRenderer:
                 parts.append('<div class="fn-indent">')
                 in_indent = True
                 has_content = False
-            # Empty paragraph → preserve as line break
+            # Empty paragraph → preserve as line break (not before any content)
             if not rendered.strip():
-                parts.append("<br>")
+                if parts:
+                    parts.append("<br>")
                 continue
             # <br> between consecutive same-level paragraphs
             if has_content:
@@ -303,7 +312,7 @@ class HTMLRenderer:
         for run in runs:
             text = html.escape(run.text)
             if run.hyperlink_url:
-                url = html.escape(run.hyperlink_url)
+                url = html.escape(run.link_url)
                 text = f'<a href="{url}" target="_blank" rel="noopener">{text}</a>'
             if run.strike:
                 text = f"<s>{text}</s>"
@@ -314,18 +323,28 @@ class HTMLRenderer:
             parts.append(text)
         return "".join(parts)
 
-    def _render_old_version(self, unit: DocumentUnit, is_child: bool = False) -> str:
+    def _render_old_version(self, unit: DocumentUnit, is_child: bool = False, path: str = "") -> str:
         """Renderiza uma versão antiga (strikethrough + amendment note)."""
-        text = html.escape(unit.full_text)
+        # The final notes ("(Redação dada...) (Revogado...).") are part of the text:
+        # mark them there, as one span without the strikethrough
+        full = unit.full_text
+        spans = note_tail_spans(full)
+        if spans:
+            s = spans[0][0]
+            body = full[:s].rstrip(" \xa0")
+            tail = re.sub(r"[\s\xa0]+", " ", full[s:]).strip()
+            text = f'{html.escape(body)} <span class="amendment-note">{html.escape(tail)}</span>'
+        else:
+            text = html.escape(full)
         note = ""
-        if unit.amendment_note:
+        if unit.amendment_note and unit.amendment_note not in full:
             note = f' <span class="amendment-note">{html.escape(unit.amendment_note)}</span>'
-        # Extract identifier (everything before first separator) for JS diff pairing
-        ident = ""
-        m = re.match(r"(.+?)\s+[-–—]\s", unit.full_text)
-        if m:
-            ident = html.escape(m.group(1).strip())
+        # For JS diff pairing: the parser's identifier (as in the current version's
+        # unit-id) and the provision's path in the article (as in its data-path)
+        ident = html.escape(unit.identifier)
         ident_attr = f' data-ident="{ident}"' if ident else ""
+        if path:
+            ident_attr += f' data-path="{html.escape(path)}"'
         cls = "old-version art-para" if is_child else "old-version"
         return f'    <p class="{cls}"{ident_attr}>{text}{note}</p>'
 

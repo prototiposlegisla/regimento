@@ -36,7 +36,9 @@ RE_ARTIGO = re.compile(
     r"(?:[-–]([A-H])(?=[.\s\xa0])|([A-H])(?=\s*[-–—.]))?",
 )
 RE_PARAGRAFO_UNICO = re.compile(r"^Par[aá]grafo\s+[uú]nico", re.IGNORECASE)
-RE_PARAGRAFO_NUM = re.compile(r"^[§Ss]\s*(\d+)(\.?[ºª°]?)")
+# Group 3 = letter of an inserted paragraph, as in "§ 1º-A." or "§ 1º-A -" (hyphen and
+# letter glued to the number; "§ 1º - A destituição..." and "§ 3º-O Presidente..." are not)
+RE_PARAGRAFO_NUM = re.compile(r"^[§Ss]\s*(\d+)(\.?[ºª°]?)(?:-([A-H])(?=\.|[\s\xa0]*[-–—]))?")
 RE_INCISO = re.compile(r"^l?[IVXLC]+\s*[-–—]")
 RE_ALINEA = re.compile(r"^[a-z]\)")
 RE_SUB_ALINEA = re.compile(r"^\d+\)")
@@ -58,6 +60,20 @@ RE_AMENDMENT = re.compile(
     re.IGNORECASE,
 )
 RE_NORMA = re.compile(r"^NORMA:\s*(.+)", re.IGNORECASE)
+# Início da primeira nota de um dispositivo: "(Redação dada...", "(Revogado...", "(Vide..." etc.
+RE_NOTE_START = re.compile(
+    r"\(\s*(?:Reda[çc][ãa]o|Inclu[ií]d|Inserid|Acrescentad|Revogad|Renumerad|Alterad|"
+    r"Vide\b|Suprimid|Declarad|Adin\b|ADI\b|Precedente|NR\)|Vig[êe]ncia|Produ[çc][ãa]o|"
+    r"Novamente|Designad|Restabelecid|Reestabelecid)",
+    re.IGNORECASE,
+)
+# Identificador no início do dispositivo, com o separador: "Art. 5º -", "§ 1º-A.", "IV —", "b)"
+RE_LEADING_IDENT = re.compile(
+    r"^\s*(?:Art\.?\s*\d+\s*[ºª°]?(?:-?[A-H](?=[.\s\xa0\-–—]))?|[§Ss]\s*\d+\s*\.?\s*[ºª°]?(?:-[A-H]\b)?|"
+    r"Par[aá]grafo\s+[uú]nico|l?[IVXLC]+(?=\s*[-–—])|[a-z]\)|\d+\s*\)|\d+(?=\s*[-–—]))"
+    r"\s*[-–—.:]?\s*",
+    re.IGNORECASE,
+)
 
 
 def parse_docx(path: str | Path, *, include_private: bool = False) -> ParsedDocument:
@@ -175,7 +191,8 @@ def _parse_footnotes_xml(
                     for r in p.runs:
                         stripped = r.text.lstrip()
                         if stripped.lower().startswith("b "):
-                            r.text = r.text.replace("b ", "", 1).replace("B ", "", 1)
+                            # only the prefix: "b Nota B sobre" → "Nota B sobre"
+                            r.text = r.text[:len(r.text) - len(stripped)] + stripped[2:]
                             break
                         elif stripped.lower() == "b":
                             r.text = ""
@@ -289,12 +306,7 @@ def _parse_paragraph(
 
     full_text = "".join(r.text for r in runs).strip()
 
-    # Check if paragraph is predominantly strikethrough.
-    # Word often leaves the identifier prefix un-struck, so we use a
-    # character-count majority: >50% of non-whitespace chars are struck.
-    strike_chars = sum(len(r.text.strip()) for r in runs if r.strike)
-    total_chars = sum(len(r.text.strip()) for r in runs)
-    all_strike = total_chars > 0 and strike_chars > total_chars * 0.5
+    all_strike = _is_predominantly_struck(runs)
 
     return _RawParagraph(
         text=full_text,
@@ -305,6 +317,60 @@ def _parse_paragraph(
         bookmark_name=bookmark_name,
         footnote_ids=footnote_ids,
     )
+
+
+def _is_predominantly_struck(runs: list[TextRun]) -> bool:
+    """Diz se o parágrafo é uma redação tachada (antiga ou revogada).
+
+    Critério 1: mais de 50% dos caracteres (sem espaços) tachados — o Word
+    costuma deixar o identificador sem tachado.
+    Critério 2: o corpo (o texto entre o identificador e as notas finais, como
+    "(Revogado pela ...)" ou "(Vide ...)") pelo menos 75% tachado. As notas
+    muitas vezes ficam sem tachado e, quando longas, superam um corpo todo
+    tachado. A exigência maior preserva o dispositivo vigente com só um trecho
+    tachado (ex.: parte declarada inconstitucional).
+    """
+    strike_chars = sum(len(r.text.strip()) for r in runs if r.strike)
+    total_chars = sum(len(r.text.strip()) for r in runs)
+    if total_chars > 0 and strike_chars > total_chars * 0.5:
+        return True
+    text = "".join(r.text for r in runs)
+    mask = [r.strike for r in runs for _ in r.text]
+    m_ident = RE_LEADING_IDENT.match(text)
+    start = m_ident.end() if m_ident else 0
+    tail = note_tail_spans(text)
+    end = max(start, tail[0][0]) if tail else len(text)
+    body = [s for c, s in zip(text[start:end], mask[start:end]) if not c.isspace()]
+    return bool(body) and sum(body) >= len(body) * 0.75
+
+
+def note_tail_spans(text: str) -> list[tuple[int, int]]:
+    """Posições das notas no fim do dispositivo: "... (Redação dada ...) (Vide ...)."
+
+    Só a cadeia final conta; um "(vide art. 5º)" no meio do texto é texto normativo.
+    """
+    spans: list[tuple[int, int]] = []
+    end = len(text)
+    while True:
+        k = end
+        while k > 0 and text[k - 1] in " \xa0\t.;,:":
+            k -= 1
+        if k == 0 or text[k - 1] != ")":
+            break
+        depth, j = 0, k - 1
+        while j >= 0:
+            if text[j] == ")":
+                depth += 1
+            elif text[j] == "(":
+                depth -= 1
+                if depth == 0:
+                    break
+            j -= 1
+        if j < 0 or not RE_NOTE_START.match(text, j):
+            break
+        spans.append((j, k))
+        end = j
+    return spans[::-1]
 
 
 def _parse_run(r_el: ET.Element, w: str) -> TextRun:
@@ -412,8 +478,9 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
             # Normaliza: remove ponto antes de ordinal (§ 1.º → § 1º, § 10. → § 10º)
             # e converte degree sign ° (U+00B0) → ordinal º (U+00BA)
             suffix = raw_suffix.lstrip(".").replace("\u00b0", "\u00ba") or "º"
+            letter = m2.group(3) if m2 and m2.group(3) else ""
             ut = UnitType.PARAGRAFO_NUM
-            ident = f"§ {num}{suffix}"
+            ident = f"§ {num}{suffix}" + (f"-{letter}" if letter else "")
         elif RE_INCISO.match(text):
             ut = UnitType.INCISO
             # Extract roman numeral
@@ -666,7 +733,8 @@ def _build_document(
             ):
                 # Merge: previous caput + children → all_versions
                 if current_article.caput:
-                    current_article.caput.is_old_version = True
+                    # stays as struck (or not) in the DOCX: resolve_amendments swaps
+                    # a restored caput in force before a struck one
                     current_article.all_versions.append(current_article.caput)
                 for child in current_article.children:
                     child.is_old_version = True
@@ -795,7 +863,8 @@ def _uid_suffix(cp: _ClassifiedParagraph) -> str:
     elif cp.unit_type == UnitType.PARAGRAFO_NUM:
         m = RE_PARAGRAFO_NUM.match(cp.text)
         num = m.group(1) if m else "0"
-        return f"p{num}"
+        letter = m.group(3) if m and m.group(3) else ""
+        return f"p{num}{letter}"
     elif cp.unit_type == UnitType.INCISO:
         m = re.match(r"^(l?[IVXLC]+)", cp.text)
         raw = m.group(1) if m else ""

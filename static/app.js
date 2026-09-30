@@ -1887,16 +1887,18 @@
     const cached = ancestorHeadingsCache.get(card);
     if (cached) return cached;
     const levelOrder = ['norma', 'tit', 'cap', 'sec', 'subsec'];
-    const foundLevels = new Set();
+    // Only headings above the ones already found: once a title is found, the
+    // chapters and sections before it belong to the previous title
+    let minIdx = levelOrder.length;
     const ancestors = [];
     let prev = card.previousElementSibling;
-    while (prev && foundLevels.size < levelOrder.length) {
+    while (prev && minIdx > 0) {
       if (prev.classList.contains('card-titulo')) {
         const level = headingLevel(prev);
-        if (level && !foundLevels.has(level)) {
-          foundLevels.add(level);
+        const idx = levelOrder.indexOf(level);
+        if (idx >= 0 && idx < minIdx) {
+          minIdx = idx;
           ancestors.push({ el: prev, level });
-          if (level === 'norma') break;
         }
       }
       prev = prev.previousElementSibling;
@@ -3065,15 +3067,44 @@
     return result.reverse();
   }
 
+  // Amendment notes ("(Redação dada…)", "(Revogado…)", "(Vide…)"), left out of the
+  // comparison on both sides (the old version has them in .amendment-note spans)
+  const AMENDMENT_NOTE_RE = /\s*\((?:Reda[çc][ãa]o|Inclu[ií]d|Inserid|Acrescentad|Revogad|Renumerad|Alterad|Vide\b|Suprimid|Declarad|Adin\b|ADI\b|Precedente|NR(?=\))|Vig[êe]ncia|Produ[çc][ãa]o|Novamente|Designad|Restabelecid|Reestabelecid)[^()]*(?:\([^()]*\)[^()]*)*\)/gi;
+  // The provision's identifier and separator at the start ("§ 1º -", "IV —", "b)"):
+  // the current version shows it in .unit-id, the old one in the text
+  const LEADING_IDENT_RE = /^\s*(?:Art\.?\s*\d+\s*[ºª°]?(?:-?[A-H](?=[.\s\-–—]))?|§\s*\d+\s*\.?\s*[ºª°]?(?:-[A-H])?|Par[aá]grafo\s+[uú]nico|[IVXLC]+(?=\s*[-–—])|[a-z]\s?\)|\d+\s*\)|\d+(?=\s*[-–—]))\s*[-–—.:]?\s*/i;
+
   function extractPlainText(el) {
-    // Get text content excluding amendment-note spans
+    // Only the provision's text: no identifier, amendment notes or UI bits
     const clone = el.cloneNode(true);
-    clone.querySelectorAll('.amendment-note, .diff-toggle, .footnote-ref, .footnote-box').forEach(n => n.remove());
-    return clone.textContent.trim();
+    clone.querySelectorAll('.amendment-note, .diff-toggle, .footnote-ref, .footnote-box, .unit-id, .indent-path')
+      .forEach(n => n.remove());
+    return clone.textContent
+      .replace(AMENDMENT_NOTE_RE, '')
+      .replace(/([.;:,])\s*[.;,]+/g, '$1')      // punctuation left around a removed note
+      .replace(LEADING_IDENT_RE, '')
+      .replace(/^[\s\-–—]+/, '')
+      .trim();
   }
 
   function findNextVersion(oldEl) {
     const ident = oldEl.dataset.ident || '';
+    const path = oldEl.dataset.path || '';
+    // A provision in the article (it has a path): the next old version of the same
+    // path, or the current version of the same path, wherever it is in the card
+    if (path) {
+      for (let sib = oldEl.nextElementSibling; sib; sib = sib.nextElementSibling) {
+        if (sib.classList.contains('old-version')) {
+          if (sib.dataset.path === path) return sib;
+          continue;
+        }
+        const uid = sib.querySelector && sib.querySelector('.unit-id');
+        if (uid && uid.dataset.path === path) return sib;
+      }
+      return null;
+    }
+    // Old caput versions: the next old caput or the current caput
+    if (!/^Art/i.test(ident)) return null;
     // Walk forward through siblings to find the next version (old or current)
     let sib = oldEl.nextElementSibling;
     while (sib) {
@@ -3085,7 +3116,7 @@
       if (sib.classList.contains('old-version')) {
         // Another old version — return it if same ident (sequential diff)
         const sibIdent = sib.dataset.ident || '';
-        if (ident === sibIdent) return sib;
+        if (ident && ident === sibIdent) return sib;
         // Different ident — skip
         sib = sib.nextElementSibling;
         continue;
@@ -3132,6 +3163,12 @@
 
     const panel = document.createElement('div');
     panel.className = 'diff-panel';
+    if (!diff.some(part => part.type !== 'eq')) {
+      panel.textContent = 'Sem alteração no texto (só nas notas).';
+      oldEl.classList.add('diff-open');
+      oldEl.after(panel);
+      return;
+    }
     for (const part of diff) {
       if (part.type === 'del') {
         const s = document.createElement('span');

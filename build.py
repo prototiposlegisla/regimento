@@ -20,6 +20,10 @@ if sys.stdout.encoding != "utf-8":
 
 BASE_DIR = Path(__file__).parent
 
+# Números repetidos que o próprio texto normativo tem (não é redação antiga sem tachar):
+# (norma, artigo, caminho do dispositivo)
+KNOWN_DUPLICATES: set[tuple[str, str, str]] = set()
+
 
 # ── Validation report ────────────────────────────────────────────────────
 
@@ -173,6 +177,11 @@ def _build_once(
         for a in articles
     )
     print(f"      → {version_count} versões anteriores detectadas")
+
+    # Dispositivo repetido sem tachado; nota de rodapé presa a redação tachada
+    from src.resolve_amendments import structure_warnings
+    for message, context in structure_warnings(doc, KNOWN_DUPLICATES):
+        report.add("docx", "aviso", message, context)
 
     # ── 3. Parse XLSX ──────────────────────────────────────────────────
     print("[3/8] Parseando XLSX...")

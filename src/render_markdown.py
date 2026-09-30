@@ -97,8 +97,9 @@ class MarkdownRenderer:
     def _render_old_version(self, unit: DocumentUnit) -> str:
         text = unit.full_text.replace("\xa0", " ")
         line = f"*[Versão supersedida]* {text}"
-        if unit.amendment_note:
-            line += f" *{unit.amendment_note}*"
+        note = unit.amendment_note.replace("\xa0", " ")
+        if note and note not in text:  # usually the note is already in the text
+            line += f" *{note}*"
         return line
 
     def _render_runs_after_identifier(self, unit: DocumentUnit) -> str:
@@ -106,15 +107,15 @@ class MarkdownRenderer:
         full_text = unit.full_text
         ident = unit.identifier
 
-        escaped = re.escape(ident)
+        # tolera espaço inicial e \xa0 dentro do identificador ("  Art.\xa029. O Município...")
+        escaped = r"\s*" + re.escape(ident).replace(r"\ ", r"\s*")
         patterns = [
             escaped + r"\s*[-–—.]\s*",
             escaped + r"\s+",
         ]
         if any(c in ident for c in "ºª°"):
-            flex = escaped
-            for c in "ºª°":
-                flex = flex.replace(c, r"\.?" + c)
+            # Also "§ 1.º", "§ 1°" (degree sign), "§ 10" (no ordinal) and "§ 1 o A..." (CF)
+            flex = re.sub("[ºª°]", lambda _: r"\s*\.?\s*(?:[ºª°]|(?-i:o)(?=\s))?", escaped)
             patterns += [flex + r"\s*[-–—.]\s*", flex + r"\s+"]
 
         skip_chars = 0
@@ -144,7 +145,7 @@ class MarkdownRenderer:
             text = text.replace("\xa0", " ")
 
             if run.hyperlink_url:
-                text = f"[{text}]({run.hyperlink_url})"
+                text = f"[{text}]({run.link_url})"
             # hyperlink_anchor → plain text (no link target in markdown)
 
             if run.strike:

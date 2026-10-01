@@ -85,6 +85,26 @@ class DocumentUnit:
         return "".join(r.text for r in self.runs)
 
 
+def unit_path(unit: DocumentUnit, ctx: list[str]) -> str:
+    """Caminho do dispositivo no artigo ("§ 1º,II,a", "§ú,I"), como no data-path do site.
+
+    ctx = [parágrafo, inciso, alínea, item], atualizado aqui; "" para o caput e o resto.
+    """
+    t = unit.unit_type
+    if t in (UnitType.PARAGRAFO_UNICO, UnitType.PARAGRAFO_NUM):
+        ctx[:] = ["§ú" if t == UnitType.PARAGRAFO_UNICO else unit.identifier, "", "", ""]
+    elif t == UnitType.INCISO:
+        ctx[1:] = [unit.identifier, "", ""]
+    elif t == UnitType.ALINEA:
+        ctx[2:] = [re.sub(r"\)$", "", unit.identifier), ""]
+    elif t in (UnitType.SUB_ALINEA, UnitType.ITEM_NUM):
+        m = re.match(r"(\d+)", unit.identifier)
+        ctx[3] = m.group(1) if m else unit.identifier
+    else:
+        return ""
+    return ",".join(part for part in ctx if part)
+
+
 @dataclass
 class SectionHeading:
     """Título de seção (TÍTULO, CAPÍTULO, SEÇÃO, subtítulo)."""

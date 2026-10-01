@@ -1404,3 +1404,134 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   #search-tick-tooltip { max-width: min(300px, 70vw); }
   #search-tick-tooltip .mtt-chip { font-size: 11px; padding: 3px 8px; }
 }
+
+/* ===== REMISSÕES ===== */
+/* explicit: the cited text itself opens a preview of the cited provision */
+.rem-exp {
+  text-decoration: underline dotted #2e86c1;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.rem-exp a { color: inherit; text-decoration: inherit; }   /* the citation's original link */
+.rem-exp:focus-visible { outline: 2px solid #2e86c1; outline-offset: 1px; border-radius: 2px; }
+.rem-exp::after {
+  content: "\2197";            /* ↗, out of the text (not searchable) */
+  content: "\2197" / "";       /* and not read as part of the name */
+  font-size: .7em;
+  color: #2e86c1;
+  margin-left: 1px;
+  vertical-align: super;
+}
+/* "Citado em:" at the end of the card; labels via CSS, out of the searchable text */
+.rem-backlinks {
+  margin-top: calc(6px * var(--zoom-scale));
+  font-size: calc(.82rem * var(--zoom-scale));
+  color: #7f8c8d;
+}
+.rem-backlinks::before { content: attr(data-label); margin-right: 2px; }
+.rem-back {
+  display: inline-block;
+  margin: 2px 0 2px 4px;
+  padding: 0 7px;
+  border-radius: 10px;
+  line-height: 1.6;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  background: #eef5fb; color: #1f618d; border: 1px solid #d4e6f1;
+}
+.rem-back::before { content: attr(data-label); }
+#cards-container.compact .rem-backlinks { display: none; }
+
+/* preview: hover on desktop (interactive, unlike #footnote-tooltip) */
+#rem-pop {
+  display: none;
+  position: fixed;
+  z-index: 210;
+  width: min(460px, 92vw);
+  max-height: 60vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  border: 1px solid #d6dbdf;
+  border-top: 3px solid #2e86c1;
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.18);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+#rem-pop.visible { display: block; }
+.rem-group { position: relative; }   /* sticky head and foot stay within their article */
+.rem-group + .rem-group { border-top: 2px solid #eaeded; }
+.rem-head {
+  position: sticky; top: 0; z-index: 1;
+  background: #f8f9f9;
+  padding: 6px 10px;
+  border-bottom: 1px solid #eaeded;
+  font-weight: 600;
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline;
+}
+.rem-head .rem-law {
+  font-size: 10px; font-weight: 700; letter-spacing: .5px;
+  padding: 1px 5px; border-radius: 3px; background: #d6eaf8; color: #1b4f72;
+}
+.rem-head .rem-law.LOM { background: #fdebd0; color: #7e5109; }
+.rem-head .rem-law.CF { background: #d5f5e3; color: #145a32; }
+.rem-head .rem-sint { font-weight: 400; color: #566573; }
+.rem-head .rem-revoked {
+  font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px;
+  background: #fdedec; color: #a93226;
+}
+.rem-body { padding: 6px 10px; }
+.rem-body p { margin: 3px 0; }
+.rem-body .art-para { padding-left: calc(12px * var(--depth, 1)); }
+.rem-body .rem-uid { font-weight: 700; padding: 1px 5px; }
+.rem-body .rem-gap { color: #95a5a6; margin: 0 0 0 12px; }
+.rem-body .rem-hit { background: #eaf2f8; border-radius: 3px; }
+.rem-body .old-version.rem-hit { opacity: .8; }
+.rem-foot {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  padding: 5px 10px 7px; border-top: 1px solid #eaeded; font-size: 12.5px;
+  position: sticky; bottom: 0; background: #fff;   /* "Ir para" in view in long previews */
+}
+.rem-foot button {
+  background: #2e86c1; color: #fff; border: 0; border-radius: 4px;
+  padding: 3px 10px; cursor: pointer; font-size: 12.5px;
+}
+.rem-foot a { color: #7f8c8d; }
+/* pinned box under the provision (click / tap) */
+.rem-box {
+  position: relative;
+  margin-top: calc(6px * var(--zoom-scale));
+  background: #fbfcfc;
+  border: 1px solid #eaeded;
+  border-left: 3px solid #2e86c1;
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: calc(.95rem * var(--zoom-scale));
+}
+.rem-box .rem-close {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  min-width: 32px; min-height: 32px;
+  background: none; border: none; font-size: 18px; cursor: pointer; color: #999;
+}
+.rem-box .rem-body { max-height: 60vh; overflow: auto; }
+.rem-box > .rem-group:first-of-type .rem-head { padding-right: 40px; }   /* room for the × */
+@media (hover: none) {
+  .rem-foot button, .rem-foot a { min-height: 32px; display: inline-flex; align-items: center; }
+}
+.rem-box .rem-foot { background: #fbfcfc; }
+#cards-container.compact .rem-box { display: none; }
+/* target, after "Ir para" */
+.rem-flash { animation: remflash 2s ease-out 1; }
+@keyframes remflash { 0%, 50% { background-color: #fcf3cf; } }
+/* "voltar" after following a remissão */
+#rem-return {
+  display: none; position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: 18px; z-index: 220;
+  background: #1b4f72; color: #fff; border: 0; border-radius: 18px;
+  padding: 7px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.25); cursor: pointer;
+}
+#rem-return.visible { display: block; }
+body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */

@@ -64,6 +64,7 @@ class ValidationReport:
             "formato": "Formato da planilha",
             "ref_cruzada": "Referências cruzadas (XLSX → DOCX)",
             "vide": "Vides apontando para assuntos inexistentes",
+            "remissoes": "Remissões entre artigos (citações não resolvidas)",
         }
 
         print(f"\n{'─' * 60}")
@@ -291,6 +292,14 @@ def _build_once(
                 for v in el.all_versions:
                     v.uid = v.uid.replace("art", f"art{lp}", 1)
 
+    # Remissões explícitas: citações a outros artigos ("artigo 369"), com prévia no site
+    from src.remissoes import detectar, carregar_excecoes, mudancas_desde_ultimo_build
+    remissoes = detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml"))
+    n_rem = sum(1 for r in remissoes.remissoes if r.exibivel)
+    print(f"      → {n_rem} remissões entre artigos")
+    for message, context in remissoes.avisos:
+        report.add("remissoes", "aviso", message, context)
+
     # ── 4. Parse referencias DOCX ────────────────────────────────────
     print("[4/8] Parseando referências...")
     from src.parse_referencias import parse_referencias
@@ -329,7 +338,7 @@ def _build_once(
     print("[7/8] Renderizando cards HTML...")
     from src.render_html import render_cards
 
-    cards_html = render_cards(doc)
+    cards_html = render_cards(doc, remissoes)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
     # ── 8. Assemble ────────────────────────────────────────────────────
@@ -360,6 +369,14 @@ def _build_once(
     elapsed = time.time() - t0
     size_kb = output_path.stat().st_size / 1024
     print(f"\n✓ {label} pronto em {elapsed:.1f}s → {output_path} ({size_kb:.0f} KB)")
+
+    if not include_private:
+        # Remissões that changed since the last published build (docs/index.html is the
+        # reference; a test build only compares)
+        publicado = output_path.resolve() == (BASE_DIR / "docs" / "index.html").resolve()
+        for line in mudancas_desde_ultimo_build(remissoes, BASE_DIR / "intermediate" / "remissoes.json",
+                                                gravar=publicado):
+            print(f"  {line}")
 
     # ── Validation report ────────────────────────────────────────────
     report.print_report()
@@ -497,7 +514,8 @@ def _build_markdown(
     print("[5/5] Renderizando Markdown...")
     from src.render_markdown import MarkdownRenderer
 
-    renderer = MarkdownRenderer()
+    from src.remissoes import detectar, carregar_excecoes
+    renderer = MarkdownRenderer(detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml")))
 
     regimento_md = renderer.render_document(doc)
     (output_dir / "regimento.md").write_text(regimento_md, encoding="utf-8")

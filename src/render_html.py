@@ -4,20 +4,27 @@ from __future__ import annotations
 
 import html
 import re
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .parse_docx import note_tail_spans
+from .remissoes import EXIBIVEIS, law_of
+
+if TYPE_CHECKING:
+    from .remissoes import Remissao, Resultado
 from .models import (
     ArticleBlock, DocumentUnit, Footnote, FootnotePara,
-    ParsedDocument, SectionHeading, TextRun, UnitType,
+    ParsedDocument, SectionHeading, TextRun, UnitType, unit_path,
 )
 
 
 class HTMLRenderer:
     """Gera HTML dos cards com a mesma estrutura do index.html original."""
 
-    def __init__(self):
+    def __init__(self, remissoes: Optional["Resultado"] = None):
         self.footnote_counter = 0
+        # Remissões explícitas: os trechos citados viram gatilho de uma prévia
+        self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
+        self._cited_by = remissoes.citado_em() if remissoes else {}
 
     def render(self, doc: ParsedDocument) -> str:
         """Renderiza todos os elementos do documento."""
@@ -106,6 +113,16 @@ class HTMLRenderer:
                     art_number=art.art_number,
                 ))
 
+        # Where this article is cited (labels via CSS, out of the searchable text)
+        cited = self._cited_by.get((law_of(art), art.art_number))
+        if cited:
+            items = "".join(
+                f'<span class="rem rem-back" tabindex="0" role="button" data-ref="{html.escape(o.ref)}"'
+                f' data-label="{html.escape(o.rotulo)}"></span>'
+                for o in cited
+            )
+            parts.append(f'    <div class="rem-backlinks" data-label="Citado em:">{items}</div>')
+
         parts.append("  </div>")
         return "\n".join(parts)
 
@@ -117,22 +134,7 @@ class HTMLRenderer:
         ctx = [para, inciso, alinea, sub]
         Formato do path: "I,b,2", "§ 1º,I", "§ú", etc.
         """
-        if unit.unit_type in (UnitType.PARAGRAFO_UNICO, UnitType.PARAGRAFO_NUM):
-            ctx[0] = "§ú" if unit.unit_type == UnitType.PARAGRAFO_UNICO else unit.identifier
-            ctx[1] = ctx[2] = ctx[3] = ""
-        elif unit.unit_type == UnitType.INCISO:
-            ctx[1] = unit.identifier  # "I", "II", etc.
-            ctx[2] = ctx[3] = ""
-        elif unit.unit_type == UnitType.ALINEA:
-            ctx[2] = re.sub(r"\)$", "", unit.identifier)  # "a)" → "a"
-            ctx[3] = ""
-        elif unit.unit_type in (UnitType.SUB_ALINEA, UnitType.ITEM_NUM):
-            m = re.match(r"(\d+)", unit.identifier)
-            ctx[3] = m.group(1) if m else unit.identifier
-        else:
-            return ""
-
-        return ",".join(part for part in ctx if part)
+        return unit_path(unit, ctx)
 
     def _render_indent_path(self, art_number: str, path: str) -> str:
         """Generate per-column indent-path spans for gutter ancestry hints."""
@@ -179,7 +181,7 @@ class HTMLRenderer:
         # Build inline content
         inner = indent_html + self._render_unit_id(unit, path=path)
         inner += " — "
-        inner += self._render_runs_after_identifier(unit)
+        inner += self._render_runs_after_identifier(unit, self._rem_by_unit.get(id(unit), ()))
 
         # Insert footnote superscript references inline
         for fn in unit.footnotes:
@@ -202,8 +204,11 @@ class HTMLRenderer:
         path_attr = f' data-path="{html.escape(path)}"' if path else ""
         return f'<span class="unit-id" data-uid="{uid}"{path_attr}>{label}</span>'
 
-    def _render_runs_after_identifier(self, unit: DocumentUnit) -> str:
-        """Renderiza os runs removendo o identificador do início."""
+    def _render_runs_after_identifier(self, unit: DocumentUnit, marks: "tuple | list" = ()) -> str:
+        """Renderiza os runs removendo o identificador do início.
+
+        marks: remissões do dispositivo; o trecho citado vira o gatilho da prévia.
+        """
         full_text = unit.full_text
         ident = unit.identifier
 
@@ -233,7 +238,91 @@ class HTMLRenderer:
             skip_chars = len(ident)
 
         # Now render runs, skipping the first skip_chars characters
+        if marks:
+            return self._render_runs_with_marks(unit.runs, skip_chars, marks)
         return self._render_runs_from(unit.runs, skip_chars)
+
+    def _render_runs_with_marks(
+        self, runs: list[TextRun], skip_chars: int, marks: "list[Remissao]",
+    ) -> str:
+        """Como _render_runs_from, envolvendo cada trecho citado num gatilho de remissão.
+
+        O link oficial que já estava no trecho fica no href do gatilho (sem link
+        dentro de link); o JS mostra a prévia e o oferece como "fonte oficial".
+        """
+        spans = []
+        last_end = skip_chars
+        for m in sorted(marks, key=lambda r: r.start):
+            if m.start >= last_end and m.end > m.start:
+                spans.append(m)
+                last_end = m.end
+        if not spans:
+            return self._render_runs_from(runs, skip_chars)
+
+        cuts = sorted({skip_chars, *(m.start for m in spans), *(m.end for m in spans)})
+        parts: list[str] = []
+        pos = 0
+        mi = 0
+        open_mark = None
+        for run in runs:
+            r_start, r_end = pos, pos + len(run.text)
+            pos = r_end
+            if r_end <= skip_chars:
+                continue
+            bounds = [max(r_start, skip_chars)] + [c for c in cuts if max(r_start, skip_chars) < c < r_end] + [r_end]
+            for a, b in zip(bounds, bounds[1:]):
+                if open_mark is None and mi < len(spans) and spans[mi].start == a:
+                    open_mark = spans[mi]
+                    parts.append(self._open_mark(open_mark))
+                text = run.text[a - r_start:b - r_start]
+                # a link cut by a citation: its leftover " " or ";" outside stays plain text
+                split = (a > r_start or b < r_end) and open_mark is None
+                parts.append(self._wrap_run(html.escape(text), run,
+                                            link=not (split and re.fullmatch(
+                                                r"[\s\xa0.,;:()–—-]*(?:(?:no|na|nos|nas|do|da|dos|das|ao|aos|e)"
+                                                r"[\s\xa0]*)?", text)),
+                                            in_mark=open_mark is not None))
+                if open_mark is not None and open_mark.end == b:
+                    parts.append("</span>")
+                    open_mark = None
+                    mi += 1
+        if open_mark is not None:
+            parts.append("</span>")
+        return "".join(parts)
+
+    @staticmethod
+    def _open_mark(rem: "Remissao") -> str:
+        alvos = [a for a in rem.alvos if a.status in EXIBIVEIS]
+        attrs = f' data-ref="{html.escape(";".join(a.ref for a in alvos))}"'
+        revogados = [a.ref for a in alvos if a.status == "revogado"]
+        if revogados:
+            attrs += f' data-rev="{html.escape(";".join(revogados))}"'
+        tachados = [a.ref for a in alvos if a.status == "tachado"]
+        if tachados:
+            attrs += f' data-tach="{html.escape(";".join(tachados))}"'
+        return f'<span class="rem rem-exp" tabindex="0" role="button"{attrs}>'
+
+    @staticmethod
+    def _wrap_run(escaped: str, run: TextRun, link: bool = True, in_mark: bool = False) -> str:
+        """Link, tachado, negrito e itálico de um trecho de run (já escapado).
+
+        in_mark: dentro de um gatilho de remissão; o link sai da ordem do Tab (o
+        gatilho é a parada) e continua abrindo com Ctrl/Cmd+clique.
+        """
+        if link and run.hyperlink_url:
+            tab = ' tabindex="-1"' if in_mark else ""
+            escaped = f'<a href="{html.escape(run.link_url)}" target="_blank" rel="noopener"{tab}>{escaped}</a>'
+        elif link and run.hyperlink_anchor:
+            # Internal link — generate navigation
+            tab = ' tabindex="-1"' if in_mark else ""
+            escaped = f'<a href="#{html.escape(run.hyperlink_anchor)}" class="internal-ref"{tab}>{escaped}</a>'
+        if run.strike:
+            escaped = f"<s>{escaped}</s>"
+        if run.bold:
+            escaped = f"<strong>{escaped}</strong>"
+        if run.italic:
+            escaped = f"<em>{escaped}</em>"
+        return escaped
 
     def _render_runs_from(
         self, runs: list[TextRun], skip_chars: int
@@ -249,25 +338,7 @@ class HTMLRenderer:
 
             text = run.text[remaining_skip:]
             remaining_skip = 0
-
-            escaped = html.escape(text)
-
-            if run.hyperlink_url:
-                url = html.escape(run.link_url)
-                escaped = f'<a href="{url}" target="_blank" rel="noopener">{escaped}</a>'
-            elif run.hyperlink_anchor:
-                # Internal link — generate navigation
-                anchor = html.escape(run.hyperlink_anchor)
-                escaped = f'<a href="#{anchor}" class="internal-ref">{escaped}</a>'
-
-            if run.strike:
-                escaped = f"<s>{escaped}</s>"
-            if run.bold:
-                escaped = f"<strong>{escaped}</strong>"
-            if run.italic:
-                escaped = f"<em>{escaped}</em>"
-
-            parts.append(escaped)
+            parts.append(self._wrap_run(html.escape(text), run))
 
         return "".join(parts)
 
@@ -349,6 +420,6 @@ class HTMLRenderer:
         return f'    <p class="{cls}"{ident_attr}>{text}{note}</p>'
 
 
-def render_cards(doc: ParsedDocument) -> str:
-    renderer = HTMLRenderer()
+def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None) -> str:
+    renderer = HTMLRenderer(remissoes)
     return renderer.render(doc)

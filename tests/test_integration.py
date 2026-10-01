@@ -182,3 +182,87 @@ def _all_units(art: ArticleBlock):
         yield art.caput
     yield from art.children
     yield from art.all_versions
+
+
+# ── Remissões explícitas ────────────────────────────────────────────────
+
+class TestRemissoes:
+    @pytest.fixture(scope="class")
+    def remissoes(self, resolved_doc):
+        from pathlib import Path
+        from src.remissoes import carregar_excecoes, detectar
+        root = Path(__file__).resolve().parent.parent
+        return detectar(resolved_doc, carregar_excecoes(root / "remissoes_excecoes.toml"))
+
+    def _alvos(self, remissoes, origem):
+        return [a.ref for r in remissoes.remissoes if r.origem.ref == origem and r.exibivel for a in r.alvos]
+
+    def test_quantidade(self, remissoes):
+        """~155 citações a outros artigos viram gatilho (tolerância 10%)."""
+        n = sum(1 for r in remissoes.remissoes if r.exibivel)
+        assert n == pytest.approx(155, rel=0.10), n
+
+    def test_sem_avisos(self, remissoes):
+        assert remissoes.avisos == []
+
+    def test_exemplo_do_usuario(self, remissoes):
+        """RI art. 18, VI cita o art. 369."""
+        assert self._alvos(remissoes, "18,VI") == ["369"]
+
+    def test_cruzada_ri_lom(self, remissoes):
+        assert self._alvos(remissoes, "13,I,d") == ["LOM:18,III", "LOM:18,IV", "LOM:18,V"]
+
+    def test_excecoes_aplicadas(self, remissoes):
+        assert self._alvos(remissoes, "262") == ["261,§ 2º"]
+        assert "LOM:ADT26" in self._alvos(remissoes, "LOM:ADT29")
+
+    def test_dgt_que_citam_a_ec_103_sao_externas(self, remissoes):
+        assert self._alvos(remissoes, "LOM:ADT26,I") == []
+
+    def test_render_real_preserva_texto_e_links(self, resolved_doc, remissoes):
+        """Com e sem os gatilhos: mesmo texto, nenhum link dentro de link, os mesmos links oficiais."""
+        import re as _re
+        from html.parser import HTMLParser
+        from src.render_html import HTMLRenderer
+
+        com = HTMLRenderer(remissoes).render(resolved_doc)
+        sem = HTMLRenderer().render(resolved_doc)
+
+        class Texto(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.parts, self.hrefs, self.depth, self.nested = [], [], 0, 0
+
+            def handle_starttag(self, tag, attrs):
+                a = dict(attrs)
+                if tag == "a":
+                    self.nested += self.depth > 0
+                    self.depth += 1
+                    self.hrefs.append(a.get("href"))
+
+            def handle_endtag(self, tag):
+                if tag == "a":
+                    self.depth -= 1
+
+            def handle_data(self, data):
+                self.parts.append(data)
+
+        pc, ps = Texto(), Texto()
+        pc.feed(com)
+        ps.feed(sem)
+        assert pc.nested == 0
+        # (o "Citado em:" só acrescenta espaços: os rótulos são CSS)
+        assert _re.sub(r"\s+", " ", "".join(pc.parts)) == _re.sub(r"\s+", " ", "".join(ps.parts))
+        n_gatilhos = com.count('class="rem rem-exp"')
+        assert n_gatilhos == sum(1 for r in remissoes.remissoes if r.exibivel)
+        # by provision: no official link lost (the trigger keeps the original links inside)
+        from collections import Counter
+        pat = _re.compile(r'<p[ >].*?</p>', _re.S)
+        hrefs = lambda p: Counter(_re.findall(r'<a href="([^"]+)"', p))
+        perdidos = [(h, n) for p_sem, p_com in zip(pat.findall(sem), pat.findall(com))
+                    for h, n in (hrefs(p_sem) - hrefs(p_com)).items()]
+        assert not perdidos, perdidos[:5]
+
+    def test_dgt_que_citam_a_ec_103_existem_como_externas(self, remissoes):
+        ext = [r for r in remissoes.remissoes if r.origem.ref == "LOM:ADT26,I"]
+        assert ext and all(r.classe == "externa" for r in ext)

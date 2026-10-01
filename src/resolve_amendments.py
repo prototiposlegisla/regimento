@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 
-from .models import ArticleBlock, DocumentUnit, ParsedDocument, SectionHeading, UnitType
+from .models import ArticleBlock, DocumentUnit, ParsedDocument, SectionHeading, UnitType, unit_path
 
 
 def resolve_amendments(doc: ParsedDocument) -> ParsedDocument:
@@ -70,7 +70,7 @@ def duplicate_identifiers(doc: ParsedDocument) -> list[tuple[ArticleBlock, str]]
             # levels, e.g. RI 47, XIV: incisos in 2019, alíneas today)
             if child.is_old_version:
                 continue
-            path = _unit_path(child, ctx)
+            path = unit_path(child, ctx)
             if not path:
                 continue
             if path in seen and not any(path.startswith(r + ",") for r in reported):
@@ -78,23 +78,6 @@ def duplicate_identifiers(doc: ParsedDocument) -> list[tuple[ArticleBlock, str]]
                 reported.append(path)
             seen.add(path)
     return found
-
-
-def _unit_path(unit: DocumentUnit, ctx: list[str]) -> str:
-    """Caminho do dispositivo no artigo, no formato do data-path do site ("§ 1º,II,a", "§ú")."""
-    t = unit.unit_type
-    if t in (UnitType.PARAGRAFO_UNICO, UnitType.PARAGRAFO_NUM):
-        ctx[:] = ["§ú" if t == UnitType.PARAGRAFO_UNICO else unit.identifier, "", "", ""]
-    elif t == UnitType.INCISO:
-        ctx[1:] = [unit.identifier, "", ""]
-    elif t == UnitType.ALINEA:
-        ctx[2:] = [unit.identifier.rstrip(")"), ""]
-    elif t in (UnitType.SUB_ALINEA, UnitType.ITEM_NUM):
-        m = re.match(r"\d+", unit.identifier)
-        ctx[3] = m.group(0) if m else unit.identifier
-    else:
-        return ""
-    return ",".join(p for p in ctx if p)
 
 
 def structure_warnings(

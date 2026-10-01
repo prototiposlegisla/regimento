@@ -8,22 +8,55 @@ from .models import (
     ArticleBlock, DocumentUnit, Footnote, FootnotePara,
     ParsedDocument, SectionHeading, TextRun, UnitType,
 )
+from .remissoes import EXIBIVEIS, law_of
 
 
 class MarkdownRenderer:
     """Gera arquivos Markdown otimizados para consumo por LLMs."""
+
+    def __init__(self, remissoes=None):
+        # Remissões explícitas: "(remete a: Art. 369 — síntese)" depois do dispositivo
+        self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
+        self._summaries: dict[tuple[str, str], str] = {}
 
     # ── Documento principal ───────────────────────────────────────────
 
     def render_document(self, doc: ParsedDocument) -> str:
         """Renderiza o documento completo em Markdown."""
         parts: list[str] = []
+        self._summaries = {(law_of(a), a.art_number): a.summary
+                           for a in doc.elements if isinstance(a, ArticleBlock)}
         for el in doc.elements:
             if isinstance(el, SectionHeading):
                 parts.append(self._render_heading(el))
             elif isinstance(el, ArticleBlock):
                 parts.append(self._render_article(el))
         return "\n\n".join(parts) + "\n"
+
+    def _remissoes_suffix(self, unit: DocumentUnit) -> str:
+        """Sufixo com os dispositivos citados: *(remete a: Art. 369 — Promulgação...)*."""
+        # by article: "LOM art. 18, III, IV e V — Perda do mandato"
+        groups: dict[tuple[str, str], list] = {}
+        for rem in self._rem_by_unit.get(id(unit), ()):
+            for a in rem.alvos:
+                if a.status in EXIBIVEIS:
+                    g = groups.setdefault((a.law, a.art), [])
+                    if a not in g:
+                        g.append(a)
+        items = []
+        for (law, art), alvos in groups.items():
+            head = alvos[0].rotulo.split(",")[0]
+            paths = [a.path.replace("§ú", "parágrafo único").replace(",", ", ") for a in alvos if a.path]
+            tail = (", ".join(paths[:-1]) + " e " + paths[-1]) if len(paths) > 1 else "".join(paths)
+            whole = any(not a.path for a in alvos)
+            label = head[0].upper() + head[1:] + ((" e " if whole else ", ") + tail if tail else "")
+            if any(a.status == "revogado" for a in alvos):
+                label += " (revogado)"
+            elif any(a.status == "tachado" for a in alvos):
+                label += " (sem efeito)"
+            summary = self._summaries.get((law, art), "")
+            items.append(label + (f" — {summary}" if summary else ""))
+        return f" *(remete a: {' | '.join(items)})*" if items else ""
 
     def _render_heading(self, h: SectionHeading) -> str:
         level_map = {
@@ -54,7 +87,7 @@ class MarkdownRenderer:
         if art.caput:
             caput_text = self._render_runs_after_identifier(art.caput)
             if caput_text.strip():
-                parts.append(caput_text)
+                parts.append(caput_text + self._remissoes_suffix(art.caput))
             for fn in art.caput.footnotes:
                 parts.append(self._render_footnote(fn))
 
@@ -84,7 +117,7 @@ class MarkdownRenderer:
         indent = self._get_indent(child)
         identifier = child.identifier
         body = self._render_runs_after_identifier(child)
-        return f"{indent}**{identifier}** — {body}"
+        return f"{indent}**{identifier}** — {body}{self._remissoes_suffix(child)}"
 
     @staticmethod
     def _get_indent(unit: DocumentUnit) -> str:

@@ -1,0 +1,27 @@
+# Ajustes da detecção automática de remissões explícitas (src/remissoes.py).
+#
+# O build acha sozinho as citações a outros dispositivos ("artigo 369", "§ 1º do
+# artigo 368", "artigo 73 da Lei Orgânica") e mostra no site uma prévia do texto
+# citado. Use este arquivo só quando a detecção errar:
+#
+#   [[ignorar]]  descarta uma citação detectada;
+#   [[definir]]  diz para onde aponta uma citação (troca a detectada ou acrescenta).
+#
+# origem: o dispositivo onde está a citação, no formato do site:
+#         "262" (caput do art. 262 do Regimento), "18,VI", "LOM:42,§ 7º", "LOM:ADT29"
+# trecho: o texto da citação, como está no dispositivo
+# alvos:  os dispositivos citados, no mesmo formato da origem
+#
+# O build avisa quando uma exceção não encontra a origem ou o trecho.
+
+[[definir]]
+origem = "262"
+trecho = "parágrafo segundo do artigo anterior"
+alvos = ["261,§ 2º"]
+motivo = "ordinal por extenso ('parágrafo segundo'), que a detecção não lê"
+
+[[definir]]
+origem = "LOM:ADT29"
+trecho = "art. 26"
+alvos = ["LOM:ADT26"]
+motivo = "nas Disposições Gerais e Transitórias, 'art. 26' é o art. 26 das próprias DGT (Emenda 41/2021), não o art. 26 da LOM"

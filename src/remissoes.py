@@ -1,4 +1,4 @@
-"""Remissões explícitas: as citações a outros dispositivos no texto vigente.
+"""Remissões: as citações a outros dispositivos (explícitas) e os correlatos (implícitas).
 
 Detecta, em cada dispositivo vigente, trechos como "artigo 369", "§ 1º do artigo
 368", "incisos III, IV e V do artigo 18, da Lei Orgânica do Município" e os
@@ -9,6 +9,10 @@ redação vigente do alvo; nada é copiado para o DOCX.
 Os alvos são endereçados por (norma, artigo, caminho), com o caminho no formato do
 data-path do site ("§ 1º,II,a", "§ú"), nunca por UID, que muda com as emendas.
 Ajustes manuais da detecção ficam em remissoes_excecoes.toml.
+
+As implícitas (dispositivos de normas diferentes que tratam da mesma coisa sem se
+citarem: mesma regra, detalhamento, fundamento ou divergência) vêm da planilha
+remissoes.xlsx, revisada à mão; o site mostra um selo nos dois lados.
 """
 
 from __future__ import annotations
@@ -75,10 +79,36 @@ class Remissao:
                 and any(a.status in EXIBIVEIS for a in self.alvos))
 
 
+# Tipos de remissão implícita: nome na planilha -> código no site
+TIPOS = {"mesma regra": "eq", "detalha": "det", "fundamento": "fund", "diverge": "div"}
+
+
+@dataclass
+class Implicita:
+    """Correlato entre dispositivos de normas diferentes (linha da planilha remissoes.xlsx)."""
+    id: str
+    origem: Alvo
+    destino: Alvo
+    tipo: str                 # eq | det | fund | div (TIPOS)
+    nota: str
+    proposta: bool            # Status "proposto": ainda não revisada (só em build de teste)
+    u_origem: DocumentUnit
+    u_destino: DocumentUnit
+
+
 @dataclass
 class Resultado:
     remissoes: list[Remissao] = field(default_factory=list)
     avisos: list[tuple[str, str]] = field(default_factory=list)
+    implicitas: list[Implicita] = field(default_factory=list)
+
+    def implicitas_por_unidade(self) -> dict[int, list[tuple[Implicita, str]]]:
+        """Correlatos por dispositivo, nos dois lados: id(unit) -> [(implícita, "src" | "tgt")]."""
+        out: dict[int, list[tuple[Implicita, str]]] = defaultdict(list)
+        for im in self.implicitas:
+            out[id(im.u_origem)].append((im, "src"))
+            out[id(im.u_destino)].append((im, "tgt"))
+        return out
 
     def por_unidade(self) -> dict[int, list[Remissao]]:
         """Remissões exibíveis por dispositivo de origem (id do objeto)."""
@@ -754,13 +784,30 @@ def carregar_excecoes(path: str | Path) -> dict:
 
 
 def _parse_ref(ref: str) -> tuple[str, str, str]:
-    """"369" / "LOM:42,§ 7º" / "LOM:ADT29,III" → (norma, artigo, caminho)."""
+    """"369" / "LOM:42,§ 7º" / "LOM:ADT29,III" → (norma, artigo, caminho).
+
+    Aceita variações digitadas à mão: "LOM: 26, p.ú.", "§1", "§ 2", "a)", "RI:369".
+    """
     law = "RI"
-    m = re.match(r"^([A-Z]{2,}):(.+)$", ref.strip())
+    m = re.match(r"^\s*([A-Za-z]{2,})\s*:\s*(.+)$", ref.strip())
     if m:
-        law, ref = m.group(1), m.group(2)
+        law, ref = m.group(1).upper(), m.group(2)
     parts = [p.strip() for p in ref.split(",")]
-    return law, parts[0], ",".join(parts[1:])
+    art = re.sub(r"\s+", "", parts[0]).replace("º", "").replace("°", "").upper()
+    segs = []
+    for p in parts[1:]:
+        low = p.lower().replace(" ", "")
+        if low in ("pu", "p.u.", "p.ú.", "§ú", "§u", "parágrafoúnico", "paragrafounico"):
+            segs.append("§ú")
+            continue
+        mp = re.match(r"^§\s*(\d+)\s*[º°o]?(?:\s*-\s*([A-H]))?$", p, re.I)
+        if mp:
+            segs.append(f"§ {mp.group(1)}º" + (f"-{mp.group(2).upper()}" if mp.group(2) else ""))
+            continue
+        if re.fullmatch(r"[a-z]\)", p):
+            p = p[0]
+        segs.append(p)
+    return law, art, ",".join(segs)
 
 
 def _norm_space(s: str) -> str:
@@ -808,9 +855,15 @@ def _aplicar_excecoes(corpus: _Corpus, res: Resultado, exc: dict) -> None:
 
 # ── entrada ───────────────────────────────────────────────────────────────
 
-def detectar(doc: ParsedDocument, excecoes: Optional[dict] = None) -> Resultado:
+def detectar(doc: ParsedDocument, excecoes: Optional[dict] = None, implicitas: Optional[list[dict]] = None,
+             *, privadas: bool = False, propostas: bool = False) -> Resultado:
     """Detecta e resolve as remissões do documento (depois de resolve_amendments e dos
-    prefixos de norma)."""
+    prefixos de norma).
+
+    implicitas: linhas da planilha (carregar_implicitas). Entram as de Status "aprovado";
+    as "proposto" só com propostas=True (build de teste, para revisar); as de
+    Visibilidade "privado" só com privadas=True (versão privada).
+    """
     corpus = _Corpus(doc)
     res = Resultado()
     for (law, art_number), units in corpus.units.items():
@@ -835,7 +888,89 @@ def detectar(doc: ParsedDocument, excecoes: Optional[dict] = None) -> Resultado:
                     f"→ {a.rotulo}",
                     r.origem.rotulo,
                 ))
+    if implicitas:
+        _resolver_implicitas(corpus, res, implicitas, privadas=privadas, propostas=propostas)
     return res
+
+
+# ── implícitas (remissoes.xlsx) ───────────────────────────────────────────
+
+COLUNAS = ("ID", "Origem", "Destino", "Tipo", "Nota", "Status", "Visibilidade")
+
+
+def carregar_implicitas(path: str | Path) -> list[dict]:
+    """Linhas da aba "Remissões" da planilha (ou da primeira aba), como dicts pelas colunas COLUNAS.
+
+    Cada dict tem também "linha" (número da linha no Excel). Planilha ausente: [].
+    """
+    p = Path(path)
+    if not p.exists():
+        return []
+    import openpyxl
+
+    wb = openpyxl.load_workbook(p, read_only=True, data_only=True)
+    try:
+        ws = wb["Remissões"] if "Remissões" in wb.sheetnames else wb.worksheets[0]
+        rows = ws.iter_rows(values_only=True)
+        header = [str(c or "").strip().lower() for c in next(rows, ())]
+        idx = {c: header.index(c.lower()) for c in COLUNAS if c.lower() in header}
+        out = []
+        for n, row in enumerate(rows, start=2):
+            item = {c: str(row[i]).strip() if i < len(row) and row[i] is not None else "" for c, i in idx.items()}
+            if item.get("Origem") or item.get("Destino"):
+                item["linha"] = n
+                out.append(item)
+        return out
+    finally:
+        wb.close()
+
+
+def _resolver_implicitas(corpus: _Corpus, res: Resultado, linhas: list[dict], *,
+                         privadas: bool, propostas: bool) -> None:
+    explicit = {(id(r.unit), a.ref) for r in res.remissoes if r.exibivel for a in r.alvos}
+    vistos = set()
+    for item in linhas:
+        status = item.get("Status", "").strip().lower()
+        if status in ("rejeitado", "rejeitada"):
+            continue
+        if status not in ("aprovado", "aprovada", "proposto", "proposta"):
+            res.avisos.append((f"Status desconhecido {item.get('Status')!r} (use aprovado, proposto ou rejeitado)",
+                               f"remissoes.xlsx, linha {item['linha']}"))
+            continue
+        proposta = status.startswith("propost")
+        if proposta and not propostas:
+            continue
+        if item.get("Visibilidade", "").strip().lower().startswith("priv") and not privadas:
+            continue
+        ctx = f"remissoes.xlsx, linha {item['linha']}"
+        tipo = TIPOS.get(item.get("Tipo", "").strip().lower())
+        if tipo is None:
+            res.avisos.append((f"Tipo desconhecido {item.get('Tipo')!r} (use: {', '.join(TIPOS)})", ctx))
+            continue
+        if tipo == "div" and not item.get("Nota", "").strip():
+            res.avisos.append(("Divergência sem nota (a nota é obrigatória)", ctx))
+            continue
+        lados = []
+        for col in ("Origem", "Destino"):
+            law, art, path = _parse_ref(item.get(col, ""))
+            u = corpus.vig.get((law, art, path))
+            a = corpus.arts.get((law, art))
+            if u is None or a is None or a.is_revoked or u.is_old_version or u.is_revoked:
+                res.avisos.append((f"{col} {item.get(col)!r} não existe no documento (ou não está em vigor)", ctx))
+                break
+            lados.append((Alvo(law, art, path), u))
+        if len(lados) < 2:
+            continue
+        (o, uo), (d, ud) = lados
+        if (o.ref, d.ref) in vistos:
+            res.avisos.append((f"Par repetido: {o.ref} → {d.ref}", ctx))
+            continue
+        vistos.add((o.ref, d.ref))
+        if (id(uo), d.ref) in explicit:
+            res.avisos.append((f"O texto de {o.rotulo} já cita {d.rotulo} (remissão explícita)", ctx))
+        res.implicitas.append(Implicita(id=item.get("ID", ""), origem=o, destino=d, tipo=tipo,
+                                        nota=item.get("Nota", "").strip(), proposta=proposta,
+                                        u_origem=uo, u_destino=ud))
 
 
 # ── o que mudou desde o último build ──────────────────────────────────────

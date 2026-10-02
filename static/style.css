@@ -1443,6 +1443,27 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 .rem-back::before { content: attr(data-label); }
 #cards-container.compact .rem-backlinks { display: none; }
+/* implicit: a badge at the end of the provision, on both sides; label via CSS */
+.rem-imp {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 10px;
+  font-size: .78em;
+  line-height: 1.6;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: 1px;
+  background: #efe6fb; color: #6c3483; border: 1px solid #d7bde2;
+}
+.rem-imp::before { content: attr(data-label); }
+.rem-imp:focus-visible { outline: 2px solid #8e44ad; outline-offset: 1px; }
+.rem-imp.t-det  { background: #e8f6f3; color: #0e6655; border-color: #a2d9ce; }
+.rem-imp.t-fund { background: #e9f7ef; color: #196f3d; border-color: #abebc6; }
+.rem-imp.t-div  { background: #fdedec; color: #a93226; border-color: #f5b7b1; font-weight: 600; }
+.rem-imp[data-status="proposta"] { border-style: dashed; opacity: .85; }
+#cards-container.compact .rem-imp { display: none; }
 
 /* preview: hover on desktop (interactive, unlike #footnote-tooltip) */
 #rem-pop {
@@ -1462,6 +1483,20 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   line-height: 1.5;
 }
 #rem-pop.visible { display: block; }
+/* correlate: the note on top, colored by kind */
+.rem-note { padding: 5px 10px; color: #6c3483; background: #f9f5fc; border-bottom: 1px dashed #eaeded; }
+.rem-note .rem-kind { display: block; font-weight: 700; font-size: .85em; margin-bottom: 1px; }
+.rem-note .rem-proposta {
+  display: table; margin: 0 0 3px; padding: 0 5px; border-radius: 3px;
+  font-size: 10px; font-weight: 700; background: #fef5e7; color: #9c640c;
+}
+.rem-note.t-det { color: #0e6655; background: #f3fbf9; }
+.rem-note.t-fund { color: #196f3d; background: #f4fbf6; }
+.rem-note.t-div { color: #922b21; background: #fdf2f1; }
+.rem-box.t-eq { border-left-color: #8e44ad; }
+.rem-box.t-det { border-left-color: #16a085; }
+.rem-box.t-fund { border-left-color: #27ae60; }
+.rem-box.t-div { border-left-color: #c0392b; }
 .rem-group { position: relative; }   /* sticky head and foot stay within their article */
 .rem-group + .rem-group { border-top: 2px solid #eaeded; }
 .rem-head {

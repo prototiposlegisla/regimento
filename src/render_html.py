@@ -25,6 +25,8 @@ class HTMLRenderer:
         # Remissões explícitas: os trechos citados viram gatilho de uma prévia
         self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
         self._cited_by = remissoes.citado_em() if remissoes else {}
+        # Remissões implícitas: um selo no fim do dispositivo, nos dois lados
+        self._imp_by_unit = remissoes.implicitas_por_unidade() if remissoes else {}
 
     def render(self, doc: ParsedDocument) -> str:
         """Renderiza todos os elementos do documento."""
@@ -182,6 +184,7 @@ class HTMLRenderer:
         inner = indent_html + self._render_unit_id(unit, path=path)
         inner += " — "
         inner += self._render_runs_after_identifier(unit, self._rem_by_unit.get(id(unit), ()))
+        inner += self._render_correlatos(unit)
 
         # Insert footnote superscript references inline
         for fn in unit.footnotes:
@@ -289,6 +292,26 @@ class HTMLRenderer:
         if open_mark is not None:
             parts.append("</span>")
         return "".join(parts)
+
+    # Label of the implicit remissão's badge, seen from each side: (origin, target)
+    CHIP_PREFIX = {"eq": ("≈", "≈"), "det": ("detalha", "detalhado em"), "fund": ("↑", "↓"), "div": ("≠", "≠")}
+
+    def _render_correlatos(self, unit: DocumentUnit) -> str:
+        """Selos das remissões implícitas do dispositivo (rótulo e nota em atributos: fora da busca)."""
+        out = []
+        for im, side in self._imp_by_unit.get(id(unit), ()):
+            other = im.destino if side == "src" else im.origem
+            prefix = self.CHIP_PREFIX[im.tipo][0 if side == "src" else 1]
+            art = f"DGT {other.art[3:]}" if other.art.startswith("ADT") and other.law == "LOM" else \
+                (f"ADT {other.art[3:]}" if other.art.startswith("ADT") else other.art)
+            path = other.path.replace("§ú", "p.ú.").replace(",", ", ")
+            label = f"{prefix} {other.law} {art}" + (f", {path}" if path else "")
+            attrs = (f' data-ref="{html.escape(other.ref)}" data-tipo="{im.tipo}" data-side="{side}"'
+                     f' data-nota="{html.escape(im.nota)}" data-label="{html.escape(label)}"')
+            if im.proposta:
+                attrs += ' data-status="proposta"'
+            out.append(f'<span class="rem rem-imp t-{im.tipo}" tabindex="0" role="button"{attrs}></span>')
+        return "".join(out)
 
     @staticmethod
     def _open_mark(rem: "Remissao") -> str:

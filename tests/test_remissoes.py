@@ -202,3 +202,64 @@ class TestMudancas:
         p.write_text(json.dumps(["RI art. 1: \"x\" → Art. 2"]), encoding="utf-8")
         out = mudancas_desde_ultimo_build(res, p)
         assert out[0].startswith("remissões desde o build anterior:") and any(x.startswith("- ") for x in out)
+
+
+# ── Implícitas (remissoes.xlsx) ──────────────────────────────────────────
+
+def _linha(n, origem, destino, tipo="mesma regra", nota="", status="aprovado", vis="público"):
+    return {"ID": f"R{n}", "Origem": origem, "Destino": destino, "Tipo": tipo, "Nota": nota,
+            "Status": status, "Visibilidade": vis, "linha": n + 1}
+
+
+class TestImplicitas:
+    def test_status_e_visibilidade(self):
+        linhas = [
+            _linha(1, "369", "LOM:18,III"),
+            _linha(2, "368", "LOM:18,IV", status="proposto"),
+            _linha(3, "18,VI", "LOM:18", tipo="detalha", status="rejeitado"),
+            _linha(4, "162", "LOM:18,III", vis="privado"),
+        ]
+        pub = detectar(_doc(), implicitas=linhas)
+        assert [im.id for im in pub.implicitas] == ["R1"]
+        teste = detectar(_doc(), implicitas=linhas, propostas=True)
+        assert [im.id for im in teste.implicitas] == ["R1", "R2"]
+        priv = detectar(_doc(), implicitas=linhas, privadas=True)
+        assert [im.id for im in priv.implicitas] == ["R1"]   # 162 é revogado: origem não existe em vigor
+
+    def test_avisos(self):
+        res = detectar(_doc(), implicitas=[
+            _linha(1, "369", "LOM:99"),
+            _linha(2, "369", "LOM:18", tipo="parecido"),
+            _linha(3, "369", "LOM:18", tipo="diverge"),
+            _linha(4, "18,VI", "369"),
+        ])
+        msgs = " | ".join(m for m, _ in res.avisos)
+        assert "LOM:99" in msgs and "Tipo desconhecido" in msgs and "Divergência sem nota" in msgs
+        assert "já cita" in msgs              # 18,VI cita o 369 explicitamente
+        assert sum(ctx.startswith("remissoes.xlsx, linha") for _, ctx in res.avisos) == 4
+
+    def test_selos_nos_dois_lados_e_markdown(self):
+        doc = _doc()
+        res = detectar(doc, implicitas=[_linha(1, "369", "LOM:18,III", tipo="diverge",
+                                               nota="O RI diz 60 dias; a LOM diz 120.")])
+        html = HTMLRenderer(res).render(doc)
+        assert ('class="rem rem-imp t-div" tabindex="0" role="button" data-ref="LOM:18,III" data-tipo="div"'
+                ' data-side="src" data-nota="O RI diz 60 dias; a LOM diz 120." data-label="≠ LOM 18, III"') in html
+        assert 'data-ref="369" data-tipo="div" data-side="tgt"' in html
+        md = MarkdownRenderer(res).render_document(doc)
+        assert "*(correlatos: diverge de LOM art. 18, III — O RI diz 60 dias; a LOM diz 120.)*" in md
+
+    def test_planilha(self, tmp_path):
+        import openpyxl
+        from src.remissoes import carregar_implicitas
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Remissões"
+        ws.append(["ID", "Origem", "Destino", "Tipo", "Nota", "Status", "Visibilidade", "Texto da origem"])
+        ws.append(["R1", "369", "LOM:42,§ 7º", "mesma regra", "", "aprovado", "público", "Art. 369 ..."])
+        ws.append([None, None, None, None, None, None, None, None])
+        p = tmp_path / "remissoes.xlsx"
+        wb.save(p)
+        (linha,) = carregar_implicitas(p)
+        assert linha["Origem"] == "369" and linha["Destino"] == "LOM:42,§ 7º" and linha["linha"] == 2
+        assert carregar_implicitas(tmp_path / "nao_existe.xlsx") == []

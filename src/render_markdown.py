@@ -17,6 +17,7 @@ class MarkdownRenderer:
     def __init__(self, remissoes=None):
         # Remissões explícitas: "(remete a: Art. 369 — síntese)" depois do dispositivo
         self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
+        self._imp_by_unit = remissoes.implicitas_por_unidade() if remissoes else {}
         self._summaries: dict[tuple[str, str], str] = {}
 
     # ── Documento principal ───────────────────────────────────────────
@@ -56,7 +57,21 @@ class MarkdownRenderer:
                 label += " (sem efeito)"
             summary = self._summaries.get((law, art), "")
             items.append(label + (f" — {summary}" if summary else ""))
-        return f" *(remete a: {' | '.join(items)})*" if items else ""
+        out = f" *(remete a: {' | '.join(items)})*" if items else ""
+        return out + self._correlatos_suffix(unit)
+
+    # How each type reads from each side: (origin, target)
+    _IMP_WORDS = {"eq": ("mesma regra que", "mesma regra que"), "det": ("detalha", "detalhado em"),
+                  "fund": ("tem fundamento em", "é fundamento de"), "div": ("diverge de", "diverge de")}
+
+    def _correlatos_suffix(self, unit: DocumentUnit) -> str:
+        """Sufixo das remissões implícitas: *(correlatos: diverge de LOM art. 48, § 6º — nota)*."""
+        items = []
+        for im, side in self._imp_by_unit.get(id(unit), ()):
+            other = im.destino if side == "src" else im.origem
+            words = self._IMP_WORDS[im.tipo][0 if side == "src" else 1]
+            items.append(f"{words} {other.rotulo}" + (f" — {im.nota}" if im.nota else ""))
+        return f" *(correlatos: {' | '.join(items)})*" if items else ""
 
     def _render_heading(self, h: SectionHeading) -> str:
         level_map = {

@@ -2129,9 +2129,12 @@
   // A citation ("artigo 369") is a trigger (span.rem-exp, around the text and its
   // original links) with data-ref = the cited provisions ("369", "LOM:42,§ 7º",
   // "18,VI"; several separated by ";"), and data-rev / data-tach = the revoked or
-  // struck ones. The preview is built from the target's card in this same page,
-  // so it always shows the wording in force. Hover (desktop) shows a floating
-  // preview; click/tap or Enter pins a box under the provision.
+  // struck ones. A correlate in another norm (implicit remissão) is a badge
+  // (span.rem-imp) at the end of the provision, on both sides, with data-tipo
+  // (eq / det / fund / div), data-side (src / tgt) and data-nota. The preview is
+  // built from the target's card in this same page, so it always shows the
+  // wording in force. Hover (desktop) shows a floating preview; click/tap or
+  // Enter pins a box under the provision.
   const HOVER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   // Official texts, for "fonte oficial" (anchors artN exist on these pages)
   const REM_SOURCES = {
@@ -2148,6 +2151,17 @@
   $remReturn.type = 'button';
   document.body.appendChild($remReturn);
   let remHideTimer = null, remShowTimer = null, remReturnTo = null, remPopTrigger = null;
+  // Kind of correlate, as read from the origin and from the target side
+  const REM_TIPO = {
+    eq: ['≈ Mesma regra', '≈ Mesma regra'],
+    det: ['Detalha a norma correlata', 'Detalhado na norma correlata'],
+    fund: ['↑ Fundamento na norma superior', '↓ Aplicado na norma correlata'],
+    div: ['≠ Divergência', '≠ Divergência'],
+  };
+  // A box belongs to one trigger: a citation and a badge may point to the same place
+  function remKey(trigger) {
+    return (trigger.classList.contains('rem-imp') ? 'imp:' : '') + trigger.dataset.ref;
+  }
 
   function parseRemRef(s) {
     let law = 'RI';
@@ -2189,7 +2203,7 @@
   // A copy of a paragraph for the preview, without the page's controls
   function remClone(p) {
     const c = p.cloneNode(true);
-    c.querySelectorAll('.footnote-ref, .footnote-box, .indent-path, .diff-toggle, .rem-backlinks')
+    c.querySelectorAll('.footnote-ref, .footnote-box, .indent-path, .diff-toggle, .rem-backlinks, .rem-imp')
       .forEach(n => n.remove());
     c.querySelectorAll('.unit-id').forEach(u => {
       u.classList.replace('unit-id', 'rem-uid');
@@ -2263,6 +2277,24 @@
       if (struck.has(ref)) g.struck = true;
     }
     const wrap = document.createDocumentFragment();
+    const tipo = trigger.dataset.tipo;
+    if (tipo && REM_TIPO[tipo]) {
+      // correlate: what links the two provisions comes first
+      const n = document.createElement('div');
+      n.className = 'rem-note t-' + tipo;
+      const k = document.createElement('span');
+      k.className = 'rem-kind';
+      k.textContent = REM_TIPO[tipo][trigger.dataset.side === 'tgt' ? 1 : 0];
+      n.appendChild(k);
+      if (trigger.dataset.status === 'proposta') {
+        const pr = document.createElement('span');
+        pr.className = 'rem-proposta';
+        pr.textContent = 'proposta, ainda não revisada';
+        n.appendChild(pr);
+      }
+      if (trigger.dataset.nota) n.appendChild(document.createTextNode(trigger.dataset.nota));
+      wrap.appendChild(n);
+    }
     for (const g of groups) {
       const ex = remExcerpt(g);
       const group = document.createElement('section');
@@ -2342,8 +2374,9 @@
   }
   function remBoxOpen(trigger) {
     const p = trigger.closest('p');
+    const key = remKey(trigger);
     for (let box = p && p.nextElementSibling; box && box.classList.contains('rem-box'); box = box.nextElementSibling) {
-      if (box.dataset.for === trigger.dataset.ref) return box;
+      if (box.dataset.for === key) return box;
     }
     return null;
   }
@@ -2355,14 +2388,14 @@
   // Click/tap: pins the preview in a box under the provision (the only mode on touch)
   function toggleRemBox(trigger) {
     const p = trigger.closest('p') || trigger.closest('.rem-backlinks');
-    const key = trigger.dataset.ref;
+    const key = remKey(trigger);
     let after = p;
     for (let box = p.nextElementSibling; box && box.classList.contains('rem-box'); box = box.nextElementSibling) {
       if (box.dataset.for === key) { box.remove(); return; }
       after = box;
     }
     const b = document.createElement('div');
-    b.className = 'rem-box';
+    b.className = 'rem-box' + (trigger.dataset.tipo ? ' t-' + trigger.dataset.tipo : '');
     b.dataset.for = key;
     const close = document.createElement('button');
     close.type = 'button';
@@ -2454,13 +2487,17 @@
     if (e.key !== 'Escape') return;
     const active = document.activeElement;
     let box = null;
-    if (active && active.classList && active.classList.contains('rem-exp')) box = remBoxOpen(active);
+    if (active && active.classList && (active.classList.contains('rem-exp') || active.classList.contains('rem-imp'))) {
+      box = remBoxOpen(active);
+    }
     if (!box && active && active.closest) box = active.closest('.rem-box');
     if ($remPop.classList.contains('visible')) hideRemPop();
     else if (box) {
       let p = box.previousElementSibling;
       while (p && p.classList.contains('rem-box')) p = p.previousElementSibling;
-      const t = p && p.querySelector(`.rem-exp[data-ref="${CSS.escape(box.dataset.for)}"]`);
+      const imp = box.dataset.for.startsWith('imp:');
+      const ref = imp ? box.dataset.for.slice(4) : box.dataset.for;
+      const t = p && p.querySelector(`${imp ? '.rem-imp' : '.rem-exp'}[data-ref="${CSS.escape(ref)}"]`);
       box.remove();
       if (t) t.focus({ preventScroll: true });
     } else return;
@@ -2470,11 +2507,11 @@
 
   if (HOVER) {
     $cards.addEventListener('mouseover', e => {
-      const t = e.target.closest('.rem-exp, .rem-back');
+      const t = e.target.closest('.rem-exp, .rem-imp, .rem-back');
       if (!t || t.closest('.rem-box')) return;
       if (e.relatedTarget && t.contains(e.relatedTarget)) return;   // moving inside the trigger
       clearTimeout(remHideTimer); clearTimeout(remShowTimer);
-      if (t.classList.contains('rem-exp') && remBoxOpen(t)) return;  // its box is already open
+      if (!t.classList.contains('rem-back') && remBoxOpen(t)) return;  // its box is already open
       remShowTimer = setTimeout(() => showRemPop(t), 250);
     });
     $cards.addEventListener('mouseout', e => {

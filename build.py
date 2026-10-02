@@ -293,10 +293,15 @@ def _build_once(
                     v.uid = v.uid.replace("art", f"art{lp}", 1)
 
     # Remissões explícitas: citações a outros artigos ("artigo 369"), com prévia no site
-    from src.remissoes import detectar, carregar_excecoes, mudancas_desde_ultimo_build
-    remissoes = detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml"))
+    from src.remissoes import detectar, carregar_excecoes, carregar_implicitas, mudancas_desde_ultimo_build
+    remissoes = detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml"),
+                         carregar_implicitas(args.remissoes),
+                         privadas=include_private, propostas=args.com_propostas)
     n_rem = sum(1 for r in remissoes.remissoes if r.exibivel)
-    print(f"      → {n_rem} remissões entre artigos")
+    n_imp = len(remissoes.implicitas)
+    n_prop = sum(1 for im in remissoes.implicitas if im.proposta)
+    print(f"      → {n_rem} remissões entre artigos, {n_imp} correlatos entre normas"
+          + (f" ({n_prop} ainda propostos)" if n_prop else ""))
     for message, context in remissoes.avisos:
         report.add("remissoes", "aviso", message, context)
 
@@ -514,8 +519,9 @@ def _build_markdown(
     print("[5/5] Renderizando Markdown...")
     from src.render_markdown import MarkdownRenderer
 
-    from src.remissoes import detectar, carregar_excecoes
-    renderer = MarkdownRenderer(detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml")))
+    from src.remissoes import detectar, carregar_excecoes, carregar_implicitas
+    renderer = MarkdownRenderer(detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml"),
+                                         carregar_implicitas(args.remissoes), privadas=include_private))
 
     regimento_md = renderer.render_document(doc)
     (output_dir / "regimento.md").write_text(regimento_md, encoding="utf-8")
@@ -581,6 +587,8 @@ def main() -> int:
     default_xlsx = sources.get("xlsx", str(BASE_DIR / "remissivo.xlsx"))
     default_refs = sources.get("referencias", str(BASE_DIR / "referencias.docx"))
     default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.docx"))
+    # Remissões implícitas (correlatos entre normas): ao lado do DOCX, salvo indicação
+    default_remissoes = sources.get("remissoes", str(Path(default_docx).parent / "remissoes.xlsx"))
     default_private = output_cfg.get("private", "")
     default_chatbot = output_cfg.get("chatbot", "")
 
@@ -634,6 +642,14 @@ def main() -> int:
     parser.add_argument(
         "--strict", action="store_true",
         help="Trata avisos como erros (exit code 1 se houver qualquer problema)",
+    )
+    parser.add_argument(
+        "--remissoes", default=default_remissoes,
+        help="Planilha das remissões implícitas (remissoes.xlsx)",
+    )
+    parser.add_argument(
+        "--com-propostas", action="store_true",
+        help="Mostra também os correlatos com Status 'proposto' (para revisar no build de teste)",
     )
     args = parser.parse_args()
 

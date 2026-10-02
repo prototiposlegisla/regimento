@@ -15,8 +15,9 @@ pytestmark = pytest.mark.integration
 
 class TestArticleCounts:
     def test_total_artigos_regulares(self, resolved_doc):
-        """645 artigos regulares (Regimento + Lei Orgânica + CF)."""
-        arts = [e for e in resolved_doc.elements if isinstance(e, ArticleBlock) and not e.is_adt]
+        """645 artigos regulares (Regimento + Lei Orgânica + CF), fora os precedentes."""
+        arts = [e for e in resolved_doc.elements
+                if isinstance(e, ArticleBlock) and not e.is_adt and e.law_prefix != "PREC"]
         assert len(arts) == 645
 
     def test_artigos_por_lei(self, resolved_doc):
@@ -198,9 +199,12 @@ class TestRemissoes:
         return [a.ref for r in remissoes.remissoes if r.origem.ref == origem and r.exibivel for a in r.alvos]
 
     def test_quantidade(self, remissoes):
-        """~155 citações a outros artigos viram gatilho (tolerância 10%)."""
-        n = sum(1 for r in remissoes.remissoes if r.exibivel)
+        """~155 citações entre artigos viram gatilho (tolerância 10%), fora as dos precedentes e a eles."""
+        prec = lambda r: r.origem.law == "PREC" or any(a.law == "PREC" for a in r.alvos)
+        n = sum(1 for r in remissoes.remissoes if r.exibivel and not prec(r))
         assert n == pytest.approx(155, rel=0.10), n
+        n_prec = sum(1 for r in remissoes.remissoes if r.exibivel and prec(r))
+        assert n_prec == pytest.approx(137, rel=0.10), n_prec
 
     def test_sem_avisos(self, remissoes):
         assert remissoes.avisos == []
@@ -266,3 +270,40 @@ class TestRemissoes:
     def test_dgt_que_citam_a_ec_103_existem_como_externas(self, remissoes):
         ext = [r for r in remissoes.remissoes if r.origem.ref == "LOM:ADT26,I"]
         assert ext and all(r.classe == "externa" for r in ext)
+
+
+# ── Precedentes Regimentais ─────────────────────────────────────────────
+
+class TestPrecedentes:
+    ORDEM = ["2/1993", "4/1993", "0/1997", "1/2001", "2/2001", "1/2002", "2/2002", "1/2004", "2/2004",
+             "3/2004", "1/2007", "1/2015", "1/2019", "2/2019", "1/2020", "2/2020", "1/2021", "2/2021",
+             "3/2021", "1/2026"]
+
+    @pytest.fixture(scope="class")
+    def precs(self, resolved_doc):
+        return [e for e in resolved_doc.elements if isinstance(e, ArticleBlock) and e.law_prefix == "PREC"]
+
+    def test_todos_em_ordem_cronologica(self, precs):
+        assert [p.art_number for p in precs] == self.ORDEM
+
+    def test_sintese_texto_e_fonte(self, precs):
+        assert all(p.summary and p.children for p in precs)
+        assert [p.art_number for p in precs if not p.source_url] == ["1/2026"]   # ainda fora do SAGAL
+
+    def test_vides_do_regimento_resolvem(self, resolved_doc):
+        from src.remissoes import detectar
+        res = detectar(resolved_doc)
+        vides = [r for r in res.remissoes if r.origem.law != "PREC" and any(a.law == "PREC" for a in r.alvos)]
+        assert len(vides) == 55 and all(r.exibivel for r in vides)
+        cit = res.citado_em()
+        for art in ("294", "295", "296"):     # o 1/2026 aparece nos três artigos que indica
+            assert "PREC:1/2026" in [o.ref for o in cit[("RI", art)]]
+
+    def test_redacoes_dadas_por_outro_precedente(self, precs):
+        """Compilados como no PLP: 1/2015 itens 6 e 13 (pelo 1/2019) e 2/2020 item 6 (pelo 3/2021)."""
+        by = {p.art_number: p for p in precs}
+        olds = {k: [c.full_text[:3] for c in by[k].children if c.is_old_version] for k in ("1/2015", "2/2020")}
+        assert olds == {"1/2015": ["6) ", "13)"], "2/2020": ["6 -"]}
+        notas = {k: sum("(Redação dada pelo Precedente Regimental nº " + n in c.full_text for c in by[k].children)
+                 for k, n in (("1/2015", "1/2019)"), ("2/2020", "3/2021)"))}
+        assert notas == {"1/2015": 2, "2/2020": 2}

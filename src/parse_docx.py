@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .models import (
     TextRun, DocumentUnit, SectionHeading, ArticleBlock,
-    ParsedDocument, UnitType, Footnote, FootnotePara,
+    ParsedDocument, UnitType, Footnote, FootnotePara, PREC, prec_label,
 )
 
 # ── Namespaces ──────────────────────────────────────────────────────────
@@ -60,6 +60,25 @@ RE_AMENDMENT = re.compile(
     re.IGNORECASE,
 )
 RE_NORMA = re.compile(r"^NORMA:\s*(.+)", re.IGNORECASE)
+# Seção dos precedentes ("NORMA: Precedentes Regimentais") e o título de cada um:
+# "PRECEDENTE REGIMENTAL Nº 2/2004", "SEM NÚMERO, DE 1997" e as variantes das
+# publicações oficiais ("nº 02/93", "01/2026", "N.º 2", "Nº 3, DE 8 DE OUTUBRO DE 2021")
+RE_NORMA_PREC = re.compile(r"^Precedentes\s+Regimentais", re.IGNORECASE)
+RE_PRECEDENTE = re.compile(
+    r"^PRECEDENTE\s+REGIMENTAL\s+(?:N\s*\.?\s*[º°o]?\.?\s*)?"
+    r"(?:(\d{1,3})\s*(?:/\s*(\d{4}|\d{2})(?!\d)|,?\s+DE\s+(?:\d{1,2}º?\s+DE\s+[A-ZÇa-zç]+\s+DE\s+)?(\d{4}))"
+    r"|\(?SEM\s+N[ÚU]MERO\)?,?\s+DE\s+(\d{4}))",
+    re.IGNORECASE,
+)
+RE_TITULO_PREC = re.compile(r"^\s*PRECEDENTE\s+REGIMENTAL\b", re.IGNORECASE)   # para avisar se não casar
+
+
+def prec_number(m: re.Match) -> str:
+    """"número/ano" de um título de precedente ("0/1997" = sem número)."""
+    ano = m.group(2) or m.group(3) or m.group(4)
+    if len(ano) == 2:
+        ano = str((2000 if int(ano) < 50 else 1900) + int(ano))
+    return f"{int(m.group(1)) if m.group(1) else 0}/{ano}"
 # Início da primeira nota de um dispositivo: "(Redação dada...", "(Revogado...", "(Vide..." etc.
 RE_NOTE_START = re.compile(
     r"\(\s*(?:Reda[çc][ãa]o|Inclu[ií]d|Inserid|Acrescentad|Revogad|Renumerad|Alterad|"
@@ -546,6 +565,8 @@ def _build_document(
     in_adt = False  # Ato das Disposições Transitórias
     current_article: ArticleBlock | None = None
     current_law_name: str = ""  # Set by NORMA: markers
+    in_prec = False  # in the Precedentes Regimentais section
+    prec_par = 0     # paragraph counter inside the current precedent (uids)
     uid_ctx: list[str] = ["", "", "", ""]  # [para, inciso, alinea, sub_alinea]
     seen_uids: set[str] = set()  # global dedup for collision detection
 
@@ -570,6 +591,7 @@ def _build_document(
             if norma_m:
                 current_law_name = norma_m.group(1).strip()
                 in_adt = False  # Reset: ADT is per-law, not global
+                in_prec = bool(RE_NORMA_PREC.match(current_law_name))
                 if current_article:
                     doc.elements.append(current_article)
                     current_article = None
@@ -582,6 +604,45 @@ def _build_document(
                 doc.elements.append(heading)
                 i += 1
                 continue
+
+        # Precedentes Regimentais: each title "PRECEDENTE REGIMENTAL Nº 2/2004" opens a
+        # card; the paragraphs after it are its text, as written (no provisions or headings)
+        if in_prec:
+            m_prec = RE_PRECEDENTE.match(cp.text)
+            if m_prec:
+                if current_article:
+                    doc.elements.append(current_article)
+                private_counter[0] = 0
+                art_num = prec_number(m_prec)
+                uid = f"art{PREC}{art_num.replace('/', '-')}"
+                seen_uids.add(uid)
+                prec_par = 0
+                current_article = ArticleBlock(
+                    art_number=art_num,
+                    summary=next((summaries_map[f] for f in cp.footnote_ids if f in summaries_map), ""),
+                    law_name=current_law_name,
+                    law_prefix=PREC,
+                    source_url=next((r.hyperlink_url for r in cp.runs if r.hyperlink_url), ""),
+                )
+                current_article.caput = DocumentUnit(
+                    unit_type=UnitType.ARTIGO,
+                    identifier=f"Precedente Regimental {prec_label(art_num)}",
+                    uid=uid,
+                    runs=cp.runs,
+                    footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
+                )
+            elif current_article is not None:
+                prec_par += 1
+                current_article.children.append(DocumentUnit(
+                    unit_type=UnitType.OTHER,
+                    identifier="",
+                    uid=f"{current_article.caput.uid}_{prec_par}",
+                    runs=cp.runs,
+                    is_old_version=cp.has_strike,
+                    footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
+                ))
+            i += 1
+            continue
 
         # Detect ADT marker
         if cp.is_centered and RE_ADT_MARKER.search(cp.text):

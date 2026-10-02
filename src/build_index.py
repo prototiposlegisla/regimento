@@ -6,8 +6,8 @@ import re
 from collections import defaultdict
 
 from .models import (
-    ArticleBlock, ParsedDocument, SectionHeading, UnitType,
-    SysIndexNode, sys_index_to_list,
+    PREC, ArticleBlock, ParsedDocument, SectionHeading, UnitType,
+    SysIndexLeaf, SysIndexNode, prec_label, sys_index_to_list,
 )
 
 
@@ -15,12 +15,34 @@ def build_systematic_index(doc: ParsedDocument) -> list[dict]:
     """Gera o índice sistemático como lista JSON-friendly.
 
     Estrutura: TÍTULO > CAPÍTULO > SEÇÃO/SUBSEÇÃO (sem artigos).
-    Normas não-Regimento aparecem só pelo nome, ao final.
+    Normas não-Regimento aparecem só pelo nome, ao final. Os precedentes
+    regimentais, que não têm títulos, aparecem um a um na norma deles.
     """
     nodes = _build_tree(doc)
     direct_articles = _collect_direct_articles(doc)
     _annotate_ranges(nodes, direct_articles)
+    _add_precedents(nodes, doc)
     return sys_index_to_list(nodes)
+
+
+def _add_precedents(nodes: list[SysIndexNode], doc: ParsedDocument) -> None:
+    """Uma folha por precedente ("nº 2/2004 — síntese"), em ordem, no nó da norma."""
+    by_norma: dict[str, list[ArticleBlock]] = defaultdict(list)
+    norma = ""
+    for el in doc.elements:
+        if isinstance(el, SectionHeading) and el.data_section.startswith("norma"):
+            norma = el.data_section
+        elif isinstance(el, ArticleBlock) and el.law_prefix == PREC and norma:
+            by_norma[norma].append(el)
+    for node in nodes:
+        precs = by_norma.get(node.section_id)
+        if precs:
+            node.art_range = ""
+            node.children = [
+                SysIndexLeaf(label=prec_label(a.art_number) + (f" — {a.summary}" if a.summary else ""),
+                             art=a.art_number, law=PREC)
+                for a in precs
+            ]
 
 
 def _build_tree(doc: ParsedDocument) -> list[SysIndexNode]:

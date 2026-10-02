@@ -12,8 +12,8 @@ from .remissoes import EXIBIVEIS, law_of
 if TYPE_CHECKING:
     from .remissoes import Remissao, Resultado
 from .models import (
-    ArticleBlock, DocumentUnit, Footnote, FootnotePara,
-    ParsedDocument, SectionHeading, TextRun, UnitType, unit_path,
+    PREC, ArticleBlock, DocumentUnit, Footnote, FootnotePara,
+    ParsedDocument, SectionHeading, TextRun, UnitType, prec_label, unit_path,
 )
 
 
@@ -62,6 +62,8 @@ class HTMLRenderer:
         return "nivel-subsecao"
 
     def _render_article(self, art: ArticleBlock) -> str:
+        if art.law_prefix == PREC:
+            return self._render_precedent(art)
         art_num = html.escape(art.art_number)
         revoked_cls = " revoked" if art.is_revoked else ""
         law_attr = ""
@@ -115,18 +117,77 @@ class HTMLRenderer:
                     art_number=art.art_number,
                 ))
 
-        # Where this article is cited (labels via CSS, out of the searchable text)
-        cited = self._cited_by.get((law_of(art), art.art_number))
-        if cited:
-            items = "".join(
-                f'<span class="rem rem-back" tabindex="0" role="button" data-ref="{html.escape(o.ref)}"'
-                f' data-label="{html.escape(o.rotulo)}"></span>'
-                for o in cited
-            )
-            parts.append(f'    <div class="rem-backlinks" data-label="Citado em:">{items}</div>')
+        parts.extend(self._render_backlinks(art))
 
         parts.append("  </div>")
         return "\n".join(parts)
+
+    def _render_backlinks(self, art: ArticleBlock) -> list[str]:
+        """Where this article is cited (labels via CSS, out of the searchable text).
+
+        The precedents that cite an article of the Regimento come in a line of their own.
+        """
+        cited = self._cited_by.get((law_of(art), art.art_number), [])
+        precs = [o for o in cited if o.law == PREC] if art.law_prefix != PREC else []
+        others = [o for o in cited if o not in precs]
+
+        def items(origins, label):
+            return "".join(
+                f'<span class="rem rem-back" tabindex="0" role="button" data-ref="{html.escape(o.ref)}"'
+                f' data-label="{html.escape(label(o))}"></span>'
+                for o in origins
+            )
+        out = []
+        if others:
+            out.append(f'    <div class="rem-backlinks" data-label="Citado em:">{items(others, lambda o: o.rotulo)}</div>')
+        if precs:
+            out.append(f'    <div class="rem-backlinks rem-precs" data-label="Precedentes regimentais:">'
+                       f'{items(precs, lambda o: prec_label(o.art))}</div>')
+        return out
+
+    def _render_precedent(self, art: ArticleBlock) -> str:
+        """Card of a Precedente Regimental: its title, then its text as written, with the
+        citations it makes (to the Regimento, by default) as remissão triggers."""
+        art_num = html.escape(art.art_number)
+        src = f' data-src="{html.escape(art.source_url)}"' if art.source_url else ""
+        parts = [
+            f'  <div class="card card-artigo card-prec" data-art="{art_num}" data-law="{PREC}"{src}>',
+            f'    <span class="art-compact-label">Precedente {html.escape(prec_label(art.art_number))}</span>',
+        ]
+        if art.summary:
+            parts.append(f'    <span class="art-summary">{html.escape(art.summary)}</span>')
+        parts.append(f'    <span class="law-badge">{PREC}</span>')
+        cap = art.caput
+        parts.append(f"    <p>{self._render_unit_id(cap)}{self._footnote_refs(cap)}</p>{self._footnote_boxes(cap)}")
+        for child in art.children:
+            # the item number ("6)", "6 -", "6.") pairs a struck wording with the new one (diff)
+            m = re.match(r"\s*(\d{1,3})\s*[).\-–—]", child.full_text)
+            item = f' data-item="{m.group(1)}"' if m else ""
+            if child.is_old_version:
+                old = self._render_old_version(child)
+                parts.append(old.replace('<p class="old-version"', f'<p class="old-version"{item}', 1))
+                continue
+            marks = self._rem_by_unit.get(id(child), ())
+            body = (self._render_runs_with_marks(child.runs, 0, marks) if marks
+                    else self._render_runs_from(child.runs, 0))
+            parts.append(f'    <p class="prec-para"{item}>{body}{self._footnote_refs(child)}</p>'
+                         f'{self._footnote_boxes(child)}')
+        parts.extend(self._render_backlinks(art))
+        parts.append("  </div>")
+        return "\n".join(parts)
+
+    @staticmethod
+    def _footnote_refs(unit: DocumentUnit) -> str:
+        """Superscript references to the unit's footnotes, inline."""
+        out = ""
+        for fn in unit.footnotes:
+            note_id = f"b{fn.number}" if fn.is_private else str(fn.number)
+            out += f'<sup class="footnote-ref" data-note="{note_id}">[{note_id}]</sup>'
+        return out
+
+    def _footnote_boxes(self, unit: DocumentUnit) -> str:
+        """Footnote content boxes (hidden by default, toggled by click)."""
+        return "".join("\n" + self._render_footnote(fn) for fn in unit.footnotes)
 
     def _update_path_ctx(
         self, unit: DocumentUnit, ctx: list[str],
@@ -186,20 +247,8 @@ class HTMLRenderer:
         inner += self._render_runs_after_identifier(unit, self._rem_by_unit.get(id(unit), ()))
         inner += self._render_correlatos(unit)
 
-        # Insert footnote superscript references inline
-        for fn in unit.footnotes:
-            note_id = f"b{fn.number}" if fn.is_private else str(fn.number)
-            inner += (
-                f'<sup class="footnote-ref" data-note="{note_id}">'
-                f"[{note_id}]</sup>"
-            )
-
-        # Footnote content boxes (hidden by default, toggled by click)
-        footnote_html = ""
-        for fn in unit.footnotes:
-            footnote_html += "\n" + self._render_footnote(fn)
-
-        return f"    <p{cls_style}>{inner}</p>{footnote_html}"
+        inner += self._footnote_refs(unit)
+        return f"    <p{cls_style}>{inner}</p>{self._footnote_boxes(unit)}"
 
     def _render_unit_id(self, unit: DocumentUnit, path: str = "") -> str:
         uid = html.escape(unit.uid)
@@ -278,11 +327,13 @@ class HTMLRenderer:
                     open_mark = spans[mi]
                     parts.append(self._open_mark(open_mark))
                 text = run.text[a - r_start:b - r_start]
-                # a link cut by a citation: its leftover " " or ";" outside stays plain text
+                # a link cut by a citation: its leftover " ", ";", "(Vide " or "(Redação dada pelo "
+                # outside stays plain text
                 split = (a > r_start or b < r_end) and open_mark is None
                 parts.append(self._wrap_run(html.escape(text), run,
                                             link=not (split and re.fullmatch(
-                                                r"[\s\xa0.,;:()–—-]*(?:(?:no|na|nos|nas|do|da|dos|das|ao|aos|e)"
+                                                r"[\s\xa0.,;:()–—-]*(?:(?:no|na|nos|nas|do|da|dos|das|ao|aos|e|[Vv]ide"
+                                                r"|Reda[çc][ãa]o\s+dada\s+pel[oa])"
                                                 r"[\s\xa0]*)?", text)),
                                             in_mark=open_mark is not None))
                 if open_mark is not None and open_mark.end == b:

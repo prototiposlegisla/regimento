@@ -392,6 +392,9 @@ body {
 .card-artigo[data-law] > .old-version:first-of-type {
   padding-right: calc(40px * var(--zoom-scale));
 }
+/* Precedentes Regimentais: the title, then the text as written (no provisions) */
+.card-prec .law-badge { background: #8e5a2b; }
+.card-prec .prec-para { margin-top: calc(6px * var(--zoom-scale)); }
 
 /* Compact-mode label (hidden by default) */
 .art-compact-label { display: none; }
@@ -1513,6 +1516,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 .rem-head .rem-law.LOM { background: #fdebd0; color: #7e5109; }
 .rem-head .rem-law.CF { background: #d5f5e3; color: #145a32; }
+.rem-head .rem-law.PREC { background: #f6ddcc; color: #6e2c00; }
 .rem-head .rem-sint { font-weight: 400; color: #566573; }
 .rem-head .rem-revoked {
   font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px;

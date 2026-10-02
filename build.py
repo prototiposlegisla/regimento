@@ -152,7 +152,9 @@ def _build_once(
 
     headings = [e for e in doc.elements if hasattr(e, "level")]
     articles = [e for e in doc.elements if hasattr(e, "art_number")]
-    print(f"      → {len(headings)} headings, {len(articles)} artigos")
+    n_prec = sum(1 for e in articles if e.law_prefix == "PREC")
+    print(f"      → {len(headings)} headings, {len(articles) - n_prec} artigos"
+          + (f", {n_prec} precedentes regimentais" if n_prec else ""))
 
     # ── 1b. Validação do DOCX ─────────────────────────────────────────
     from validate import get_paragraphs as _get_paras, run_checks as _run_checks, CODE_LABELS
@@ -282,7 +284,7 @@ def _build_once(
     if law_mapping:
         from src.models import ArticleBlock as _AB
         for el in doc.elements:
-            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping:
+            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping and not el.law_prefix:
                 el.law_prefix = law_mapping[el.law_name]
                 lp = el.law_prefix
                 if el.caput:
@@ -500,7 +502,7 @@ def _build_markdown(
         from src.models import ArticleBlock as _AB
 
         for el in doc.elements:
-            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping:
+            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping and not el.law_prefix:
                 el.law_prefix = law_mapping[el.law_name]
 
     # ── 4. Parse referências ──────────────────────────────────────

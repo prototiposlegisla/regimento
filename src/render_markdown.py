@@ -5,8 +5,8 @@ from __future__ import annotations
 import re
 
 from .models import (
-    ArticleBlock, DocumentUnit, Footnote, FootnotePara,
-    ParsedDocument, SectionHeading, TextRun, UnitType,
+    PREC, ArticleBlock, DocumentUnit, Footnote, FootnotePara,
+    ParsedDocument, SectionHeading, TextRun, UnitType, prec_label,
 )
 from .remissoes import EXIBIVEIS, law_of
 
@@ -46,7 +46,7 @@ class MarkdownRenderer:
                         g.append(a)
         items = []
         for (law, art), alvos in groups.items():
-            head = alvos[0].rotulo.split(",")[0]
+            head = alvos[0].rotulo if law == PREC else alvos[0].rotulo.split(",")[0]
             paths = [a.path.replace("§ú", "parágrafo único").replace(",", ", ") for a in alvos if a.path]
             tail = (", ".join(paths[:-1]) + " e " + paths[-1]) if len(paths) > 1 else "".join(paths)
             whole = any(not a.path for a in alvos)
@@ -86,7 +86,28 @@ class MarkdownRenderer:
             text += " — " + h.subtitle
         return f"{prefix} {text}"
 
+    def _render_precedent(self, art: ArticleBlock) -> str:
+        """Precedente regimental: título, síntese e o texto corrido, com as remissões."""
+        heading = f"#### Precedente Regimental {prec_label(art.art_number)}"
+        if art.summary:
+            heading += f" — {art.summary}"
+        parts = [heading]
+        for fn in art.caput.footnotes:
+            parts.append(self._render_footnote(fn))
+        for child in art.children:
+            if child.is_old_version:
+                parts.append(self._render_old_version(child))
+                continue
+            parts.append(self._render_runs(child.runs).strip() + self._remissoes_suffix(child))
+            for fn in child.footnotes:
+                parts.append(self._render_footnote(fn))
+        if art.source_url:
+            parts.append(f"*Texto oficial: {art.source_url}*")
+        return "\n\n".join(parts)
+
     def _render_article(self, art: ArticleBlock) -> str:
+        if art.law_prefix == PREC:
+            return self._render_precedent(art)
         parts: list[str] = []
 
         # H4 heading with article number and optional summary

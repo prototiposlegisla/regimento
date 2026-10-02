@@ -8,7 +8,8 @@
 #   [[definir]]  diz para onde aponta uma citação (troca a detectada ou acrescenta).
 #
 # origem: o dispositivo onde está a citação, no formato do site:
-#         "262" (caput do art. 262 do Regimento), "18,VI", "LOM:42,§ 7º", "LOM:ADT29"
+#         "262" (caput do art. 262 do Regimento), "18,VI", "LOM:42,§ 7º", "LOM:ADT29",
+#         "PREC:1/2002" (um precedente regimental: o trecho é procurado no texto todo dele)
 # trecho: o texto da citação, como está no dispositivo
 # alvos:  os dispositivos citados, no mesmo formato da origem
 #
@@ -25,3 +26,9 @@ origem = "LOM:ADT29"
 trecho = "art. 26"
 alvos = ["LOM:ADT26"]
 motivo = "nas Disposições Gerais e Transitórias, 'art. 26' é o art. 26 das próprias DGT (Emenda 41/2021), não o art. 26 da LOM"
+
+[[definir]]
+origem = "PREC:1/2002"
+trecho = "344 do Regimento Interno"
+alvos = ["344"]
+motivo = "'artigos 140 da Lei Orgânica do Município e 344 do Regimento Interno': o segundo artigo vem depois do qualificador da LOM"

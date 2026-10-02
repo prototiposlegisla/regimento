@@ -13,6 +13,11 @@ Ajustes manuais da detecção ficam em remissoes_excecoes.toml.
 As implícitas (dispositivos de normas diferentes que tratam da mesma coisa sem se
 citarem: mesma regra, detalhamento, fundamento ou divergência) vêm da planilha
 remissoes.xlsx, revisada à mão; o site mostra um selo nos dois lados.
+
+Os Precedentes Regimentais (norma PREC, artigo "número/ano") entram dos dois lados:
+as citações a eles ("(Vide Precedente Regimental nº 02/2004)", também nas notas) e,
+no texto deles, as citações aos dispositivos do Regimento, que é a norma padrão ali
+("Dispositivos regimentais indicados: Artigos 13; 16; 157 a 162").
 """
 
 from __future__ import annotations
@@ -23,7 +28,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from .models import ArticleBlock, DocumentUnit, ParsedDocument, unit_path
+from .models import PREC, ArticleBlock, DocumentUnit, ParsedDocument, prec_label, unit_path
 
 LAW_SHORT = {"Regimento Interno": "RI", "Lei Orgânica": "LOM", "Constituição Federal": "CF"}
 
@@ -40,8 +45,8 @@ EXIBIVEIS = (RESOLVIDO, REVOGADO, TACHADO)
 
 @dataclass
 class Alvo:
-    law: str     # "RI", "LOM", "CF"
-    art: str     # "369", "42", "ADT29"
+    law: str     # "RI", "LOM", "CF", "PREC"
+    art: str     # "369", "42", "ADT29", "2/2004" (precedente)
     path: str    # "" (artigo inteiro), "§ 7º", "II,a"
     status: str = RESOLVIDO
 
@@ -52,7 +57,9 @@ class Alvo:
 
     @property
     def rotulo(self) -> str:
-        """Rótulo para leitura: "Art. 369", "LOM art. 42, § 7º"."""
+        """Rótulo para leitura: "Art. 369", "LOM art. 42, § 7º", "Precedente nº 2/2004"."""
+        if self.law == PREC:
+            return f"Precedente {prec_label(self.art)}"
         a = f"art. {self.art[3:]} ADT" if self.art.startswith("ADT") else f"art. {self.art}"
         p = self.path.replace("§ú", "parágrafo único").replace(",", ", ")
         return (f"{self.law} " if self.law != "RI" else "") + a + (f", {p}" if p else "")
@@ -210,12 +217,25 @@ LEVEL = {"ART": 0, "PAR": 1, "PU": 1, "CAPUT": 1, "INC": 2, "ALI": 3, "ITEM": 4}
 RELATIVE_WORDS = ("anterior", "seguinte", "precedente", "antecedente")
 
 
-def _tokenize(text):
+def _tokenize(text, prec=False):
+    """prec: texto de precedente, que lista artigos com números soltos depois de ";" ou ":"
+    ("Artigos 13; 16; 157 a 162; e 185") e chama a alínea de "letra"."""
     toks = []
     for m in TOKEN_RE.finditer(text):
         kind, val = m.lastgroup, m.group(0)
         if kind == "WORD" and len(val) == 1 and "a" <= val <= "z":
             kind = "LETTER" if val not in ("e", "o", "a") else "WORD"
+        if prec and kind == "WORD" and val.lower() in ("letra", "letras"):
+            kind = "ALI"
+        if prec and kind == "WORD" and val.lower() == "único" and toks and toks[-1][1] == "§":
+            toks[-1][:] = ["PU", toks[-1][1] + text[toks[-1][3]:m.end()], toks[-1][2], m.end()]   # "§ único"
+            continue
+        if prec and kind == "NUM" and toks:
+            k = len(toks) - 1
+            if toks[k][1] == "e" and k > 0:
+                k -= 1
+            if toks[k][1] in (";", ":"):
+                toks.append(["ART", "", m.start(), m.start()])   # "artigo" implícito
         toks.append([kind, val, m.start(), m.end()])
     return toks
 
@@ -378,9 +398,12 @@ def _parse_group(toks, i):
     return None, i + 1
 
 
-def _find_clusters(text):
-    """Citações: cada uma é uma lista de (grupo, palavras de ligação antes dele)."""
-    toks = _tokenize(text)
+def _find_clusters(text, prec=False):
+    """Citações: cada uma é uma lista de (grupo, palavras de ligação antes dele).
+
+    prec: cada trecho entre ";" é uma citação (as listas de dispositivos dos precedentes).
+    """
+    toks = _tokenize(text, prec)
     clusters = []
     i = 0
     while i < len(toks):
@@ -400,8 +423,10 @@ def _find_clusters(text):
             ):
                 links.append(toks[k][1].lower())
                 k += 1
-                if len(links) > 4:
+                if len(links) > 4 or (prec and links[-1] == ";"):
                     break
+            if prec and ";" in links:
+                break
             # romano solto depois de vírgula = inciso ("artigo 93, III")
             if k < len(toks) and toks[k][0] == "ROMAN" and _roman_ok(toks[k][1]) and links and links[0] == ",":
                 vals, j2, end = _parse_value_list(toks, k, "ROMAN")
@@ -539,13 +564,19 @@ _QUALIFIERS = [
     ("EXT", r"do\s+(?:referido|citado|mesmo|aludido)\s+artigo"),
 ]
 _QUALIFIERS = [(k, re.compile(p, re.I)) for k, p in _QUALIFIERS]
+# Só nos precedentes: o Regimento citado pela resolução que o aprovou, o ADT dele e a "LOM"
+_QUALIFIERS_PREC = [(k, re.compile(p, re.I)) for k, p in [
+    ("RI", r"(?:da|na)\s+Resolu[çc][ãa]o\s*(?:n[º°.]?\s*)?2,?\s+de\s+26\s+de\s+abril\s+de\s+1991"),
+    ("RIADT", r"(?:do|no|ao)\s+Ato\s+das\s+Disposi[çc][õo]es\s+Transit[óo]rias"),
+    ("LOM", r"(?:da|na)\s+LOM\b"),
+]]
 
 
-def _find_qualifier(text, pos):
+def _find_qualifier(text, pos, prec=False):
     """Qualificador logo depois de pos (aceita vírgula, 'todos', 'ambos')."""
     m = re.match(r"[\s,]*(?:(?:todos|ambos|todas)\s+)?", text[pos:])
     p = pos + m.end()
-    for k, rx in _QUALIFIERS:
+    for k, rx in (_QUALIFIERS_PREC + _QUALIFIERS if prec else _QUALIFIERS):
         mm = rx.match(text, p)
         if mm:
             return k, mm.end()
@@ -601,6 +632,11 @@ class _Corpus:
                 self.units[(law, art.art_number)].append((art.caput, ""))
             ctx, all_ctx = ["", "", "", ""], ["", "", "", ""]
             for c in art.children:
+                if law == PREC:
+                    # texto corrido, sem dispositivos: entra na detecção, sem endereço próprio
+                    if not c.is_old_version:
+                        self.units[(law, art.art_number)].append((c, ""))
+                    continue
                 all_path = unit_path(c, all_ctx)
                 if c.is_old_version:
                     if all_path:
@@ -653,21 +689,52 @@ def _link_norma(url: Optional[str]) -> Optional[str]:
     return "OUTRA"
 
 
+# Citação de precedente regimental: "Precedente Regimental nº 02/2004", "nº 01 de 2015",
+# "nº 02, de 24 de junho de 2020", "02/19", "No 1/2001", "sem número, de 1997", "Precedente Nº 03/04"
+RE_CIT_PREC = re.compile(
+    r"\b(?:Precedente|Procedente)\s+(?:Regimental\s+)?(?:n\s*[º°o.]\s*)?"
+    r"(?:(?P<n>\d{1,3})\s*(?:/\s*(?P<a1>\d{4}|\d{2})(?!\d)"
+    r"|,?\s+de\s+(?:\d{1,2}\s+de\s+[a-zç]+\s+de\s+)?(?P<a2>\d{4}))"
+    r"|sem\s+n[úu]mero,?\s+de\s+(?P<a3>\d{4}))",
+    re.IGNORECASE,
+)
+
+
+def _detect_precedentes(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: str) -> list[Remissao]:
+    """Citações de precedentes regimentais, inclusive nas notas ("(Vide Precedente Regimental nº 02/2004)")."""
+    law = law_of(art)
+    origem = Alvo(law, art.art_number, path)
+    text = "".join(" " * len(r.text) if r.strike else r.text for r in unit.runs)
+    found: list[Remissao] = []
+    for m in RE_CIT_PREC.finditer(text):
+        ano = m.group("a1") or m.group("a2") or m.group("a3")
+        if len(ano) == 2:
+            ano = str((2000 if int(ano) < 50 else 1900) + int(ano))
+        num = str(int(m.group("n"))) if m.group("n") else "0"
+        alvo = corpus.resolve(PREC, f"{num}/{ano}", "")
+        found.append(Remissao(unit=unit, origem=origem, start=m.start(), end=m.end(),
+                              classe="interna" if law == PREC else "cruzada", alvos=[alvo],
+                              url=_link_in(unit, m.start(), m.end()),
+                              mesmo_artigo=(law, art.art_number) == (PREC, alvo.art)))
+    return found
+
+
 def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: str) -> list[Remissao]:
     law = law_of(art)
     origem = Alvo(law, art.art_number, path)
     work = _working_text(unit)
     in_adt = art.art_number.startswith("ADT")
+    prec = law == PREC   # no precedente, "artigo 13" é do Regimento
     found: list[Remissao] = []
 
     clusters = []
-    for cl in _find_clusters(work):
+    for cl in _find_clusters(work, prec):
         cl_start = cl[0][0]["start"]
         glued = re.match(r"(?i)[dn][oa]s?(?=art)", work[cl_start:cl_start + 8])
         if glued:
             cl_start += glued.end()
         cl_end = max(g["end"] for g, _ in cl)
-        qkind, qend = _find_qualifier(work, cl_end)
+        qkind, qend = _find_qualifier(work, cl_end, prec)
         todos = bool(qkind) and bool(re.match(r"[\s,]*(?:todos|todas|ambos)\s", work[cl_end:]))
         clusters.append([cl, cl_start, cl_end, qkind, qend, todos, False])
     # "artigo 7º, incisos ..., bem como ... artigos 40 e 41, todos da Constituição": herda o qualificador
@@ -692,7 +759,8 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
             special = r.get("special")
             rpath = r["path"]
             target_art = r["art"]
-            if target_art is None and special is None and qkind not in (None, "REL_ART", "RI", "LOM", "CF", "LOMADT"):
+            if target_art is None and special is None and qkind not in (None, "REL_ART", "RI", "LOM", "CF", "LOMADT",
+                                                                        "RIADT"):
                 rem.classe = "externa"          # "inciso II do referido artigo" (de outra norma)
                 continue
             if target_art is None and special is None:
@@ -705,6 +773,8 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
                 rem.alvos.append(alvo)
                 continue
             if special in RELATIVE_WORDS:
+                if prec:
+                    continue                    # "artigo anterior" do próprio precedente (itens)
                 # "artigo anterior" / "artigo seguinte"
                 rem.classe = "relativa"
                 order = corpus.order[law]
@@ -716,9 +786,14 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
                     rem.alvos.append(Alvo(law, "?", "", NAO_RESOLVIDO))
                 continue
             if qkind in (None, "REL_ART"):
-                target_law = law
+                target_law = "RI" if prec else law
             elif qkind in ("RI", "LOM", "CF"):
                 target_law = qkind
+            elif qkind == "RIADT":
+                # "Artigos 183-A e 4D do Ato das Disposições Transitórias": o do ADT, se existe
+                target_law = "RI"
+                if not target_art.startswith("ADT") and ("RI", "ADT" + target_art) in corpus.arts:
+                    target_art = "ADT" + target_art
             elif qkind == "LOMADT":
                 target_law = "LOM"
                 target_art = target_art if target_art.startswith("ADT") else "ADT" + target_art
@@ -821,18 +896,25 @@ def _aplicar_excecoes(corpus: _Corpus, res: Resultado, exc: dict) -> None:
 
     def localizar(item, tipo):
         key = _parse_ref(item.get("origem", ""))
-        unit = by_origin.get(key)
+        if key[0] == PREC and not key[2]:
+            # precedente: o trecho é procurado em todos os parágrafos dele
+            cands = [u for u, _ in corpus.units.get((key[0], key[1]), [])]
+        else:
+            cands = [by_origin[key]] if key in by_origin else []
         trecho = item.get("trecho", "")
-        if unit is None:
+        if not cands:
             res.avisos.append((f"Exceção ({tipo}) com origem inexistente: {item.get('origem')!r}", "remissoes_excecoes.toml"))
             return None, None, None
         rx = r"[\s\xa0]+".join(map(re.escape, trecho.split()))
-        m = re.search(rx, _working_text(unit)) if trecho.strip() else None
-        if m is None:
-            res.avisos.append((f"Exceção ({tipo}): trecho {trecho!r} não encontrado em {item.get('origem')}",
-                               "remissoes_excecoes.toml"))
-            return None, None, None
-        return key, unit, (m.start(), m.end())
+        for unit in cands:
+            # also in the notes, where the citations to precedents are ("(Vide Precedente ...)")
+            for text in (_working_text(unit), "".join(" " * len(r.text) if r.strike else r.text for r in unit.runs)):
+                m = re.search(rx, text) if trecho.strip() else None
+                if m is not None:
+                    return key, unit, (m.start(), m.end())
+        res.avisos.append((f"Exceção ({tipo}): trecho {trecho!r} não encontrado em {item.get('origem')}",
+                           "remissoes_excecoes.toml"))
+        return None, None, None
 
     for item in exc.get("ignorar", []):
         key, unit, span = localizar(item, "ignorar")
@@ -874,6 +956,7 @@ def detectar(doc: ParsedDocument, excecoes: Optional[dict] = None, implicitas: O
             if unit.is_old_version or unit.is_revoked:
                 continue
             res.remissoes.extend(_detect_unit(corpus, art, unit, path))
+            res.remissoes.extend(_detect_precedentes(corpus, art, unit, path))
     if excecoes:
         _aplicar_excecoes(corpus, res, excecoes)
     res.remissoes.sort(key=lambda r: (corpus.order[r.origem.law].index(r.origem.art)
@@ -883,8 +966,9 @@ def detectar(doc: ParsedDocument, excecoes: Optional[dict] = None, implicitas: O
             continue
         for a in r.alvos:
             if a.status not in EXIBIVEIS:
+                status = "precedente inexistente" if a.law == PREC else a.status.replace("_", " ")
                 res.avisos.append((
-                    f"Remissão não resolvida ({a.status.replace('_', ' ')}): \"{_norm_space(r.trecho).strip()}\" "
+                    f"Remissão não resolvida ({status}): \"{_norm_space(r.trecho).strip()}\" "
                     f"→ {a.rotulo}",
                     r.origem.rotulo,
                 ))

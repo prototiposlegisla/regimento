@@ -110,6 +110,7 @@ def get_paragraphs(path: str | Path | None = None) -> list[dict]:
 def run_checks(paras: list[dict]) -> list[dict]:
     issues: list[dict] = []
     current_art: str = ""  # e.g. "183-A"
+    in_prec = False  # Precedentes Regimentais: free text, not provisions
 
     for p in paras:
         text = p["text"]
@@ -117,6 +118,11 @@ def run_checks(paras: list[dict]) -> list[dict]:
         indent = p["indent"]
 
         if not text or text in ("\xa0", ""):
+            continue
+
+        if centered and re.match(r"NORMA:", text):
+            in_prec = bool(re.match(r"NORMA:\s*Precedentes\s+Regimentais", text, re.IGNORECASE))
+        if in_prec:
             continue
 
         # Atualizar contexto de artigo (mesmo para detectar erros antes de classificar)

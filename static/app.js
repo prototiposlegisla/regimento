@@ -113,6 +113,21 @@
     return '';
   }
 
+  // Precedentes Regimentais: article cards with data-law="PREC", numbered
+  // "number/year" ("2/2004"; "0/1997" = sem número)
+  function isPrecCard(card) {
+    return card.dataset.law === 'PREC';
+  }
+  function precLabel(art) {
+    const [n, y] = art.split('/');
+    return n === '0' ? 'sem número, de ' + y : 'nº ' + n + '/' + y;
+  }
+  // "LOM Art. 42" / "Precedente nº 2/2004"
+  function cardRefLabel(card) {
+    if (isPrecCard(card)) return 'Precedente ' + precLabel(card.dataset.art);
+    return (card.dataset.law ? card.dataset.law + ' ' : '') + 'Art. ' + card.dataset.art;
+  }
+
   // Programmatic smooth scrolls across very long distances animate for ~1.5s
   // through 100k+ px of content and stall slow machines; jump instead.
   const FAR_SCROLL_SCREENS = 3;
@@ -343,7 +358,8 @@
     const artSpan = document.createElement('span');
     artSpan.className = 'bc-item bc-article';
     const lawPrefix = card.dataset.law;
-    artSpan.textContent = (lawPrefix ? lawPrefix + '\u00a0' : '') + card.dataset.art;
+    artSpan.textContent = isPrecCard(card) ? precLabel(card.dataset.art)
+      : (lawPrefix ? lawPrefix + '\u00a0' : '') + card.dataset.art;
     artSpan.addEventListener('click', (e) => {
       e.stopPropagation();
       const top = card.getBoundingClientRect().top + window.scrollY;
@@ -1170,9 +1186,13 @@
         if (!noise) hits++;
       }
     }
+    const nPrec = searchMatches.filter(isPrecCard).length;
+    const nArt = searchMatches.length - nPrec;
+    const counts = [];
+    if (nArt) counts.push(nArt + (nArt === 1 ? ' artigo' : ' artigos'));
+    if (nPrec) counts.push(nPrec + (nPrec === 1 ? ' precedente' : ' precedentes'));
     $resultsSummary.textContent = searchMatches.length
-      ? searchMatches.length + (searchMatches.length === 1 ? ' artigo' : ' artigos')
-        + ' · ' + hits + (hits === 1 ? ' ocorrência' : ' ocorrências')
+      ? counts.join(', ') + ' · ' + hits + (hits === 1 ? ' ocorrência' : ' ocorrências')
       : '';
     if (!searchMatches.length) {
       const empty = document.createElement('div');
@@ -1243,7 +1263,7 @@
       tag.innerHTML = matched ? '<mark>' + escapeHtml(lawPrefix) + '</mark>' : escapeHtml(lawPrefix);
       head.appendChild(tag);
     }
-    head.appendChild(document.createTextNode('Art. ' + card.dataset.art));
+    head.appendChild(document.createTextNode(isPrecCard(card) ? precLabel(card.dataset.art) : 'Art. ' + card.dataset.art));
     const summary = card.querySelector('.art-summary');
     if (summary) {
       const sum = document.createElement('span');
@@ -1321,6 +1341,7 @@
 
   function unitLabel(unit) {
     if (unit.classList.contains('footnote-box')) return 'Nota ' + (unit.dataset.note || '');
+    if (unit.closest('.card-prec') && !unit.classList.contains('old-version')) return '';  // running text
     if (unit.classList.contains('old-version')) {
       return 'redação anterior' + (unit.dataset.ident ? ' · ' + unit.dataset.ident : '');
     }
@@ -1679,7 +1700,9 @@
       let label = el ? el.textContent.trim() : marker.uid;
       if (el) {
         const card = el.closest('.card-artigo');
-        if (card) {
+        if (card && isPrecCard(card)) {
+          label = 'Prec.' + card.dataset.art;
+        } else if (card) {
           const lawPrefix = card.dataset.law;
           const pre = lawPrefix ? lawPrefix + ':' : '';
           if (el.dataset.path) {
@@ -1930,7 +1953,7 @@
       const lawPrefix = card.dataset.law;
       const key = lawPrefix ? lawPrefix + ':' + artNum : artNum;
       const summary = SUMMARIES_MAP[key] || '';
-      const prefix = (lawPrefix ? lawPrefix + ' ' : '') + 'Art. ' + artNum;
+      const prefix = cardRefLabel(card);
       const chip = document.createElement('div');
       chip.className = 'mm-chip';
       chip.style.background = MINIMAP_COLORS.article.bg;
@@ -1956,6 +1979,11 @@
       // Use element identity for old-version (no data-path), path string otherwise
       const uid = p.querySelector('.unit-id');
       const key = oldVer ? 'old:' + (p.dataset.ident || '') + ':' + p.textContent.slice(0, 40) : (uid ? (uid.dataset.path || '') : '');
+      if (p.classList.contains('prec-para')) {
+        // a precedent's running text: each paragraph is its own target
+        if (!seenPaths.has(p)) { seenPaths.add(p); matchedPaths.push({ path: '', p, isOld: false, prec: true }); }
+        continue;
+      }
       if (!seenPaths.has(key)) {
         seenPaths.add(key);
         matchedPaths.push({ path: uid ? (uid.dataset.path || '') : '', p, isOld: !!oldVer });
@@ -1979,7 +2007,14 @@
     // Build chain of ancestor + target chips, deduplicating
     const renderedPaths = new Set();
 
-    for (const { path, p, isOld } of matchedPaths) {
+    for (const { path, p, isOld, prec } of matchedPaths) {
+      if (prec) {
+        const chip = document.createElement('div');
+        chip.className = 'mtt-chip mtt-target';
+        chip.innerHTML = extractTextWithMarks(p);
+        $searchTickTooltip.appendChild(chip);
+        continue;
+      }
       // Old-version paragraphs: show caput ancestor, then strikethrough chip
       if (isOld) {
         // Render caput as ancestor if not already shown
@@ -2189,9 +2224,15 @@
   }
   function remArtLabel(art) { return art.startsWith('ADT') ? art.slice(3) + ' ADT' : art; }
   function remRefLabel(r) {
+    if (r.law === 'PREC') return 'Precedente ' + precLabel(r.art);
     return (r.law !== 'RI' ? r.law + ' ' : '') + 'Art. ' + remArtLabel(r.art) + (r.path ? ', ' + remFmtPath(r.path) : '');
   }
   function remSourceUrl(g) {
+    if (g.law === 'PREC') {
+      // each precedent has its own page (the link of its title in the DOCX)
+      const card = remCard(g);
+      return (card && card.dataset.src) || null;
+    }
     const base = REM_SOURCES[g.law];
     if (!base) return null;
     if (!g.art.startsWith('ADT')) return base + '#art' + g.art.replace('-', '');
@@ -2222,7 +2263,8 @@
   function remExcerpt(g) {
     const card = remCard(g);
     if (!card) return null;
-    const vig = [...card.querySelectorAll(':scope > p:not(.old-version)')];
+    // a precedent: its text, without the title (already in the group's head)
+    const vig = [...card.querySelectorAll(isPrecCard(card) ? ':scope > p.prec-para' : ':scope > p:not(.old-version)')];
     const pick = new Set(), hits = new Set();
     if (g.paths.includes('')) vig.forEach(p => pick.add(p));
     for (const path of g.paths.filter(Boolean)) {
@@ -2258,6 +2300,7 @@
   }
 
   function remGroupLabel(g) {
+    if (g.law === 'PREC') return 'Precedente ' + precLabel(g.art);
     const ps = g.paths.filter(Boolean).map(remFmtPath);
     const tail = ps.length > 1 ? ps.slice(0, -1).join(', ') + ' e ' + ps[ps.length - 1] : ps.join('');
     const sep = g.paths.includes('') ? ' e ' : ', ';
@@ -2779,6 +2822,7 @@
   }
 
   function sysNodeMatches(node, filter) {
+    if (node.art) return textMatchesFilter(node.label, filter);   // a precedent
     if (!node.title) return false;
     if (textMatchesFilter(node.title, filter)) return true;
     if (node.children) {
@@ -2789,7 +2833,32 @@
     return false;
   }
 
+  // A leaf of the index: one precedent ("nº 2/2004 — síntese"), which goes to its card
+  function renderSysLeaf(leaf, parent, indent, filter) {
+    if (filter && !textMatchesFilter(leaf.label, filter)) return;
+    const el = document.createElement('div');
+    el.className = 'sys-item sys-leaf';
+    el.style.marginLeft = indent + 'px';
+    el.textContent = leaf.label;
+    el.dataset.art = leaf.art;
+    el.addEventListener('click', () => {
+      closeIndex();
+      const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(leaf.art)}"][data-law="${leaf.law || ''}"]`);
+      if (!card) return;
+      if (card.classList.contains('filtered-out')) {
+        // hidden by a filter: show it (and its norma), as a remissão does
+        card.classList.remove('filtered-out');
+        showContextHeadings();
+        scheduleMinimap();
+      }
+      scrollToReadingLine(card);
+      selectCard(card, true);
+    });
+    parent.appendChild(el);
+  }
+
   function renderSysNode(node, parent, indent, filter) {
+    if (node.art) { renderSysLeaf(node, parent, indent, filter); return; }
     if (!node.title) return;
     if (filter && !sysNodeMatches(node, filter)) return;
 
@@ -2836,12 +2905,16 @@
   }
 
   function syncSystematicToScroll() {
-    const sectionId = getCurrentSectionId();
-    if (!sectionId) return;
+    // a precedent has its own entry; anything else, its section
+    const card = selectedCard;
+    const leaf = card && card.classList.contains('card-prec')
+      ? $indexContent.querySelector(`.sys-leaf[data-art="${CSS.escape(card.dataset.art)}"]`) : null;
+    const sectionId = leaf ? '' : getCurrentSectionId();
+    if (!leaf && !sectionId) return;
     // Remove previous highlight
     $indexContent.querySelectorAll('.sys-active').forEach(el => el.classList.remove('sys-active'));
     // Find matching element in the index panel
-    const target = $indexContent.querySelector('[data-section="' + sectionId + '"]');
+    const target = leaf || $indexContent.querySelector('[data-section="' + sectionId + '"]');
     if (!target) return;
     target.classList.add('sys-active');
     target.scrollIntoView({ behavior: 'instant', block: 'center' });
@@ -3512,6 +3585,14 @@
       }
       return null;
     }
+    // A precedent's item ("6)", "6 -"): the next wording with the same number
+    const item = oldEl.dataset.item || '';
+    if (item) {
+      for (let sib = oldEl.nextElementSibling; sib; sib = sib.nextElementSibling) {
+        if (sib.dataset && sib.dataset.item === item) return sib;
+      }
+      return null;
+    }
     // Old caput versions: the next old caput or the current caput
     if (!/^Art/i.test(ident)) return null;
     // Walk forward through siblings to find the next version (old or current)
@@ -3807,7 +3888,7 @@
         const lawPrefix = card.dataset.law;
         const key = lawPrefix ? lawPrefix + ':' + artNum : artNum;
         const summary = SUMMARIES_MAP[key] || '';
-        const prefix = (lawPrefix ? lawPrefix + ' ' : '') + 'Art. ' + artNum;
+        const prefix = cardRefLabel(card);
         const chip = document.createElement('div');
         chip.className = 'mm-chip';
         chip.style.background = MINIMAP_COLORS.article.bg;

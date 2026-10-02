@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 
-from .models import ArticleBlock, DocumentUnit, ParsedDocument, SectionHeading, UnitType, unit_path
+from .models import PREC, ArticleBlock, DocumentUnit, ParsedDocument, SectionHeading, UnitType, prec_label, unit_path
 
 
 def resolve_amendments(doc: ParsedDocument) -> ParsedDocument:
@@ -88,9 +88,24 @@ def structure_warnings(
 
     - dispositivo vigente repetido (falta tachar a redação antiga?), exceto os
       de known_duplicates = {(norma, artigo, caminho)};
-    - nota de rodapé presa a uma redação tachada (não aparece no site).
+    - nota de rodapé presa a uma redação tachada (não aparece no site);
+    - precedente regimental com título não reconhecido (vira texto do anterior)
+      ou com número repetido.
     """
     warnings: list[tuple[str, str]] = []
+    from .parse_docx import RE_TITULO_PREC
+    seen_prec: set[str] = set()
+    for el in doc.elements:
+        if not isinstance(el, ArticleBlock) or el.law_prefix != PREC:
+            continue
+        ctx = f"Precedente Regimental {prec_label(el.art_number)}"
+        if el.art_number in seen_prec:
+            warnings.append(("Precedente com número repetido (dois títulos iguais?)", ctx))
+        seen_prec.add(el.art_number)
+        for c in el.children:
+            if RE_TITULO_PREC.match(c.full_text):
+                warnings.append((f"Título de precedente não reconhecido, lido como texto do anterior: "
+                                 f"\"{c.full_text[:60]}\" (use \"PRECEDENTE REGIMENTAL Nº 2/2026\")", ctx))
     for art, path in duplicate_identifiers(doc):
         if (art.law_name, art.art_number, path) in known_duplicates:
             continue

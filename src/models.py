@@ -10,6 +10,17 @@ from typing import Optional
 from urllib.parse import quote, unquote
 
 
+# Prefixo dos Precedentes Regimentais (seção "NORMA: Precedentes Regimentais" do DOCX).
+# Cada precedente é um ArticleBlock com art_number "número/ano" ("2/2004"; "0/1997" = sem número).
+PREC = "PREC"
+
+
+def prec_label(art_number: str) -> str:
+    """"2/2004" → "nº 2/2004"; "0/1997" → "sem número, de 1997"."""
+    num, _, ano = art_number.partition("/")
+    return f"sem número, de {ano}" if num == "0" else f"nº {num}/{ano}"
+
+
 class UnitType(str, Enum):
     TITULO = "TITULO"
     CAPITULO = "CAPITULO"
@@ -126,6 +137,7 @@ class ArticleBlock:
     is_revoked: bool = False
     law_name: str = ""  # ex: "Lei Orgânica do Município de São Paulo"
     law_prefix: str = ""  # ex: "LO" (empty = Regimento, the default)
+    source_url: str = ""  # texto oficial (precedentes: o link do título no DOCX)
 
 
 @dataclass
@@ -161,6 +173,8 @@ class ParsedDocument:
                     d["law_name"] = el.law_name
                 if el.law_prefix:
                     d["law_prefix"] = el.law_prefix
+                if el.source_url:
+                    d["source_url"] = el.source_url
                 result.append(d)
         return {"elements": result}
 
@@ -276,16 +290,20 @@ class SysIndexNode:
 
 @dataclass
 class SysIndexLeaf:
-    """Folha do índice sistemático (artigo)."""
-    label: str  # "Art. 43 — Eleição das Presidências"
-    art: str  # "43"
+    """Folha do índice sistemático (um precedente, por exemplo)."""
+    label: str  # "nº 2/2004 — Convocação de sessão extraordinária"
+    art: str  # "2/2004"
+    law: str = ""  # "PREC"
 
 
 def sys_index_to_list(nodes: list[SysIndexNode | SysIndexLeaf]) -> list[dict]:
     result = []
     for n in nodes:
         if isinstance(n, SysIndexLeaf):
-            result.append({"label": n.label, "art": n.art})
+            leaf = {"label": n.label, "art": n.art}
+            if n.law:
+                leaf["law"] = n.law
+            result.append(leaf)
         else:
             d: dict = {"title": n.title, "children": sys_index_to_list(n.children)}
             if n.section_id:

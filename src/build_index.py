@@ -260,8 +260,10 @@ def legislacao_index(doc: ParsedDocument) -> dict | None:
                 ementa = full[len(nome):].lstrip(" —").strip()
                 g = groups.setdefault(nome, {"title": nome, "entries": [
                     {"html": f"<i>{_html.escape(ementa)}</i>"}] if ementa else []})
-                g["entries"].append({"html": _html.escape(texto[:180] + ("…" if len(texto) > 180 else "")),
-                                     "art_ref": ref})
+                entry = {"html": _html.escape(texto[:180] + ("…" if len(texto) > 180 else "")), "art_ref": ref}
+                if path:
+                    entry["path"] = path   # as in the site's data-path: the link opens that provision's box
+                g["entries"].append(entry)
     if not groups:
         return None
     return {"category": "Legislação correlata",

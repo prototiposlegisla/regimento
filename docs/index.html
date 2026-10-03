@@ -1309,7 +1309,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   background: #eef6fd;
 }
 
-.res-head, .res-entry, .res-expand {
+.res-head, .res-entry, .res-expand, .res-artlink {
   display: block;
   width: 100%;
   border: none;
@@ -1340,6 +1340,50 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 .res-expand { padding: 2px 5px 2px 14px; color: var(--selected-border); font-size: 12px; }
 .res-expand:hover { text-decoration: underline; }
 .res-empty { padding: 20px 8px; color: #888; text-align: center; }
+/* The indexes' results, above the cards' */
+.res-idx {
+  margin: 10px 4px 6px;
+  padding: 3px 8px;
+  background: #e3edf7;
+  color: #1f4e79;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.res-idx:first-child { margin-top: 2px; }
+.res-idx-group .res-head { font-weight: 600; }
+.res-ctx, .res-refs { font-weight: 400; color: #666; font-size: 12px; }
+/* Text, not buttons: a group's title, an entry with nothing to open */
+.res-idx-title, .res-inert { cursor: default; }
+.res-idx-title:hover, .res-inert:hover { background: none; }
+.res-ementa {
+  padding: 1px 5px 2px 14px;
+  color: #666;
+  font-style: italic;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+/* With the match (around it, if long): whole */
+.res-ementa:has(mark) { display: block; -webkit-line-clamp: none; line-clamp: none; }
+.res-artlinks { padding: 1px 5px 3px 10px; line-height: 1.6; }
+.res-artlinks > button {
+  display: inline;
+  width: auto;
+  margin-right: 6px;
+  padding: 0 4px;
+}
+.res-artlinks > .res-artlink { color: #2c6fa6; font-weight: 600; }
+.res-artlink:hover { text-decoration: underline; }
+.res-vide { color: #666; font-style: italic; }
+.res-expand.res-idx-more { padding-left: 9px; margin-bottom: 2px; }
+.res-idx-part + .res-law { margin-top: 14px; }
+#search-nav.index-only .search-arrow { display: none; }
 #results-list mark {
   background: #ffe066;
   color: inherit;
@@ -43674,19 +43718,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XII - tomar e julgar as contas do Prefeito, da Mesa e do Tribunal de Contas do Município;",
-            "art_ref": "105, XII"
+            "art_ref": "105, XII",
+            "path": "XII"
           },
           {
             "html": "XIV - julgar o Prefeito, o Vice-Prefeito e os Vereadores nos casos previstos em lei;",
-            "art_ref": "105, XIV"
+            "art_ref": "105, XIV",
+            "path": "XIV"
           },
           {
             "html": "V - quando a Justiça Eleitoral o decretar;",
-            "art_ref": "125, V"
+            "art_ref": "125, V",
+            "path": "V"
           },
           {
             "html": "§ 2º - Nos casos dos incisos I, II e VI deste artigo, acolhida a acusação pela maioria absoluta dos Vereadores, a perda do mandato será decidida pela Câmara, por “quorum” de 2/3 (d…",
-            "art_ref": "125, § 2º"
+            "art_ref": "125, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "Art. 128 - A renúncia torna-se irretratável após a comunicação ao Presidente da Câmara, lida em Plenário.",
@@ -43710,35 +43758,43 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "f) recusar substitutivos ou emendas que não sejam pertinentes à proposição inicial;",
-            "art_ref": "17, II, f"
+            "art_ref": "17, II, f",
+            "path": "II,f"
           },
           {
             "html": "IV - redigir o vencido em primeira discussão ou em discussão única e oferecer redação final aos projetos, de acordo com o seu mérito, bem como, quando for o caso, propor a reabertu…",
-            "art_ref": "46, IV"
+            "art_ref": "46, IV",
+            "path": "IV"
           },
           {
             "html": "Parágrafo único - As proposições deverão ser redigidas em termos claros e sintéticos e, quando sujeitas à leitura, exceto as emendas, deverão conter ementa de seu objetivo.",
-            "art_ref": "211, parágrafo único"
+            "art_ref": "211, parágrafo único",
+            "path": "§ú"
           },
           {
             "html": "II - quando, em se tratando de substitutivo ou emenda, não guardem direta relação com a proposição a que se referem;",
-            "art_ref": "212, II"
+            "art_ref": "212, II",
+            "path": "II"
           },
           {
             "html": "IV - quando contiver o mesmo teor de outra já apresentada na mesma sessão legislativa e as que disponham no mesmo sentido de lei existente, sem alterá-la, verificado pela seção com…",
-            "art_ref": "212, IV"
+            "art_ref": "212, IV",
+            "path": "IV"
           },
           {
             "html": "I - ementa de seu objetivo;",
-            "art_ref": "238, I"
+            "art_ref": "238, I",
+            "path": "I"
           },
           {
             "html": "III - divisão em artigos numerados, claros e concisos;",
-            "art_ref": "238, III"
+            "art_ref": "238, III",
+            "path": "III"
           },
           {
             "html": "IV - menção da revogação das disposições cm contrário, quando for o caso;",
-            "art_ref": "238, IV"
+            "art_ref": "238, IV",
+            "path": "IV"
           },
           {
             "html": "Art. 259 - A redação final, observadas as exceções regimentais, será proposta em parecer da Comissão de mérito ou da Comissão de Constituição e Justiça, que concluirá pelo texto de…",
@@ -43766,15 +43822,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1) projetos que disponham sobre criação, transformação ou extinção dos cargos, empregos e funções de seus serviços e fixação da respectiva remuneração;",
-            "art_ref": "13, I, b, 1"
+            "art_ref": "13, I, b, 1",
+            "path": "I,b,1"
           },
           {
             "html": "e) nomear, promover, comissionar, conceder gratificações e licenças, pôr em disponibilidade, exonerar, demitir, aposentar e punir servidores da Câmara Municipal, nos termos da lei;",
-            "art_ref": "13, II, e"
+            "art_ref": "13, II, e",
+            "path": "II,e"
           },
           {
             "html": "X - autorizar a despesa da Câmara e o seu pagamento, dentro dos limites do orçamento, observando as disposições legais e requisitando da Prefeitura o respectivo numerário, e aplica…",
-            "art_ref": "18, X"
+            "art_ref": "18, X",
+            "path": "X"
           },
           {
             "html": "Art. 28 - As contas da Mesa da Câmara compõem-se de:",
@@ -43786,27 +43845,33 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XII - acompanhar, junto ao Executivo, a elaboração da proposta orçamentaria, bem como a sua posterior execução;",
-            "art_ref": "46, XII"
+            "art_ref": "46, XII",
+            "path": "XII"
           },
           {
             "html": "a) examinar e emitir parecer sobre projetos de lei relativos ao plano plurianual, às diretrizes orçamentárias, ao orçamento anual e aos créditos adicionais, além das contas apresen…",
-            "art_ref": "47, II, a"
+            "art_ref": "47, II, a",
+            "path": "II,a"
           },
           {
             "html": "b) examinar e emitir parecer sobre os planos e programas municipais e setoriais previstos na Lei Orgânica do Município, e exercer o acompanhamento e a fiscalização orçamentária;",
-            "art_ref": "47, II, b"
+            "art_ref": "47, II, b",
+            "path": "II,b"
           },
           {
             "html": "e) opinar sobre proposições referentes a matéria tributária, abertura de créditos, empréstimos públicos, dívida pública e outras que, direta ou indiretamente, alterem a despesa ou …",
-            "art_ref": "47, II, e"
+            "art_ref": "47, II, e",
+            "path": "II,e"
           },
           {
             "html": "f) obtenção de empréstimos de particulares.",
-            "art_ref": "47, II, f"
+            "art_ref": "47, II, f",
+            "path": "II,f"
           },
           {
             "html": "3 - pessoal fixo e variável da Prefeitura, do Tribunal de Contas c da Câmara Municipal, bem como a política de recursos humanos;",
-            "art_ref": "47, IV, a, 3"
+            "art_ref": "47, IV, a, 3",
+            "path": "IV,a,3"
           },
           {
             "html": "Art. 66 - Dependendo o parecer de audiências públicas quando versarem sobre as matérias contidas no artigo 41 da Lei Orgânica do Município, os prazos estabelecidos no artigo 63 fic…",
@@ -43818,35 +43883,43 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "I - projetos de lei em tramitação, nos casos previstos no artigo 41 da Lei Orgânica do Município;",
-            "art_ref": "85, I"
+            "art_ref": "85, I",
+            "path": "I"
           },
           {
             "html": "h) autorização para obtenção de empréstimo de particular, inclusive para as autarquias, fundações e demais entidades controladas pelo Poder Público;",
-            "art_ref": "103, I, h"
+            "art_ref": "103, I, h",
+            "path": "I,h"
           },
           {
             "html": "III - dispor sobre sua organização, funcionamento, polícia, criação, transformação ou extinção dos cargos, empregos e funções de seus serviços e fixação da respectiva remuneração, …",
-            "art_ref": "105, III"
+            "art_ref": "105, III",
+            "path": "III"
           },
           {
             "html": "XVII - legislar sobre tributos municipais, bem como autorizar isenções, anistias fiscais e remissão de dívidas;",
-            "art_ref": "105, XVII"
+            "art_ref": "105, XVII",
+            "path": "XVII"
           },
           {
             "html": "XVIII- votar o plano plurianual, as diretrizes orçamentárias e o orçamento anual, bem como autorizar a abertura de créditos suplementares e especiais;",
-            "art_ref": "105, XVIII"
+            "art_ref": "105, XVIII",
+            "path": "XVIII"
           },
           {
             "html": "XIX - deliberar sobre obtenção e concessão de empréstimos e operações de crédito, bem como sobre a forma e os meios de pagamento;",
-            "art_ref": "105, XIX"
+            "art_ref": "105, XIX",
+            "path": "XIX"
           },
           {
             "html": "XX - autorizar a concessão de auxílios e subvenções;",
-            "art_ref": "105, XX"
+            "art_ref": "105, XX",
+            "path": "XX"
           },
           {
             "html": "XXVI - criar, alterar e extinguir cargos, funções e empregos públicos e fixar a remuneração da administração direta, autárquica e fundacional;",
-            "art_ref": "105, XXVI"
+            "art_ref": "105, XXVI",
+            "path": "XXVI"
           },
           {
             "html": "Art. 247 - A aprovação de projeto de resolução que crie cargos na Secretaria da Câmara depende do voto favorável da maioria absoluta dos Vereadores.",
@@ -43858,11 +43931,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - Durante a tramitação, serão realizadas pelo menos 2 (duas) audiências públicas, na forma disposta na Seção X, Capítulo II do Título III deste Regimento.",
-            "art_ref": "330, parágrafo único"
+            "art_ref": "330, parágrafo único",
+            "path": "§ú"
           },
           {
             "html": "§ 2º- Não serão recebidas pelo Presidente emendas em desacordo com as normas gerais de direito financeiro para elaboração e controle dos orçamentos.",
-            "art_ref": "337, § 2º"
+            "art_ref": "337, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "Art. 385 - As contas do Prefeito, da Mesa da Câmara e do Tribunal de Contas do Município correspondentes a cada exercício financeiro, serão julgadas pela Câmara, através do parecer…",
@@ -43874,7 +43949,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - As contas do Município ficarão, anualmente, durante 60 (sessenta) dias, após sua chegada à Câmara, à disposição de qualquer contribuinte, para exame e apreciação,…",
-            "art_ref": "388, parágrafo único"
+            "art_ref": "388, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -43898,7 +43974,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não se realizarão sessões ordinárias nos dias feriados e de ponto facultativo.",
-            "art_ref": "153, § 2º"
+            "art_ref": "153, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -43910,15 +43987,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "VI - convocar os Secretários Municipais, os responsáveis pela administração direta ou indireta e os Conselheiros do Tribunal de Contas do Município, para prestar informações sobre …",
-            "art_ref": "46, VI"
+            "art_ref": "46, VI",
+            "path": "VI"
           },
           {
             "html": "IX - convocar Secretários Municipais ou responsáveis pela administração direta e indireta para prestar informações sobre matéria de sua competência;",
-            "art_ref": "105, IX"
+            "art_ref": "105, IX",
+            "path": "IX"
           },
           {
             "html": "X - solicitar informações ao Prefeito sobre assuntos referentes à administração;",
-            "art_ref": "105, X"
+            "art_ref": "105, X",
+            "path": "X"
           },
           {
             "html": "Art. 224 - Os requerimentos de informação versarão sobre fato relacionado com matéria legislativa em trâmite ou sobre fato sujeito à fiscalização da Câmara.",
@@ -43926,7 +44006,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "III – convocação de secretários Municipais; (Redação dada pela Resolução 18 de 20 de dezembro de 1995).",
-            "art_ref": "226, III"
+            "art_ref": "226, III",
+            "path": "III"
           },
           {
             "html": "Art. 390 - O Prefeito e o Vice-Prefeito serão processados e julgados pela Câmara Municipal nas infrações político-administrativas definidas no artigo 73 da Lei Orgânica do Municípi…",
@@ -43950,19 +44031,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "I - tomar depoimento de autoridade municipal, intimar testemunhas e inquiri-las sob compromisso;",
-            "art_ref": "92, I"
+            "art_ref": "92, I",
+            "path": "I"
           },
           {
             "html": "II - proceder a verificações contábeis em livros, papéis e documentos de órgãos da administração direta, indireta, fundacional e, por deliberação do Plenário, do Tribunal de Contas…",
-            "art_ref": "92, II"
+            "art_ref": "92, II",
+            "path": "II"
           },
           {
             "html": "III - requerer a intimação judicial ao juízo competente, quando do não comparecimento do intimado pela Comissão, por duas convocações consecutivas.",
-            "art_ref": "92, III"
+            "art_ref": "92, III",
+            "path": "III"
           },
           {
             "html": "III - o prazo de funcionamento será de 120 (cento e vinte) dias, podendo ser prorrogado em no máximo até duas vezes, cada uma por igual período. (Redação dada pela Resolução nº 03,…",
-            "art_ref": "93, III"
+            "art_ref": "93, III",
+            "path": "III"
           },
           {
             "html": "Art. 95 - A Comissão Parlamentar de Inquérito elaborará relatório sobre a matéria, votando-o e enviando-o à publicação, no prazo máximo de 15 (quinze) dias após a conclusão de seus…",
@@ -43990,47 +44075,58 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "2) projetos de lei que disponham sobre abertura de créditos suplementares ou especiais, através de anulação parcial ou total de dotação da Câmara;",
-            "art_ref": "13, I, b, 2"
+            "art_ref": "13, I, b, 2",
+            "path": "I,b,2"
           },
           {
             "html": "b) suplementar, mediante ato, as dotações do orçamento da Câmara, observado o limite da autorização constante da lei orçamentária, desde que sejam provenientes de anulação total ou…",
-            "art_ref": "13, II, b"
+            "art_ref": "13, II, b",
+            "path": "II,b"
           },
           {
             "html": "X - autorizar a despesa da Câmara e o seu pagamento, dentro dos limites do orçamento, observando as disposições legais e requisitando da Prefeitura o respectivo numerário, e aplica…",
-            "art_ref": "18, X"
+            "art_ref": "18, X",
+            "path": "X"
           },
           {
             "html": "II - balanço geral anual, que deverá ser enviado até o dia 31 de março do exercício seguinte ao Tribunal de Contas do Município.",
-            "art_ref": "28, II"
+            "art_ref": "28, II",
+            "path": "II"
           },
           {
             "html": "a) examinar e emitir parecer sobre projetos de lei relativos ao plano plurianual, às diretrizes orçamentárias, ao orçamento anual e aos créditos adicionais, além das contas apresen…",
-            "art_ref": "47, II, a"
+            "art_ref": "47, II, a",
+            "path": "II,a"
           },
           {
             "html": "b) examinar e emitir parecer sobre os planos e programas municipais e setoriais previstos na Lei Orgânica do Município, e exercer o acompanhamento e a fiscalização orçamentária;",
-            "art_ref": "47, II, b"
+            "art_ref": "47, II, b",
+            "path": "II,b"
           },
           {
             "html": "c) receber as emendas à proposta orçamentária do Município e sobre elas emitir parecer;",
-            "art_ref": "47, II, c"
+            "art_ref": "47, II, c",
+            "path": "II,c"
           },
           {
             "html": "e) opinar sobre proposições referentes a matéria tributária, abertura de créditos, empréstimos públicos, dívida pública e outras que, direta ou indiretamente, alterem a despesa ou …",
-            "art_ref": "47, II, e"
+            "art_ref": "47, II, e",
+            "path": "II,e"
           },
           {
             "html": "XII - tomar e julgar as contas do Prefeito, da Mesa e do Tribunal de Contas do Município;",
-            "art_ref": "105, XII"
+            "art_ref": "105, XII",
+            "path": "XII"
           },
           {
             "html": "XVIII- votar o plano plurianual, as diretrizes orçamentárias e o orçamento anual, bem como autorizar a abertura de créditos suplementares e especiais;",
-            "art_ref": "105, XVIII"
+            "art_ref": "105, XVIII",
+            "path": "XVIII"
           },
           {
             "html": "XX - autorizar a concessão de auxílios e subvenções;",
-            "art_ref": "105, XX"
+            "art_ref": "105, XX",
+            "path": "XX"
           },
           {
             "html": "Art. 329 - Os projetos de leis orçamentárias de iniciativa do Poder Executivo, previstos no artigo 137 da Lei Orgânica do Município, deverão ser en-viados à Câmara nos seguintes pr…",
@@ -44042,7 +44138,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não serão recebidas pelo Presidente emendas em desacordo com as normas gerais de direito financeiro para elaboração e controle dos orçamentos.",
-            "art_ref": "337, § 2º"
+            "art_ref": "337, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "Art. 345 - Ocorrendo veto, emenda ou rejeição do projeto de lei orçamentária anual, os recursos que ficarem sem despesas correspondentes poderão ser utilizados, conforme o caso, me…",
@@ -44062,7 +44159,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 3º - O Vereador, no caso do parágrafo anterior, bem como os Suplentes posteriormente convocados serão empossados perante o Presidente, apresentando o respectivo diploma, a declar…",
-            "art_ref": "106, § 3º"
+            "art_ref": "106, § 3º",
+            "path": "§ 3º"
           },
           {
             "html": "Art. 117 - Dar-se-á a convocação do Suplente no caso de vaga em razão de morte ou renúncia, de investidura em função prevista no artigo 115 e quando em licença por período superior…",
@@ -44070,11 +44168,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - Na falta de Suplente, o Presidente da Câmara comunicará o fato, dentro de 48 (quarenta e oito) horas, diretamente ao Tribunal Regional Eleitoral.",
-            "art_ref": "118, parágrafo único"
+            "art_ref": "118, parágrafo único",
+            "path": "§ú"
           },
           {
             "html": "V - quando a Justiça Eleitoral o decretar;",
-            "art_ref": "125, V"
+            "art_ref": "125, V",
+            "path": "V"
           }
         ]
       },
@@ -44086,11 +44186,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XVII - legislar sobre tributos municipais, bem como autorizar isenções, anistias fiscais e remissão de dívidas;",
-            "art_ref": "105, XVII"
+            "art_ref": "105, XVII",
+            "path": "XVII"
           },
           {
             "html": "XXXI - delimitar o perímetro urbano e o de expansão urbana;",
-            "art_ref": "105, XXXI"
+            "art_ref": "105, XXXI",
+            "path": "XXXI"
           }
         ]
       },
@@ -44102,11 +44204,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "5 - denominação de próprios, vias e logradouros públicos;",
-            "art_ref": "47, VI, a, 5"
+            "art_ref": "47, VI, a, 5",
+            "path": "VI,a,5"
           },
           {
             "html": "XXX - autorizar a alteração de denominação de próprios, vias e logradouros públicos;",
-            "art_ref": "105, XXX"
+            "art_ref": "105, XXX",
+            "path": "XXX"
           }
         ]
       },
@@ -44118,11 +44222,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXVII - aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
-            "art_ref": "105, XXVII"
+            "art_ref": "105, XXVII",
+            "path": "XXVII"
           },
           {
             "html": "XXXI - delimitar o perímetro urbano e o de expansão urbana;",
-            "art_ref": "105, XXXI"
+            "art_ref": "105, XXXI",
+            "path": "XXXI"
           }
         ]
       },
@@ -44134,7 +44240,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não se realizarão sessões ordinárias nos dias feriados e de ponto facultativo.",
-            "art_ref": "153, § 2º"
+            "art_ref": "153, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -44146,7 +44253,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "IX - fiscalizar, inclusive efetuando diligências, vistorias e levantamentos “in loco”, os atos da administração direta e indireta, nos termos da legislação pertinente, em especial …",
-            "art_ref": "46, IX"
+            "art_ref": "46, IX",
+            "path": "IX"
           }
         ]
       },
@@ -44158,7 +44266,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) revisar os debates, não permitindo a publicação de expressões e conceitos anti-regimentais ou ofensivos ao decoro da Câmara, bem como de pronunciamentos que envolverem ofensas à…",
-            "art_ref": "17, V, b"
+            "art_ref": "17, V, b",
+            "path": "V,b"
           }
         ]
       },
@@ -44170,7 +44279,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 6° – No caso do inciso III deste artigo, sempre que a audiência versar sobre matéria relativa à criança e ao adolescente, deverá obrigatoriamente ser expedido convite ao Conselho…",
-            "art_ref": "86, § 6º"
+            "art_ref": "86, § 6º",
+            "path": "§ 6º"
           }
         ]
       },
@@ -44194,15 +44304,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "I -dar posse aos Vereadores e Suplentes;",
-            "art_ref": "18, I"
+            "art_ref": "18, I",
+            "path": "I"
           },
           {
             "html": "§ 1º- No ato da posse, os Vereadores deverão desincompatibilizar-se e, na mesma ocasião, bem como ao término do mandato, deverão fazer a declaração pública de seus bens, a ser tran…",
-            "art_ref": "106, § 1º"
+            "art_ref": "106, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "§ 1º- É incompatível com o decoro parlamentar, além dos casos definidos neste Regimento, o abuso das prerrogativas asseguradas a membros da Câmara Municipal ou a percepção de vanta…",
-            "art_ref": "125, § 1º"
+            "art_ref": "125, § 1º",
+            "path": "§ 1º"
           }
         ]
       },
@@ -44214,7 +44327,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "IX - fiscalizar, inclusive efetuando diligências, vistorias e levantamentos “in loco”, os atos da administração direta e indireta, nos termos da legislação pertinente, em especial …",
-            "art_ref": "46, IX"
+            "art_ref": "46, IX",
+            "path": "IX"
           }
         ]
       },
@@ -44238,7 +44352,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 1º- No ato da posse, os Vereadores deverão desincompatibilizar-se e, na mesma ocasião, bem como ao término do mandato, deverão fazer a declaração pública de seus bens, a ser tran…",
-            "art_ref": "106, § 1º"
+            "art_ref": "106, § 1º",
+            "path": "§ 1º"
           }
         ]
       },
@@ -44250,11 +44365,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - serviços de utilidade pública, sejam ou não de concessão municipal, planos habitacionais elaborados ou executados pelo Município, diretamente ou por intermédio de autarquias ou…",
-            "art_ref": "47, III, a, 3"
+            "art_ref": "47, III, a, 3",
+            "path": "III,a,3"
           },
           {
             "html": "XXI - autorizar a concessão de serviços públicos;",
-            "art_ref": "105, XXI"
+            "art_ref": "105, XXI",
+            "path": "XXI"
           }
         ]
       },
@@ -44266,7 +44383,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XII - providenciar a expedição, no prazo de 20 (vinte) dias úteis, das certidões que lhe forem solicitadas, bem como atender às requisições judiciais;",
-            "art_ref": "18, XII"
+            "art_ref": "18, XII",
+            "path": "XII"
           }
         ]
       },
@@ -44278,15 +44396,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - serviços de utilidade pública, sejam ou não de concessão municipal, planos habitacionais elaborados ou executados pelo Município, diretamente ou por intermédio de autarquias ou…",
-            "art_ref": "47, III, a, 3"
+            "art_ref": "47, III, a, 3",
+            "path": "III,a,3"
           },
           {
             "html": "e) concessão de serviço público;",
-            "art_ref": "103, I, e"
+            "art_ref": "103, I, e",
+            "path": "I,e"
           },
           {
             "html": "XXI - autorizar a concessão de serviços públicos;",
-            "art_ref": "105, XXI"
+            "art_ref": "105, XXI",
+            "path": "XXI"
           }
         ]
       },
@@ -44298,7 +44419,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não se realizarão sessões ordinárias nos dias feriados e de ponto facultativo.",
-            "art_ref": "153, § 2º"
+            "art_ref": "153, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -44318,7 +44440,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "V - quando a Justiça Eleitoral o decretar;",
-            "art_ref": "125, V"
+            "art_ref": "125, V",
+            "path": "V"
           }
         ]
       },
@@ -44330,7 +44453,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1 - sistema municipal de ensino;",
-            "art_ref": "47, VI, a, 1"
+            "art_ref": "47, VI, a, 1",
+            "path": "VI,a,1"
           }
         ]
       },
@@ -44342,7 +44466,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) examinar e emitir parecer sobre os planos e programas municipais e setoriais previstos na Lei Orgânica do Município, e exercer o acompanhamento e a fiscalização orçamentária;",
-            "art_ref": "47, II, b"
+            "art_ref": "47, II, b",
+            "path": "II,b"
           }
         ]
       },
@@ -44354,7 +44479,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "10 - Fundo Municipal de Desenvolvimento de Trânsito; (Inserido pela redação dada pela Resolução nº 08, de 19 de agosto de 2026)",
-            "art_ref": "47, V, a, 10"
+            "art_ref": "47, V, a, 10",
+            "path": "V,a,10"
           }
         ]
       },
@@ -44366,7 +44492,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "V - quando a Justiça Eleitoral o decretar;",
-            "art_ref": "125, V"
+            "art_ref": "125, V",
+            "path": "V"
           }
         ]
       },
@@ -44378,27 +44505,33 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XI - autorizar a convocação de referendo e plebiscito, exceto os casos previstos na Lei Orgânica do Município;",
-            "art_ref": "105, XI"
+            "art_ref": "105, XI",
+            "path": "XI"
           },
           {
             "html": "§ 2º - A iniciativa popular dar-se-á através de projetos de lei de interesse específico do Município, da cidade ou de bairros, através de manifestação de, pelo menos, 5% (cinco por…",
-            "art_ref": "234, § 2º"
+            "art_ref": "234, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "IV - realização de consulta plebiscitária à população;",
-            "art_ref": "316, IV"
+            "art_ref": "316, IV",
+            "path": "IV"
           },
           {
             "html": "V - submissão a referendo popular de leis aprovadas.",
-            "art_ref": "316, V"
+            "art_ref": "316, V",
+            "path": "V"
           },
           {
             "html": "I - o projeto de lei vier subscrito por eleitores representando, pelo menos, 5% (cinco por cento) do eleitorado;",
-            "art_ref": "317, I"
+            "art_ref": "317, I",
+            "path": "I"
           },
           {
             "html": "§ 1º- Após o protocolo, a Secretaria da Mesa verificará se foram cumpridas as exigências do artigo 317, no prazo máximo de 5 (cinco) dias úteis, certificando o cumprimento.",
-            "art_ref": "318, § 1º"
+            "art_ref": "318, § 1º",
+            "path": "§ 1º"
           }
         ]
       },
@@ -44422,7 +44555,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "7 - acessibilidade para pessoas com deficiência ou mobilidade reduzida em vias, hidrovias e espaços públicos, nos transportes coletivos e individuais, mobiliário e equipamentos urb…",
-            "art_ref": "47, V, a, 7"
+            "art_ref": "47, V, a, 7",
+            "path": "V,a,7"
           }
         ]
       },
@@ -44434,15 +44568,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "a) examinar e emitir parecer sobre projetos de lei relativos ao plano plurianual, às diretrizes orçamentárias, ao orçamento anual e aos créditos adicionais, além das contas apresen…",
-            "art_ref": "47, II, a"
+            "art_ref": "47, II, a",
+            "path": "II,a"
           },
           {
             "html": "1 -cadastro territorial do Município, planos gerais e parciais de urbanização ou reurbanização,zoneamento e uso e ocupação do solo;",
-            "art_ref": "47, III, a, 1"
+            "art_ref": "47, III, a, 1",
+            "path": "III,a,1"
           },
           {
             "html": "5 - Plano Diretor;",
-            "art_ref": "47, III, a, 5"
+            "art_ref": "47, III, a, 5",
+            "path": "III,a,5"
           },
           {
             "html": "Art. 66 - Dependendo o parecer de audiências públicas quando versarem sobre as matérias contidas no artigo 41 da Lei Orgânica do Município, os prazos estabelecidos no artigo 63 fic…",
@@ -44450,27 +44587,33 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "I - projetos de lei em tramitação, nos casos previstos no artigo 41 da Lei Orgânica do Município;",
-            "art_ref": "85, I"
+            "art_ref": "85, I",
+            "path": "I"
           },
           {
             "html": "b) Plano Diretor.",
-            "art_ref": "103, II, b"
+            "art_ref": "103, II, b",
+            "path": "II,b"
           },
           {
             "html": "XXVII - aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
-            "art_ref": "105, XXVII"
+            "art_ref": "105, XXVII",
+            "path": "XXVII"
           },
           {
             "html": "XXXI - delimitar o perímetro urbano e o de expansão urbana;",
-            "art_ref": "105, XXXI"
+            "art_ref": "105, XXXI",
+            "path": "XXXI"
           },
           {
             "html": "VII – Plano Diretor; (Inserido pela Resolução 3 de 20 de abril de 1995).",
-            "art_ref": "295, parágrafo único, VII"
+            "art_ref": "295, parágrafo único, VII",
+            "path": "§ú,VII"
           },
           {
             "html": "Parágrafo único - Durante a tramitação, serão realizadas pelo menos 2 (duas) audiências públicas, na forma disposta na Seção X, Capítulo II do Título III deste Regimento.",
-            "art_ref": "330, parágrafo único"
+            "art_ref": "330, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -44482,7 +44625,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "2 - obras e serviços públicos, seu uso e gozo, venda, hipoteca, permuta, outorga de concessão administrativa ou direito real de uso de bens imóveis de propriedade do Município;",
-            "art_ref": "47, III, a, 2"
+            "art_ref": "47, III, a, 2",
+            "path": "III,a,2"
           }
         ]
       },
@@ -44506,7 +44650,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "e) propor, articular e coordenar o desenvolvimento e a consolidação de ambientes promotores da inovação e as ações destinadas aos empreendimentos de base tecnológica. (Redação dada…",
-            "art_ref": "47, XV, e"
+            "art_ref": "47, XV, e",
+            "path": "XV,e"
           }
         ]
       },
@@ -44518,11 +44663,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - serviços de utilidade pública, sejam ou não de concessão municipal, planos habitacionais elaborados ou executados pelo Município, diretamente ou por intermédio de autarquias ou…",
-            "art_ref": "47, III, a, 3"
+            "art_ref": "47, III, a, 3",
+            "path": "III,a,3"
           },
           {
             "html": "XXI - autorizar a concessão de serviços públicos;",
-            "art_ref": "105, XXI"
+            "art_ref": "105, XXI",
+            "path": "XXI"
           }
         ]
       },
@@ -44534,7 +44681,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXVIII - dispor sobre convênios com entidades públicas e particulares e autorizar consórcios com outros municípios;",
-            "art_ref": "105, XXVIII"
+            "art_ref": "105, XXVIII",
+            "path": "XXVIII"
           }
         ]
       },
@@ -44546,7 +44694,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - serviços de utilidade pública, sejam ou não de concessão municipal, planos habitacionais elaborados ou executados pelo Município, diretamente ou por intermédio de autarquias ou…",
-            "art_ref": "47, III, a, 3"
+            "art_ref": "47, III, a, 3",
+            "path": "III,a,3"
           }
         ]
       },
@@ -44558,7 +44707,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - programas de merenda escolar;",
-            "art_ref": "47, VI, a, 3"
+            "art_ref": "47, VI, a, 3",
+            "path": "VI,a,3"
           }
         ]
       },
@@ -44570,7 +44720,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "g) permitir sejam divulgados os trabalhos da Câmara no Plenário ou nas Comissões, observando-se o disposto no artigo 85 da Lei Orgânica do Município, sem ônus para os cofres públic…",
-            "art_ref": "13, II, g"
+            "art_ref": "13, II, g",
+            "path": "II,g"
           }
         ]
       },
@@ -44582,15 +44733,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) determinar a publicação de informações, notas e documentos que digam respeito às atividades da Câmara e devam ser divulgados.",
-            "art_ref": "17, V, c"
+            "art_ref": "17, V, c",
+            "path": "V,c"
           },
           {
             "html": "Parágrafo único - As atas das reuniões secretas, uma vez aprovadas ao término da reunião, depois de rubricadas em todas as folhas e lacradas pelo Presidente e Vice-Presidente da Co…",
-            "art_ref": "61, parágrafo único"
+            "art_ref": "61, parágrafo único",
+            "path": "§ú"
           },
           {
             "html": "§ 2º- É permitido, a qualquer tempo, o translado de peças e fornecimento de cópias aos interessados.",
-            "art_ref": "88, § 2º"
+            "art_ref": "88, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "Art. 199 - A ata da sessão secreta, lida ao seu final, será assinada pelo Presidente e pelo Secretário dos trabalhos e, a seguir, lacrada e arquivada, juntamente com os demais docu…",
@@ -44610,7 +44764,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXVIII - dispor sobre convênios com entidades públicas e particulares e autorizar consórcios com outros municípios;",
-            "art_ref": "105, XXVIII"
+            "art_ref": "105, XXVIII",
+            "path": "XXVIII"
           }
         ]
       },
@@ -44622,11 +44777,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "h) sugerir, acompanhar e fiscalizar a implementação de cooperação entre a Guarda Civil Metropolitana e as corporações policiais de outras esferas de governo; (Inserido pela Resoluç…",
-            "art_ref": "47, XII, h"
+            "art_ref": "47, XII, h",
+            "path": "XII,h"
           },
           {
             "html": "Parágrafo único - O policiamento poderá ser feito por investigadores da Polícia, elementos da Guarda Civil Metropolitana, Polícia Militar ou ou-tros elementos requisitados à Secret…",
-            "art_ref": "374, parágrafo único"
+            "art_ref": "374, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -44638,7 +44795,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXXII - aprovar o Código de Obras e Edificações;",
-            "art_ref": "105, XXXII"
+            "art_ref": "105, XXXII",
+            "path": "XXXII"
           }
         ]
       },
@@ -44650,7 +44808,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1 - criação, estruturação e atribuição da administração direta e indireta e das empresas onde o Município tenha participação;",
-            "art_ref": "47, IV, a, 1"
+            "art_ref": "47, IV, a, 1",
+            "path": "IV,a,1"
           }
         ]
       },
@@ -44662,7 +44821,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "i) sugerir políticas de integração entre a Guarda Civil Metropolitana, a Polícia Militar e a Polícia Civil, dentro do âmbito de suas competências e prerrogativas constitucionais, v…",
-            "art_ref": "47, XII, i"
+            "art_ref": "47, XII, i",
+            "path": "XII,i"
           }
         ]
       },
@@ -44674,7 +44834,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1 - disciplina das atividades econômicas desenvolvidas no Município; (Redação dada pela Resolução nº 08, de 19 de agosto de 2026)",
-            "art_ref": "47, V, a, 1"
+            "art_ref": "47, V, a, 1",
+            "path": "V,a,1"
           }
         ]
       },
@@ -44686,15 +44847,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 9º A sessão extraordinária virtual ficará disponível para acesso, discussão e votação, mediante o sistema de certificação digital instalado nos gabinetes, por período jamais infe…",
-            "art_ref": "183-A, § 9º"
+            "art_ref": "183-A, § 9º",
+            "path": "§ 9º"
           },
           {
             "html": "§ 3º - Os substitutivos poderão ser apresentados eletronicamente, os quais serão submetidos a apoiamento com assinatura digital ou por meio de manifestação expressa no chat do sist…",
-            "art_ref": "269, § 3º"
+            "art_ref": "269, § 3º",
+            "path": "§ 3º"
           },
           {
             "html": "§ 2º As emendas poderão ser apresentadas eletronicamente, as quais serão submetidas a apoiamento com assinatura digital ou por meio de manifestação expressa no chat do sistema virt…",
-            "art_ref": "271, § 2º"
+            "art_ref": "271, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -44706,7 +44870,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "f) regulamentar o processo de licitações, observando-se o disposto no artigo 129 e parágrafos da Lei Orgânica do Município;",
-            "art_ref": "13, II, f"
+            "art_ref": "13, II, f",
+            "path": "II,f"
           },
           {
             "html": "Art. 15 - Os contratos de qualquer natureza, que a Câmara Municipal firmar com terceiros, serão assinados pela maioria dos membros efetivos da Mesa, sob pena de nulidade.",
@@ -44714,27 +44879,33 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "2 - obras e serviços públicos, seu uso e gozo, venda, hipoteca, permuta, outorga de concessão administrativa ou direito real de uso de bens imóveis de propriedade do Município;",
-            "art_ref": "47, III, a, 2"
+            "art_ref": "47, III, a, 2",
+            "path": "III,a,2"
           },
           {
             "html": "2 - normas gerais de licitações, em todas as suas modalidades, c contratação de produtos,obras c serviços da administração direta e indireta;",
-            "art_ref": "47, IV, a, 2"
+            "art_ref": "47, IV, a, 2",
+            "path": "IV,a,2"
           },
           {
             "html": "g) alienação de bens imóveis;",
-            "art_ref": "103, I, g"
+            "art_ref": "103, I, g",
+            "path": "I,g"
           },
           {
             "html": "XXII - autorizar a concessão do direito real de uso de bens municipais;",
-            "art_ref": "105, XXII"
+            "art_ref": "105, XXII",
+            "path": "XXII"
           },
           {
             "html": "XXIII - autorizar a concessão administrativa de uso de bens municipais;",
-            "art_ref": "105, XXIII"
+            "art_ref": "105, XXIII",
+            "path": "XXIII"
           },
           {
             "html": "XXIV - autorizar a alienação de bens imóveis municipais;",
-            "art_ref": "105, XXIV"
+            "art_ref": "105, XXIV",
+            "path": "XXIV"
           }
         ]
       },
@@ -44746,7 +44917,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não se realizarão sessões ordinárias nos dias feriados e de ponto facultativo.",
-            "art_ref": "153, § 2º"
+            "art_ref": "153, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -44758,11 +44930,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) revisar os debates, não permitindo a publicação de expressões e conceitos anti-regimentais ou ofensivos ao decoro da Câmara, bem como de pronunciamentos que envolverem ofensas à…",
-            "art_ref": "17, V, b"
+            "art_ref": "17, V, b",
+            "path": "V,b"
           },
           {
             "html": "VI - que sofrer condenação criminal em sentença transitada em julgado, que implique em restrição à liberdade de locomoção.",
-            "art_ref": "125, VI"
+            "art_ref": "125, VI",
+            "path": "VI"
           }
         ]
       },
@@ -44786,19 +44960,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "d) declarar a perda do mandato de Vereador, de ofício ou mediante provocação de qualquer dos membros da Câmara ou de partido político nela representado, assegurado o direito de def…",
-            "art_ref": "13, I, d"
+            "art_ref": "13, I, d",
+            "path": "I,d"
           },
           {
             "html": "II - declarar a extinção do mandato de Vereador;",
-            "art_ref": "18, II"
+            "art_ref": "18, II",
+            "path": "II"
           },
           {
             "html": "IV - justificar a ausência de Vereador às sessões plenárias, quando motivada pelo desempenho de suas funções em Comissões Temporárias, em caso de doença, nojo ou gala, mediante req…",
-            "art_ref": "18, IV"
+            "art_ref": "18, IV",
+            "path": "IV"
           },
           {
             "html": "VIII - solicitar ao Prefeito informações sobre assuntos inerentes à administração, dentro da competência da Comissão;",
-            "art_ref": "46, VIII"
+            "art_ref": "46, VIII",
+            "path": "VIII"
           },
           {
             "html": "Art. 68 - As Comissões Permanentes deverão solicitar do Executivo, por intermédio do Presidente da Câmara, todas as informações julgadas necessárias. (Precedente Regimental nº 03 d…",
@@ -44806,87 +44984,108 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "II - proceder a verificações contábeis em livros, papéis e documentos de órgãos da administração direta, indireta, fundacional e, por deliberação do Plenário, do Tribunal de Contas…",
-            "art_ref": "92, II"
+            "art_ref": "92, II",
+            "path": "II"
           },
           {
             "html": "IV - dar posse ao Prefeito e ao Vice-Prefeito, conhecer de sua renúncia e afastá-los, definitivamente, do exercício do cargo;",
-            "art_ref": "105, IV"
+            "art_ref": "105, IV",
+            "path": "IV"
           },
           {
             "html": "V - conceder licença para afastamento ao Prefeito, ao Vice-Prefeito e aos Vereadores;",
-            "art_ref": "105, V"
+            "art_ref": "105, V",
+            "path": "V"
           },
           {
             "html": "VII - autorizar o Prefeito a ausentar-se do Município por mais de 15 (quinze) dias consecutivos;",
-            "art_ref": "105, VII"
+            "art_ref": "105, VII",
+            "path": "VII"
           },
           {
             "html": "X - solicitar informações ao Prefeito sobre assuntos referentes à administração;",
-            "art_ref": "105, X"
+            "art_ref": "105, X",
+            "path": "X"
           },
           {
             "html": "XIV - julgar o Prefeito, o Vice-Prefeito e os Vereadores nos casos previstos em lei;",
-            "art_ref": "105, XIV"
+            "art_ref": "105, XIV",
+            "path": "XIV"
           },
           {
             "html": "§ 1º- No ato da posse, os Vereadores deverão desincompatibilizar-se e, na mesma ocasião, bem como ao término do mandato, deverão fazer a declaração pública de seus bens, a ser tran…",
-            "art_ref": "106, § 1º"
+            "art_ref": "106, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "§ 2º - O Vereador que não tomar posse, na sessão prevista neste artigo deverá fazê-lo no prazo de 15 (quinze) dias, ressalvados os casos de motivo justo e aceito pela Câmara.",
-            "art_ref": "106, § 2º"
+            "art_ref": "106, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "I - residir no Município;",
-            "art_ref": "109, I"
+            "art_ref": "109, I",
+            "path": "I"
           },
           {
             "html": "II - comparecer à hora regimental, nos dias designados para a abertura das sessões ou ingressar no sistema virtual, nelas permanecendo até o seu término; (Redação dada pela Resoluç…",
-            "art_ref": "109, II"
+            "art_ref": "109, II",
+            "path": "II"
           },
           {
             "html": "VIII - observar o disposto no artigo 17 da Lei Orgânica do Município.",
-            "art_ref": "109, VIII"
+            "art_ref": "109, VIII",
+            "path": "VIII"
           },
           {
             "html": "I - que infringir qualquer das proibições estabelecidas no artigo 17 da Lei Orgânica do Município;",
-            "art_ref": "125, I"
+            "art_ref": "125, I",
+            "path": "I"
           },
           {
             "html": "II - cujo procedimento for declarado incompatível com o decoro parlamentar;",
-            "art_ref": "125, II"
+            "art_ref": "125, II",
+            "path": "II"
           },
           {
             "html": "III - que deixar de comparecer, em cada sessão legislativa, à terça parte das sessões ordinárias, salvo licenças ou missão autorizada pela Câmara;",
-            "art_ref": "125, III"
+            "art_ref": "125, III",
+            "path": "III"
           },
           {
             "html": "IV - que perder ou tiver suspensos os direitos políticos;",
-            "art_ref": "125, IV"
+            "art_ref": "125, IV",
+            "path": "IV"
           },
           {
             "html": "§ 1º- É incompatível com o decoro parlamentar, além dos casos definidos neste Regimento, o abuso das prerrogativas asseguradas a membros da Câmara Municipal ou a percepção de vanta…",
-            "art_ref": "125, § 1º"
+            "art_ref": "125, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "§ 2º - Nos casos dos incisos I, II e VI deste artigo, acolhida a acusação pela maioria absoluta dos Vereadores, a perda do mandato será decidida pela Câmara, por “quorum” de 2/3 (d…",
-            "art_ref": "125, § 2º"
+            "art_ref": "125, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "§ 3º - Nos casos dos incisos III a V, a perda será declarada pela Mesa, de ofício ou mediante provocação de qualquer dos membros da Câmara ou de partido político nela representado,…",
-            "art_ref": "125, § 3º"
+            "art_ref": "125, § 3º",
+            "path": "§ 3º"
           },
           {
             "html": "I - quando ocorrer o falecimento ou renúncia por escrito;",
-            "art_ref": "126, I"
+            "art_ref": "126, I",
+            "path": "I"
           },
           {
             "html": "II - quando deixar de tomar posse, sem motivo justo aceito pela Câmara, dentro do prazo de 15 (quinze) dias;",
-            "art_ref": "126, II"
+            "art_ref": "126, II",
+            "path": "II"
           },
           {
             "html": "III - quando fixar residência fora do Município, sem prévia autorização da Mesa.",
-            "art_ref": "126, III"
+            "art_ref": "126, III",
+            "path": "III"
           },
           {
             "html": "Art. 127 - Ocorrido e comprovado o ato ou fato que dê margem à extinção do mandato, o Presidente da Câmara, na primeira sessão, comunicará ao Plenário e fará constar da ata a decla…",
@@ -44906,7 +45105,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "III - pelo Prefeito, para apreciação de matéria urgente.",
-            "art_ref": "183, III"
+            "art_ref": "183, III",
+            "path": "III"
           },
           {
             "html": "Art. 224 - Os requerimentos de informação versarão sobre fato relacionado com matéria legislativa em trâmite ou sobre fato sujeito à fiscalização da Câmara.",
@@ -44914,19 +45114,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "I– licença do Prefeito e Vice-Prefeito; (Redação dada pela Resolução 18 de 20 de dezembro de 1995).",
-            "art_ref": "226, I"
+            "art_ref": "226, I",
+            "path": "I"
           },
           {
             "html": "II – autorização do Prefeito para ausentar-se do Município por mais de 15 (quinze) dias;(Redação dada pela Resolução 18 de 20 de dezembro de 1995).",
-            "art_ref": "226, II"
+            "art_ref": "226, II",
+            "path": "II"
           },
           {
             "html": "II - perda de mandato de Vereador;",
-            "art_ref": "237, parágrafo único, II"
+            "art_ref": "237, parágrafo único, II",
+            "path": "§ú,II"
           },
           {
             "html": "h) processo de cassação de mandato de Vereador: 15 (quinze) minutos para cada Vereador e 120 (cento e vinte) minutos para o relator e o denunciado ou para seu procurador, com apart…",
-            "art_ref": "306, V, h"
+            "art_ref": "306, V, h",
+            "path": "V,h"
           },
           {
             "html": "Art. 389 - Nos crimes comuns e nos de responsabilidade, o Prefeito e o Vice-Prefeito serão processados e julgados pelo Tribunal de Justiça do Estado, nos termos da legislação feder…",
@@ -44954,15 +45158,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "2 - obras e serviços públicos, seu uso e gozo, venda, hipoteca, permuta, outorga de concessão administrativa ou direito real de uso de bens imóveis de propriedade do Município;",
-            "art_ref": "47, III, a, 2"
+            "art_ref": "47, III, a, 2",
+            "path": "III,a,2"
           },
           {
             "html": "f) concessão de direito real de uso;",
-            "art_ref": "103, I, f"
+            "art_ref": "103, I, f",
+            "path": "I,f"
           },
           {
             "html": "XXII - autorizar a concessão do direito real de uso de bens municipais;",
-            "art_ref": "105, XXII"
+            "art_ref": "105, XXII",
+            "path": "XXII"
           }
         ]
       },
@@ -44974,11 +45181,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º As sessões ordinárias e extraordinárias funcionarão de forma híbrida, presencial e virtual, com o auxílio de sistema de videoconferência com chat de comunicação e do Sistema d…",
-            "art_ref": "132, § 2º"
+            "art_ref": "132, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "§ 9º A sessão extraordinária virtual ficará disponível para acesso, discussão e votação, mediante o sistema de certificação digital instalado nos gabinetes, por período jamais infe…",
-            "art_ref": "183-A, § 9º"
+            "art_ref": "183-A, § 9º",
+            "path": "§ 9º"
           }
         ]
       },
@@ -44990,11 +45199,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "VIII - observar o disposto no artigo 17 da Lei Orgânica do Município.",
-            "art_ref": "109, VIII"
+            "art_ref": "109, VIII",
+            "path": "VIII"
           },
           {
             "html": "I - que infringir qualquer das proibições estabelecidas no artigo 17 da Lei Orgânica do Município;",
-            "art_ref": "125, I"
+            "art_ref": "125, I",
+            "path": "I"
           }
         ]
       },
@@ -45034,7 +45245,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XII - providenciar a expedição, no prazo de 20 (vinte) dias úteis, das certidões que lhe forem solicitadas, bem como atender às requisições judiciais;",
-            "art_ref": "18, XII"
+            "art_ref": "18, XII",
+            "path": "XII"
           }
         ]
       },
@@ -45058,11 +45270,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "4 - criação, organização ou supressão de distritos e subdistritos, divisão do território em áreas administrativas;",
-            "art_ref": "47, III, a, 4"
+            "art_ref": "47, III, a, 4",
+            "path": "III,a,4"
           },
           {
             "html": "l) criação, organização e supressão de distritos e subdistritos, e divisão do território do Município em áreas administrativas;",
-            "art_ref": "103, I, l"
+            "art_ref": "103, I, l",
+            "path": "I,l"
           }
         ]
       },
@@ -45074,15 +45288,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "IX - fiscalizar, inclusive efetuando diligências, vistorias e levantamentos “in loco”, os atos da administração direta e indireta, nos termos da legislação pertinente, em especial …",
-            "art_ref": "46, IX"
+            "art_ref": "46, IX",
+            "path": "IX"
           },
           {
             "html": "b) examinar e emitir parecer sobre os planos e programas municipais e setoriais previstos na Lei Orgânica do Município, e exercer o acompanhamento e a fiscalização orçamentária;",
-            "art_ref": "47, II, b"
+            "art_ref": "47, II, b",
+            "path": "II,b"
           },
           {
             "html": "XII - tomar e julgar as contas do Prefeito, da Mesa e do Tribunal de Contas do Município;",
-            "art_ref": "105, XII"
+            "art_ref": "105, XII",
+            "path": "XII"
           },
           {
             "html": "Art. 385 - As contas do Prefeito, da Mesa da Câmara e do Tribunal de Contas do Município correspondentes a cada exercício financeiro, serão julgadas pela Câmara, através do parecer…",
@@ -45098,11 +45315,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "t) aprovação de Conselheiros do Tribunal de Contas do Município.",
-            "art_ref": "103, I, t"
+            "art_ref": "103, I, t",
+            "path": "I,t"
           },
           {
             "html": "XV - aprovar, após arguição pública, os membros do Tribunal de Contas do Município;",
-            "art_ref": "105, XV"
+            "art_ref": "105, XV",
+            "path": "XV"
           },
           {
             "html": "Art. 352 - A indicação de membros do Tribunal de Contas do Município será feita atendidas as normas previstas nos artigos 49 e 50 da Lei Orgânica do Município.",
@@ -45118,7 +45337,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXVII - aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
-            "art_ref": "105, XXVII"
+            "art_ref": "105, XXVII",
+            "path": "XXVII"
           }
         ]
       },
@@ -45130,19 +45350,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1 -cadastro territorial do Município, planos gerais e parciais de urbanização ou reurbanização,zoneamento e uso e ocupação do solo;",
-            "art_ref": "47, III, a, 1"
+            "art_ref": "47, III, a, 1",
+            "path": "III,a,1"
           },
           {
             "html": "a) zoneamento urbano;",
-            "art_ref": "103, II, a"
+            "art_ref": "103, II, a",
+            "path": "II,a"
           },
           {
             "html": "XXVII - aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
-            "art_ref": "105, XXVII"
+            "art_ref": "105, XXVII",
+            "path": "XXVII"
           },
           {
             "html": "VI – Zoneamento urbano; (Redação dada pela Resolução 3 de 20 de abril de 1995).",
-            "art_ref": "295, parágrafo único, VI"
+            "art_ref": "295, parágrafo único, VI",
+            "path": "§ú,VI"
           }
         ]
       },
@@ -45154,11 +45378,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "5 - Plano Diretor;",
-            "art_ref": "47, III, a, 5"
+            "art_ref": "47, III, a, 5",
+            "path": "III,a,5"
           },
           {
             "html": "VII – Plano Diretor; (Inserido pela Resolução 3 de 20 de abril de 1995).",
-            "art_ref": "295, parágrafo único, VII"
+            "art_ref": "295, parágrafo único, VII",
+            "path": "§ú,VII"
           }
         ]
       },
@@ -45170,7 +45396,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXXII - aprovar o Código de Obras e Edificações;",
-            "art_ref": "105, XXXII"
+            "art_ref": "105, XXXII",
+            "path": "XXXII"
           }
         ]
       },
@@ -45182,11 +45409,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "4 - criação, organização ou supressão de distritos e subdistritos, divisão do território em áreas administrativas;",
-            "art_ref": "47, III, a, 4"
+            "art_ref": "47, III, a, 4",
+            "path": "III,a,4"
           },
           {
             "html": "l) criação, organização e supressão de distritos e subdistritos, e divisão do território do Município em áreas administrativas;",
-            "art_ref": "103, I, l"
+            "art_ref": "103, I, l",
+            "path": "I,l"
           }
         ]
       },
@@ -45198,7 +45427,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não se realizarão sessões ordinárias nos dias feriados e de ponto facultativo.",
-            "art_ref": "153, § 2º"
+            "art_ref": "153, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -45210,7 +45440,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) opinar sobre a regulamentação, gestão, integração e fiscalização dos transportes coletivos e individuais de pessoas e de carga, motorizados e ativos, incluindo o transporte esco…",
-            "art_ref": "47, V, c"
+            "art_ref": "47, V, c",
+            "path": "V,c"
           }
         ]
       },
@@ -45222,15 +45453,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "e) nomear, promover, comissionar, conceder gratificações e licenças, pôr em disponibilidade, exonerar, demitir, aposentar e punir servidores da Câmara Municipal, nos termos da lei;",
-            "art_ref": "13, II, e"
+            "art_ref": "13, II, e",
+            "path": "II,e"
           },
           {
             "html": "3 - pessoal fixo e variável da Prefeitura, do Tribunal de Contas c da Câmara Municipal, bem como a política de recursos humanos;",
-            "art_ref": "47, IV, a, 3"
+            "art_ref": "47, IV, a, 3",
+            "path": "IV,a,3"
           },
           {
             "html": "c) Estatuto dos Servidores Municipais;",
-            "art_ref": "103, I, c"
+            "art_ref": "103, I, c",
+            "path": "I,c"
           },
           {
             "html": "Art. 108 - O servidor público investido no mandato de Vereador poderá afastar-se do cargo, emprego ou função, sendo-lhe facultado optar pelos seus vencimentos ou pela remuneração d…",
@@ -45238,7 +45472,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) nos casos do inciso II, a licença será concedida segundo os mesmos critérios, prazos e condições estabelecidos para os funcionários públicos municipais;",
-            "art_ref": "112, § 3º, c"
+            "art_ref": "112, § 3º, c",
+            "path": "§ 3º,c"
           }
         ]
       },
@@ -45250,27 +45485,33 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "d) enviar ao Tribunal de Contas do Município, até o dia 31 de março, as contas do exercício anterior;",
-            "art_ref": "13, II, d"
+            "art_ref": "13, II, d",
+            "path": "II,d"
           },
           {
             "html": "II - balanço geral anual, que deverá ser enviado até o dia 31 de março do exercício seguinte ao Tribunal de Contas do Município.",
-            "art_ref": "28, II"
+            "art_ref": "28, II",
+            "path": "II"
           },
           {
             "html": "t) aprovação de Conselheiros do Tribunal de Contas do Município.",
-            "art_ref": "103, I, t"
+            "art_ref": "103, I, t",
+            "path": "I,t"
           },
           {
             "html": "a) rejeição do parecer prévio do Tribunal de Contas do Município;",
-            "art_ref": "103, III, a"
+            "art_ref": "103, III, a",
+            "path": "III,a"
           },
           {
             "html": "XII - tomar e julgar as contas do Prefeito, da Mesa e do Tribunal de Contas do Município;",
-            "art_ref": "105, XII"
+            "art_ref": "105, XII",
+            "path": "XII"
           },
           {
             "html": "XV - aprovar, após arguição pública, os membros do Tribunal de Contas do Município;",
-            "art_ref": "105, XV"
+            "art_ref": "105, XV",
+            "path": "XV"
           },
           {
             "html": "Art. 353 - A mensagem do Executivo submetendo à apreciação da Câmara a indicação de membros do Tribunal de Contas do Município, devidamente instruída com o currículo e com os docum…",
@@ -45294,7 +45535,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "4 - preservação da memória da cidade no plano estético, paisagístico, de seu patrimônio histórico, cultural, artístico e arquitetônico;",
-            "art_ref": "47, VI, a, 4"
+            "art_ref": "47, VI, a, 4",
+            "path": "VI,a,4"
           }
         ]
       },
@@ -45306,7 +45548,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) opinar sobre a regulamentação, gestão, integração e fiscalização dos transportes coletivos e individuais de pessoas e de carga, motorizados e ativos, incluindo o transporte esco…",
-            "art_ref": "47, V, c"
+            "art_ref": "47, V, c",
+            "path": "V,c"
           }
         ]
       },
@@ -45318,7 +45561,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) nos casos do inciso II, a licença será concedida segundo os mesmos critérios, prazos e condições estabelecidos para os funcionários públicos municipais;",
-            "art_ref": "112, § 3º, c"
+            "art_ref": "112, § 3º, c",
+            "path": "§ 3º,c"
           }
         ]
       },
@@ -45330,7 +45574,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "e) determinar a inclusão do nome do proponente, bem como da sigla do partido a que pertença, todas as vezes em que a publicação faça referência a qualquer projeto de sua iniciativa…",
-            "art_ref": "17, V, e"
+            "art_ref": "17, V, e",
+            "path": "V,e"
           }
         ]
       },
@@ -45370,11 +45615,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) fiscalizar e acompanhar programas governamentais relativos à proteção dos direitos da criança e do adolescente; (Redação dada pela Resolução nº 01 de 21 de março de 2007)",
-            "art_ref": "47, IX, b"
+            "art_ref": "47, IX, b",
+            "path": "IX,b"
           },
           {
             "html": "§ 6° – No caso do inciso III deste artigo, sempre que a audiência versar sobre matéria relativa à criança e ao adolescente, deverá obrigatoriamente ser expedido convite ao Conselho…",
-            "art_ref": "86, § 6º"
+            "art_ref": "86, § 6º",
+            "path": "§ 6º"
           }
         ]
       },
@@ -45386,7 +45633,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "a) promover estudos e iniciativas no sentido do desenvolvimento do turismo, do lazer, da gastronomia, da hospitalidade e dos eventos no Município de São Paulo; (Redação dada pela R…",
-            "art_ref": "47, XIV, a"
+            "art_ref": "47, XIV, a",
+            "path": "XIV,a"
           }
         ]
       },
@@ -45398,11 +45646,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "4 - criação, organização ou supressão de distritos e subdistritos, divisão do território em áreas administrativas;",
-            "art_ref": "47, III, a, 4"
+            "art_ref": "47, III, a, 4",
+            "path": "III,a,4"
           },
           {
             "html": "l) criação, organização e supressão de distritos e subdistritos, e divisão do território do Município em áreas administrativas;",
-            "art_ref": "103, I, l"
+            "art_ref": "103, I, l",
+            "path": "I,l"
           }
         ]
       },
@@ -45414,7 +45664,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - serviços de utilidade pública, sejam ou não de concessão municipal, planos habitacionais elaborados ou executados pelo Município, diretamente ou por intermédio de autarquias ou…",
-            "art_ref": "47, III, a, 3"
+            "art_ref": "47, III, a, 3",
+            "path": "III,a,3"
           }
         ]
       },
@@ -45426,7 +45677,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) opinar sobre a regulamentação, gestão, integração e fiscalização dos transportes coletivos e individuais de pessoas e de carga, motorizados e ativos, incluindo o transporte esco…",
-            "art_ref": "47, V, c"
+            "art_ref": "47, V, c",
+            "path": "V,c"
           }
         ]
       },
@@ -45438,7 +45690,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) nos casos do inciso II, a licença será concedida segundo os mesmos critérios, prazos e condições estabelecidos para os funcionários públicos municipais;",
-            "art_ref": "112, § 3º, c"
+            "art_ref": "112, § 3º, c",
+            "path": "§ 3º,c"
           }
         ]
       },
@@ -45450,15 +45703,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "4 - criação, organização ou supressão de distritos e subdistritos, divisão do território em áreas administrativas;",
-            "art_ref": "47, III, a, 4"
+            "art_ref": "47, III, a, 4",
+            "path": "III,a,4"
           },
           {
             "html": "l) criação, organização e supressão de distritos e subdistritos, e divisão do território do Município em áreas administrativas;",
-            "art_ref": "103, I, l"
+            "art_ref": "103, I, l",
+            "path": "I,l"
           },
           {
             "html": "m) criação, estruturação e atribuições das Secretarias, Subprefeituras, Conselhos de Representantes e dos órgãos da administração pública;",
-            "art_ref": "103, I, m"
+            "art_ref": "103, I, m",
+            "path": "I,m"
           }
         ]
       },
@@ -45470,7 +45726,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) devolver à Tesouraria da Prefeitura o saldo de caixa existente na Câmara no final do exercício;",
-            "art_ref": "13, II, c"
+            "art_ref": "13, II, c",
+            "path": "II,c"
           }
         ]
       },
@@ -45482,15 +45739,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1) projetos que disponham sobre criação, transformação ou extinção dos cargos, empregos e funções de seus serviços e fixação da respectiva remuneração;",
-            "art_ref": "13, I, b, 1"
+            "art_ref": "13, I, b, 1",
+            "path": "I,b,1"
           },
           {
             "html": "e) nomear, promover, comissionar, conceder gratificações e licenças, pôr em disponibilidade, exonerar, demitir, aposentar e punir servidores da Câmara Municipal, nos termos da lei;",
-            "art_ref": "13, II, e"
+            "art_ref": "13, II, e",
+            "path": "II,e"
           },
           {
             "html": "III - dispor sobre sua organização, funcionamento, polícia, criação, transformação ou extinção dos cargos, empregos e funções de seus serviços e fixação da respectiva remuneração, …",
-            "art_ref": "105, III"
+            "art_ref": "105, III",
+            "path": "III"
           },
           {
             "html": "Art. 247 - A aprovação de projeto de resolução que crie cargos na Secretaria da Câmara depende do voto favorável da maioria absoluta dos Vereadores.",
@@ -45510,19 +45770,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "a) superintender os serviços administrativos da Câmara e elaborar seu regulamento, interpretando conclusivamente, em grau de recurso, os seus dispositivos;",
-            "art_ref": "13, II, a"
+            "art_ref": "13, II, a",
+            "path": "II,a"
           },
           {
             "html": "IX - nomear e exonerar o chefe e os auxiliares do Gabinete da Presidência:",
-            "art_ref": "18, IX"
+            "art_ref": "18, IX",
+            "path": "IX"
           },
           {
             "html": "III - dispor sobre sua organização, funcionamento, polícia, criação, transformação ou extinção dos cargos, empregos e funções de seus serviços e fixação da respectiva remuneração, …",
-            "art_ref": "105, III"
+            "art_ref": "105, III",
+            "path": "III"
           },
           {
             "html": "§ 1º - Cada Líder, que contará com infra-estrutura humana e material suficiente ao exercício de suas funções, poderá indicar Vice-Líderes, na proporção de um para cada 3 (três) Ver…",
-            "art_ref": "119, § 1º"
+            "art_ref": "119, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "Art. 121 – O Prefeito, mediante ofício à Mesa, poderá indicar um Vereador para exercer a Liderança e mais 3 (três) Vereadores para exercerem a Vice-Liderança do Governo, os quais g…",
@@ -45550,7 +45814,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "m) criação, estruturação e atribuições das Secretarias, Subprefeituras, Conselhos de Representantes e dos órgãos da administração pública;",
-            "art_ref": "103, I, m"
+            "art_ref": "103, I, m",
+            "path": "I,m"
           }
         ]
       },
@@ -45562,11 +45827,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "2 – vigilância sanitária, epidemiológica e nutricional; (Redação dada pela Resolução nº 04 de 17 de março de 2010).",
-            "art_ref": "47, VII, a, 2"
+            "art_ref": "47, VII, a, 2",
+            "path": "VII,a,2"
           },
           {
             "html": "3 – segurança do trabalho e saúde do trabalhador; (Redação dada pela Resolução nº 04 de 17 de março de 2010).",
-            "art_ref": "47, VII, a, 3"
+            "art_ref": "47, VII, a, 3",
+            "path": "VII,a,3"
           }
         ]
       },
@@ -45578,7 +45845,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) promover o acompanhamento e o desenvolvimento das políticas públicas voltadas ao idoso e a todas as questões envolvendo a Assistência Social no Município; (Redação dada pela Res…",
-            "art_ref": "47, X, b"
+            "art_ref": "47, X, b",
+            "path": "X,b"
           }
         ]
       },
@@ -45590,7 +45858,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "h) sugerir, acompanhar e fiscalizar a implementação de cooperação entre a Guarda Civil Metropolitana e as corporações policiais de outras esferas de governo; (Inserido pela Resoluç…",
-            "art_ref": "47, XII, h"
+            "art_ref": "47, XII, h",
+            "path": "XII,h"
           }
         ]
       },
@@ -45602,7 +45871,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "m) criação, estruturação e atribuições das Secretarias, Subprefeituras, Conselhos de Representantes e dos órgãos da administração pública;",
-            "art_ref": "103, I, m"
+            "art_ref": "103, I, m",
+            "path": "I,m"
           }
         ]
       },
@@ -45626,15 +45896,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XI - autorizar a convocação de referendo e plebiscito, exceto os casos previstos na Lei Orgânica do Município;",
-            "art_ref": "105, XI"
+            "art_ref": "105, XI",
+            "path": "XI"
           },
           {
             "html": "§ 2º - Tratando-se de iniciativa de cidadãos, deverá ser obedecido o disposto no inciso II doartigo 317 e demais normas do Título IX.",
-            "art_ref": "233, § 2º"
+            "art_ref": "233, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "§ 2º - A iniciativa popular dar-se-á através de projetos de lei de interesse específico do Município, da cidade ou de bairros, através de manifestação de, pelo menos, 5% (cinco por…",
-            "art_ref": "234, § 2º"
+            "art_ref": "234, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "Art. 315 - Será assegurada tramitação especial e urgente às proposituras de iniciativa popular.",
@@ -45654,7 +45927,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) agir judicialmente, em nome da Câmara, “ad referendum” ou por deliberação do Plenário;",
-            "art_ref": "17, VI, b"
+            "art_ref": "17, VI, b",
+            "path": "VI,b"
           }
         ]
       },
@@ -45666,23 +45940,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "5 - denominação de próprios, vias e logradouros públicos;",
-            "art_ref": "47, VI, a, 5"
+            "art_ref": "47, VI, a, 5",
+            "path": "VI,a,5"
           },
           {
             "html": "q) alteração de denominação de próprios, vias e logradouros públicos;",
-            "art_ref": "103, I, q"
+            "art_ref": "103, I, q",
+            "path": "I,q"
           },
           {
             "html": "XXX - autorizar a alteração de denominação de próprios, vias e logradouros públicos;",
-            "art_ref": "105, XXX"
+            "art_ref": "105, XXX",
+            "path": "XXX"
           },
           {
             "html": "II - projetos de lei que visem denominar as vias e logradouros públicos, obedecidas as normas urbanísticas aplicáveis; (Inserido pela Resolução nº 1 de 2019)",
-            "art_ref": "183-A, II"
+            "art_ref": "183-A, II",
+            "path": "II"
           },
           {
             "html": "I - alteração de denominação de próprios, vias e logradouros públicos; (Inserido pela Resolução nº 01, de 13 de março de 2025.)",
-            "art_ref": "288, § 2º, I"
+            "art_ref": "288, § 2º, I",
+            "path": "§ 2º,I"
           }
         ]
       },
@@ -45694,7 +45973,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "a) estabelecer e manter relações e parcerias com organismos multilaterais, organizações não governamentais internacionais, fundações, representantes diplomáticos, empresas internac…",
-            "art_ref": "47, XIII, a"
+            "art_ref": "47, XIII, a",
+            "path": "XIII,a"
           }
         ]
       },
@@ -45706,7 +45986,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "6 - concessão de títulos honoríficos, outorga de honrarias, prêmios ou homenagens a pessoas que, reconhecidamente, tenham prestado serviços ao Município;",
-            "art_ref": "47, VI, a, 6"
+            "art_ref": "47, VI, a, 6",
+            "path": "VI,a,6"
           }
         ]
       },
@@ -45718,15 +45999,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º- Não se realizarão sessões ordinárias nos dias feriados e de ponto facultativo.",
-            "art_ref": "153, § 2º"
+            "art_ref": "153, § 2º",
+            "path": "§ 2º"
           },
           {
             "html": "I - projetos de lei que visem instituir datas comemorativas e eventos no Calendário de Eventos da Cidade de São Paulo; (Inserido pela Resolução nº 1 de 2019)",
-            "art_ref": "183-A, I"
+            "art_ref": "183-A, I",
+            "path": "I"
           },
           {
             "html": "II - alteração na legislação referente a datas comemorativas e eventos do Município de São Paulo; (Inserido pela Resolução nº 01, de 13 de março de 2025.)",
-            "art_ref": "288, § 2º, II"
+            "art_ref": "288, § 2º, II",
+            "path": "§ 2º,II"
           }
         ]
       },
@@ -45738,7 +46022,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "10 - Fundo Municipal de Desenvolvimento de Trânsito; (Inserido pela redação dada pela Resolução nº 08, de 19 de agosto de 2026)",
-            "art_ref": "47, V, a, 10"
+            "art_ref": "47, V, a, 10",
+            "path": "V,a,10"
           }
         ]
       },
@@ -45750,23 +46035,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "5 - Plano Diretor;",
-            "art_ref": "47, III, a, 5"
+            "art_ref": "47, III, a, 5",
+            "path": "III,a,5"
           },
           {
             "html": "b) Plano Diretor.",
-            "art_ref": "103, II, b"
+            "art_ref": "103, II, b",
+            "path": "II,b"
           },
           {
             "html": "XXVII - aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
-            "art_ref": "105, XXVII"
+            "art_ref": "105, XXVII",
+            "path": "XXVII"
           },
           {
             "html": "XXXI - delimitar o perímetro urbano e o de expansão urbana;",
-            "art_ref": "105, XXXI"
+            "art_ref": "105, XXXI",
+            "path": "XXXI"
           },
           {
             "html": "VII – Plano Diretor; (Inserido pela Resolução 3 de 20 de abril de 1995).",
-            "art_ref": "295, parágrafo único, VII"
+            "art_ref": "295, parágrafo único, VII",
+            "path": "§ú,VII"
           }
         ]
       },
@@ -45778,19 +46068,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "1 -cadastro territorial do Município, planos gerais e parciais de urbanização ou reurbanização,zoneamento e uso e ocupação do solo;",
-            "art_ref": "47, III, a, 1"
+            "art_ref": "47, III, a, 1",
+            "path": "III,a,1"
           },
           {
             "html": "a) zoneamento urbano;",
-            "art_ref": "103, II, a"
+            "art_ref": "103, II, a",
+            "path": "II,a"
           },
           {
             "html": "XXVII - aprovar as diretrizes gerais de desenvolvimento urbano, o Plano Diretor, a legislação de controle de uso, de parcelamento e de ocupação do solo urbano;",
-            "art_ref": "105, XXVII"
+            "art_ref": "105, XXVII",
+            "path": "XXVII"
           },
           {
             "html": "VI – Zoneamento urbano; (Redação dada pela Resolução 3 de 20 de abril de 1995).",
-            "art_ref": "295, parágrafo único, VI"
+            "art_ref": "295, parágrafo único, VI",
+            "path": "§ú,VI"
           }
         ]
       },
@@ -45802,11 +46096,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) Código de Obras e Edificações e outros Códigos;",
-            "art_ref": "103, I, b"
+            "art_ref": "103, I, b",
+            "path": "I,b"
           },
           {
             "html": "XXXII - aprovar o Código de Obras e Edificações;",
-            "art_ref": "105, XXXII"
+            "art_ref": "105, XXXII",
+            "path": "XXXII"
           }
         ]
       },
@@ -45818,7 +46114,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) opinar sobre a regulação e fiscalização do uso da rede viária e hidroviária municipal, bem como da rede cicloviária e rede de mobilidade a pé; (Inserido pela redação dada pela R…",
-            "art_ref": "47, V, b"
+            "art_ref": "47, V, b",
+            "path": "V,b"
           }
         ]
       },
@@ -45830,7 +46127,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "b) opinar sobre a regulação e fiscalização do uso da rede viária e hidroviária municipal, bem como da rede cicloviária e rede de mobilidade a pé; (Inserido pela redação dada pela R…",
-            "art_ref": "47, V, b"
+            "art_ref": "47, V, b",
+            "path": "V,b"
           }
         ]
       },
@@ -45842,7 +46140,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "i) promover iniciativas e campanhas de divulgação das leis que amparam os direitos dos animais e os deveres de seus proprietários; (Inserido pela Resolução nº 03, de 18 de junho de…",
-            "art_ref": "47, XI, i"
+            "art_ref": "47, XI, i",
+            "path": "XI,i"
           }
         ]
       },
@@ -45858,7 +46157,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "I - fixação de remuneração do Prefeito e do Vice-Prefeito;",
-            "art_ref": "236, parágrafo único, I"
+            "art_ref": "236, parágrafo único, I",
+            "path": "§ú,I"
           }
         ]
       },
@@ -45870,7 +46170,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "e) nomear, promover, comissionar, conceder gratificações e licenças, pôr em disponibilidade, exonerar, demitir, aposentar e punir servidores da Câmara Municipal, nos termos da lei;",
-            "art_ref": "13, II, e"
+            "art_ref": "13, II, e",
+            "path": "II,e"
           }
         ]
       },
@@ -45882,7 +46183,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "3 - turismo e defesa do consumidor; (Redação dada pela Resolução nº 08, de 19 de agosto de 2026)",
-            "art_ref": "47, V, a, 3"
+            "art_ref": "47, V, a, 3",
+            "path": "V,a,3"
           }
         ]
       },
@@ -45894,7 +46196,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - O policiamento poderá ser feito por investigadores da Polícia, elementos da Guarda Civil Metropolitana, Polícia Militar ou ou-tros elementos requisitados à Secret…",
-            "art_ref": "374, parágrafo único"
+            "art_ref": "374, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -45930,7 +46233,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "2 - normas gerais de licitações, em todas as suas modalidades, c contratação de produtos,obras c serviços da administração direta e indireta;",
-            "art_ref": "47, IV, a, 2"
+            "art_ref": "47, IV, a, 2",
+            "path": "IV,a,2"
           }
         ]
       },
@@ -45942,7 +46246,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "e) propor, articular e coordenar o desenvolvimento e a consolidação de ambientes promotores da inovação e as ações destinadas aos empreendimentos de base tecnológica. (Redação dada…",
-            "art_ref": "47, XV, e"
+            "art_ref": "47, XV, e",
+            "path": "XV,e"
           }
         ]
       },
@@ -45954,7 +46259,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "f) regulamentar o processo de licitações, observando-se o disposto no artigo 129 e parágrafos da Lei Orgânica do Município;",
-            "art_ref": "13, II, f"
+            "art_ref": "13, II, f",
+            "path": "II,f"
           }
         ]
       },
@@ -45966,7 +46272,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - O policiamento poderá ser feito por investigadores da Polícia, elementos da Guarda Civil Metropolitana, Polícia Militar ou ou-tros elementos requisitados à Secret…",
-            "art_ref": "374, parágrafo único"
+            "art_ref": "374, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -45978,7 +46285,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "g) permitir sejam divulgados os trabalhos da Câmara no Plenário ou nas Comissões, observando-se o disposto no artigo 85 da Lei Orgânica do Município, sem ônus para os cofres públic…",
-            "art_ref": "13, II, g"
+            "art_ref": "13, II, g",
+            "path": "II,g"
           }
         ]
       },
@@ -45990,7 +46298,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único – O processo eletrônico de registro de votos dar-se-á conforme disposto em resolução. (Redação dada pela Resolução 16 de 04 de novembro de 1997)",
-            "art_ref": "293, parágrafo único"
+            "art_ref": "293, parágrafo único",
+            "path": "§ú"
           },
           {
             "html": "Art. 296 - Ao submeter qualquer matéria à votação nominal, o Presidente convidará os Vereadores a responderem “sim” ou “não”, conforme sejam favoráveis ou contrários. (Vide Precede…",
@@ -46018,11 +46327,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XIV - julgar o Prefeito, o Vice-Prefeito e os Vereadores nos casos previstos em lei;",
-            "art_ref": "105, XIV"
+            "art_ref": "105, XIV",
+            "path": "XIV"
           },
           {
             "html": "§ 1º- No ato da posse, os Vereadores deverão desincompatibilizar-se e, na mesma ocasião, bem como ao término do mandato, deverão fazer a declaração pública de seus bens, a ser tran…",
-            "art_ref": "106, § 1º"
+            "art_ref": "106, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "Art. 109 - São deveres do Vereador: (Vide Ato nº 654/99)",
@@ -46050,15 +46361,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "II - perda de mandato de Vereador;",
-            "art_ref": "237, parágrafo único, II"
+            "art_ref": "237, parágrafo único, II",
+            "path": "§ú,II"
           },
           {
             "html": "§ 1º - O Vereador que se considerar impedido de votar, nos termos do presente artigo, fará a devida comunicação ao Presidente, computando-se, todavia, sua presença para efeito de “…",
-            "art_ref": "288, § 1º"
+            "art_ref": "288, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "h) processo de cassação de mandato de Vereador: 15 (quinze) minutos para cada Vereador e 120 (cento e vinte) minutos para o relator e o denunciado ou para seu procurador, com apart…",
-            "art_ref": "306, V, h"
+            "art_ref": "306, V, h",
+            "path": "V,h"
           }
         ]
       },
@@ -46070,7 +46384,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "IX - Da Comissão Extraordinária Permanente de Defesa dos Direitos da Criança, do Adolescente e da Juventude: (Redação dada pela Resolução nº 01 de 21 de março de 2007)",
-            "art_ref": "47, IX"
+            "art_ref": "47, IX",
+            "path": "IX"
           }
         ]
       },
@@ -46094,7 +46409,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "VIII - Da Comissão Extraordinária Permanente de Defesa dos Direitos Humanos e Cidadania: (Redação dada pela Resolução nº 21 de 13 de dezembro de 2017).",
-            "art_ref": "47, VIII"
+            "art_ref": "47, VIII",
+            "path": "VIII"
           }
         ]
       },
@@ -46106,7 +46422,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "V - realizar audiências públicas;",
-            "art_ref": "46, V"
+            "art_ref": "46, V",
+            "path": "V"
           },
           {
             "html": "Art. 85 - As Comissões Permanentes, isoladamente ou em conjunto, deverão convocar audiências públicas sobre:",
@@ -46122,7 +46439,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) receber, avaliar e proceder investigações e denúncias relativas às ameaças dos interesses e direitos da mulher; (Redação dada pela Resolução nº 04 de 17 de março de 2010).",
-            "art_ref": "47, VII, c"
+            "art_ref": "47, VII, c",
+            "path": "VII,c"
           }
         ]
       },
@@ -46138,7 +46456,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "IV - fixação de remuneração dos Vereadores;",
-            "art_ref": "237, parágrafo único, IV"
+            "art_ref": "237, parágrafo único, IV",
+            "path": "§ú,IV"
           }
         ]
       },
@@ -46150,7 +46469,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "a) receber, avaliar e proceder investigações de denúncias relativas às ameaças ou violação aos direitos da criança e do adolescente; (Redação dada pela Resolução nº 01 de 21 de mar…",
-            "art_ref": "47, IX, a"
+            "art_ref": "47, IX, a",
+            "path": "IX,a"
           }
         ]
       },
@@ -46178,7 +46498,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XII - providenciar a expedição, no prazo de 20 (vinte) dias úteis, das certidões que lhe forem solicitadas, bem como atender às requisições judiciais;",
-            "art_ref": "18, XII"
+            "art_ref": "18, XII",
+            "path": "XII"
           }
         ]
       },
@@ -46190,7 +46511,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - Cada Bancada poderá credenciar assessores para acompanhar os trabalhos na proporção de um para cada cinco membros da mesma, desde que igualmente trajados.",
-            "art_ref": "138, parágrafo único"
+            "art_ref": "138, parágrafo único",
+            "path": "§ú"
           },
           {
             "html": "Art. 376 - No recinto do Plenário e em outras dependências da Câmara, reservadas a critério da Mesa, só serão admitidos Vereadores e funcionários da Secretaria, estes quando em ser…",
@@ -46206,7 +46528,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) determinar lugar reservado aos repre-sentantes credenciados da imprensa escrita, falada e televisionada;",
-            "art_ref": "17, VI, c"
+            "art_ref": "17, VI, c",
+            "path": "VI,c"
           },
           {
             "html": "Art. 375 - O corpo de policiamento cuidará, também, para que as tribunas reservadas para convidados especiais, representantes do Corpo Consular, bem como da imprensa escrita, falad…",
@@ -46222,15 +46545,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "IV - justificar a ausência de Vereador às sessões plenárias, quando motivada pelo desempenho de suas funções em Comissões Temporárias, em caso de doença, nojo ou gala, mediante req…",
-            "art_ref": "18, IV"
+            "art_ref": "18, IV",
+            "path": "IV"
           },
           {
             "html": "XVII - encaminhar ao Presidente da Câmara as solicitações de justificação das faltas de membros da Comissão às reuniões;",
-            "art_ref": "50, XVII"
+            "art_ref": "50, XVII",
+            "path": "XVII"
           },
           {
             "html": "XI - justificação de falta do Vereador às sessões plenárias;",
-            "art_ref": "223, XI"
+            "art_ref": "223, XI",
+            "path": "XI"
           }
         ]
       },
@@ -46254,7 +46580,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "XXXIII - conceder títulos de cidadão honorário ou qualquer outra honraria;",
-            "art_ref": "105, XXXIII"
+            "art_ref": "105, XXXIII",
+            "path": "XXXIII"
           },
           {
             "html": "Art. 347 - Por via de projeto de decreto legislativo, aprovado em discussão e votação únicas, no mínimo por 2/3 (dois terços) de seus membros, a Câmara poderá conceder título de ci…",
@@ -46262,7 +46589,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - Tão logo seja aprovada a concessão do título honorífico, será expedido o respeclivo diploma com a imediata assinatura do autor da propositura.",
-            "art_ref": "350, parágrafo único"
+            "art_ref": "350, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -46274,7 +46602,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 1º- É incompatível com o decoro parlamentar, além dos casos definidos neste Regimento, o abuso das prerrogativas asseguradas a membros da Câmara Municipal ou a percepção de vanta…",
-            "art_ref": "125, § 1º"
+            "art_ref": "125, § 1º",
+            "path": "§ 1º"
           }
         ]
       },
@@ -46286,7 +46615,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 1º- No ato da posse, os Vereadores deverão desincompatibilizar-se e, na mesma ocasião, bem como ao término do mandato, deverão fazer a declaração pública de seus bens, a ser tran…",
-            "art_ref": "106, § 1º"
+            "art_ref": "106, § 1º",
+            "path": "§ 1º"
           }
         ]
       },
@@ -46298,7 +46628,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "II - No setor administrativo:",
-            "art_ref": "13, II"
+            "art_ref": "13, II",
+            "path": "II"
           }
         ]
       },
@@ -46310,7 +46641,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "II - a Mesa obrigar-se-á a promover a publicação do anúncio da audiência solicitada pela Comissão competente, em pelo menos 2 (dois) jornais de grande circulação, observando-se, qu…",
-            "art_ref": "86, II"
+            "art_ref": "86, II",
+            "path": "II"
           }
         ]
       },
@@ -46322,7 +46654,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "Parágrafo único - O policiamento poderá ser feito por investigadores da Polícia, elementos da Guarda Civil Metropolitana, Polícia Militar ou ou-tros elementos requisitados à Secret…",
-            "art_ref": "374, parágrafo único"
+            "art_ref": "374, parágrafo único",
+            "path": "§ú"
           }
         ]
       },
@@ -46334,7 +46667,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "a) superintender os serviços administrativos da Câmara e elaborar seu regulamento, interpretando conclusivamente, em grau de recurso, os seus dispositivos;",
-            "art_ref": "13, II, a"
+            "art_ref": "13, II, a",
+            "path": "II,a"
           },
           {
             "html": "Art. 372 - Os serviços administrativos da Câmara serão feitos através de sua Secretaria, segundo as determinações da Mesa e serão regidos pelo respectivo Regulamento.",
@@ -46362,7 +46696,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 1º - Cada Líder, que contará com infra-estrutura humana e material suficiente ao exercício de suas funções, poderá indicar Vice-Líderes, na proporção de um para cada 3 (três) Ver…",
-            "art_ref": "119, § 1º"
+            "art_ref": "119, § 1º",
+            "path": "§ 1º"
           }
         ]
       },
@@ -46386,11 +46721,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 1º- Reputam-se nulas as sessões da Câmara realizadas fora de sua sede, à exceção das sessões solenes ou comemorativas.",
-            "art_ref": "1, § 1º"
+            "art_ref": "1, § 1º",
+            "path": "§ 1º"
           },
           {
             "html": "§ 3º - Na sede da Câmara não se realizarão atos estranhos à sua função, sem prévia autorização da Mesa.",
-            "art_ref": "1, § 3º"
+            "art_ref": "1, § 3º",
+            "path": "§ 3º"
           },
           {
             "html": "Art. 58 - As Comissões Permanentes devem reunir-se nas salas destinadas a esse fim e com a presença da maioria de seus membros.",
@@ -46410,7 +46747,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 3º - Na sede da Câmara não se realizarão atos estranhos à sua função, sem prévia autorização da Mesa.",
-            "art_ref": "1, § 3º"
+            "art_ref": "1, § 3º",
+            "path": "§ 3º"
           }
         ]
       },
@@ -46422,7 +46760,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "c) determinar a publicação de informações, notas e documentos que digam respeito às atividades da Câmara e devam ser divulgados.",
-            "art_ref": "17, V, c"
+            "art_ref": "17, V, c",
+            "path": "V,c"
           }
         ]
       },
@@ -46438,11 +46777,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 3º - Os substitutivos poderão ser apresentados eletronicamente, os quais serão submetidos a apoiamento com assinatura digital ou por meio de manifestação expressa no chat do sist…",
-            "art_ref": "269, § 3º"
+            "art_ref": "269, § 3º",
+            "path": "§ 3º"
           },
           {
             "html": "§ 2º As emendas poderão ser apresentadas eletronicamente, as quais serão submetidas a apoiamento com assinatura digital ou por meio de manifestação expressa no chat do sistema virt…",
-            "art_ref": "271, § 2º"
+            "art_ref": "271, § 2º",
+            "path": "§ 2º"
           }
         ]
       },
@@ -46454,7 +46795,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "h) determinar abertura de sindicâncias e inquéritos administrativos.",
-            "art_ref": "13, II, h"
+            "art_ref": "13, II, h",
+            "path": "II,h"
           }
         ]
       },
@@ -46466,7 +46808,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "f) regulamentar o processo de licitações, observando-se o disposto no artigo 129 e parágrafos da Lei Orgânica do Município;",
-            "art_ref": "13, II, f"
+            "art_ref": "13, II, f",
+            "path": "II,f"
           }
         ]
       },
@@ -46478,7 +46821,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 3º - Na sede da Câmara não se realizarão atos estranhos à sua função, sem prévia autorização da Mesa.",
-            "art_ref": "1, § 3º"
+            "art_ref": "1, § 3º",
+            "path": "§ 3º"
           }
         ]
       },
@@ -46490,7 +46834,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "html": "§ 2º - Havendo motivo relevante ou de força maior, a Câmara poderá, por deliberação da Mesa, “ad referendum” da maioria absoluta dos Vereadores, reunir-se em outro edifício ou em p…",
-            "art_ref": "1, § 2º"
+            "art_ref": "1, § 2º",
+            "path": "§ 2º"
           }
         ]
       }
@@ -46537,6 +46882,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   let zoomTimeout = null;
   let searchMatches = [];
   let searchIdx = 0;
+  let indexMatches = null;   // the indexes' entries with the search terms (see searchIndexes)
   let currentRefCategory = 0;
   let markerFilter = false;
   let markerTooltipTimer = null;
@@ -47213,10 +47559,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   }
 
   function resetSearchNav() {
+    indexMatches = null;
     hideResults();
     searchMatches = [];
     searchIdx = 0;
-    $searchNav.classList.remove('open');
+    $searchNav.classList.remove('open', 'index-only');
     $searchInput.classList.remove('has-nav');
     updateSearchTicks();
     scheduleMinimap();
@@ -47313,19 +47660,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     }
 
     searchMatches = articleCards.filter(c => matchedCards.has(c));
+    // The same terms again (a filter changed): the same object, so the list
+    // keeps its indexes' part
+    const indexKey = JSON.stringify([phrases, words]);
+    if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
     searchIdx = 0;
     showResults();
 
     if (searchMatches.length > 0) {
       $searchNav.classList.add('open');
+      $searchNav.classList.remove('index-only');
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
       updateSearchTicks();
       scrollToFirstMark(searchMatches[0]);
       selectCard(searchMatches[0], true);
     } else {
-      $searchNav.classList.remove('open');
-      $searchInput.classList.remove('has-nav');
+      // Found only in the indexes: the counter (which opens the list) says so
+      const inIndex = indexMatches.count > 0;
+      $searchNav.classList.toggle('open', inIndex);
+      $searchNav.classList.toggle('index-only', inIndex);
+      $searchInput.classList.toggle('has-nav', inIndex);
+      if (inIndex) updateSearchCounter();
       updateSearchTicks();
     }
     scheduleMinimap();
@@ -47407,7 +47763,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   });
 
   function updateSearchCounter() {
-    $searchCounter.textContent = (searchIdx + 1) + ' / ' + searchMatches.length;
+    $searchCounter.textContent = searchMatches.length ? (searchIdx + 1) + ' / ' + searchMatches.length
+      : (indexMatches ? indexMatches.count : 0) + ' no índice';
   }
 
   function updateSearchTicks() {
@@ -47521,6 +47878,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   let resultsHidden = false;        // sidebar closed by the user (remembered)
   try { resultsHidden = localStorage.getItem('regimento-results-hidden') === '1'; } catch (e) {}
   let resultGroups = new Map();     // card → its group element in the list
+  let indexPart = null;             // the list's element with the indexes' results
+  let indexPartFor = null;          // the indexMatches it shows
   const groupCards = new WeakMap(); // group element → card
   const filledGroups = new WeakSet();
   let resultsAppended = 0;          // searchMatches with a group in the list so far
@@ -47579,7 +47938,9 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     clearResultsList();
   }
 
-  function clearResultsList() {
+  // keepIndex: the indexes' results stay (as expanded, focused and scrolled
+  // as they are); only the cards' results go
+  function clearResultsList(keepIndex) {
     if (!resultsBuiltFor) return;
     resultsFillObserver.disconnect();
     resultsMoreObserver.disconnect();
@@ -47588,7 +47949,16 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     resultsAppended = 0;
     currentResultGroup = null;
     revealGroup = null;
-    $resultsList.textContent = '';
+    revealPending = false;
+    if (keepIndex && indexPart && $resultsList.lastChild !== indexPart) {
+      const rest = document.createRange();
+      rest.setStartAfter(indexPart);
+      rest.setEndAfter($resultsList.lastChild);
+      rest.deleteContents();
+    } else if (!keepIndex) {
+      $resultsList.textContent = '';
+      indexPart = indexPartFor = null;
+    }
     $resultsSummary.textContent = '';
   }
 
@@ -47597,7 +47967,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     document.body.classList.toggle('results-drawer-open', resultsDrawerOpen);
     $indexOverlay.classList.toggle('open', resultsDrawerOpen || $indexPanel.classList.contains('open'));
     $indexResultsLink.hidden = !resultsActive;
-    if (resultsActive) $indexResultsLink.textContent = 'Lista de resultados da busca (' + searchMatches.length + ') ›';
+    if (resultsActive) {
+      const n = searchMatches.length + (indexMatches ? indexMatches.count : 0);
+      $indexResultsLink.textContent = 'Lista de resultados da busca (' + n + ') ›';
+    }
     const shown = resultsShown();
     $searchCounter.setAttribute('aria-expanded', shown ? 'true' : 'false');
     const becameShown = shown && !resultsPanelShown;
@@ -47613,9 +47986,20 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       scheduleResultsBuild();
     } else if (becameShown) {
       observeLastResultGroup();
-      markCurrentResult(selectedCard);
-      revealCurrentResult(true);
+      // Shown again as built: the indexes' results first, if the first match
+      // is still the selected one
+      if (!listStartsWithIndex()) {
+        markCurrentResult(selectedCard);
+        revealCurrentResult(true);
+      }
     }
+  }
+
+  // The list starts with the indexes' results, and the first match (right
+  // below them) is marked but not scrolled to
+  function listStartsWithIndex() {
+    return indexMatches !== null && indexMatches.count > 0 && searchMatches.length > 0
+      && selectedCard === searchMatches[0];
   }
 
   // Built after the search result is painted, so typing stays responsive
@@ -47661,10 +48045,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   }
 
   function buildResultsList() {
-    clearResultsList();
+    // Rebuilt for the same search (a subject or section opened from the list
+    // runs it again): the indexes' results are the same, and stay as they are
+    const keepIndex = indexPart !== null && indexPartFor === indexMatches;
+    const scrollTop = $resultsList.scrollTop;
+    clearResultsList(keepIndex);
     resultsBuiltFor = searchMatches;
     resultsLaw = null;
-    $resultsList.scrollTop = 0;
+    if (!keepIndex) $resultsList.scrollTop = 0;
 
     let hits = 0;
     const noisy = new Map(); // element → inside RESULT_NOISE
@@ -47678,17 +48066,22 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     }
     const nPrec = searchMatches.filter(isPrecCard).length;
     const nArt = searchMatches.length - nPrec;
+    const nIndex = indexMatches ? indexMatches.count : 0;
     const counts = [];
     if (nArt) counts.push(nArt + (nArt === 1 ? ' artigo' : ' artigos'));
     if (nPrec) counts.push(nPrec + (nPrec === 1 ? ' precedente' : ' precedentes'));
-    $resultsSummary.textContent = searchMatches.length
-      ? counts.join(', ') + ' · ' + hits + (hits === 1 ? ' ocorrência' : ' ocorrências')
-      : '';
+    const summary = [];
+    if (searchMatches.length) summary.push(counts.join(', '), hits + (hits === 1 ? ' ocorrência' : ' ocorrências'));
+    if (nIndex) summary.push(nIndex + ' no índice');
+    $resultsSummary.textContent = summary.join(' · ');
+    if (nIndex && !keepIndex) appendIndexResults();
     if (!searchMatches.length) {
       const empty = document.createElement('div');
       empty.className = 'res-empty';
-      empty.textContent = 'Nenhum resultado para “' + currentSearch + '”';
+      empty.textContent = nIndex ? 'Nenhum resultado no texto das normas'
+        : 'Nenhum resultado para “' + currentSearch + '”';
       $resultsList.appendChild(empty);
+      if (keepIndex) $resultsList.scrollTop = scrollTop;
       return;
     }
 
@@ -47696,14 +48089,20 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     // The top of the list shows filled right away (the observer reports later)
     for (const card of searchMatches.slice(0, RESULTS_FILLED_UPFRONT)) fillResultGroup(card);
     observeLastResultGroup();
-    markCurrentResult(selectedCard);
+    // The list stays where it was (on the indexes' result just used), or
+    // starts at its top with the indexes' results: the selected match is
+    // marked, not scrolled to
+    if (keepIndex) $resultsList.scrollTop = scrollTop;
+    markCurrentResult(selectedCard, !keepIndex && !listStartsWithIndex());
   }
 
   // Appends groups for searchMatches[resultsAppended, until), stopping early
-  // at the deadline (a performance.now() time)
+  // at the deadline (a performance.now() time); the list's first group is
+  // always appended
   function appendResultGroups(until, deadline = Infinity) {
     const frag = document.createDocumentFragment();
-    while (resultsAppended < until && performance.now() < deadline) {
+    while (resultsAppended < until) {
+      if (resultsAppended && performance.now() >= deadline) break;
       const card = searchMatches[resultsAppended++];
       const lawTitle = resultLawTitle(card);
       if (lawTitle !== resultsLaw) {
@@ -47711,6 +48110,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         if (lawTitle) {
           const sep = document.createElement('div');
           sep.className = 'res-law';
+          sep.setAttribute('role', 'heading');
+          sep.setAttribute('aria-level', '3');
           sep.textContent = lawTitle;
           frag.appendChild(sep);
         }
@@ -47972,7 +48373,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   }
 
   // Highlights the group of the selected card and scrolls the list to it
-  function markCurrentResult(card) {
+  // (unless reveal is false)
+  function markCurrentResult(card, reveal = true) {
     if (resultsBuiltFor !== searchMatches || !card) return;
     if (!resultsShown()) {
       // Nothing appended nor measured in a hidden list: it's revealed when shown
@@ -47990,20 +48392,24 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     const group = resultGroups.get(card);
     if (!group || group === currentResultGroup) return;
     setCurrentResultGroup(group);
-    revealCurrentResult(false);
+    if (reveal) revealCurrentResult(false);
   }
 
   function setCurrentResultGroup(group) {
     if (currentResultGroup) currentResultGroup.classList.remove('current');
     currentResultGroup = group;
-    group.classList.add('current');
+    if (group) group.classList.add('current');
   }
 
   // Scrolls the list to the current group, unless the mouse is on it (then
   // it waits for the mouse to leave)
   function revealCurrentResult(force) {
     const group = currentResultGroup;
-    if (!group || !resultsShown()) {
+    if (!group) {
+      revealPending = false;
+      return;
+    }
+    if (!resultsShown()) {
       revealPending = true;
       return;
     }
@@ -48079,6 +48485,384 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     resultsDrawerOpen = false;
     preserveScroll(updateResultsVisibility);
   });
+
+  // ===== INDEX RESULTS =====
+  // The entries of the three indexes (sistemático, remissivo, referências)
+  // with every term of the search, at the top of the results list. Matched by
+  // their own text: a section by its title, a subject by its name (a
+  // sub-subject together with its subject's), a prazo or quórum by its group
+  // title and text, a norm of the legislação correlata by its name and ementa.
+  // Precedents (leaves of the sistemático) and the provisions' texts are in
+  // the cards, which the search already lists.
+  const INDEX_GROUPS_SHOWN = 3;   // per index; the rest behind "+ N"
+  const INDEX_ENTRIES_SHOWN = 2;  // per group (sub-subjects, prazos)
+  const ART_LINKS_SHOWN = 6;      // a norm's provisions (legislação correlata)
+  const REFS_SHOWN = 4;           // a subject's articles shown beside it
+  const LEGISLACAO = 'Legislação correlata';
+  let indexItems = null;          // the indexes' entries and their normalized text
+
+  function normIndexText(s) {
+    return stripAccents(s.toLowerCase()).replace(/\s+/g, ' ');
+  }
+
+  function htmlToText(html) {
+    const t = document.createElement('template');
+    t.innerHTML = html;
+    return t.content.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  // Fields matched together are joined by a character no term has: words
+  // may be in different fields, a phrase must be in one
+  const FIELD_SEP = '\u0000';
+
+  function getIndexItems() {
+    if (indexItems) return indexItems;
+    const sys = [];
+    (function walk(nodes, ctx) {
+      for (const node of nodes) {
+        if (node.art || !node.title) continue;
+        sys.push({ node, ctx, text: normIndexText(node.title) });
+        // "TÍTULO I — DA CÂMARA MUNICIPAL" → "TÍTULO I" in its children's context
+        if (node.children) walk(node.children, ctx.concat(node.title.split(' — ')[0]));
+      }
+    })(SYSTEMATIC_INDEX, []);
+
+    const subj = SUBJECT_INDEX.slice()
+      .sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'))
+      .map(entry => {
+        const text = normIndexText(entry.subject);
+        return {
+          entry,
+          text,
+          children: (entry.children || []).map(ch => {
+            const own = normIndexText(ch.sub_subject);
+            return { ch, text: own, withSubject: text + FIELD_SEP + own };
+          }),
+        };
+      });
+
+    const refs = [];
+    for (const cat of REFERENCIAS_INDEX) {
+      const leg = cat.category === LEGISLACAO;
+      for (const group of cat.groups) {
+        const title = normIndexText(group.title);
+        const entries = group.entries.map(e => ({ e, text: htmlToText(e.html) }));
+        if (leg) {
+          // the ementa (the entry without an article), then the provisions
+          const ementa = entries.filter(x => !x.e.art_ref).map(x => x.text);
+          refs.push({ cat, leg, group, ementa: ementa.join(' '), entries: entries.filter(x => x.e.art_ref),
+                      text: [title].concat(ementa.map(normIndexText)).join(FIELD_SEP) });
+        } else {
+          for (const x of entries) x.withTitle = title + FIELD_SEP + normIndexText(x.text);
+          refs.push({ cat, leg, group, entries });
+        }
+      }
+    }
+    return indexItems = { sys, subj, refs };
+  }
+
+  // The indexes' entries with every phrase and word (as parseSearchTerms
+  // returns them): {sections: [{title, hits, build}], count, regex, key}
+  function searchIndexes(phrases, words, regex, key) {
+    const has = text => phrases.every(p => text.includes(p)) && words.every(w => text.includes(w));
+    const { sys, subj, refs } = getIndexItems();
+
+    const sysHits = sys.filter(it => has(it.text));
+
+    // Subjects found by their name first, then those found by a sub-subject
+    const byName = [], bySub = [];
+    for (const it of subj) {
+      const self = has(it.text);
+      const subs = it.children.filter(c => has(self ? c.text : c.withSubject));
+      if (self) byName.push({ it, subs, byName: true });
+      else if (subs.length) bySub.push({ it, subs, byName: false });
+    }
+
+    const refHits = [];
+    for (const it of refs) {
+      if (it.leg) {
+        if (has(it.text)) refHits.push({ it, entries: it.entries });
+      } else {
+        const entries = it.entries.filter(x => has(x.withTitle));
+        if (entries.length) refHits.push({ it, entries });
+      }
+    }
+
+    const sections = [
+      { title: 'Índice sistemático', where: 'no índice sistemático', hits: sysHits, build: buildSysResult },
+      { title: 'Índice remissivo', where: 'no índice remissivo', hits: byName.concat(bySub), build: buildSubjectResult },
+      { title: 'Referências', where: 'nas referências', hits: refHits, build: buildRefResult },
+    ].filter(s => s.hits.length);
+    return { sections, count: sections.reduce((n, s) => n + s.hits.length, 0), regex, key };
+  }
+
+  // The indexes' part of the list, in one element at its top (kept when the
+  // list is rebuilt for the same indexMatches: see buildResultsList)
+  function appendIndexResults() {
+    indexPart = document.createElement('div');
+    indexPart.className = 'res-idx-part';
+    indexPartFor = indexMatches;
+    for (const sec of indexMatches.sections) {
+      const head = document.createElement('div');
+      head.className = 'res-idx';
+      head.setAttribute('role', 'heading');
+      head.setAttribute('aria-level', '3');
+      head.textContent = sec.title + ' · ' + sec.hits.length;
+      indexPart.appendChild(head);
+      const more = appendWithMore(indexPart, sec.hits, INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');
+      if (more) more.setAttribute('aria-label', more.textContent + ' ' + sec.where);
+    }
+    $resultsList.appendChild(indexPart);
+  }
+
+  // Appends build(item) of the first `shown` items to parent, the rest behind
+  // a "+ N" button (returned). noun: [singular, plural].
+  function appendWithMore(parent, items, shown, build, noun, cls) {
+    for (const item of items.slice(0, shown)) parent.appendChild(build(item));
+    const rest = items.length - shown;
+    if (rest <= 0) return null;
+    const more = document.createElement('button');
+    more.className = 'res-expand' + (cls ? ' ' + cls : '');
+    more.textContent = '+ ' + rest + ' ' + noun[rest === 1 ? 0 : 1];
+    more.addEventListener('click', () => {
+      const hadFocus = document.activeElement === more;
+      const added = items.slice(shown).map(build);
+      more.before(...added);
+      // the keyboard goes on from the first entry shown now (or, if none of
+      // them does anything, from the next one in the list)
+      let next = null;
+      if (hadFocus) {
+        for (const el of added) {
+          next = el.matches('button') ? el : el.querySelector('button');
+          if (next) break;
+        }
+        if (!next) {
+          const last = added[added.length - 1];
+          next = Array.from($resultsList.querySelectorAll('button')).find(b =>
+            b !== more && last.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+        }
+      }
+      more.remove();
+      if (next) next.focus();
+    });
+    parent.appendChild(more);
+    return more;
+  }
+
+  // text as HTML with the search's matches marked; whole, or (long texts)
+  // just around the matches
+  function indexMarkHtml(text, snippet) {
+    const re = indexMatches.regex;
+    const spans = [];
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null) {
+      if (!m[0].length) { re.lastIndex++; continue; }
+      spans.push([m.index, m.index + m[0].length]);
+    }
+    return snippet ? snippetHtml(text, spans) : markSpans(text, 0, text.length, spans);
+  }
+
+  // label: what the group is (a subject, a norm), for screen readers
+  // entering one of its entries
+  function indexGroup(label) {
+    const group = document.createElement('div');
+    group.className = 'res-group res-idx-group';
+    if (label) {
+      group.setAttribute('role', 'group');
+      group.setAttribute('aria-label', label);
+    }
+    return group;
+  }
+
+  // A button of the list: go() moves the page (and returns the element to
+  // focus, if not the selected card). Without go (nothing to open), plain text.
+  function indexButton(cls, html, go) {
+    const el = document.createElement(go ? 'button' : 'div');
+    el.className = cls + (go ? '' : ' res-inert');
+    el.innerHTML = html;
+    if (go) el.addEventListener('click', e => goToIndexResult(e, go));
+    return el;
+  }
+
+  function goToIndexResult(event, go) {
+    const fromDrawer = resultsDrawerOpen;
+    if (resultsDrawerOpen) {
+      resultsDrawerOpen = false;
+      updateResultsVisibility();
+    }
+    const target = go() || selectedCard;
+    // As in goToResult: after a click or tap, the keys scroll the page
+    // (keyboard activation keeps the focus on the sidebar list, which keeps
+    // its indexes' part when the search runs again)
+    if (target && (fromDrawer || (event && event.detail > 0))) {
+      if (!target.hasAttribute('tabindex')) target.tabIndex = -1;
+      target.focus({ preventScroll: true });
+    }
+  }
+
+  // A section of the sistemático: "TÍTULO III › CAPÍTULO II — DAS COMISSÕES PERMANENTES (art. 46–79)"
+  function buildSysResult(hit) {
+    const { node, ctx } = hit;
+    let html = ctx.length ? '<span class="res-ctx">' + escapeHtml(ctx.join(' › ')) + ' › </span>' : '';
+    html += indexMarkHtml(node.title);
+    if (node.art_range && !(node.children && node.children.length)) {
+      html += ' <span class="res-sum">' + escapeHtml(node.art_range) + '</span>';
+    }
+    const group = indexGroup();
+    group.appendChild(indexButton('res-head', html, () => navigateToSection(node.section_id)));
+    return group;
+  }
+
+  // A subject of the remissivo: its sub-subjects with the terms (and their
+  // "vide") and, found by its name, its articles and "vide"; each opens the
+  // subject pill with its articles
+  function buildSubjectResult(hit) {
+    const { entry } = hit.it;
+    const group = indexGroup(entry.subject);
+    const allRefs = collectAllRefs(entry);
+    group.appendChild(indexButton('res-head', indexMarkHtml(entry.subject) + (hit.byName ? refsHtml(entry.refs) : ''),
+      allRefs.length ? () => { openSubjectPill({ subject: entry.subject, refs: allRefs }); } : null));
+    const items = [];
+    for (const sub of hit.subs) {
+      items.push({ sub });
+      for (const vide of sub.ch.vides || []) items.push({ vide });
+    }
+    if (hit.byName) for (const vide of entry.vides || []) items.push({ vide });
+    const noun = items.slice(INDEX_ENTRIES_SHOWN).every(item => item.sub) ? ['subassunto', 'subassuntos'] : ['outro', 'outros'];
+    appendWithMore(group, items, INDEX_ENTRIES_SHOWN, ({ sub, vide }) => {
+      if (vide) {
+        const target = findVide(vide);
+        return indexButton('res-entry res-vide', 'vide ' + escapeHtml(target.label),
+          target.refs.length ? () => { openSubjectPill({ subject: target.label, refs: target.refs }); } : null);
+      }
+      const ch = sub.ch;
+      const refs = subjectRefs(entry, ch.sub_subject);
+      return indexButton('res-entry', '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs),
+        refs.length ? () => { openSubjectPill({ subject: entry.subject + ' — ' + ch.sub_subject, refs }); } : null);
+    }, noun);
+    return group;
+  }
+
+  // "art. 46; LOM art. 13, I; +3"
+  function refsHtml(refs) {
+    if (!refs || !refs.length) return '';
+    const labels = formatRefsList(refs).map(r => r.label.replace(/,(?=\S)/g, ', '));   // "§1,I" → "§1, I"
+    const shown = labels.slice(0, REFS_SHOWN).join('; ') + (labels.length > REFS_SHOWN ? '; +' + (labels.length - REFS_SHOWN) : '');
+    return ' <span class="res-refs">' + escapeHtml(shown) + '</span>';
+  }
+
+  // The subject (or sub-subject) a "vide" points to ("ASSUNTO" or
+  // "ASSUNTO|subassunto"), and its articles
+  let subjectsByKey = null;
+  function findVide(vide, seen = new Set([vide])) {
+    if (!subjectsByKey) subjectsByKey = new Map(SUBJECT_INDEX.map(e => [normIndexText(e.subject), e]));
+    const [subject, sub] = vide.split('|').map(s => s.trim());
+    const entry = subjectsByKey.get(normIndexText(subject));
+    if (!entry) return { label: sub ? subject + ' — ' + sub : subject, refs: [] };
+    if (!sub) return { label: entry.subject, refs: collectAllRefs(entry) };
+    return { label: entry.subject + ' — ' + sub, refs: subjectRefs(entry, sub, seen) };
+  }
+
+  // The articles of a sub-subject. One without its own (a heading, as
+  // "vantagens" or "cargo"): those of the sub-subjects under it ("vantagens:
+  // adicional", "cargo em comissão") and of its "vide", as the index shows
+  // around it.
+  function subjectRefs(entry, sub, seen = new Set()) {
+    const key = normIndexText(sub);
+    const children = entry.children || [];
+    const ch = children.find(c => normIndexText(c.sub_subject) === key);
+    if (ch && ch.refs.length) return ch.refs;
+    const refs = [];
+    for (const c of children) {
+      const k = normIndexText(c.sub_subject);
+      if (k !== key && (k.startsWith(key + ':') || k.startsWith(key + ' '))) refs.push(...c.refs);
+    }
+    for (const vide of (ch && ch.vides) || []) {
+      if (seen.has(vide)) continue;   // "cargo" and "função" point to each other
+      seen.add(vide);
+      refs.push(...findVide(vide, seen).refs);
+    }
+    // once each, in order
+    const keys = new Set();
+    return refs.filter(r => {
+      const k = (r.law_prefix || '') + ':' + r.art + ':' + (r.detail || '');
+      return !keys.has(k) && keys.add(k);
+    });
+  }
+
+  // A group of the referências: a prazo or quórum (its entries with the
+  // terms), or a norm of the legislação correlata (its ementa and the
+  // provisions it's linked to)
+  function buildRefResult(hit) {
+    const { it, entries } = hit;
+    const group = indexGroup(it.group.title);
+    const head = document.createElement('div');
+    head.className = 'res-head res-idx-title';
+    head.innerHTML = '<span class="res-law-tag">' + escapeHtml(it.cat.category) + '</span>' + indexMarkHtml(it.group.title);
+    group.appendChild(head);
+    if (!it.leg) {
+      appendWithMore(group, entries, INDEX_ENTRIES_SHOWN, x => indexButton('res-entry',
+        (x.e.art_ref ? '<span class="res-label">' + escapeHtml(refEntryLabel(x.e)) + '</span> ' : '')
+          + '<span class="res-text">' + indexMarkHtml(x.text, true) + '</span>',
+        x.e.art_ref ? () => goToRefEntry(x.e, false) : null,
+      ), ['trecho', 'trechos']);
+      return group;
+    }
+    if (it.ementa) {
+      const ementa = document.createElement('div');
+      ementa.className = 'res-ementa';
+      ementa.innerHTML = indexMarkHtml(it.ementa, true);
+      ementa.title = it.ementa;
+      group.appendChild(ementa);
+    }
+    // The provisions as links in a line, their text on hover
+    const links = document.createElement('div');
+    links.className = 'res-artlinks';
+    appendWithMore(links, entries, ART_LINKS_SHOWN, x => {
+      const btn = indexButton('res-artlink', escapeHtml(refEntryLabel(x.e)), () => goToRefEntry(x.e, true));
+      btn.title = x.text;
+      return btn;
+    }, ['dispositivo', 'dispositivos']);
+    group.appendChild(links);
+    return group;
+  }
+
+  // "Art. 105, XII", "Art. 4-C ADT, I"
+  function refEntryLabel(entry) {
+    const ref = entry.art_ref || '';
+    return 'Art. ' + (ref.startsWith('ADT') ? ref.slice(3).replace(/^([^,\s]+)/, '$1 ADT') : ref);
+  }
+
+  // The article of an entry of the referências (of the Regimento), shown
+  // even if a filter hides it; for the legislação correlata, its provision,
+  // with the norms' box open. Returns the element to focus.
+  function goToRefEntry(entry, leg) {
+    if (!entry.art_ref) return null;
+    const art = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
+    const card = remCard({ law: 'RI', art });
+    if (!card) return null;
+    revealCard(card);
+    let target = card;
+    if (leg) {
+      const p = entry.path ? remUnitP(card, entry.path) : remCaputP(card);
+      const ref = p && p.querySelector('.leg-ref');
+      const box = ref && card.querySelector(`.leg-box[data-note="${ref.dataset.note}"]`);
+      if (box) box.classList.add('open');
+      if (p) target = p;
+    }
+    scrollToReadingLine(target);
+    selectCard(card, true);
+    return target;
+  }
+
+  // A card hidden by a filter (search, subject, markers) shown again, with its headings
+  function revealCard(card) {
+    if (!card.classList.contains('filtered-out')) return;
+    card.classList.remove('filtered-out');
+    showContextHeadings();
+    scheduleMinimap();
+  }
 
   // ===== MARKERS (click-on-identifier system) =====
   function loadMarkers() {
@@ -49342,12 +50126,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       closeIndex();
       const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(leaf.art)}"][data-law="${leaf.law || ''}"]`);
       if (!card) return;
-      if (card.classList.contains('filtered-out')) {
-        // hidden by a filter: show it (and its norma), as a remissão does
-        card.classList.remove('filtered-out');
-        showContextHeadings();
-        scheduleMinimap();
-      }
+      revealCard(card);   // hidden by a filter: shown (and its norma), as a remissão does
       scrollToReadingLine(card);
       selectCard(card, true);
     });
@@ -49419,15 +50198,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
 
   function navigateToSection(sectionId) {
     const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
-    if (card) {
-      if (card.classList.contains('filtered-out')) {
-        searchFilter = false;
-        $btnFilter.classList.remove('active');
-        doSearch($searchInput.value.trim());
-      }
-      scrollToReadingLine(card);
-      selectCard(card, true);
+    if (!card) return null;
+    // Hidden by the search filter alone: the section is read whole, without it
+    if (card.classList.contains('filtered-out') && searchFilter && !(activeSubject && subjectFilter)
+        && !(markerFilter && markersList.length > 0)) {
+      searchFilter = false;
+      $btnFilter.classList.remove('active');
+      doSearch($searchInput.value.trim());
     }
+    revealCard(card);   // still hidden by another filter: shown anyway
+    scrollToReadingLine(card);
+    selectCard(card, true);
+    return card;
   }
 
   function formatRefsList(refs) {
@@ -49667,14 +50449,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           const linkEl = document.createElement('a');
           linkEl.className = 'ref-art-link';
           linkEl.href = '#';
-          linkEl.textContent = ' — Art. ' + (entry.art_ref.startsWith('ADT')
-            ? entry.art_ref.slice(3).replace(/^(\S+)/, '$1 ADT') : entry.art_ref);
+          linkEl.textContent = ' — ' + refEntryLabel(entry);
           linkEl.addEventListener('click', (e) => {
             e.preventDefault();
             closeIndex();
-            // Extract base article number for navigation
-            const artNum = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
-            navigateToArt(artNum, '');
+            goToRefEntry(entry, cat.category === LEGISLACAO);
           });
           entryEl.appendChild(linkEl);
         }
@@ -49703,21 +50482,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         }
       }
     }
-  }
-
-  function navigateToArt(artNum, lawPrefix) {
-    let card;
-    if (lawPrefix) {
-      card = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
-    } else {
-      card = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
-          || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
-    }
-    if (card) {
-      scrollToReadingLine(card);
-      selectCard(card, true);
-    }
-    return card;
   }
 
   // ===== DETAIL HIGHLIGHT =====

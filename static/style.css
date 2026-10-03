@@ -1301,7 +1301,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   background: #eef6fd;
 }
 
-.res-head, .res-entry, .res-expand {
+.res-head, .res-entry, .res-expand, .res-artlink {
   display: block;
   width: 100%;
   border: none;
@@ -1332,6 +1332,50 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 .res-expand { padding: 2px 5px 2px 14px; color: var(--selected-border); font-size: 12px; }
 .res-expand:hover { text-decoration: underline; }
 .res-empty { padding: 20px 8px; color: #888; text-align: center; }
+/* The indexes' results, above the cards' */
+.res-idx {
+  margin: 10px 4px 6px;
+  padding: 3px 8px;
+  background: #e3edf7;
+  color: #1f4e79;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.res-idx:first-child { margin-top: 2px; }
+.res-idx-group .res-head { font-weight: 600; }
+.res-ctx, .res-refs { font-weight: 400; color: #666; font-size: 12px; }
+/* Text, not buttons: a group's title, an entry with nothing to open */
+.res-idx-title, .res-inert { cursor: default; }
+.res-idx-title:hover, .res-inert:hover { background: none; }
+.res-ementa {
+  padding: 1px 5px 2px 14px;
+  color: #666;
+  font-style: italic;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+/* With the match (around it, if long): whole */
+.res-ementa:has(mark) { display: block; -webkit-line-clamp: none; line-clamp: none; }
+.res-artlinks { padding: 1px 5px 3px 10px; line-height: 1.6; }
+.res-artlinks > button {
+  display: inline;
+  width: auto;
+  margin-right: 6px;
+  padding: 0 4px;
+}
+.res-artlinks > .res-artlink { color: #2c6fa6; font-weight: 600; }
+.res-artlink:hover { text-decoration: underline; }
+.res-vide { color: #666; font-style: italic; }
+.res-expand.res-idx-more { padding-left: 9px; margin-bottom: 2px; }
+.res-idx-part + .res-law { margin-top: 14px; }
+#search-nav.index-only .search-arrow { display: none; }
 #results-list mark {
   background: #ffe066;
   color: inherit;

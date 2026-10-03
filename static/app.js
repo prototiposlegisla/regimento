@@ -47,6 +47,7 @@
   let zoomTimeout = null;
   let searchMatches = [];
   let searchIdx = 0;
+  let indexMatches = null;   // the indexes' entries with the search terms (see searchIndexes)
   let currentRefCategory = 0;
   let markerFilter = false;
   let markerTooltipTimer = null;
@@ -723,10 +724,11 @@
   }
 
   function resetSearchNav() {
+    indexMatches = null;
     hideResults();
     searchMatches = [];
     searchIdx = 0;
-    $searchNav.classList.remove('open');
+    $searchNav.classList.remove('open', 'index-only');
     $searchInput.classList.remove('has-nav');
     updateSearchTicks();
     scheduleMinimap();
@@ -823,19 +825,28 @@
     }
 
     searchMatches = articleCards.filter(c => matchedCards.has(c));
+    // The same terms again (a filter changed): the same object, so the list
+    // keeps its indexes' part
+    const indexKey = JSON.stringify([phrases, words]);
+    if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
     searchIdx = 0;
     showResults();
 
     if (searchMatches.length > 0) {
       $searchNav.classList.add('open');
+      $searchNav.classList.remove('index-only');
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
       updateSearchTicks();
       scrollToFirstMark(searchMatches[0]);
       selectCard(searchMatches[0], true);
     } else {
-      $searchNav.classList.remove('open');
-      $searchInput.classList.remove('has-nav');
+      // Found only in the indexes: the counter (which opens the list) says so
+      const inIndex = indexMatches.count > 0;
+      $searchNav.classList.toggle('open', inIndex);
+      $searchNav.classList.toggle('index-only', inIndex);
+      $searchInput.classList.toggle('has-nav', inIndex);
+      if (inIndex) updateSearchCounter();
       updateSearchTicks();
     }
     scheduleMinimap();
@@ -917,7 +928,8 @@
   });
 
   function updateSearchCounter() {
-    $searchCounter.textContent = (searchIdx + 1) + ' / ' + searchMatches.length;
+    $searchCounter.textContent = searchMatches.length ? (searchIdx + 1) + ' / ' + searchMatches.length
+      : (indexMatches ? indexMatches.count : 0) + ' no índice';
   }
 
   function updateSearchTicks() {
@@ -1031,6 +1043,8 @@
   let resultsHidden = false;        // sidebar closed by the user (remembered)
   try { resultsHidden = localStorage.getItem('regimento-results-hidden') === '1'; } catch (e) {}
   let resultGroups = new Map();     // card → its group element in the list
+  let indexPart = null;             // the list's element with the indexes' results
+  let indexPartFor = null;          // the indexMatches it shows
   const groupCards = new WeakMap(); // group element → card
   const filledGroups = new WeakSet();
   let resultsAppended = 0;          // searchMatches with a group in the list so far
@@ -1089,7 +1103,9 @@
     clearResultsList();
   }
 
-  function clearResultsList() {
+  // keepIndex: the indexes' results stay (as expanded, focused and scrolled
+  // as they are); only the cards' results go
+  function clearResultsList(keepIndex) {
     if (!resultsBuiltFor) return;
     resultsFillObserver.disconnect();
     resultsMoreObserver.disconnect();
@@ -1098,7 +1114,16 @@
     resultsAppended = 0;
     currentResultGroup = null;
     revealGroup = null;
-    $resultsList.textContent = '';
+    revealPending = false;
+    if (keepIndex && indexPart && $resultsList.lastChild !== indexPart) {
+      const rest = document.createRange();
+      rest.setStartAfter(indexPart);
+      rest.setEndAfter($resultsList.lastChild);
+      rest.deleteContents();
+    } else if (!keepIndex) {
+      $resultsList.textContent = '';
+      indexPart = indexPartFor = null;
+    }
     $resultsSummary.textContent = '';
   }
 
@@ -1107,7 +1132,10 @@
     document.body.classList.toggle('results-drawer-open', resultsDrawerOpen);
     $indexOverlay.classList.toggle('open', resultsDrawerOpen || $indexPanel.classList.contains('open'));
     $indexResultsLink.hidden = !resultsActive;
-    if (resultsActive) $indexResultsLink.textContent = 'Lista de resultados da busca (' + searchMatches.length + ') ›';
+    if (resultsActive) {
+      const n = searchMatches.length + (indexMatches ? indexMatches.count : 0);
+      $indexResultsLink.textContent = 'Lista de resultados da busca (' + n + ') ›';
+    }
     const shown = resultsShown();
     $searchCounter.setAttribute('aria-expanded', shown ? 'true' : 'false');
     const becameShown = shown && !resultsPanelShown;
@@ -1123,9 +1151,20 @@
       scheduleResultsBuild();
     } else if (becameShown) {
       observeLastResultGroup();
-      markCurrentResult(selectedCard);
-      revealCurrentResult(true);
+      // Shown again as built: the indexes' results first, if the first match
+      // is still the selected one
+      if (!listStartsWithIndex()) {
+        markCurrentResult(selectedCard);
+        revealCurrentResult(true);
+      }
     }
+  }
+
+  // The list starts with the indexes' results, and the first match (right
+  // below them) is marked but not scrolled to
+  function listStartsWithIndex() {
+    return indexMatches !== null && indexMatches.count > 0 && searchMatches.length > 0
+      && selectedCard === searchMatches[0];
   }
 
   // Built after the search result is painted, so typing stays responsive
@@ -1171,10 +1210,14 @@
   }
 
   function buildResultsList() {
-    clearResultsList();
+    // Rebuilt for the same search (a subject or section opened from the list
+    // runs it again): the indexes' results are the same, and stay as they are
+    const keepIndex = indexPart !== null && indexPartFor === indexMatches;
+    const scrollTop = $resultsList.scrollTop;
+    clearResultsList(keepIndex);
     resultsBuiltFor = searchMatches;
     resultsLaw = null;
-    $resultsList.scrollTop = 0;
+    if (!keepIndex) $resultsList.scrollTop = 0;
 
     let hits = 0;
     const noisy = new Map(); // element → inside RESULT_NOISE
@@ -1188,17 +1231,22 @@
     }
     const nPrec = searchMatches.filter(isPrecCard).length;
     const nArt = searchMatches.length - nPrec;
+    const nIndex = indexMatches ? indexMatches.count : 0;
     const counts = [];
     if (nArt) counts.push(nArt + (nArt === 1 ? ' artigo' : ' artigos'));
     if (nPrec) counts.push(nPrec + (nPrec === 1 ? ' precedente' : ' precedentes'));
-    $resultsSummary.textContent = searchMatches.length
-      ? counts.join(', ') + ' · ' + hits + (hits === 1 ? ' ocorrência' : ' ocorrências')
-      : '';
+    const summary = [];
+    if (searchMatches.length) summary.push(counts.join(', '), hits + (hits === 1 ? ' ocorrência' : ' ocorrências'));
+    if (nIndex) summary.push(nIndex + ' no índice');
+    $resultsSummary.textContent = summary.join(' · ');
+    if (nIndex && !keepIndex) appendIndexResults();
     if (!searchMatches.length) {
       const empty = document.createElement('div');
       empty.className = 'res-empty';
-      empty.textContent = 'Nenhum resultado para “' + currentSearch + '”';
+      empty.textContent = nIndex ? 'Nenhum resultado no texto das normas'
+        : 'Nenhum resultado para “' + currentSearch + '”';
       $resultsList.appendChild(empty);
+      if (keepIndex) $resultsList.scrollTop = scrollTop;
       return;
     }
 
@@ -1206,14 +1254,20 @@
     // The top of the list shows filled right away (the observer reports later)
     for (const card of searchMatches.slice(0, RESULTS_FILLED_UPFRONT)) fillResultGroup(card);
     observeLastResultGroup();
-    markCurrentResult(selectedCard);
+    // The list stays where it was (on the indexes' result just used), or
+    // starts at its top with the indexes' results: the selected match is
+    // marked, not scrolled to
+    if (keepIndex) $resultsList.scrollTop = scrollTop;
+    markCurrentResult(selectedCard, !keepIndex && !listStartsWithIndex());
   }
 
   // Appends groups for searchMatches[resultsAppended, until), stopping early
-  // at the deadline (a performance.now() time)
+  // at the deadline (a performance.now() time); the list's first group is
+  // always appended
   function appendResultGroups(until, deadline = Infinity) {
     const frag = document.createDocumentFragment();
-    while (resultsAppended < until && performance.now() < deadline) {
+    while (resultsAppended < until) {
+      if (resultsAppended && performance.now() >= deadline) break;
       const card = searchMatches[resultsAppended++];
       const lawTitle = resultLawTitle(card);
       if (lawTitle !== resultsLaw) {
@@ -1221,6 +1275,8 @@
         if (lawTitle) {
           const sep = document.createElement('div');
           sep.className = 'res-law';
+          sep.setAttribute('role', 'heading');
+          sep.setAttribute('aria-level', '3');
           sep.textContent = lawTitle;
           frag.appendChild(sep);
         }
@@ -1482,7 +1538,8 @@
   }
 
   // Highlights the group of the selected card and scrolls the list to it
-  function markCurrentResult(card) {
+  // (unless reveal is false)
+  function markCurrentResult(card, reveal = true) {
     if (resultsBuiltFor !== searchMatches || !card) return;
     if (!resultsShown()) {
       // Nothing appended nor measured in a hidden list: it's revealed when shown
@@ -1500,20 +1557,24 @@
     const group = resultGroups.get(card);
     if (!group || group === currentResultGroup) return;
     setCurrentResultGroup(group);
-    revealCurrentResult(false);
+    if (reveal) revealCurrentResult(false);
   }
 
   function setCurrentResultGroup(group) {
     if (currentResultGroup) currentResultGroup.classList.remove('current');
     currentResultGroup = group;
-    group.classList.add('current');
+    if (group) group.classList.add('current');
   }
 
   // Scrolls the list to the current group, unless the mouse is on it (then
   // it waits for the mouse to leave)
   function revealCurrentResult(force) {
     const group = currentResultGroup;
-    if (!group || !resultsShown()) {
+    if (!group) {
+      revealPending = false;
+      return;
+    }
+    if (!resultsShown()) {
       revealPending = true;
       return;
     }
@@ -1589,6 +1650,384 @@
     resultsDrawerOpen = false;
     preserveScroll(updateResultsVisibility);
   });
+
+  // ===== INDEX RESULTS =====
+  // The entries of the three indexes (sistemático, remissivo, referências)
+  // with every term of the search, at the top of the results list. Matched by
+  // their own text: a section by its title, a subject by its name (a
+  // sub-subject together with its subject's), a prazo or quórum by its group
+  // title and text, a norm of the legislação correlata by its name and ementa.
+  // Precedents (leaves of the sistemático) and the provisions' texts are in
+  // the cards, which the search already lists.
+  const INDEX_GROUPS_SHOWN = 3;   // per index; the rest behind "+ N"
+  const INDEX_ENTRIES_SHOWN = 2;  // per group (sub-subjects, prazos)
+  const ART_LINKS_SHOWN = 6;      // a norm's provisions (legislação correlata)
+  const REFS_SHOWN = 4;           // a subject's articles shown beside it
+  const LEGISLACAO = 'Legislação correlata';
+  let indexItems = null;          // the indexes' entries and their normalized text
+
+  function normIndexText(s) {
+    return stripAccents(s.toLowerCase()).replace(/\s+/g, ' ');
+  }
+
+  function htmlToText(html) {
+    const t = document.createElement('template');
+    t.innerHTML = html;
+    return t.content.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  // Fields matched together are joined by a character no term has: words
+  // may be in different fields, a phrase must be in one
+  const FIELD_SEP = '\u0000';
+
+  function getIndexItems() {
+    if (indexItems) return indexItems;
+    const sys = [];
+    (function walk(nodes, ctx) {
+      for (const node of nodes) {
+        if (node.art || !node.title) continue;
+        sys.push({ node, ctx, text: normIndexText(node.title) });
+        // "TÍTULO I — DA CÂMARA MUNICIPAL" → "TÍTULO I" in its children's context
+        if (node.children) walk(node.children, ctx.concat(node.title.split(' — ')[0]));
+      }
+    })(SYSTEMATIC_INDEX, []);
+
+    const subj = SUBJECT_INDEX.slice()
+      .sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'))
+      .map(entry => {
+        const text = normIndexText(entry.subject);
+        return {
+          entry,
+          text,
+          children: (entry.children || []).map(ch => {
+            const own = normIndexText(ch.sub_subject);
+            return { ch, text: own, withSubject: text + FIELD_SEP + own };
+          }),
+        };
+      });
+
+    const refs = [];
+    for (const cat of REFERENCIAS_INDEX) {
+      const leg = cat.category === LEGISLACAO;
+      for (const group of cat.groups) {
+        const title = normIndexText(group.title);
+        const entries = group.entries.map(e => ({ e, text: htmlToText(e.html) }));
+        if (leg) {
+          // the ementa (the entry without an article), then the provisions
+          const ementa = entries.filter(x => !x.e.art_ref).map(x => x.text);
+          refs.push({ cat, leg, group, ementa: ementa.join(' '), entries: entries.filter(x => x.e.art_ref),
+                      text: [title].concat(ementa.map(normIndexText)).join(FIELD_SEP) });
+        } else {
+          for (const x of entries) x.withTitle = title + FIELD_SEP + normIndexText(x.text);
+          refs.push({ cat, leg, group, entries });
+        }
+      }
+    }
+    return indexItems = { sys, subj, refs };
+  }
+
+  // The indexes' entries with every phrase and word (as parseSearchTerms
+  // returns them): {sections: [{title, hits, build}], count, regex, key}
+  function searchIndexes(phrases, words, regex, key) {
+    const has = text => phrases.every(p => text.includes(p)) && words.every(w => text.includes(w));
+    const { sys, subj, refs } = getIndexItems();
+
+    const sysHits = sys.filter(it => has(it.text));
+
+    // Subjects found by their name first, then those found by a sub-subject
+    const byName = [], bySub = [];
+    for (const it of subj) {
+      const self = has(it.text);
+      const subs = it.children.filter(c => has(self ? c.text : c.withSubject));
+      if (self) byName.push({ it, subs, byName: true });
+      else if (subs.length) bySub.push({ it, subs, byName: false });
+    }
+
+    const refHits = [];
+    for (const it of refs) {
+      if (it.leg) {
+        if (has(it.text)) refHits.push({ it, entries: it.entries });
+      } else {
+        const entries = it.entries.filter(x => has(x.withTitle));
+        if (entries.length) refHits.push({ it, entries });
+      }
+    }
+
+    const sections = [
+      { title: 'Índice sistemático', where: 'no índice sistemático', hits: sysHits, build: buildSysResult },
+      { title: 'Índice remissivo', where: 'no índice remissivo', hits: byName.concat(bySub), build: buildSubjectResult },
+      { title: 'Referências', where: 'nas referências', hits: refHits, build: buildRefResult },
+    ].filter(s => s.hits.length);
+    return { sections, count: sections.reduce((n, s) => n + s.hits.length, 0), regex, key };
+  }
+
+  // The indexes' part of the list, in one element at its top (kept when the
+  // list is rebuilt for the same indexMatches: see buildResultsList)
+  function appendIndexResults() {
+    indexPart = document.createElement('div');
+    indexPart.className = 'res-idx-part';
+    indexPartFor = indexMatches;
+    for (const sec of indexMatches.sections) {
+      const head = document.createElement('div');
+      head.className = 'res-idx';
+      head.setAttribute('role', 'heading');
+      head.setAttribute('aria-level', '3');
+      head.textContent = sec.title + ' · ' + sec.hits.length;
+      indexPart.appendChild(head);
+      const more = appendWithMore(indexPart, sec.hits, INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');
+      if (more) more.setAttribute('aria-label', more.textContent + ' ' + sec.where);
+    }
+    $resultsList.appendChild(indexPart);
+  }
+
+  // Appends build(item) of the first `shown` items to parent, the rest behind
+  // a "+ N" button (returned). noun: [singular, plural].
+  function appendWithMore(parent, items, shown, build, noun, cls) {
+    for (const item of items.slice(0, shown)) parent.appendChild(build(item));
+    const rest = items.length - shown;
+    if (rest <= 0) return null;
+    const more = document.createElement('button');
+    more.className = 'res-expand' + (cls ? ' ' + cls : '');
+    more.textContent = '+ ' + rest + ' ' + noun[rest === 1 ? 0 : 1];
+    more.addEventListener('click', () => {
+      const hadFocus = document.activeElement === more;
+      const added = items.slice(shown).map(build);
+      more.before(...added);
+      // the keyboard goes on from the first entry shown now (or, if none of
+      // them does anything, from the next one in the list)
+      let next = null;
+      if (hadFocus) {
+        for (const el of added) {
+          next = el.matches('button') ? el : el.querySelector('button');
+          if (next) break;
+        }
+        if (!next) {
+          const last = added[added.length - 1];
+          next = Array.from($resultsList.querySelectorAll('button')).find(b =>
+            b !== more && last.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+        }
+      }
+      more.remove();
+      if (next) next.focus();
+    });
+    parent.appendChild(more);
+    return more;
+  }
+
+  // text as HTML with the search's matches marked; whole, or (long texts)
+  // just around the matches
+  function indexMarkHtml(text, snippet) {
+    const re = indexMatches.regex;
+    const spans = [];
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null) {
+      if (!m[0].length) { re.lastIndex++; continue; }
+      spans.push([m.index, m.index + m[0].length]);
+    }
+    return snippet ? snippetHtml(text, spans) : markSpans(text, 0, text.length, spans);
+  }
+
+  // label: what the group is (a subject, a norm), for screen readers
+  // entering one of its entries
+  function indexGroup(label) {
+    const group = document.createElement('div');
+    group.className = 'res-group res-idx-group';
+    if (label) {
+      group.setAttribute('role', 'group');
+      group.setAttribute('aria-label', label);
+    }
+    return group;
+  }
+
+  // A button of the list: go() moves the page (and returns the element to
+  // focus, if not the selected card). Without go (nothing to open), plain text.
+  function indexButton(cls, html, go) {
+    const el = document.createElement(go ? 'button' : 'div');
+    el.className = cls + (go ? '' : ' res-inert');
+    el.innerHTML = html;
+    if (go) el.addEventListener('click', e => goToIndexResult(e, go));
+    return el;
+  }
+
+  function goToIndexResult(event, go) {
+    const fromDrawer = resultsDrawerOpen;
+    if (resultsDrawerOpen) {
+      resultsDrawerOpen = false;
+      updateResultsVisibility();
+    }
+    const target = go() || selectedCard;
+    // As in goToResult: after a click or tap, the keys scroll the page
+    // (keyboard activation keeps the focus on the sidebar list, which keeps
+    // its indexes' part when the search runs again)
+    if (target && (fromDrawer || (event && event.detail > 0))) {
+      if (!target.hasAttribute('tabindex')) target.tabIndex = -1;
+      target.focus({ preventScroll: true });
+    }
+  }
+
+  // A section of the sistemático: "TÍTULO III › CAPÍTULO II — DAS COMISSÕES PERMANENTES (art. 46–79)"
+  function buildSysResult(hit) {
+    const { node, ctx } = hit;
+    let html = ctx.length ? '<span class="res-ctx">' + escapeHtml(ctx.join(' › ')) + ' › </span>' : '';
+    html += indexMarkHtml(node.title);
+    if (node.art_range && !(node.children && node.children.length)) {
+      html += ' <span class="res-sum">' + escapeHtml(node.art_range) + '</span>';
+    }
+    const group = indexGroup();
+    group.appendChild(indexButton('res-head', html, () => navigateToSection(node.section_id)));
+    return group;
+  }
+
+  // A subject of the remissivo: its sub-subjects with the terms (and their
+  // "vide") and, found by its name, its articles and "vide"; each opens the
+  // subject pill with its articles
+  function buildSubjectResult(hit) {
+    const { entry } = hit.it;
+    const group = indexGroup(entry.subject);
+    const allRefs = collectAllRefs(entry);
+    group.appendChild(indexButton('res-head', indexMarkHtml(entry.subject) + (hit.byName ? refsHtml(entry.refs) : ''),
+      allRefs.length ? () => { openSubjectPill({ subject: entry.subject, refs: allRefs }); } : null));
+    const items = [];
+    for (const sub of hit.subs) {
+      items.push({ sub });
+      for (const vide of sub.ch.vides || []) items.push({ vide });
+    }
+    if (hit.byName) for (const vide of entry.vides || []) items.push({ vide });
+    const noun = items.slice(INDEX_ENTRIES_SHOWN).every(item => item.sub) ? ['subassunto', 'subassuntos'] : ['outro', 'outros'];
+    appendWithMore(group, items, INDEX_ENTRIES_SHOWN, ({ sub, vide }) => {
+      if (vide) {
+        const target = findVide(vide);
+        return indexButton('res-entry res-vide', 'vide ' + escapeHtml(target.label),
+          target.refs.length ? () => { openSubjectPill({ subject: target.label, refs: target.refs }); } : null);
+      }
+      const ch = sub.ch;
+      const refs = subjectRefs(entry, ch.sub_subject);
+      return indexButton('res-entry', '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs),
+        refs.length ? () => { openSubjectPill({ subject: entry.subject + ' — ' + ch.sub_subject, refs }); } : null);
+    }, noun);
+    return group;
+  }
+
+  // "art. 46; LOM art. 13, I; +3"
+  function refsHtml(refs) {
+    if (!refs || !refs.length) return '';
+    const labels = formatRefsList(refs).map(r => r.label.replace(/,(?=\S)/g, ', '));   // "§1,I" → "§1, I"
+    const shown = labels.slice(0, REFS_SHOWN).join('; ') + (labels.length > REFS_SHOWN ? '; +' + (labels.length - REFS_SHOWN) : '');
+    return ' <span class="res-refs">' + escapeHtml(shown) + '</span>';
+  }
+
+  // The subject (or sub-subject) a "vide" points to ("ASSUNTO" or
+  // "ASSUNTO|subassunto"), and its articles
+  let subjectsByKey = null;
+  function findVide(vide, seen = new Set([vide])) {
+    if (!subjectsByKey) subjectsByKey = new Map(SUBJECT_INDEX.map(e => [normIndexText(e.subject), e]));
+    const [subject, sub] = vide.split('|').map(s => s.trim());
+    const entry = subjectsByKey.get(normIndexText(subject));
+    if (!entry) return { label: sub ? subject + ' — ' + sub : subject, refs: [] };
+    if (!sub) return { label: entry.subject, refs: collectAllRefs(entry) };
+    return { label: entry.subject + ' — ' + sub, refs: subjectRefs(entry, sub, seen) };
+  }
+
+  // The articles of a sub-subject. One without its own (a heading, as
+  // "vantagens" or "cargo"): those of the sub-subjects under it ("vantagens:
+  // adicional", "cargo em comissão") and of its "vide", as the index shows
+  // around it.
+  function subjectRefs(entry, sub, seen = new Set()) {
+    const key = normIndexText(sub);
+    const children = entry.children || [];
+    const ch = children.find(c => normIndexText(c.sub_subject) === key);
+    if (ch && ch.refs.length) return ch.refs;
+    const refs = [];
+    for (const c of children) {
+      const k = normIndexText(c.sub_subject);
+      if (k !== key && (k.startsWith(key + ':') || k.startsWith(key + ' '))) refs.push(...c.refs);
+    }
+    for (const vide of (ch && ch.vides) || []) {
+      if (seen.has(vide)) continue;   // "cargo" and "função" point to each other
+      seen.add(vide);
+      refs.push(...findVide(vide, seen).refs);
+    }
+    // once each, in order
+    const keys = new Set();
+    return refs.filter(r => {
+      const k = (r.law_prefix || '') + ':' + r.art + ':' + (r.detail || '');
+      return !keys.has(k) && keys.add(k);
+    });
+  }
+
+  // A group of the referências: a prazo or quórum (its entries with the
+  // terms), or a norm of the legislação correlata (its ementa and the
+  // provisions it's linked to)
+  function buildRefResult(hit) {
+    const { it, entries } = hit;
+    const group = indexGroup(it.group.title);
+    const head = document.createElement('div');
+    head.className = 'res-head res-idx-title';
+    head.innerHTML = '<span class="res-law-tag">' + escapeHtml(it.cat.category) + '</span>' + indexMarkHtml(it.group.title);
+    group.appendChild(head);
+    if (!it.leg) {
+      appendWithMore(group, entries, INDEX_ENTRIES_SHOWN, x => indexButton('res-entry',
+        (x.e.art_ref ? '<span class="res-label">' + escapeHtml(refEntryLabel(x.e)) + '</span> ' : '')
+          + '<span class="res-text">' + indexMarkHtml(x.text, true) + '</span>',
+        x.e.art_ref ? () => goToRefEntry(x.e, false) : null,
+      ), ['trecho', 'trechos']);
+      return group;
+    }
+    if (it.ementa) {
+      const ementa = document.createElement('div');
+      ementa.className = 'res-ementa';
+      ementa.innerHTML = indexMarkHtml(it.ementa, true);
+      ementa.title = it.ementa;
+      group.appendChild(ementa);
+    }
+    // The provisions as links in a line, their text on hover
+    const links = document.createElement('div');
+    links.className = 'res-artlinks';
+    appendWithMore(links, entries, ART_LINKS_SHOWN, x => {
+      const btn = indexButton('res-artlink', escapeHtml(refEntryLabel(x.e)), () => goToRefEntry(x.e, true));
+      btn.title = x.text;
+      return btn;
+    }, ['dispositivo', 'dispositivos']);
+    group.appendChild(links);
+    return group;
+  }
+
+  // "Art. 105, XII", "Art. 4-C ADT, I"
+  function refEntryLabel(entry) {
+    const ref = entry.art_ref || '';
+    return 'Art. ' + (ref.startsWith('ADT') ? ref.slice(3).replace(/^([^,\s]+)/, '$1 ADT') : ref);
+  }
+
+  // The article of an entry of the referências (of the Regimento), shown
+  // even if a filter hides it; for the legislação correlata, its provision,
+  // with the norms' box open. Returns the element to focus.
+  function goToRefEntry(entry, leg) {
+    if (!entry.art_ref) return null;
+    const art = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
+    const card = remCard({ law: 'RI', art });
+    if (!card) return null;
+    revealCard(card);
+    let target = card;
+    if (leg) {
+      const p = entry.path ? remUnitP(card, entry.path) : remCaputP(card);
+      const ref = p && p.querySelector('.leg-ref');
+      const box = ref && card.querySelector(`.leg-box[data-note="${ref.dataset.note}"]`);
+      if (box) box.classList.add('open');
+      if (p) target = p;
+    }
+    scrollToReadingLine(target);
+    selectCard(card, true);
+    return target;
+  }
+
+  // A card hidden by a filter (search, subject, markers) shown again, with its headings
+  function revealCard(card) {
+    if (!card.classList.contains('filtered-out')) return;
+    card.classList.remove('filtered-out');
+    showContextHeadings();
+    scheduleMinimap();
+  }
 
   // ===== MARKERS (click-on-identifier system) =====
   function loadMarkers() {
@@ -2852,12 +3291,7 @@
       closeIndex();
       const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(leaf.art)}"][data-law="${leaf.law || ''}"]`);
       if (!card) return;
-      if (card.classList.contains('filtered-out')) {
-        // hidden by a filter: show it (and its norma), as a remissão does
-        card.classList.remove('filtered-out');
-        showContextHeadings();
-        scheduleMinimap();
-      }
+      revealCard(card);   // hidden by a filter: shown (and its norma), as a remissão does
       scrollToReadingLine(card);
       selectCard(card, true);
     });
@@ -2929,15 +3363,18 @@
 
   function navigateToSection(sectionId) {
     const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
-    if (card) {
-      if (card.classList.contains('filtered-out')) {
-        searchFilter = false;
-        $btnFilter.classList.remove('active');
-        doSearch($searchInput.value.trim());
-      }
-      scrollToReadingLine(card);
-      selectCard(card, true);
+    if (!card) return null;
+    // Hidden by the search filter alone: the section is read whole, without it
+    if (card.classList.contains('filtered-out') && searchFilter && !(activeSubject && subjectFilter)
+        && !(markerFilter && markersList.length > 0)) {
+      searchFilter = false;
+      $btnFilter.classList.remove('active');
+      doSearch($searchInput.value.trim());
     }
+    revealCard(card);   // still hidden by another filter: shown anyway
+    scrollToReadingLine(card);
+    selectCard(card, true);
+    return card;
   }
 
   function formatRefsList(refs) {
@@ -3177,14 +3614,11 @@
           const linkEl = document.createElement('a');
           linkEl.className = 'ref-art-link';
           linkEl.href = '#';
-          linkEl.textContent = ' — Art. ' + (entry.art_ref.startsWith('ADT')
-            ? entry.art_ref.slice(3).replace(/^(\S+)/, '$1 ADT') : entry.art_ref);
+          linkEl.textContent = ' — ' + refEntryLabel(entry);
           linkEl.addEventListener('click', (e) => {
             e.preventDefault();
             closeIndex();
-            // Extract base article number for navigation
-            const artNum = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
-            navigateToArt(artNum, '');
+            goToRefEntry(entry, cat.category === LEGISLACAO);
           });
           entryEl.appendChild(linkEl);
         }
@@ -3213,21 +3647,6 @@
         }
       }
     }
-  }
-
-  function navigateToArt(artNum, lawPrefix) {
-    let card;
-    if (lawPrefix) {
-      card = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
-    } else {
-      card = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
-          || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
-    }
-    if (card) {
-      scrollToReadingLine(card);
-      selectCard(card, true);
-    }
-    return card;
   }
 
   // ===== DETAIL HIGHLIGHT =====

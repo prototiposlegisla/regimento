@@ -56,6 +56,8 @@ class TestLegislacaoCorrelata:
         # a ementa primeiro (sem link), depois os dispositivos
         assert cat["groups"][0]["entries"][0] == {"html": "<i>Consolida.</i>"}
         assert [e["art_ref"] for e in cat["groups"][0]["entries"][1:]] == ["5, § 2º", "105, XXX"]
+        # o caminho como no data-path do site: o link abre o quadro daquele dispositivo
+        assert [e["path"] for e in cat["groups"][0]["entries"][1:]] == ["§ 2º", "XXX"]
 
     def test_sem_notas_nao_cria_categoria(self):
         doc = _doc()

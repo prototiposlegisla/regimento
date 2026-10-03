@@ -87,7 +87,10 @@ class Remissao:
 
 
 # Tipos de remissão implícita: nome na planilha -> código no site
-TIPOS = {"mesma regra": "eq", "detalha": "det", "fundamento": "fund", "diverge": "div"}
+# correspondente: a regra equivalente para a União/Congresso Nacional (o paralelo federal), sem
+# afirmar que ela se aplique ao Município ("simetria" = nome antigo, ainda aceito)
+TIPOS = {"mesma regra": "eq", "detalha": "det", "fundamento": "fund", "diverge": "div",
+         "correspondente": "sim", "simetria": "sim"}
 
 
 @dataclass
@@ -201,7 +204,8 @@ TOKEN_RE = re.compile(
     r"|(?P<INC>\b(?i:incisos?)\b)"
     r"|(?P<ALI>\b(?i:al[íi]neas?)\b)"
     r"|(?P<ITEM>\b(?i:ite(?:m|ns))\b)"
-    r"|(?P<NUM>\d+(?:\s?[º°ª]|\.\s?[º°ª])?(?:\s?[-–]\s?[A-Z](?![A-Za-zÀ-ÿ])|[A-Z](?![A-Za-zÀ-ÿ]))?(?![\d/])(?!\.\d))"
+    r"|(?P<NUM>\d+(?:\s?[º°ª]|\.\s?[º°ª])?(?:\s?[-–]\s?[A-Z](?![A-Za-zÀ-ÿ])|[A-Z](?![A-Za-zÀ-ÿ]))?(?![\d/%])(?!\.\d)"
+    r"(?!\s?(?:%|por\s+cento)))"   # "50% (cinquenta por cento)" não é artigo
     r"|(?P<ROMAN>\b[IVXLC]+\b)"
     r"|(?P<QLETTER>[“\"'‘][a-z][”\"'’])"
     r"|(?P<WORD>[A-Za-zÀ-ÿ]+)"
@@ -1029,7 +1033,8 @@ def _resolver_implicitas(corpus: _Corpus, res: Resultado, linhas: list[dict], *,
         ctx = f"remissoes.xlsx, linha {item['linha']}"
         tipo = TIPOS.get(item.get("Tipo", "").strip().lower())
         if tipo is None:
-            res.avisos.append((f"Tipo desconhecido {item.get('Tipo')!r} (use: {', '.join(TIPOS)})", ctx))
+            res.avisos.append((f"Tipo desconhecido {item.get('Tipo')!r} "
+                               f"(use: {', '.join(t for t in TIPOS if t != 'simetria')})", ctx))
             continue
         if tipo == "div" and not item.get("Nota", "").strip():
             res.avisos.append(("Divergência sem nota (a nota é obrigatória)", ctx))

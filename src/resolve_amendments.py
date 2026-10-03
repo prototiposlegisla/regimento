@@ -120,9 +120,14 @@ def structure_warnings(
         # rendered as old versions, without their footnotes (the current caput shows
         # them even when struck)
         for u in [*el.all_versions, *(c for c in el.children if c.is_old_version)]:
-            if u.footnotes:
+            if u.footnotes or u.legislacao:
                 warnings.append((
                     f"Nota de rodapé em redação tachada (não aparece no site): \"{u.full_text[:60]}\"", ctx))
+        for u in [el.caput, *el.children]:
+            for p in (u.legislacao if u else []):
+                if not any(r.hyperlink_url for r in p.runs):
+                    warnings.append((f"Legislação correlata sem link: \"{''.join(r.text for r in p.runs)[:60]}\"",
+                                     ctx))
         if el.caput and not el.caput.is_old_version and any(
             v.unit_type == UnitType.ARTIGO and not v.is_old_version for v in el.all_versions
         ):

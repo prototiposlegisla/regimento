@@ -322,6 +322,14 @@ def _build_once(
         print("      → DOCX de referências não encontrado, aba vazia")
         referencias_data = []
 
+    # Legislação correlata (notas "L" do DOCX): uma categoria a mais na aba Referências
+    from src.build_index import legislacao_index
+    leg = legislacao_index(doc)
+    if leg:
+        referencias_data.append(leg)
+        print(f"      → legislação correlata: {len(leg['groups'])} normas, "
+              f"{sum(1 for g in leg['groups'] for e in g['entries'] if e.get('art_ref'))} ligações a dispositivos")
+
     # ── 5. Parse informacoes DOCX ─────────────────────────────────────
     print("[5/8] Parseando informações...")
     from src.parse_informacoes import parse_informacoes

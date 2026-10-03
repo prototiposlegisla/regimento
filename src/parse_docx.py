@@ -36,10 +36,17 @@ RE_ARTIGO = re.compile(
     r"(?:[-–]([A-H])(?=[.\s\xa0])|([A-H])(?=\s*[-–—.]))?",
 )
 RE_PARAGRAFO_UNICO = re.compile(r"^Par[aá]grafo\s+[uú]nico", re.IGNORECASE)
-# Group 3 = letter of an inserted paragraph, as in "§ 1º-A." or "§ 1º-A -" (hyphen and
-# letter glued to the number; "§ 1º - A destituição..." and "§ 3º-O Presidente..." are not)
-RE_PARAGRAFO_NUM = re.compile(r"^[§Ss]\s*(\d+)(\.?[ºª°]?)(?:-([A-H])(?=\.|[\s\xa0]*[-–—]))?")
-RE_INCISO = re.compile(r"^l?[IVXLC]+\s*[-–—]")
+# Group 3 = letter of an inserted paragraph, as in "§ 1º-A.", "§ 1º-A -" or, in the CF,
+# "§ 9º-B Os recursos" / "§ 9º-A Do limite" (hyphen and letter glued to the number; an "A"
+# then a capitalized word only if that word can't follow the article "A": "A O", "A Do");
+# "§ 1º - A destituição...", "§ 2º-A Mesa decidirá" and "§ 3º-O Presidente..." are not
+RE_PARAGRAFO_NUM = re.compile(
+    r"^[§Ss]\s*(\d+)(\.?[ºª°]?)"
+    r"(?:-(?=[B-H](?:\.|[\s\xa0]*[-–—]|[\s\xa0]+[A-ZÀ-Ú])"
+    r"|A(?:\.|[\s\xa0]*[-–—]|[\s\xa0]+(?:O|Os|As|Do|Da|Dos|Das|No|Na|Nos|Nas|Ao|Aos|Em|É|Para)\b))([A-H]))?"
+)
+# "IV - texto"; na CF do Planalto, às vezes sem o travessão: "II que exerçam atividades de risco"
+RE_INCISO = re.compile(r"^l?[IVXLC]+(?:\s*[-–—]|\s+(?=[a-záéíóúâêôãõç]))")
 RE_ALINEA = re.compile(r"^[a-z]\)")
 RE_SUB_ALINEA = re.compile(r"^\d+\)")
 RE_ITEM_NUM = re.compile(r"^\d+\s*[-–—]")
@@ -104,21 +111,22 @@ def parse_docx(path: str | Path, *, include_private: bool = False) -> ParsedDocu
     path = Path(path)
     with zipfile.ZipFile(path, "r") as zf:
         rels = _parse_rels(zf)
-        footnotes_map, summaries_map, private_fn_ids = _parse_footnotes_xml(zf, include_private=include_private)
+        footnotes_map, summaries_map, private_fn_ids, legislacao_map = _parse_footnotes_xml(
+            zf, include_private=include_private, rels=_parse_rels(zf, "word/_rels/footnotes.xml.rels"))
         paragraphs = _parse_document_xml(zf, rels)
 
     raw_units = _classify_paragraphs(paragraphs)
-    doc = _build_document(raw_units, footnotes_map, summaries_map, private_fn_ids)
+    doc = _build_document(raw_units, footnotes_map, summaries_map, private_fn_ids, legislacao_map)
     return doc
 
 
 # ── Leitura do XML ─────────────────────────────────────────────────────
 
-def _parse_rels(zf: zipfile.ZipFile) -> dict[str, tuple[str, str]]:
-    """Parseia word/_rels/document.xml.rels → {rId: (url, target_mode)}."""
+def _parse_rels(zf: zipfile.ZipFile, name: str = "word/_rels/document.xml.rels") -> dict[str, tuple[str, str]]:
+    """Parseia os links de um .rels (word/_rels/document.xml.rels) → {rId: (url, target_mode)}."""
     rels: dict[str, tuple[str, str]] = {}
     try:
-        data = zf.read("word/_rels/document.xml.rels")
+        data = zf.read(name)
     except KeyError:
         return rels
 
@@ -141,23 +149,28 @@ def _parse_footnotes_xml(
     zf: zipfile.ZipFile,
     *,
     include_private: bool = False,
-) -> tuple[dict[int, list[FootnotePara]], dict[int, str], set[int]]:
-    """Parseia word/footnotes.xml → (footnotes_map, summaries_map, private_fn_ids).
+    rels: dict[str, tuple[str, str]] | None = None,
+) -> tuple[dict[int, list[FootnotePara]], dict[int, str], set[int], dict[int, list[FootnotePara]]]:
+    """Parseia word/footnotes.xml → (footnotes_map, summaries_map, private_fn_ids, legislacao_map).
 
     Footnotes whose content starts with "b " (build notes) are excluded
     unless *include_private* is True.
     Footnotes whose content starts with "s " are extracted as article
     summaries (the text after "s " is the summary string).
+    Footnotes whose content starts with "L " are legislação correlata: one
+    norm per paragraph, usually with a link (*rels* = the footnotes' links).
     *private_fn_ids* contains the Word footnote IDs that had the "b " prefix.
     """
     w = NS["w"]
+    rels = rels or {}
     footnotes: dict[int, list[FootnotePara]] = {}
     summaries: dict[int, str] = {}
     private_fn_ids: set[int] = set()
+    legislacao: dict[int, list[FootnotePara]] = {}
     try:
         data = zf.read("word/footnotes.xml")
     except KeyError:
-        return footnotes, summaries, private_fn_ids
+        return footnotes, summaries, private_fn_ids, legislacao
 
     root = ET.fromstring(data)
     for fn_el in root.findall(f"{{{w}}}footnote"):
@@ -174,13 +187,25 @@ def _parse_footnotes_xml(
         paras: list[FootnotePara] = []
         for p_el in fn_el.findall(f"{{{w}}}p"):
             runs: list[TextRun] = []
-            for r_el in p_el.findall(f"{{{w}}}r"):
-                # Skip footnoteRef marker run (just the superscript number)
-                if r_el.find(f"{{{w}}}footnoteRef") is not None:
+            for child in p_el:
+                # runs, also inside links (as in the document's paragraphs)
+                if child.tag == f"{{{w}}}hyperlink":
+                    rid = child.get(f"{{{NS['r']}}}id", "")
+                    url = rels[rid][0] if rid in rels else ""
+                    anchor = child.get(f"{{{w}}}anchor", "")
+                    r_els, link = child.findall(f"{{{w}}}r"), (url or None, anchor or None)
+                elif child.tag == f"{{{w}}}r":
+                    r_els, link = [child], (None, None)
+                else:
                     continue
-                tr = _parse_run(r_el, w)
-                if tr.text:
-                    runs.append(tr)
+                for r_el in r_els:
+                    # Skip footnoteRef marker run (just the superscript number)
+                    if r_el.find(f"{{{w}}}footnoteRef") is not None:
+                        continue
+                    tr = _parse_run(r_el, w)
+                    if tr.text:
+                        tr.hyperlink_url, tr.hyperlink_anchor = link
+                        runs.append(tr)
             # Detect paragraph indent via <w:ind w:left="...">
             indent = False
             ppr = p_el.find(f"{{{w}}}pPr")
@@ -221,9 +246,38 @@ def _parse_footnotes_xml(
         if first_text[:2].lower() == "s ":
             summaries[fn_id] = first_text[2:].strip()
             continue
+        # Legislação correlata: "L " prefix → one norm per non-empty paragraph
+        if first_text[:2].lower() == "l ":
+            _strip_prefix(paras)
+            legislacao[fn_id] = [p for p in paras if "".join(r.text for r in p.runs).strip()]
+            continue
 
         footnotes[fn_id] = paras
-    return footnotes, summaries, private_fn_ids
+    return footnotes, summaries, private_fn_ids, legislacao
+
+
+def _strip_prefix(paras: list[FootnotePara], n: int = 1) -> None:
+    """Remove o prefixo (a letra "L") do primeiro parágrafo com texto, e os espaços em volta.
+
+    O Word pode gravar a letra, o espaço e o nome da norma em runs diferentes (inclusive
+    dentro do link): primeiro some a letra, depois só os espaços até o primeiro caractere.
+    """
+    for p in paras:
+        if not "".join(r.text for r in p.runs).strip():
+            continue
+        tirados = 0
+        for r in p.runs:
+            if tirados < n:
+                s = r.text.lstrip()
+                take = min(n - tirados, len(s))
+                r.text, tirados = s[take:], tirados + take
+                if tirados < n:
+                    continue
+            r.text = r.text.lstrip()
+            if r.text:
+                break
+        p.runs = [r for r in p.runs if r.text]
+        return
 
 
 from dataclasses import dataclass as _dc
@@ -550,8 +604,14 @@ def _build_document(
     footnotes_map: dict[int, list[FootnotePara]] | None = None,
     summaries_map: dict[int, str] | None = None,
     private_fn_ids: set[int] | None = None,
+    legislacao_map: dict[int, list[FootnotePara]] | None = None,
 ) -> ParsedDocument:
     """Constrói ParsedDocument a partir dos parágrafos classificados."""
+    legislacao_map = legislacao_map or {}
+
+    def legislacao(fn_ids: list[int]) -> list[FootnotePara]:
+        return [p for f in fn_ids for p in legislacao_map.get(f, [])]
+
     if footnotes_map is None:
         footnotes_map = {}
     if summaries_map is None:
@@ -630,6 +690,8 @@ def _build_document(
                     uid=uid,
                     runs=cp.runs,
                     footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
+                    legislacao=legislacao(cp.footnote_ids),
+                    source_index=i,
                 )
             elif current_article is not None:
                 prec_par += 1
@@ -640,6 +702,8 @@ def _build_document(
                     runs=cp.runs,
                     is_old_version=cp.has_strike,
                     footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
+                    legislacao=legislacao(cp.footnote_ids),
+                    source_index=i,
                 ))
             i += 1
             continue
@@ -784,6 +848,8 @@ def _build_document(
                 is_old_version=cp.has_strike,
                 amendment_note=amendment,
                 footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
+                legislacao=legislacao(cp.footnote_ids),
+                source_index=i,
             )
 
             # Check if this is a duplicate of the current article
@@ -870,6 +936,8 @@ def _build_document(
                 is_old_version=cp.has_strike,
                 amendment_note=amendment,
                 footnotes=_build_footnotes(cp.footnote_ids, footnotes_map, footnote_counter, private_fn_ids, private_counter),
+                legislacao=legislacao(cp.footnote_ids),
+                source_index=i,
             )
 
             # Always keep children in document order (old versions

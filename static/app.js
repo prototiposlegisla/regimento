@@ -1340,6 +1340,12 @@
   }
 
   function unitLabel(unit) {
+    if (unit.classList.contains('leg-box')) {
+      // legislação correlata: the provision it belongs to (the paragraph right before the box)
+      const owner = unit.previousElementSibling;
+      const base = owner && owner.tagName === 'P' ? unitLabel(owner) : '';
+      return (base ? base + ' › ' : '') + 'Legislação correlata';
+    }
     if (unit.classList.contains('footnote-box')) return 'Nota ' + (unit.dataset.note || '');
     if (unit.closest('.card-prec') && !unit.classList.contains('old-version')) return '';  // running text
     if (unit.classList.contains('old-version')) {
@@ -2192,6 +2198,7 @@
     det: ['Detalha a norma correlata', 'Detalhado na norma correlata'],
     fund: ['↑ Fundamento na norma superior', '↓ Aplicado na norma correlata'],
     div: ['≠ Divergência', '≠ Divergência'],
+    sim: ['⇄ Regra federal correspondente', '⇄ Regra municipal correspondente'],
   };
   // A box belongs to one trigger: a citation and a badge may point to the same place
   function remKey(trigger) {
@@ -3170,7 +3177,8 @@
           const linkEl = document.createElement('a');
           linkEl.className = 'ref-art-link';
           linkEl.href = '#';
-          linkEl.textContent = ' — Art. ' + entry.art_ref;
+          linkEl.textContent = ' — Art. ' + (entry.art_ref.startsWith('ADT')
+            ? entry.art_ref.slice(3).replace(/^(\S+)/, '$1 ADT') : entry.art_ref);
           linkEl.addEventListener('click', (e) => {
             e.preventDefault();
             closeIndex();

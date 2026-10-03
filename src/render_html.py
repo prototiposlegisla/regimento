@@ -22,6 +22,7 @@ class HTMLRenderer:
 
     def __init__(self, remissoes: Optional["Resultado"] = None):
         self.footnote_counter = 0
+        self._leg_ids: dict[int, str] = {}   # legislação correlata: id(unit) -> "L1", "L2"...
         # Remissões explícitas: os trechos citados viram gatilho de uma prévia
         self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
         self._cited_by = remissoes.citado_em() if remissoes else {}
@@ -176,18 +177,36 @@ class HTMLRenderer:
         parts.append("  </div>")
         return "\n".join(parts)
 
-    @staticmethod
-    def _footnote_refs(unit: DocumentUnit) -> str:
-        """Superscript references to the unit's footnotes, inline."""
+    def _footnote_refs(self, unit: DocumentUnit) -> str:
+        """References to the unit's notes, inline: the legislação correlata badge, then the footnotes."""
         out = ""
+        if unit.legislacao:
+            n = len(unit.legislacao)
+            label = "Legislação correlata" + (f" ({n})" if n > 1 else "")
+            # a footnote reference (same box and tooltip), shown as a badge; label via CSS
+            out += f'<sup class="footnote-ref leg-ref" data-note="{self._leg_id(unit)}" data-label="{label}"></sup>'
         for fn in unit.footnotes:
             note_id = f"b{fn.number}" if fn.is_private else str(fn.number)
             out += f'<sup class="footnote-ref" data-note="{note_id}">[{note_id}]</sup>'
         return out
 
     def _footnote_boxes(self, unit: DocumentUnit) -> str:
-        """Footnote content boxes (hidden by default, toggled by click)."""
-        return "".join("\n" + self._render_footnote(fn) for fn in unit.footnotes)
+        """Note boxes (hidden by default, toggled by click)."""
+        out = ""
+        if unit.legislacao:
+            # one per line: the search text and the results' snippets keep the norms apart
+            items = "\n".join(f"<li>{self._render_runs(p.runs).strip()}</li>" for p in unit.legislacao)
+            out += (f'\n    <div class="footnote-box leg-box" data-note="{self._leg_id(unit)}">\n'
+                    f'      <button class="footnote-close">&times;</button>\n'
+                    f'      <strong>Legislação correlata:</strong><ul class="leg-list">{items}</ul>\n'
+                    f'    </div>')
+        return out + "".join("\n" + self._render_footnote(fn) for fn in unit.footnotes)
+
+    def _leg_id(self, unit: DocumentUnit) -> str:
+        nid = self._leg_ids.get(id(unit))
+        if nid is None:
+            nid = self._leg_ids[id(unit)] = f"L{len(self._leg_ids) + 1}"
+        return nid
 
     def _update_path_ctx(
         self, unit: DocumentUnit, ctx: list[str],
@@ -345,7 +364,8 @@ class HTMLRenderer:
         return "".join(parts)
 
     # Label of the implicit remissão's badge, seen from each side: (origin, target)
-    CHIP_PREFIX = {"eq": ("≈", "≈"), "det": ("detalha", "detalhado em"), "fund": ("↑", "↓"), "div": ("≠", "≠")}
+    CHIP_PREFIX = {"eq": ("≈", "≈"), "det": ("detalha", "detalhado em"), "fund": ("↑", "↓"), "div": ("≠", "≠"),
+                   "sim": ("⇄", "⇄")}
 
     def _render_correlatos(self, unit: DocumentUnit) -> str:
         """Selos das remissões implícitas do dispositivo (rótulo e nota em atributos: fora da busca)."""

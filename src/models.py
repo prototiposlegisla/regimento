@@ -90,6 +90,9 @@ class DocumentUnit:
     is_old_version: bool = False
     amendment_note: str = ""  # ex: "(Redação dada pela Resolução nº 21/2017)"
     children: list[DocumentUnit] = field(default_factory=list)
+    # Legislação correlata (notas de rodapé "L"): uma norma por parágrafo, com o link
+    legislacao: list[FootnotePara] = field(default_factory=list)
+    source_index: int = -1  # posição do parágrafo no corpo do DOCX (para ferramentas que editam o DOCX)
 
     @property
     def full_text(self) -> str:

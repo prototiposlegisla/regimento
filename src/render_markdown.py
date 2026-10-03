@@ -58,11 +58,17 @@ class MarkdownRenderer:
             summary = self._summaries.get((law, art), "")
             items.append(label + (f" — {summary}" if summary else ""))
         out = f" *(remete a: {' | '.join(items)})*" if items else ""
-        return out + self._correlatos_suffix(unit)
+        return out + self._correlatos_suffix(unit) + self._legislacao_suffix(unit)
+
+    def _legislacao_suffix(self, unit: DocumentUnit) -> str:
+        """Legislação correlata (notas "L"): *(legislação correlata: [Lei nº ...](link) — ementa)*."""
+        items = [self._render_runs(p.runs).strip() for p in unit.legislacao]
+        return f" *(legislação correlata: {' | '.join(items)})*" if items else ""
 
     # How each type reads from each side: (origin, target)
     _IMP_WORDS = {"eq": ("mesma regra que", "mesma regra que"), "det": ("detalha", "detalhado em"),
-                  "fund": ("tem fundamento em", "é fundamento de"), "div": ("diverge de", "diverge de")}
+                  "fund": ("tem fundamento em", "é fundamento de"), "div": ("diverge de", "diverge de"),
+                  "sim": ("tem como regra federal correspondente", "é a regra federal correspondente a")}
 
     def _correlatos_suffix(self, unit: DocumentUnit) -> str:
         """Sufixo das remissões implícitas: *(correlatos: diverge de LOM art. 48, § 6º — nota)*."""

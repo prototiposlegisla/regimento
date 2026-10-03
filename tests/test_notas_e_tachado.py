@@ -57,6 +57,19 @@ class TestParagrafoComLetra:
         assert cp.identifier == "§ 1º-A"
         assert _uid_suffix(cp) == "p1A"
 
+    @pytest.mark.parametrize("text, ident", [
+        ("§ 9º-A Do limite a que se refere o § 9º deste artigo", "§ 9º-A"),   # como na CF (Planalto)
+        ("§ 1º-A O imposto previsto no inciso I", "§ 1º-A"),
+    ])
+    def test_paragrafo_com_letra_sem_ponto(self, make_raw, text, ident):
+        assert _classify_one(make_raw(text)).identifier == ident
+
+    def test_inciso_sem_travessao(self, make_raw):
+        """Na CF do Planalto: "II que exerçam atividades de risco"."""
+        cp = _classify_one(make_raw("II que exerçam atividades de risco;"))
+        assert (cp.unit_type, cp.identifier) == (UnitType.INCISO, "II")
+        assert _classify_one(make_raw("Comissão de Finanças")).unit_type != UnitType.INCISO
+
     @pytest.mark.parametrize("text", [
         "§ 1º - A destituição automática de cargo da Mesa...",
         "§ 5º- A Comissão Processante terá prazo máximo...",
@@ -97,26 +110,58 @@ class TestNotasDeRodape:
     NOTES = ((2, ["S Sede da Câmara"]), (3, ["Nota pública"]), (4, ["b Nota B sobre o art. 9º"]))
 
     def test_sintese_vira_summary(self):
-        footnotes, summaries, _ = _parse_footnotes_xml(_footnotes_zip(*self.NOTES))
+        footnotes, summaries, _, _ = _parse_footnotes_xml(_footnotes_zip(*self.NOTES))
         assert summaries == {2: "Sede da Câmara"}
         assert 2 not in footnotes
 
     def test_versao_publica_exclui_nota_privada(self):
-        footnotes, _, private = _parse_footnotes_xml(_footnotes_zip(*self.NOTES))
+        footnotes, _, private, _ = _parse_footnotes_xml(_footnotes_zip(*self.NOTES))
         assert set(footnotes) == {3}
         assert private == set()
 
     def test_versao_privada_tira_so_o_prefixo(self):
         """"b Nota B sobre..." → "Nota B sobre..." (o "B " do meio fica)."""
-        footnotes, _, private = _parse_footnotes_xml(_footnotes_zip(*self.NOTES), include_private=True)
+        footnotes, _, private, _ = _parse_footnotes_xml(_footnotes_zip(*self.NOTES), include_private=True)
         assert private == {4}
         assert _text(footnotes[4]) == "Nota B sobre o art. 9º"
 
     def test_nota_privada_com_b_sozinho_no_primeiro_paragrafo(self):
-        footnotes, _, private = _parse_footnotes_xml(
+        footnotes, _, private, _ = _parse_footnotes_xml(
             _footnotes_zip((6, [" b", "Nota para o Regimento B."])), include_private=True)
         assert private == {6}
         assert _text(footnotes[6]).endswith("Nota para o Regimento B.")
+
+    def test_legislacao_correlata_com_link(self):
+        """Nota "L": uma norma por parágrafo, com o link de dentro da nota (rels das notas)."""
+        w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        r = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+        url = "https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=LEI&NUMERO=14454&ANO=2007"
+        ref = '<w:r><w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr><w:footnoteRef/></w:r>'
+        xml = (f'<?xml version="1.0" encoding="UTF-8"?><w:footnotes xmlns:w="{w}" xmlns:r="{r}">'
+               f'<w:footnote w:id="5"><w:p>{ref}<w:r><w:t xml:space="preserve"> L </w:t></w:r>'
+               f'<w:hyperlink r:id="rId1"><w:r><w:t>Lei nº 14.454, de 27 de junho de 2007</w:t></w:r></w:hyperlink>'
+               f'<w:r><w:t xml:space="preserve"> — Consolida a legislação sobre denominação.</w:t></w:r></w:p>'
+               f'<w:p><w:r><w:t>Decreto nº 1, de 2020 — Outra.</w:t></w:r></w:p></w:footnote>'
+               f'<w:footnote w:id="6"><w:p>{ref}<w:hyperlink r:id="rId1"><w:r><w:t>Nota com link</w:t></w:r>'
+               f'</w:hyperlink></w:p></w:footnote></w:footnotes>')
+        rels = ('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/'
+                '2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/'
+                f'2006/relationships/hyperlink" Target="{url.replace("&", "&amp;")}" TargetMode="External"/></Relationships>')
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr("word/footnotes.xml", xml)
+            z.writestr("word/_rels/footnotes.xml.rels", rels)
+        buf.seek(0)
+        zf = zipfile.ZipFile(buf)
+        from src.parse_docx import _parse_rels
+        footnotes, _, _, leg = _parse_footnotes_xml(zf, rels=_parse_rels(zf, "word/_rels/footnotes.xml.rels"))
+        assert set(leg) == {5} and 5 not in footnotes
+        assert [_text([p]) for p in leg[5]] == [
+            "Lei nº 14.454, de 27 de junho de 2007 — Consolida a legislação sobre denominação.",
+            "Decreto nº 1, de 2020 — Outra."]
+        assert [r.hyperlink_url for r in leg[5][0].runs] == [url, None]
+        # uma nota comum também guarda o link (antes ele e o texto sumiam)
+        assert [(r.text, r.hyperlink_url) for r in footnotes[6][0].runs] == [("Nota com link", url)]
 
 
 # ── Links com âncora ────────────────────────────────────────────────────

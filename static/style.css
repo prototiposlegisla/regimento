@@ -514,6 +514,23 @@ mark {
   position: relative;
 }
 .footnote-box.open { display: block; }
+/* Legislação correlata (notas "L"): a reference shown as a badge; label via CSS */
+.footnote-ref.leg-ref {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 10px;
+  font-size: .78em;
+  font-weight: 400;
+  line-height: 1.6;
+  vertical-align: 1px;
+  background: #fef5e7; color: #935116; border: 1px solid #f5cba7;
+}
+.footnote-ref.leg-ref::before { content: attr(data-label); }
+.leg-box { background: #fdf6ec; border-left-color: #e59866; }
+.leg-list { margin: 4px 0 0; padding-left: 1.2em; }
+.leg-list li + li { margin-top: 4px; }
+#cards-container.compact .leg-ref { display: none; }
 .fn-indent { margin-left: 1.5em; }
 
 .footnote-close {
@@ -1465,6 +1482,7 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 .rem-imp.t-det  { background: #e8f6f3; color: #0e6655; border-color: #a2d9ce; }
 .rem-imp.t-fund { background: #e9f7ef; color: #196f3d; border-color: #abebc6; }
 .rem-imp.t-div  { background: #fdedec; color: #a93226; border-color: #f5b7b1; font-weight: 600; }
+.rem-imp.t-sim  { background: #ebf5fb; color: #1b4f72; border-color: #aed6f1; }
 .rem-imp[data-status="proposta"] { border-style: dashed; opacity: .85; }
 #cards-container.compact .rem-imp { display: none; }
 
@@ -1496,10 +1514,12 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 .rem-note.t-det { color: #0e6655; background: #f3fbf9; }
 .rem-note.t-fund { color: #196f3d; background: #f4fbf6; }
 .rem-note.t-div { color: #922b21; background: #fdf2f1; }
+.rem-note.t-sim { color: #1b4f72; background: #f2f8fc; }
 .rem-box.t-eq { border-left-color: #8e44ad; }
 .rem-box.t-det { border-left-color: #16a085; }
 .rem-box.t-fund { border-left-color: #27ae60; }
 .rem-box.t-div { border-left-color: #c0392b; }
+.rem-box.t-sim { border-left-color: #2e86c1; }
 .rem-group { position: relative; }   /* sticky head and foot stay within their article */
 .rem-group + .rem-group { border-top: 2px solid #eaeded; }
 .rem-head {

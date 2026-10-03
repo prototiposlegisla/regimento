@@ -7,7 +7,7 @@ from collections import defaultdict
 
 from .models import (
     PREC, ArticleBlock, ParsedDocument, SectionHeading, UnitType,
-    SysIndexLeaf, SysIndexNode, prec_label, sys_index_to_list,
+    SysIndexLeaf, SysIndexNode, prec_label, sys_index_to_list, unit_path,
 )
 
 
@@ -215,3 +215,54 @@ def _format_art_range(articles: list[str]) -> str:
     if first == last:
         return f"(art. {first})"
     return f"(art. {first}\u2013{last})"
+
+
+# ---- Legislação correlata (aba Referências) ----
+
+_TIPO_ORDEM = ("constituição", "lei complementar", "lei", "decreto-lei", "decreto legislativo", "decreto",
+               "resolução", "ato")
+
+
+def _norma_key(label: str) -> tuple:
+    """Ordem: esfera (federal, estadual, municipal), tipo (constituição, lei complementar, lei,
+    decreto-lei, decreto legislativo, decreto, resolução, ato), ano, número; os artigos de uma
+    Constituição em ordem."""
+    low = label.lower()
+    esfera = 0 if re.search(r"\bfederal\b", low) else 1 if re.search(r"\bestadual\b", low) else 2
+    tipo = next((i for i, t in enumerate(_TIPO_ORDEM) if low.startswith(t)), len(_TIPO_ORDEM))
+    num = re.search(r"(?:\bn\.?\s?[º°o]\.?|\bn\.|\bart\.)\s*(\d[\d.]*)", low)   # "nº", "nº.", "n.º", "art."
+    ano = re.search(r"(\d{4})", low[num.end():] if num else low)
+    return (esfera, tipo, int(ano.group(1)) if ano else 0,
+            int(re.sub(r"\D", "", num.group(1)) or 0) if num else 0, low)
+
+
+def legislacao_index(doc: ParsedDocument) -> dict | None:
+    """Categoria "Legislação correlata" da aba Referências: cada norma (nota "L") e os
+    dispositivos do Regimento a que ela se liga, com link para o artigo."""
+    import html as _html
+    groups: dict[str, dict] = {}
+    for art in doc.elements:
+        if not isinstance(art, ArticleBlock) or art.law_prefix or not art.caput:
+            continue
+        ctx = ["", "", "", ""]
+        for u in [art.caput, *art.children]:
+            if u.is_old_version:
+                continue
+            path = unit_path(u, ctx) if u is not art.caput else ""
+            if not u.legislacao:
+                continue
+            ref = art.art_number + (", " + path.replace("§ú", "parágrafo único").replace(",", ", ") if path else "")
+            texto = re.sub(r"\s+", " ", u.full_text).strip()
+            for p in u.legislacao:
+                full = re.sub(r"\s+", " ", "".join(r.text for r in p.runs)).strip()
+                nome = full.split(" — ")[0].strip()
+                # the norm's name as the title; its ementa first, then the provisions
+                ementa = full[len(nome):].lstrip(" —").strip()
+                g = groups.setdefault(nome, {"title": nome, "entries": [
+                    {"html": f"<i>{_html.escape(ementa)}</i>"}] if ementa else []})
+                g["entries"].append({"html": _html.escape(texto[:180] + ("…" if len(texto) > 180 else "")),
+                                     "art_ref": ref})
+    if not groups:
+        return None
+    return {"category": "Legislação correlata",
+            "groups": [groups[k] for k in sorted(groups, key=_norma_key)]}

@@ -725,6 +725,7 @@
 
   function resetSearchNav() {
     indexMatches = null;
+    resultsShownFor = null;
     hideResults();
     searchMatches = [];
     searchIdx = 0;
@@ -830,6 +831,14 @@
     const indexKey = JSON.stringify([phrases, words]);
     if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
     searchIdx = 0;
+    // A new term shows its results (the sidebar, or on small screens the
+    // drawer, below the search bar), even if the list was closed for an
+    // earlier one. The same term run again (a filter changed) leaves it as is.
+    if (term !== resultsShownFor) {
+      resultsShownFor = term;
+      resultsHidden = false;
+      if (!resultsWide.matches) resultsDrawerOpen = true;
+    }
     showResults();
 
     if (searchMatches.length > 0) {
@@ -1040,8 +1049,10 @@
   let resultsBuildPending = false;
   let resultsPanelShown = false;
   let resultsDrawerOpen = false;
-  let resultsHidden = false;        // sidebar closed by the user (remembered)
-  try { resultsHidden = localStorage.getItem('regimento-results-hidden') === '1'; } catch (e) {}
+  let resultsHidden = false;        // sidebar closed by the user, until the next search
+  let resultsShownFor = null;       // the search term that last showed the list
+  // (closing it was remembered across visits before)
+  try { localStorage.removeItem('regimento-results-hidden'); } catch (e) {}
   let resultGroups = new Map();     // card → its group element in the list
   let indexPart = null;             // the list's element with the indexes' results
   let indexPartFor = null;          // the indexMatches it shows
@@ -1205,7 +1216,6 @@
 
   function setResultsHidden(hidden) {
     resultsHidden = hidden;
-    try { localStorage.setItem('regimento-results-hidden', hidden ? '1' : '0'); } catch (e) {}
     preserveScroll(updateResultsVisibility);
   }
 
@@ -3120,6 +3130,12 @@
   let currentIndexTab = 'systematic';
 
   function openIndex() {
+    // The results drawer (opened by a search, below the header) gives way;
+    // the panel links back to it
+    if (resultsDrawerOpen) {
+      resultsDrawerOpen = false;
+      updateResultsVisibility();
+    }
     $indexOverlay.classList.add('open');
     $indexPanel.classList.add('open');
     renderIndex();

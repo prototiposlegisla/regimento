@@ -1432,15 +1432,17 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 
 /* Small screens: drawer, like the index panel */
 @media screen and (max-width: 1179.98px) {
+  /* Below the header: the search bar stays visible and usable */
   body.results-drawer-open #results-panel {
     display: flex;
-    top: 0;
+    top: var(--header-h);
     left: 0;
     bottom: 0;
     width: min(380px, 90vw);
     z-index: 500;
     box-shadow: 2px 0 12px rgba(0,0,0,.2);
   }
+  body.results-drawer-open #index-overlay { top: var(--header-h); }
 }
 
 @media print {

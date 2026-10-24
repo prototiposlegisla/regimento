@@ -68,7 +68,8 @@ class MarkdownRenderer:
     # How each type reads from each side: (origin, target)
     _IMP_WORDS = {"eq": ("mesma regra que", "mesma regra que"), "det": ("detalha", "detalhado em"),
                   "fund": ("tem fundamento em", "é fundamento de"), "div": ("diverge de", "diverge de"),
-                  "sim": ("tem como regra federal correspondente", "é a regra federal correspondente a")}
+                  "sim": ("tem como regra federal correspondente", "é a regra federal correspondente a"),
+                  "exc": ("é exceção à regra geral de", "tem como exceção")}
 
     def _correlatos_suffix(self, unit: DocumentUnit) -> str:
         """Sufixo das remissões implícitas: *(correlatos: diverge de LOM art. 48, § 6º — nota)*."""

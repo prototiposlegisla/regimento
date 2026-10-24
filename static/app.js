@@ -2648,6 +2648,7 @@
     fund: ['↑ Fundamento na norma superior', '↓ Aplicado na norma correlata'],
     div: ['≠ Divergência', '≠ Divergência'],
     sim: ['⇄ Regra federal correspondente', '⇄ Regra municipal correspondente'],
+    exc: ['Regra geral', 'Exceção à regra geral'],
   };
   // A box belongs to one trigger: a citation and a badge may point to the same place
   function remKey(trigger) {

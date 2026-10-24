@@ -89,8 +89,10 @@ class Remissao:
 # Tipos de remissão implícita: nome na planilha -> código no site
 # correspondente: a regra equivalente para a União/Congresso Nacional (o paralelo federal), sem
 # afirmar que ela se aplique ao Município ("simetria" = nome antigo, ainda aceito)
+# exceção: na mesma norma, a origem abre exceção à regra geral do destino ("salvo as exceções
+# previstas nesta Lei")
 TIPOS = {"mesma regra": "eq", "detalha": "det", "fundamento": "fund", "diverge": "div",
-         "correspondente": "sim", "simetria": "sim"}
+         "correspondente": "sim", "simetria": "sim", "exceção": "exc", "excecao": "exc"}
 
 
 @dataclass
@@ -99,7 +101,7 @@ class Implicita:
     id: str
     origem: Alvo
     destino: Alvo
-    tipo: str                 # eq | det | fund | div (TIPOS)
+    tipo: str                 # eq | det | fund | div | sim | exc (TIPOS)
     nota: str
     proposta: bool            # Status "proposto": ainda não revisada (só em build de teste)
     u_origem: DocumentUnit
@@ -1034,7 +1036,7 @@ def _resolver_implicitas(corpus: _Corpus, res: Resultado, linhas: list[dict], *,
         tipo = TIPOS.get(item.get("Tipo", "").strip().lower())
         if tipo is None:
             res.avisos.append((f"Tipo desconhecido {item.get('Tipo')!r} "
-                               f"(use: {', '.join(t for t in TIPOS if t != 'simetria')})", ctx))
+                               f"(use: {', '.join(t for t in TIPOS if t not in ('simetria', 'excecao'))})", ctx))
             continue
         if tipo == "div" and not item.get("Nota", "").strip():
             res.avisos.append(("Divergência sem nota (a nota é obrigatória)", ctx))

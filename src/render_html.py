@@ -365,7 +365,7 @@ class HTMLRenderer:
 
     # Label of the implicit remissão's badge, seen from each side: (origin, target)
     CHIP_PREFIX = {"eq": ("≈", "≈"), "det": ("detalha", "detalhado em"), "fund": ("↑", "↓"), "div": ("≠", "≠"),
-                   "sim": ("⇄", "⇄")}
+                   "sim": ("⇄", "⇄"), "exc": ("regra geral:", "exceção:")}
 
     def _render_correlatos(self, unit: DocumentUnit) -> str:
         """Selos das remissões implícitas do dispositivo (rótulo e nota em atributos: fora da busca)."""

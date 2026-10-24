@@ -249,6 +249,17 @@ class TestImplicitas:
         md = MarkdownRenderer(res).render_document(doc)
         assert "*(correlatos: diverge de LOM art. 18, III — O RI diz 60 dias; a LOM diz 120.)*" in md
 
+    def test_excecao_na_mesma_norma(self):
+        doc = _doc()
+        res = detectar(doc, implicitas=[_linha(1, "368", "369", tipo="exceção", nota="O 368 abre exceção.")])
+        assert not [m for m, ctx in res.avisos if "remissoes.xlsx" in ctx] and res.implicitas[0].tipo == "exc"
+        html = HTMLRenderer(res).render(doc)
+        assert 'data-tipo="exc" data-side="src" data-nota="O 368 abre exceção." data-label="regra geral: RI 369"' in html
+        assert 'data-ref="368" data-tipo="exc" data-side="tgt"' in html and 'data-label="exceção: RI 368"' in html
+        md = MarkdownRenderer(res).render_document(doc)
+        assert "*(correlatos: é exceção à regra geral de art. 369 — O 368 abre exceção.)*" in md
+        assert "*(correlatos: tem como exceção art. 368 — O 368 abre exceção.)*" in md
+
     def test_planilha(self, tmp_path):
         import openpyxl
         from src.remissoes import carregar_implicitas

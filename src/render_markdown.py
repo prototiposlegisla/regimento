@@ -287,7 +287,9 @@ class MarkdownRenderer:
         hint = ref.get("hint", "")
 
         label = f"Art. {art}"
-        if law_prefix:
+        if law_prefix == "PREC":
+            label = f"Precedente Regimental {prec_label(art)}"
+        elif law_prefix:
             label = f"Art. {law_prefix}:{art}"
         if detail:
             label += f", {detail}"

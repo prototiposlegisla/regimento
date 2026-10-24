@@ -3398,8 +3398,8 @@
     // Returns array of {label, hint, art, lawPrefix} — one per ref, no range compaction
     const result = [];
     for (const r of refs) {
-      const prefix = r.law_prefix ? r.law_prefix + ' ' : '';
-      const label = prefix + 'art. ' + r.art + (r.detail ? ', ' + r.detail : '');
+      const label = r.law_prefix === 'PREC' ? 'Precedente ' + precLabel(r.art)
+        : (r.law_prefix ? r.law_prefix + ' ' : '') + 'art. ' + r.art + (r.detail ? ', ' + r.detail : '');
       // Hint: from XLSX parentheses → fallback to SUMMARIES_MAP
       let hint = r.hint || '';
       if (!hint) {
@@ -3746,8 +3746,14 @@
   function updatePill() {
     if (!activeSubject) return;
     const ref = activeSubject.refs[subjectIdx];
+    $pillCurrent.textContent = pillRefLabel(ref);
+  }
+
+  // "LOM:Art. 42, § 1º"; a precedente regimental, "Precedente nº 2/2004"
+  function pillRefLabel(ref) {
+    if (ref.law_prefix === 'PREC') return 'Precedente ' + precLabel(ref.art);
     const prefix = ref.law_prefix ? ref.law_prefix + ':' : '';
-    $pillCurrent.textContent = prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+    return prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
   }
 
   function findRefTarget(ref) {
@@ -3837,8 +3843,7 @@
     activeSubject.refs.forEach((ref, idx) => {
       const btn = document.createElement('button');
       btn.className = 'pill-dd-item' + (idx === subjectIdx ? ' current' : '');
-      const prefix = ref.law_prefix ? ref.law_prefix + ':' : '';
-      btn.textContent = prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+      btn.textContent = pillRefLabel(ref);
       btn.addEventListener('click', () => {
         $pillDropdown.classList.remove('open');
         navigateToSubjectRef(idx);

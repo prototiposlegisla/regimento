@@ -8,7 +8,7 @@ from pathlib import Path
 _ROMAN_RE = re.compile(r"^[IVXLC]+$")
 _ALINEA_RE = re.compile(r"^[a-z]$")
 _ITEM_RE = re.compile(r"^\d+$")
-_ART_RE = re.compile(r"^(?:ADT)?\d+[-A-Za-z]*$")
+_ART_RE = re.compile(r"^(?:ADT)?\d+[-A-Za-z]*$|^\d+/\d{4}$")  # "2/2004": precedente regimental
 _RANGE_RE = re.compile(r"^\d+\s*[-\u2013\u2014]\s*\d+$")
 _LAW_PREFIX_LINE_RE = re.compile(r"^([A-Za-z]{2,})\s*:\s*(.+)$")
 _HINT_RE = re.compile(r"\(([^)]+)\)\s*$")
@@ -16,14 +16,15 @@ _HINT_RE = re.compile(r"\(([^)]+)\)\s*$")
 
 def _validate_detail(detail: str) -> str | None:
     """Retorna mensagem de erro se detalhe inválido, None se válido."""
-    d = detail.strip()
+    # "§ 1º" e "§ 1º-A" (o endereço como no site) valem como "§1" e "§1-A"
+    d = re.sub(r"§\s*(\d+)\s*[º°]?", r"§\1", detail.strip())
 
     # caput / PU / §ú
     if d.lower() == "caput":
         return None
     if d.upper() == "PU" or d in ("\u00a7\u00fa", "\u00a7u"):
         return None
-    if re.match(r"^\u00a7\d+$", d):
+    if re.match(r"^\u00a7\d+(-[A-Z])?$", d):
         return None
 
     parts = [p.strip() for p in d.split(",")]
@@ -45,7 +46,7 @@ def _validate_detail(detail: str) -> str | None:
         if _ALINEA_RE.match(p0) and _ALINEA_RE.match(p1):
             return f"múltiplas alíneas na mesma linha — use linhas separadas"
         # §ú,inciso ou §N,inciso (parágrafo com inciso) ✓
-        if re.match(r"^§(\d+|ú|u)$", p0) and _ROMAN_RE.match(p1):
+        if re.match(r"^§(\d+(-[A-Z])?|ú|u)$", p0) and _ROMAN_RE.match(p1):
             return None
         return f"estrutura de detalhe inválida: '{d}'"
 
@@ -53,6 +54,8 @@ def _validate_detail(detail: str) -> str | None:
         p0, p1, p2 = parts
         if _ROMAN_RE.match(p0) and _ALINEA_RE.match(p1) and _ITEM_RE.match(p2):
             return None  # inciso,alínea,item ✓
+        if re.match(r"^§(\d+(-[A-Z])?|ú|u)$", p0) and _ROMAN_RE.match(p1) and _ALINEA_RE.match(p2):
+            return None  # parágrafo,inciso,alínea ✓
         return f"estrutura de detalhe inválida (esperado: inciso,alínea,item): '{d}'"
 
     return f"detalhe com muitas partes: '{d}'"
@@ -152,11 +155,8 @@ def validate_xlsx(path: str | Path, law_mapping: dict[str, str]) -> list[str]:
     known_prefixes: set[str] = set(law_mapping.values())
 
     # Localiza aba principal
-    ws = None
-    for name in wb.sheetnames:
-        if name != "Normas":
-            ws = wb[name]
-            break
+    from .parse_xlsx import aba_principal
+    ws = aba_principal(wb)
 
     if ws is None:
         wb.close()
@@ -164,6 +164,7 @@ def validate_xlsx(path: str | Path, law_mapping: dict[str, str]) -> list[str]:
         return messages
 
     rows = list(ws.iter_rows(min_row=2, values_only=True))
+    _validar_propostas(wb, known_prefixes, messages)
     wb.close()
 
     for i, row in enumerate(rows, start=2):  # linha 1 = cabeçalho
@@ -214,3 +215,26 @@ def validate_xlsx(path: str | Path, law_mapping: dict[str, str]) -> list[str]:
                         )
 
     return messages
+
+
+def _validar_propostas(wb, known_prefixes: set[str], messages: list[str]) -> None:
+    """Formato do Dispositivo (e do Para, na troca) das linhas da aba Propostas."""
+    if "Propostas" not in wb.sheetnames:
+        return
+    rows = wb["Propostas"].iter_rows(values_only=True)
+    header = [str(c or "").strip().lower() for c in next(rows, ())]
+    if "dispositivo" not in header:
+        messages.append("  aviso: aba 'Propostas' sem a coluna 'Dispositivo'")
+        return
+    i_disp = header.index("dispositivo")
+    i_acao = header.index("ação") if "ação" in header else None
+    i_para = header.index("para") if "para" in header else None
+    for n, row in enumerate(rows, start=2):
+        acao = str(row[i_acao] or "").strip().lower() if i_acao is not None and i_acao < len(row) else ""
+        cols = [("Dispositivo", i_disp)] + ([("Para", i_para)] if acao == "trocar" and i_para is not None else [])
+        for nome, i in cols:
+            raw = str(row[i] or "").strip() if i < len(row) and row[i] is not None else ""
+            for dline in raw.split("\n"):
+                if dline.strip():
+                    for err in _validate_device_line(dline, known_prefixes):
+                        messages.append(f"  Propostas, linha {n} · {nome} '{dline.strip()}': {err}")

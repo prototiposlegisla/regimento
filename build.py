@@ -63,6 +63,7 @@ class ValidationReport:
             "docx": "Formatação do DOCX",
             "formato": "Formato da planilha",
             "ref_cruzada": "Referências cruzadas (XLSX → DOCX)",
+            "propostas": "Propostas do índice remissivo (aba Propostas)",
             "vide": "Vides apontando para assuntos inexistentes",
             "remissoes": "Remissões entre artigos (citações não resolvidas)",
         }
@@ -121,6 +122,96 @@ def _load_config() -> dict:
         import tomli as tomllib  # type: ignore[no-redef]
     with open(config_path, "rb") as f:
         return tomllib.load(f)
+
+
+def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
+    """Índice remissivo da planilha, com as propostas e a conferência dos dispositivos.
+
+    Retorna (SubjectIndex ou None, {nome da norma: prefixo}). Os problemas vão para report:
+    formato da planilha, propostas que não se aplicam e referências a artigo inexistente
+    (erro) ou a dispositivo inexistente, revogado ou só tachado (aviso).
+    """
+    import re as _re
+    from src.parse_xlsx import aplicar_propostas, carregar_propostas, parse_law_mapping, parse_xlsx
+    from src.remissoes import ART_INEXISTENTE, REVOGADO, SUB_INEXISTENTE, TACHADO, _Corpus
+
+    xlsx_path = Path(args.xlsx)
+    if not xlsx_path.exists():
+        print("      → XLSX não encontrado, índice remissivo vazio")
+        return None, {}
+    try:
+        law_mapping = parse_law_mapping(xlsx_path)
+        if law_mapping:
+            print(f"      → {len(law_mapping)} normas mapeadas")
+
+        from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
+        for _e in _validate_xlsx_fmt(xlsx_path, law_mapping):
+            report.add("formato", "aviso", _e.strip())
+
+        # Artigos letrados do DOCX (ex: "212-A"), por norma, para expansão correta de ranges
+        known_lettered: dict[str, set[str]] = {}
+        for el in doc.elements:
+            if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number):
+                prefix = el.law_prefix or law_mapping.get(getattr(el, "law_name", None) or "", "")
+                known_lettered.setdefault(prefix, set()).add(el.art_number)
+        subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
+
+        propostas = carregar_propostas(xlsx_path)
+        if propostas:
+            n, n_prop, avisos = aplicar_propostas(subject_index, propostas, known_lettered=known_lettered,
+                                                  incluir_propostas=args.com_propostas)
+            print(f"      → {n} propostas aplicadas" + (f" ({n_prop} com Status proposto)" if n_prop else ""))
+            for message, context in avisos:
+                report.add("propostas", "aviso", message, context)
+    except PermissionError:
+        print("      ⚠ Não foi possível abrir remissivo.xlsx (arquivo em uso pelo Excel?)")
+        print("        Feche a planilha e rode o build novamente.")
+        print("        Continuando sem índice remissivo...")
+        return None, {}
+
+    # Normalizar refs de ADT letrados: "4-C" → "ADT4-C"
+    # Apenas artigos com sufixo de letra (ex: 4-C, 4-F) pois números puros
+    # (ex: 4, 15) podem ser artigos regulares do Regimento.
+    known_adt_lettered: set[str] = {
+        el.art_number[3:] for el in doc.elements
+        if hasattr(el, "art_number") and el.art_number.startswith("ADT")
+        and _re.search(r"-[A-Za-z]", el.art_number)
+    }
+    if known_adt_lettered:
+        for entry in subject_index.entries:
+            for ref in entry.refs:
+                if not ref.law_prefix and not ref.art.startswith("ADT") and ref.art in known_adt_lettered:
+                    ref.art = f"ADT{ref.art}"
+
+    # Cada referência confere com o DOCX no nível do dispositivo. O que veio de um
+    # intervalo ("211-275") e não está em vigor sai calado; o resto é avisado.
+    corpus = _Corpus(doc)
+    problema = {
+        SUB_INEXISTENTE: "dispositivo inexistente",
+        REVOGADO: "revogado",
+        TACHADO: "só existe a redação antiga (tachada)",
+    }
+    for entry in subject_index.entries:
+        ctx = entry.subject + (f" > {entry.sub_subject}" if entry.sub_subject else "")
+        mantidas = []
+        for ref in entry.refs:
+            path = "" if ref.detail.strip().lower() == "caput" else ref.detail
+            alvo = corpus.resolve(ref.law_prefix or "RI", ref.art, path)
+            if ref.from_range and alvo.status in (ART_INEXISTENTE, REVOGADO, TACHADO):
+                continue
+            mantidas.append(ref)
+            if ref.law_prefix == "CF":
+                report.add("ref_cruzada", "aviso", f"{alvo.ref} — artigo da CF (o índice não cita a CF)",
+                           f"assunto: {ctx}")
+            if alvo.status == ART_INEXISTENTE:
+                label = f"Art. {ref.law_prefix}:{ref.art}" if ref.law_prefix else f"Art. {ref.art}"
+                report.add("ref_cruzada", "erro", label, f"assunto: {ctx}")
+            elif alvo.status in problema:
+                report.add("ref_cruzada", "aviso", f"{alvo.ref} — {problema[alvo.status]}", f"assunto: {ctx}")
+        entry.refs = mantidas
+
+    print(f"      → {len({e.subject for e in subject_index.entries})} assuntos")
+    return subject_index, law_mapping
 
 
 def _build_once(
@@ -188,78 +279,8 @@ def _build_once(
 
     # ── 3. Parse XLSX ──────────────────────────────────────────────────
     print("[3/8] Parseando XLSX...")
-    from src.parse_xlsx import parse_xlsx, parse_law_mapping
-
-    xlsx_path = Path(args.xlsx)
-    law_mapping: dict[str, str] = {}
-    subject_index = None
-    if xlsx_path.exists():
-        try:
-            law_mapping = parse_law_mapping(xlsx_path)
-            if law_mapping:
-                print(f"      → {len(law_mapping)} normas mapeadas")
-
-            from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
-            _fmt_errs = _validate_xlsx_fmt(xlsx_path, law_mapping)
-            for _e in _fmt_errs:
-                report.add("formato", "aviso", _e.strip())
-
-            # Artigos letrados do DOCX (ex: "212-A") para expansão correta de ranges
-            import re as _re
-            known_lettered: set[str] = {
-                el.art_number for el in doc.elements
-                if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
-            }
-            subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
-
-            # Normalizar refs de ADT letrados: "4-C" → "ADT4-C"
-            # Apenas artigos com sufixo de letra (ex: 4-C, 4-F) pois números puros
-            # (ex: 4, 15) podem ser artigos regulares do Regimento.
-            known_adt_lettered: set[str] = {
-                el.art_number[3:] for el in doc.elements
-                if hasattr(el, "art_number") and el.art_number.startswith("ADT")
-                and _re.search(r"-[A-Za-z]", el.art_number)
-            }
-            if known_adt_lettered:
-                for entry in subject_index.entries:
-                    for ref in entry.refs:
-                        if not ref.law_prefix and not ref.art.startswith("ADT") and ref.art in known_adt_lettered:
-                            ref.art = f"ADT{ref.art}"
-
-            subject_list = subject_index.to_list()
-            print(f"      → {len(subject_list)} assuntos")
-        except PermissionError:
-            print("      ⚠ Não foi possível abrir remissivo.xlsx (arquivo em uso pelo Excel?)")
-            print("        Feche a planilha e rode o build novamente.")
-            print("        Continuando sem índice remissivo...")
-            subject_list = []
-    else:
-        print("      → XLSX não encontrado, índice remissivo vazio")
-        subject_list = []
-
-    # Cross-reference: articles in XLSX but not in DOCX
-    if subject_list:
-        docx_arts: set[str] = set()
-        for el in doc.elements:
-            if hasattr(el, "art_number"):
-                prefix = law_mapping.get(getattr(el, "law_name", None) or "", "")
-                docx_arts.add(f"{prefix}:{el.art_number}" if prefix else el.art_number)
-                # Lettered articles from other laws: also register plain art_number
-                # so range-expanded refs (e.g. 39-88 → 55-A) can match
-                if prefix:
-                    docx_arts.add(el.art_number)
-
-        seen_refs: set[str] = set()
-        for entry in subject_index.entries:
-            for ref in entry.refs:
-                key = f"{ref.law_prefix}:{ref.art}" if ref.law_prefix else ref.art
-                if key not in docx_arts and key not in seen_refs:
-                    seen_refs.add(key)
-                    art_label = f"Art. {ref.law_prefix}:{ref.art}" if ref.law_prefix else f"Art. {ref.art}"
-                    ctx = entry.subject
-                    if entry.sub_subject:
-                        ctx += f" > {entry.sub_subject}"
-                    report.add("ref_cruzada", "erro", art_label, f"assunto: {ctx}")
+    subject_index, law_mapping = _carregar_indice(args, doc, report)
+    subject_list = subject_index.to_list() if subject_index else []
 
     # Cross-reference: vides pointing to non-existent index entries
     if subject_list:
@@ -471,39 +492,8 @@ def _build_markdown(
 
     # ── 3. Parse XLSX ─────────────────────────────────────────────
     print("[3/5] Parseando XLSX...")
-    from src.parse_xlsx import parse_xlsx, parse_law_mapping
-    import re as _re
-
-    xlsx_path = Path(args.xlsx)
-    law_mapping: dict[str, str] = {}
-    subject_list: list[dict] = []
-    if xlsx_path.exists():
-        try:
-            law_mapping = parse_law_mapping(xlsx_path)
-            known_lettered: set[str] = {
-                el.art_number for el in doc.elements
-                if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number)
-            }
-            subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
-
-            # Normalizar refs de ADT letrados: "4-C" → "ADT4-C"
-            known_adt_lettered: set[str] = {
-                el.art_number[3:] for el in doc.elements
-                if hasattr(el, "art_number") and el.art_number.startswith("ADT")
-                and _re.search(r"-[A-Za-z]", el.art_number)
-            }
-            if known_adt_lettered:
-                for entry in subject_index.entries:
-                    for ref in entry.refs:
-                        if not ref.law_prefix and not ref.art.startswith("ADT") and ref.art in known_adt_lettered:
-                            ref.art = f"ADT{ref.art}"
-
-            subject_list = subject_index.to_list()
-            print(f"      → {len(subject_list)} assuntos")
-        except PermissionError:
-            print("      ⚠ Não foi possível abrir remissivo.xlsx")
-    else:
-        print("      → XLSX não encontrado")
+    subject_index, law_mapping = _carregar_indice(args, doc, ValidationReport())
+    subject_list = subject_index.to_list() if subject_index else []
 
     # Apply law prefixes
     if law_mapping:
@@ -659,7 +649,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--com-propostas", action="store_true",
-        help="Mostra também os correlatos com Status 'proposto' (para revisar no build de teste)",
+        help="Mostra também os correlatos e as propostas do índice remissivo com Status 'proposto' "
+             "(para revisar no build de teste)",
     )
     args = parser.parse_args()
 

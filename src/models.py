@@ -218,6 +218,8 @@ class SubjectRef:
     detail: str = ""  # ex: "§ 1º", "II", "§ú"
     law_prefix: str = ""  # ex: "LO" (empty = Regimento)
     hint: str = ""  # ex: "propor privativamente" (from XLSX parentheses)
+    from_range: bool = False  # veio da expansão de um intervalo ("211-275")
+    proposta: str = ""  # ID da proposta (aba Propostas) que incluiu a referência
 
 
 @dataclass
@@ -232,6 +234,16 @@ class SubjectEntry:
         if self.sub_subject:
             return f"{self.subject} — {self.sub_subject}"
         return self.subject
+
+
+def _junta(destino: list[dict], novas: list[dict]) -> None:
+    """Acrescenta as referências que ainda não estão (a conversão do PDF repetiu algumas)."""
+    vistas = {(d.get("law_prefix", ""), d["art"], d["detail"]) for d in destino}
+    for d in novas:
+        k = (d.get("law_prefix", ""), d["art"], d["detail"])
+        if k not in vistas:
+            vistas.add(k)
+            destino.append(d)
 
 
 @dataclass
@@ -258,17 +270,19 @@ class SubjectIndex:
                     rd["hint"] = r.hint
                 refs_dicts.append(rd)
             if e.sub_subject:
-                child: dict = {
-                    "sub_subject": e.sub_subject,
-                    "refs": refs_dicts,
-                }
+                # o mesmo subassunto em duas linhas (ou fundido por uma proposta): um só
+                child = next((c for c in groups[key]["children"]
+                              if c["sub_subject"].lower() == e.sub_subject.lower()), None)
+                if child is None:
+                    child = {"sub_subject": e.sub_subject, "refs": []}
+                    groups[key]["children"].append(child)
+                _junta(child["refs"], refs_dicts)
                 if e.vides:
-                    child["vides"] = e.vides
-                groups[key]["children"].append(child)
+                    child.setdefault("vides", []).extend(v for v in e.vides if v not in child.get("vides", []))
             else:
-                groups[key]["refs"].extend(refs_dicts)
+                _junta(groups[key]["refs"], refs_dicts)
                 if e.vides:
-                    groups[key]["vides"].extend(e.vides)
+                    groups[key]["vides"].extend(v for v in e.vides if v not in groups[key]["vides"])
 
         result = list(groups.values())
         # Remove empty children/refs/vides lists for cleaner JSON

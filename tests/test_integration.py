@@ -15,28 +15,28 @@ pytestmark = pytest.mark.integration
 
 class TestArticleCounts:
     def test_total_artigos_regulares(self, resolved_doc):
-        """720 artigos regulares (Regimento + Lei Orgânica + 79 da CF), fora os precedentes."""
+        """779 artigos regulares (Regimento + Lei Orgânica + 138 da CF), fora os precedentes."""
         arts = [e for e in resolved_doc.elements
                 if isinstance(e, ArticleBlock) and not e.is_adt and e.law_prefix != "PREC"]
-        assert len(arts) == 720
+        assert len(arts) == 779
 
     def test_artigos_por_lei(self, resolved_doc):
-        """Distribuição por lei: RI=397, LO=244, CF=79 (os artigos relevantes para o RI e a LOM)."""
+        """Distribuição por lei: RI=397, LO=244, CF=138 (os artigos relevantes para o RI e a LOM)."""
         arts = [e for e in resolved_doc.elements if isinstance(e, ArticleBlock) and not e.is_adt]
         by_law = Counter(a.law_name for a in arts)
         assert by_law["Regimento Interno"] == 397
         assert by_law["Lei Orgânica"] == 244
-        assert by_law["Constituição Federal"] == 79
+        assert by_law["Constituição Federal"] == 138
 
     def test_artigos_letrados(self, resolved_doc):
-        """9 artigos letrados: RI 183-A e 212-A; LOM 55-A, 69-A, 101-A, 149-A, 229-A e 229-B; CF 29-A."""
+        """11 artigos letrados: RI 183-A e 212-A; LOM 55-A, 69-A, 101-A, 149-A, 229-A e 229-B; CF 29-A, 163-A e 216-A."""
         lettered = {
             (e.law_name, e.art_number) for e in resolved_doc.elements
             if isinstance(e, ArticleBlock) and not e.is_adt and "-" in e.art_number
         }
         expected = {("Regimento Interno", n) for n in ("183-A", "212-A")}
         expected |= {("Lei Orgânica", n) for n in ("55-A", "69-A", "101-A", "149-A", "229-A", "229-B")}
-        expected |= {("Constituição Federal", "29-A")}
+        expected |= {("Constituição Federal", n) for n in ("29-A", "163-A", "216-A")}
         assert lettered == expected
 
     def test_artigos_adt(self, resolved_doc):
@@ -45,12 +45,12 @@ class TestArticleCounts:
         assert Counter(a.law_name for a in adts) == {"Regimento Interno": 14, "Lei Orgânica": 39}
 
     def test_artigos_com_versoes(self, resolved_doc):
-        """66 artigos com múltiplas versões do caput."""
+        """73 artigos com múltiplas versões do caput."""
         versioned = [
             e for e in resolved_doc.elements
             if isinstance(e, ArticleBlock) and len(e.all_versions) > 0
         ]
-        assert len(versioned) == 66
+        assert len(versioned) == 73
 
 
 # ── Dispositivos conferidos na Fase 0 ───────────────────────────────────
@@ -153,7 +153,7 @@ class TestSerialization:
 
 class TestHyperlinks:
     def test_hyperlinks_externos(self, resolved_doc):
-        """~2093 hyperlinks externos (tolerância 5%)."""
+        """~2269 hyperlinks externos (tolerância 5%)."""
         count = 0
         for el in resolved_doc.elements:
             if not isinstance(el, ArticleBlock):
@@ -162,7 +162,7 @@ class TestHyperlinks:
                 for run in unit.runs:
                     if run.hyperlink_url:
                         count += 1
-        assert count == pytest.approx(2093, rel=0.05), f"Hyperlinks externos: {count}"
+        assert count == pytest.approx(2269, rel=0.05), f"Hyperlinks externos: {count}"
 
     def test_anchors_internos(self, resolved_doc):
         """~526 links com âncora (#art369 etc.; tolerância 5%)."""
@@ -199,12 +199,12 @@ class TestRemissoes:
         return [a.ref for r in remissoes.remissoes if r.origem.ref == origem and r.exibivel for a in r.alvos]
 
     def test_quantidade(self, remissoes):
-        """~247 citações entre artigos viram gatilho (tolerância 10%), fora as dos precedentes e a eles.
+        """~275 citações entre artigos viram gatilho (tolerância 10%), fora as dos precedentes e a eles.
 
         Com os artigos da CF na página, as citações a eles na LOM e no RI também viram gatilho."""
         prec = lambda r: r.origem.law == "PREC" or any(a.law == "PREC" for a in r.alvos)
         n = sum(1 for r in remissoes.remissoes if r.exibivel and not prec(r))
-        assert n == pytest.approx(247, rel=0.10), n
+        assert n == pytest.approx(275, rel=0.10), n
         n_prec = sum(1 for r in remissoes.remissoes if r.exibivel and prec(r))
         assert n_prec == pytest.approx(137, rel=0.10), n_prec
 

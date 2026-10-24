@@ -1,5 +1,5 @@
 {
-  "total_articles": 793,
+  "total_articles": 852,
   "articles": [
     {
       "law": "Regimento Interno",
@@ -826,7 +826,7 @@
         "art47IIIaitem4",
         "art47IIIaitem5",
         "art47IIIaitem6",
-        "art47_2",
+        "art47IIIaitem6_2",
         "art47IIIb",
         "art47IV",
         "art47IVa",
@@ -10540,6 +10540,49 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "1",
+      "is_adt": false,
+      "uids": [
+        "art1",
+        "art1I",
+        "art1II",
+        "art1III",
+        "art1IV",
+        "art1V",
+        "art1pu_3"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "2",
+      "is_adt": false,
+      "uids": [
+        "art2"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "3",
+      "is_adt": false,
+      "uids": [
+        "art3",
+        "art3I",
+        "art3II",
+        "art3III",
+        "art3IV"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "4",
       "is_adt": false,
       "uids": [
@@ -10680,6 +10723,18 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "6",
+      "is_adt": false,
+      "uids": [
+        "art6",
+        "art6pu_2"
+      ],
+      "children_count": 1,
+      "versions_count": 3,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "7",
       "is_adt": false,
       "uids": [
@@ -10759,6 +10814,30 @@
         "art8pu_5"
       ],
       "children_count": 9,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "10",
+      "is_adt": false,
+      "uids": [
+        "art10"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "13",
+      "is_adt": false,
+      "uids": [
+        "art13",
+        "art13p1",
+        "art13p2"
+      ],
+      "children_count": 2,
       "versions_count": 0,
       "has_summary": true
     },
@@ -10864,6 +10943,25 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "18",
+      "is_adt": false,
+      "uids": [
+        "art18",
+        "art18p1_2",
+        "art18p2_2",
+        "art18p3_2",
+        "art18p4_3",
+        "art18p4_4"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "old_versions": [
+        "art18p4_3"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "19",
       "is_adt": false,
       "uids": [
@@ -10874,6 +10972,105 @@
       ],
       "children_count": 3,
       "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "20",
+      "is_adt": false,
+      "uids": [
+        "art20",
+        "art20I_2",
+        "art20II_2",
+        "art20III_2",
+        "art20IV_3",
+        "art20IV_4",
+        "art20V",
+        "art20VI",
+        "art20VII",
+        "art20VIII",
+        "art20IX",
+        "art20X",
+        "art20XI",
+        "art20p1_2",
+        "art20p1_3",
+        "art20p2_2"
+      ],
+      "children_count": 15,
+      "versions_count": 0,
+      "old_versions": [
+        "art20IV_3",
+        "art20p1_2"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "21",
+      "is_adt": false,
+      "uids": [
+        "art21",
+        "art21I",
+        "art21II",
+        "art21III",
+        "art21IV",
+        "art21V",
+        "art21VI",
+        "art21VII",
+        "art21VIII",
+        "art21IX",
+        "art21X",
+        "art21XI",
+        "art21XI_2",
+        "art21XII",
+        "art21XIIa",
+        "art21XIIa_2",
+        "art21XIIb",
+        "art21XIIc",
+        "art21XIId",
+        "art21XIIe",
+        "art21XIIf",
+        "art21XIII",
+        "art21XIII_2",
+        "art21XIV",
+        "art21XIV_2",
+        "art21XIV_3",
+        "art21XV",
+        "art21XVI",
+        "art21XVII",
+        "art21XVIII",
+        "art21XIX",
+        "art21XX",
+        "art21XXI",
+        "art21XXII",
+        "art21XXII_2",
+        "art21XXIII",
+        "art21XXIIIa",
+        "art21XXIIIb",
+        "art21XXIIIb_2",
+        "art21XXIIIb_3",
+        "art21XXIIIc",
+        "art21XXIIIc_2",
+        "art21XXIIIc_3",
+        "art21XXIIId",
+        "art21XXIV",
+        "art21XXV",
+        "art21XXVI"
+      ],
+      "children_count": 46,
+      "versions_count": 0,
+      "old_versions": [
+        "art21XI",
+        "art21XIIa",
+        "art21XIII",
+        "art21XIV",
+        "art21XIV_2",
+        "art21XXII",
+        "art21XXIIIb",
+        "art21XXIIIb_2",
+        "art21XXIIIc",
+        "art21XXIIIc_2"
+      ],
       "has_summary": true
     },
     {
@@ -10953,6 +11150,112 @@
       "old_versions": [
         "art23V",
         "art23pu"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "24",
+      "is_adt": false,
+      "uids": [
+        "art24",
+        "art24I",
+        "art24II",
+        "art24III",
+        "art24IV",
+        "art24V",
+        "art24VI",
+        "art24VII",
+        "art24VIII",
+        "art24IX",
+        "art24IX_2",
+        "art24X",
+        "art24XI",
+        "art24XII",
+        "art24XIII",
+        "art24XIV",
+        "art24XV",
+        "art24XVI",
+        "art24p1_2",
+        "art24p2_2",
+        "art24p3",
+        "art24p4"
+      ],
+      "children_count": 21,
+      "versions_count": 0,
+      "old_versions": [
+        "art24IX"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "25",
+      "is_adt": false,
+      "uids": [
+        "art25",
+        "art25p1",
+        "art25p2",
+        "art25p2_2",
+        "art25p3"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "old_versions": [
+        "art25p2"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "26",
+      "is_adt": false,
+      "uids": [
+        "art26",
+        "art26I_2",
+        "art26II_2",
+        "art26III_2",
+        "art26IV_2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "27",
+      "is_adt": false,
+      "uids": [
+        "art27",
+        "art27p1",
+        "art27p2",
+        "art27p2_2",
+        "art27p2_3",
+        "art27p3",
+        "art27p4"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "old_versions": [
+        "art27p2",
+        "art27p2_2"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "28",
+      "is_adt": false,
+      "uids": [
+        "art28",
+        "art28pu",
+        "art28p1",
+        "art28p2"
+      ],
+      "children_count": 3,
+      "versions_count": 2,
+      "old_versions": [
+        "art28pu"
       ],
       "has_summary": true
     },
@@ -11102,6 +11405,35 @@
       "versions_count": 0,
       "old_versions": [
         "art31p1_3"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "34",
+      "is_adt": false,
+      "uids": [
+        "art34",
+        "art34I_3",
+        "art34II_3",
+        "art34III_2",
+        "art34IV_2",
+        "art34V",
+        "art34Va",
+        "art34Vb",
+        "art34VI",
+        "art34VII",
+        "art34VIIa",
+        "art34VIIb",
+        "art34VIIc",
+        "art34VIId",
+        "art34VIIe",
+        "art34VIIe_2"
+      ],
+      "children_count": 15,
+      "versions_count": 0,
+      "old_versions": [
+        "art34VIIe"
       ],
       "has_summary": true
     },
@@ -11834,6 +12166,23 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "68",
+      "is_adt": false,
+      "uids": [
+        "art68",
+        "art68p1_2",
+        "art68p1I",
+        "art68p1II",
+        "art68p1III",
+        "art68p2_2",
+        "art68p3_2"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "69",
       "is_adt": false,
       "uids": [
@@ -11841,6 +12190,22 @@
       ],
       "children_count": 0,
       "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "70",
+      "is_adt": false,
+      "uids": [
+        "art70",
+        "art70pu_3",
+        "art70pu_4"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "old_versions": [
+        "art70pu_3"
+      ],
       "has_summary": true
     },
     {
@@ -11911,6 +12276,23 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "74",
+      "is_adt": false,
+      "uids": [
+        "art74",
+        "art74I_2",
+        "art74II_2",
+        "art74III_2",
+        "art74IV_2",
+        "art74p1",
+        "art74p2"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "75",
       "is_adt": false,
       "uids": [
@@ -11923,11 +12305,50 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "76",
+      "is_adt": false,
+      "uids": [
+        "art76"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "77",
+      "is_adt": false,
+      "uids": [
+        "art77",
+        "art77p1_2",
+        "art77p2_2",
+        "art77p3_2",
+        "art77p4",
+        "art77p5"
+      ],
+      "children_count": 5,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "78",
       "is_adt": false,
       "uids": [
         "art78",
         "art78pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "79",
+      "is_adt": false,
+      "uids": [
+        "art79",
+        "art79pu_2"
       ],
       "children_count": 1,
       "versions_count": 0,
@@ -11946,6 +12367,30 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "81",
+      "is_adt": false,
+      "uids": [
+        "art81",
+        "art81p1_2",
+        "art81p2_2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "82",
+      "is_adt": false,
+      "uids": [
+        "art82"
+      ],
+      "children_count": 0,
+      "versions_count": 2,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "83",
       "is_adt": false,
       "uids": [
@@ -11953,6 +12398,54 @@
       ],
       "children_count": 0,
       "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "84",
+      "is_adt": false,
+      "uids": [
+        "art84",
+        "art84I_2",
+        "art84II_2",
+        "art84III",
+        "art84IV",
+        "art84V",
+        "art84VI",
+        "art84VI_2",
+        "art84VIa",
+        "art84VIb",
+        "art84VII",
+        "art84VIII",
+        "art84IX",
+        "art84X",
+        "art84XI",
+        "art84XII",
+        "art84XIII",
+        "art84XIII_2",
+        "art84XIV",
+        "art84XV",
+        "art84XVI",
+        "art84XVII",
+        "art84XVIII",
+        "art84XIX",
+        "art84XX",
+        "art84XXI",
+        "art84XXII",
+        "art84XXIII",
+        "art84XXIV",
+        "art84XXV",
+        "art84XXVI",
+        "art84XXVII",
+        "art84XXVIII",
+        "art84pu_3"
+      ],
+      "children_count": 33,
+      "versions_count": 0,
+      "old_versions": [
+        "art84VI",
+        "art84XIII"
+      ],
       "has_summary": true
     },
     {
@@ -11989,6 +12482,33 @@
       ],
       "children_count": 6,
       "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "87",
+      "is_adt": false,
+      "uids": [
+        "art87",
+        "art87pu_3",
+        "art87puI",
+        "art87puII",
+        "art87puIII",
+        "art87puIV"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "88",
+      "is_adt": false,
+      "uids": [
+        "art88"
+      ],
+      "children_count": 0,
+      "versions_count": 1,
       "has_summary": true
     },
     {
@@ -12042,6 +12562,20 @@
         "art102pu_2",
         "art102p2_2"
       ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "131",
+      "is_adt": false,
+      "uids": [
+        "art131",
+        "art131p1_2",
+        "art131p2_2",
+        "art131p3_2"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
       "has_summary": true
     },
     {
@@ -12100,6 +12634,24 @@
         "art144p3_2",
         "art144p6_2"
       ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "145",
+      "is_adt": false,
+      "uids": [
+        "art145",
+        "art145I",
+        "art145II",
+        "art145III",
+        "art145p1",
+        "art145p2",
+        "art145p3",
+        "art145p4"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
       "has_summary": true
     },
     {
@@ -12352,6 +12904,29 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "162",
+      "is_adt": false,
+      "uids": [
+        "art162",
+        "art162pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "163-A",
+      "is_adt": false,
+      "uids": [
+        "art163-A"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "164",
       "is_adt": false,
       "uids": [
@@ -12574,6 +13149,48 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "170",
+      "is_adt": false,
+      "uids": [
+        "art170",
+        "art170I",
+        "art170II",
+        "art170III",
+        "art170IV",
+        "art170V",
+        "art170VI",
+        "art170VI_2",
+        "art170VII",
+        "art170VIII",
+        "art170IX",
+        "art170IX_2",
+        "art170pu_3"
+      ],
+      "children_count": 12,
+      "versions_count": 0,
+      "old_versions": [
+        "art170VI",
+        "art170IX"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "174",
+      "is_adt": false,
+      "uids": [
+        "art174",
+        "art174p1_3",
+        "art174p2_3",
+        "art174p3_3",
+        "art174p4"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "175",
       "is_adt": false,
       "uids": [
@@ -12585,6 +13202,67 @@
         "art175puIV"
       ],
       "children_count": 5,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "177",
+      "is_adt": false,
+      "uids": [
+        "art177",
+        "art177I_2",
+        "art177II_2",
+        "art177III",
+        "art177IV",
+        "art177V",
+        "art177V_2",
+        "art177p1_2",
+        "art177p1_3",
+        "art177p2_2",
+        "art177p2_3",
+        "art177p2I",
+        "art177p2II",
+        "art177p2III",
+        "art177p3",
+        "art177p4",
+        "art177p4I",
+        "art177p4Ia",
+        "art177p4Ib",
+        "art177p4II",
+        "art177p4IIa",
+        "art177p4IIb",
+        "art177p4IIc",
+        "art177p4IId"
+      ],
+      "children_count": 23,
+      "versions_count": 0,
+      "old_versions": [
+        "art177V",
+        "art177p1_2",
+        "art177p2_2"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "179",
+      "is_adt": false,
+      "uids": [
+        "art179"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "180",
+      "is_adt": false,
+      "uids": [
+        "art180"
+      ],
+      "children_count": 0,
       "versions_count": 0,
       "has_summary": true
     },
@@ -12603,6 +13281,148 @@
         "art182p4III"
       ],
       "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "183",
+      "is_adt": false,
+      "uids": [
+        "art183",
+        "art183p1_3",
+        "art183p2_3",
+        "art183p3_3"
+      ],
+      "children_count": 3,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "188",
+      "is_adt": false,
+      "uids": [
+        "art188",
+        "art188p1_2",
+        "art188p2_2"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "193",
+      "is_adt": false,
+      "uids": [
+        "art193",
+        "art193pu"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "194",
+      "is_adt": false,
+      "uids": [
+        "art194",
+        "art194pu_2",
+        "art194puI",
+        "art194puII",
+        "art194puIII",
+        "art194puIV",
+        "art194puV",
+        "art194puVI",
+        "art194puVI_2",
+        "art194puVII",
+        "art194puVII_2"
+      ],
+      "children_count": 10,
+      "versions_count": 0,
+      "old_versions": [
+        "art194puVI",
+        "art194puVII"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "195",
+      "is_adt": false,
+      "uids": [
+        "art195",
+        "art195I",
+        "art195I_2",
+        "art195Ia",
+        "art195Ib",
+        "art195Ic",
+        "art195II",
+        "art195II_2",
+        "art195II_3",
+        "art195III",
+        "art195IV",
+        "art195V",
+        "art195p1",
+        "art195p2",
+        "art195p3",
+        "art195p4",
+        "art195p5",
+        "art195p6",
+        "art195p7",
+        "art195p8",
+        "art195p8_2",
+        "art195p9",
+        "art195p9_2",
+        "art195p9_3",
+        "art195p10",
+        "art195p11",
+        "art195p11_2",
+        "art195p12",
+        "art195p13",
+        "art195p13_2",
+        "art195p14",
+        "art195p15",
+        "art195p16",
+        "art195p17",
+        "art195p18",
+        "art195p19"
+      ],
+      "children_count": 35,
+      "versions_count": 0,
+      "old_versions": [
+        "art195I",
+        "art195II",
+        "art195II_2",
+        "art195p8",
+        "art195p9",
+        "art195p9_2",
+        "art195p11",
+        "art195p13"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "196",
+      "is_adt": false,
+      "uids": [
+        "art196"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "197",
+      "is_adt": false,
+      "uids": [
+        "art197"
+      ],
+      "children_count": 0,
       "versions_count": 0,
       "has_summary": true
     },
@@ -12782,6 +13602,78 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "203",
+      "is_adt": false,
+      "uids": [
+        "art203",
+        "art203I_3",
+        "art203II_3",
+        "art203III_3",
+        "art203IV_2",
+        "art203V_2",
+        "art203VI"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "204",
+      "is_adt": false,
+      "uids": [
+        "art204",
+        "art204I_2",
+        "art204II_2",
+        "art204pu_2",
+        "art204puI",
+        "art204puII",
+        "art204puIII"
+      ],
+      "children_count": 6,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "205",
+      "is_adt": false,
+      "uids": [
+        "art205"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "206",
+      "is_adt": false,
+      "uids": [
+        "art206",
+        "art206I",
+        "art206II",
+        "art206III",
+        "art206IV",
+        "art206V",
+        "art206V_2",
+        "art206V_3",
+        "art206VI",
+        "art206VII",
+        "art206VIII",
+        "art206IX",
+        "art206pu"
+      ],
+      "children_count": 12,
+      "versions_count": 0,
+      "old_versions": [
+        "art206V",
+        "art206V_2"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "208",
       "is_adt": false,
       "uids": [
@@ -12811,6 +13703,19 @@
         "art208IV",
         "art208VII"
       ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "209",
+      "is_adt": false,
+      "uids": [
+        "art209",
+        "art209I",
+        "art209II"
+      ],
+      "children_count": 2,
+      "versions_count": 0,
       "has_summary": true
     },
     {
@@ -12871,6 +13776,61 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "213",
+      "is_adt": false,
+      "uids": [
+        "art213",
+        "art213I_2",
+        "art213II_2",
+        "art213p1",
+        "art213p2",
+        "art213p2_2"
+      ],
+      "children_count": 5,
+      "versions_count": 0,
+      "old_versions": [
+        "art213p2"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "214",
+      "is_adt": false,
+      "uids": [
+        "art214",
+        "art214I",
+        "art214II",
+        "art214III",
+        "art214IV",
+        "art214V",
+        "art214VI"
+      ],
+      "children_count": 6,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "215",
+      "is_adt": false,
+      "uids": [
+        "art215",
+        "art215p1_2",
+        "art215p2_2",
+        "art215p3_2",
+        "art215p3I",
+        "art215p3II",
+        "art215p3III",
+        "art215p3IV",
+        "art215p3V"
+      ],
+      "children_count": 8,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "216",
       "is_adt": false,
       "uids": [
@@ -12891,6 +13851,127 @@
         "art216p6III"
       ],
       "children_count": 14,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "216-A",
+      "is_adt": false,
+      "uids": [
+        "art216-A",
+        "art216-Ap1",
+        "art216-Ap1I",
+        "art216-Ap1II",
+        "art216-Ap1III",
+        "art216-Ap1IV",
+        "art216-Ap1V",
+        "art216-Ap1VI",
+        "art216-Ap1VII",
+        "art216-Ap1VIII",
+        "art216-Ap1IX",
+        "art216-Ap1X",
+        "art216-Ap1XI",
+        "art216-Ap1XII",
+        "art216-Ap2",
+        "art216-Ap2I",
+        "art216-Ap2II",
+        "art216-Ap2III",
+        "art216-Ap2IV",
+        "art216-Ap2V",
+        "art216-Ap2VI",
+        "art216-Ap2VII",
+        "art216-Ap2VIII",
+        "art216-Ap2IX",
+        "art216-Ap3",
+        "art216-Ap4"
+      ],
+      "children_count": 25,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "217",
+      "is_adt": false,
+      "uids": [
+        "art217",
+        "art217I",
+        "art217II",
+        "art217III",
+        "art217IV",
+        "art217p1_2",
+        "art217p2_2",
+        "art217p3_2"
+      ],
+      "children_count": 7,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "218",
+      "is_adt": false,
+      "uids": [
+        "art218",
+        "art218p1",
+        "art218p1_2",
+        "art218p2",
+        "art218p3",
+        "art218p3_2",
+        "art218p4",
+        "art218p5",
+        "art218p6",
+        "art218p7"
+      ],
+      "children_count": 9,
+      "versions_count": 1,
+      "old_versions": [
+        "art218p1",
+        "art218p3"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "219",
+      "is_adt": false,
+      "uids": [
+        "art219",
+        "art219pu_2"
+      ],
+      "children_count": 1,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "221",
+      "is_adt": false,
+      "uids": [
+        "art221",
+        "art221I_4",
+        "art221II_4",
+        "art221III_4",
+        "art221IV_2"
+      ],
+      "children_count": 4,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "223",
+      "is_adt": false,
+      "uids": [
+        "art223",
+        "art223p1_2",
+        "art223p2_3",
+        "art223p3",
+        "art223p4",
+        "art223p5"
+      ],
+      "children_count": 5,
       "versions_count": 0,
       "has_summary": true
     },
@@ -12921,6 +14002,29 @@
       "versions_count": 0,
       "old_versions": [
         "art225p1VIII"
+      ],
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "226",
+      "is_adt": false,
+      "uids": [
+        "art226",
+        "art226p1_2",
+        "art226p2_2",
+        "art226p3",
+        "art226p4",
+        "art226p5",
+        "art226p6",
+        "art226p6_2",
+        "art226p7",
+        "art226p8"
+      ],
+      "children_count": 9,
+      "versions_count": 0,
+      "old_versions": [
+        "art226p6"
       ],
       "has_summary": true
     },
@@ -12986,6 +14090,28 @@
       ],
       "children_count": 0,
       "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "244",
+      "is_adt": false,
+      "uids": [
+        "art244"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
+      "art_number": "249",
+      "is_adt": false,
+      "uids": [
+        "art249"
+      ],
+      "children_count": 0,
+      "versions_count": 0,
       "has_summary": true
     },
     {

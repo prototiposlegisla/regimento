@@ -68,8 +68,8 @@ def _validate_device_line(raw_line: str, known_prefixes: set[str]) -> list[str]:
     if not line:
         return errors
 
-    # 1. Espaço após vírgula
-    if ", " in line:
+    # 1. Espaço após vírgula (fora da dica entre parênteses, que é texto livre)
+    if ", " in _HINT_RE.sub("", line):
         errors.append(
             f"espaço após vírgula — use '{line.replace(', ', ',')}' em vez de '{line}'"
         )

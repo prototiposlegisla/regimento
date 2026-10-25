@@ -185,21 +185,19 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
                 if not ref.law_prefix and not ref.art.startswith("ADT") and ref.art in known_adt_lettered:
                     ref.art = f"ADT{ref.art}"
 
-    # Cada referência confere com o DOCX no nível do dispositivo. O que veio de um
-    # intervalo ("211-275") e não está em vigor sai calado; o resto é avisado.
+    # Cada referência confere com o DOCX no nível do dispositivo. Dispositivo revogado fica no
+    # índice (a regra que deixou de existir ainda explica práticas e textos antigos), com a dica
+    # "revogado"; quem o cita sem marcar — "(revogado)", "(declarado inconstitucional)" — é avisado,
+    # para decidir se há substituto. Do intervalo, o revogado entra marcado, sem aviso.
     corpus = _Corpus(doc)
-    problema = {
-        SUB_INEXISTENTE: "dispositivo inexistente",
-        REVOGADO: "revogado",
-        TACHADO: "só existe a redação antiga (tachada)",
-    }
+    marcado = _re.compile(r"revogad|inconstitucional|ADIN|reda[çc][ãa]o anterior", _re.I)
     for entry in subject_index.entries:
         ctx = entry.subject + (f" > {entry.sub_subject}" if entry.sub_subject else "")
         mantidas = []
         for ref in entry.refs:
             path = "" if ref.detail.strip().lower() == "caput" else ref.detail
             alvo = corpus.resolve(ref.law_prefix or "RI", ref.art, path)
-            if ref.from_range and alvo.status in (ART_INEXISTENTE, REVOGADO, TACHADO):
+            if ref.from_range and alvo.status == ART_INEXISTENTE:
                 continue
             mantidas.append(ref)
             if ref.law_prefix == "CF":
@@ -208,8 +206,17 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
             if alvo.status == ART_INEXISTENTE:
                 label = f"Art. {ref.law_prefix}:{ref.art}" if ref.law_prefix else f"Art. {ref.art}"
                 report.add("ref_cruzada", "erro", label, f"assunto: {ctx}")
-            elif alvo.status in problema:
-                report.add("ref_cruzada", "aviso", f"{alvo.ref} — {problema[alvo.status]}", f"assunto: {ctx}")
+            elif alvo.status == SUB_INEXISTENTE:
+                report.add("ref_cruzada", "aviso", f"{alvo.ref} — dispositivo inexistente", f"assunto: {ctx}")
+            elif alvo.status in (REVOGADO, TACHADO):
+                if not marcado.search(ref.hint):
+                    if not ref.from_range:
+                        report.add("ref_cruzada", "aviso",
+                                   f"{alvo.ref} — revogado (se fica de propósito, marque \"(revogado)\" na planilha; "
+                                   f"senão, troque pelo substituto)", f"assunto: {ctx}")
+                    a = corpus.arts.get((ref.law_prefix or "RI", ref.art))
+                    resto = ref.hint or (a.summary if a is not None else "")
+                    ref.hint = "revogado" + (f" — {resto}" if resto else "")
         entry.refs = mantidas
 
     print(f"      → {len({e.subject for e in subject_index.entries})} assuntos")

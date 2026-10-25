@@ -3753,7 +3753,9 @@
   function pillRefLabel(ref) {
     if (ref.law_prefix === 'PREC') return 'Precedente ' + precLabel(ref.art);
     const prefix = ref.law_prefix ? ref.law_prefix + ':' : '';
-    return prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '');
+    // revoked provisions stay in the index, marked by the build ("revogado — ...")
+    const gone = /^(revogado|declarado inconstitucional)/.exec(ref.hint || '');
+    return prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '') + (gone ? ' (' + gone[1] + ')' : '');
   }
 
   function findRefTarget(ref) {

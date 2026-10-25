@@ -2181,7 +2181,8 @@
   // "Art. 105, XII", "Art. 4-C ADT, I"
   function refEntryLabel(entry) {
     const ref = entry.art_ref || '';
-    return 'Art. ' + (ref.startsWith('ADT') ? ref.slice(3).replace(/^([^,\s]+)/, '$1 ADT') : ref);
+    return (entry.law ? entry.law + ' art. ' : 'Art. ') +
+      (ref.startsWith('ADT') ? ref.slice(3).replace(/^([^,\s]+)/, '$1 ADT') : ref);
   }
 
   // The article of an entry of the referências (of the Regimento), shown
@@ -2190,7 +2191,7 @@
   function goToRefEntry(entry, leg) {
     if (!entry.art_ref) return null;
     const art = entry.art_ref.replace(/[º°ª]/g, '').split(/[,\s]/)[0].trim();
-    const card = remCard({ law: 'RI', art });
+    const card = remCard({ law: entry.law || 'RI', art });
     if (!card) return null;
     revealCard(card);
     let target = card;

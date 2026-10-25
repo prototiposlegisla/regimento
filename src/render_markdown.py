@@ -320,7 +320,7 @@ class MarkdownRenderer:
 
                     line = f"- {md_text}"
                     if art_ref:
-                        line += f" — Art. {art_ref}"
+                        line += f" — {entry['law'] + ' art.' if entry.get('law') else 'Art.'} {art_ref}"
                     lines.append(line)
 
         return "\n".join(lines) + "\n"

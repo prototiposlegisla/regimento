@@ -238,11 +238,15 @@ def _norma_key(label: str) -> tuple:
 
 def legislacao_index(doc: ParsedDocument) -> dict | None:
     """Categoria "Legislação correlata" da aba Referências: cada norma (nota "L") e os
-    dispositivos do Regimento a que ela se liga, com link para o artigo."""
+    dispositivos do Regimento e da Lei Orgânica a que ela se liga, com link para o artigo."""
     import html as _html
+    from .remissoes import law_of
     groups: dict[str, dict] = {}
     for art in doc.elements:
-        if not isinstance(art, ArticleBlock) or art.law_prefix or not art.caput:
+        if not isinstance(art, ArticleBlock) or not art.caput:
+            continue
+        law = law_of(art)
+        if law not in ("RI", "LOM"):
             continue
         ctx = ["", "", "", ""]
         for u in [art.caput, *art.children]:
@@ -261,6 +265,8 @@ def legislacao_index(doc: ParsedDocument) -> dict | None:
                 g = groups.setdefault(nome, {"title": nome, "entries": [
                     {"html": f"<i>{_html.escape(ementa)}</i>"}] if ementa else []})
                 entry = {"html": _html.escape(texto[:180] + ("…" if len(texto) > 180 else "")), "art_ref": ref}
+                if law != "RI":
+                    entry["law"] = law
                 if path:
                     entry["path"] = path   # as in the site's data-path: the link opens that provision's box
                 g["entries"].append(entry)

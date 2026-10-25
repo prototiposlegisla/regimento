@@ -59,6 +59,15 @@ class TestLegislacaoCorrelata:
         # o caminho como no data-path do site: o link abre o quadro daquele dispositivo
         assert [e["path"] for e in cat["groups"][0]["entries"][1:]] == ["§ 2º", "XXX"]
 
+    def test_aba_referencias_inclui_a_lei_organica(self):
+        doc = _doc()
+        caput = DocumentUnit(UnitType.ARTIGO, "Art. 77", "lom77", [TextRun("Art. 77 — Subprefeituras.")],
+                             legislacao=[_norma("Lei nº 14.454, de 27 de junho de 2007", "Consolida.")])
+        doc.elements.append(ArticleBlock(art_number="77", caput=caput, law_name="Lei Orgânica", law_prefix="LOM"))
+        entradas = legislacao_index(doc)["groups"][0]["entries"][1:]
+        assert [(e["art_ref"], e.get("law")) for e in entradas] == [("5, § 2º", None), ("105, XXX", None), ("77", "LOM")]
+        assert "— LOM art. 77" in MarkdownRenderer().render_referencias([legislacao_index(doc)])
+
     def test_sem_notas_nao_cria_categoria(self):
         doc = _doc()
         for a in doc.elements:

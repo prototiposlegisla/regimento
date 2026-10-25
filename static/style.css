@@ -67,8 +67,9 @@ body {
 #search-input.has-nav { padding-right: 130px; }
 #search-input:focus { border-color: var(--selected-border); }
 
-/* A subject of the remissivo in the search bar; app.js gives the input room
-   for it. The color of the subject's dispositivos in the cards. */
+/* A subject of the remissivo, or the marked articles, in the search bar;
+   app.js gives the input room for it. A subject has the color of its
+   dispositivos in the cards; the markers, the color of their funnel. */
 #search-chip {
   position: absolute;
   left: 4px;
@@ -82,7 +83,9 @@ body {
 }
 #search-chip[hidden] { display: none; }
 #chip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-#chip-label::before { content: "Remissivo: "; font-weight: 400; }
+#search-chip[data-kind="subject"] #chip-label::before { content: "Remissivo: "; font-weight: 400; }
+#search-chip[data-kind="markers"] { background: #e3f0fb; color: #1b4f72; border-color: #9cc8ec; }
+#search-chip[data-kind="markers"] #chip-remove { color: #1b4f72; }
 #chip-remove {
   flex-shrink: 0;
   width: 22px; height: 22px;
@@ -1394,7 +1397,7 @@ mark {
 @media (max-width: 480px) {
   #search-counter { padding: 6px 4px; }
   #search-chip { max-width: 38%; }
-  #chip-label::before { content: none; }
+  #search-chip[data-kind="subject"] #chip-label::before { content: none; }
   /* No room for it between the chip and the counter */
   #search-input.has-nav::placeholder { color: transparent; }
   #cards-container { padding: 8px; }

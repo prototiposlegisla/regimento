@@ -8,6 +8,8 @@
 
   const REFERENCIAS_INDEX = /*__REFERENCIAS_INDEX__*/[];
 
+  const CONSULTA_INDEX = /*__CONSULTA_INDEX__*/[];
+
   const SUMMARIES_MAP = /*__SUMMARIES_MAP__*/{};
 
   const INFO_HTML = /*__INFO_HTML__*/"";
@@ -1839,14 +1841,17 @@
   });
 
   // ===== INDEX RESULTS =====
-  // The entries of the three indexes (sistemático, remissivo, referências)
-  // with every term of the search, at the top of the results list. Matched by
-  // their own text: a section by its title, a subject by its name (a
-  // sub-subject together with its subject's), a prazo or quórum by its group
-  // title and text, a norm of the legislação correlata by its name and ementa.
+  // The entries of the consulta rápida and of the three indexes (sistemático,
+  // remissivo, referências) with every term of the search, at the top of the
+  // results list. Matched by their own text: a prazo or quórum by its value,
+  // label and note, plus its section's words ("prazo vista"); a section by its
+  // title, a subject by its name (a sub-subject together with its subject's),
+  // a norm of the legislação correlata by its name and ementa.
   // Precedents (leaves of the sistemático) and the provisions' texts are in
   // the cards, which the search already lists.
   const INDEX_GROUPS_SHOWN = 3;   // per index; the rest behind "+ N"
+  const QUICK_SHOWN = 4;          // entries of the consulta rápida
+  const QUICK_LIST_SHOWN = 3;     // lines of a ficha (cabe aparte, a rito's steps)
   const INDEX_ENTRIES_SHOWN = 2;  // per group (sub-subjects, prazos)
   const ART_LINKS_SHOWN = 6;      // a norm's provisions (legislação correlata)
   const LEGISLACAO = 'Legislação correlata';
@@ -1909,14 +1914,32 @@
         }
       }
     }
-    return indexItems = { sys, subj, refs };
+    // The consulta rápida: each entry by its visible text (own) and with its
+    // section's words, which aren't written ("prazo", "quórum")
+    const quick = [];
+    for (const sec of CONSULTA_INDEX) {
+      for (const item of sec.items) {
+        const own = normIndexText(quickTexts(item).join(FIELD_SEP));
+        quick.push({ sec, item, own, label: normIndexText(item.label),
+                     text: own + FIELD_SEP + normIndexText(sec.terms + ' ' + (item.terms || '')) });
+      }
+    }
+    return indexItems = { sys, subj, refs, quick };
   }
 
   // The indexes' entries with every phrase and word (as parseSearchTerms
   // returns them): {sections: [{title, hits, build}], count, regex, key}
   function searchIndexes(phrases, words, regex, key) {
     const has = text => phrases.every(p => text.includes(p)) && words.every(w => text.includes(w));
-    const { sys, subj, refs } = getIndexItems();
+    const { sys, subj, refs, quick } = getIndexItems();
+
+    // Those with more of the terms in their own text first, more yet in the
+    // label ("prazo vista": the pedido de vista before every other prazo;
+    // "aparte": the shorter label, cabe aparte, before the tempos that mention it)
+    const terms = phrases.concat(words);
+    const quickHits = quick.filter(it => has(it.text))
+      .map((it, i) => ({ it, i, score: terms.reduce((n, t) => n + (it.label.includes(t) ? 2 : it.own.includes(t) ? 1 : 0), 0) }))
+      .sort((a, b) => b.score - a.score || (b.score > terms.length ? a.it.label.length - b.it.label.length : 0) || a.i - b.i);
 
     const sysHits = sys.filter(it => has(it.text));
 
@@ -1940,7 +1963,8 @@
     }
 
     const sections = [
-      { title: 'Índice sistemático', where: 'no índice sistemático', hits: sysHits, build: buildSysResult },
+      { title: 'Consulta rápida', where: 'na consulta rápida', hits: quickHits, build: buildQuickResult, shown: QUICK_SHOWN },
+      { title: 'Índice sistemático',where: 'no índice sistemático', hits: sysHits, build: buildSysResult },
       { title: 'Índice remissivo', where: 'no índice remissivo', hits: byName.concat(bySub), build: buildSubjectResult },
       { title: 'Referências', where: 'nas referências', hits: refHits, build: buildRefResult },
     ].filter(s => s.hits.length);
@@ -1960,7 +1984,7 @@
       head.setAttribute('aria-level', '3');
       head.textContent = sec.title + ' · ' + sec.hits.length;
       indexPart.appendChild(head);
-      const more = appendWithMore(indexPart, sec.hits, INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');
+      const more = appendWithMore(indexPart, sec.hits, sec.shown || INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');
       if (more) more.setAttribute('aria-label', more.textContent + ' ' + sec.where);
     }
     $resultsList.appendChild(indexPart);
@@ -2182,6 +2206,160 @@
     }, ['dispositivo', 'dispositivos']);
     group.appendChild(links);
     return group;
+  }
+
+  // ===== CONSULTA RÁPIDA =====
+  // Prazos, quóruns, tempos, datas (kind "valor": the number large, its unit
+  // under it) and hipóteses, ritos (kind "ficha": text, list or steps), from
+  // consulta-rapida.yaml (see src/consulta.py). The same element in the
+  // Referências tab and at the top of the search results.
+
+  // The texts of an entry the search matches (and marks)
+  function quickTexts(item) {
+    return [item.v, item.u, item.label, item.text, item.obs].filter(Boolean)
+      .concat((item.list || []).map(x => x.text), item.steps || []);
+  }
+
+  function buildQuickResult(hit) {
+    const { sec, item } = hit.it;
+    return quickItemEl(sec, item, text => indexMarkHtml(text), true);
+  }
+
+  // The provision of a reference ({law, art, path}), shown even if a filter
+  // hides it, highlighted if it's a part of the article. Returns the element to focus.
+  function goToQuickRef(ref) {
+    const card = remCard(ref);
+    if (!card) return null;
+    revealCard(card);
+    const p = ref.path ? remUnitP(card, ref.path) : null;
+    scrollToReadingLine(p || card);
+    selectCard(card, true);
+    if (p) remFlash(p);
+    return p || card;
+  }
+
+  // From the search list (its drawer closes) or from the tab (the index closes)
+  function quickGo(go, inSearch) {
+    return e => {
+      if (inSearch) { goToIndexResult(e, go); return; }
+      closeIndex();
+      go();
+    };
+  }
+
+  // The references of an entry, as links: "art. 63, § 4º", "LOM art. 138, § 6º"
+  function quickRefsEl(refs, inSearch) {
+    const el = document.createElement('div');
+    el.className = 'q-refs';
+    for (const ref of refs) {
+      const btn = document.createElement('button');
+      btn.className = 'q-ref';
+      btn.textContent = ref.label;
+      btn.addEventListener('click', quickGo(() => goToQuickRef(ref), inSearch));
+      el.appendChild(btn);
+    }
+    return el;
+  }
+
+  // mark(text) → HTML: the search's matches marked, or just escaped
+  function quickItemEl(sec, item, mark, inSearch) {
+    const el = document.createElement('div');
+    el.className = 'q-item q-' + sec.kind + (inSearch ? ' res-group res-idx-group' : '');
+    el.setAttribute('role', 'group');
+    el.setAttribute('aria-label', sec.title + ': ' + (item.v ? (item.v + ' ' + item.u).trim() + ', ' : '') + item.label);
+
+    if (sec.kind === 'valor') {
+      const val = document.createElement('div');
+      val.className = 'q-val' + (item.v.length > 12 ? ' q-xlong' : item.v.length > 6 ? ' q-long' : '');
+      // "1º fev–30 jun · 1º ago–15 dez": a line each
+      val.innerHTML = '<span class="q-n">' + item.v.split(' · ').map(x => mark(x)).join('<br>') + '</span>'
+        + (item.u ? '<span class="q-u">' + mark(item.u) + '</span>' : '');
+      el.appendChild(val);
+    }
+    const body = document.createElement('div');
+    body.className = 'q-body';
+    if (inSearch) {
+      const tag = document.createElement('div');
+      tag.className = 'q-sec';
+      tag.textContent = sec.title;
+      body.appendChild(tag);
+    }
+    // the label opens the first article cited
+    const first = item.refs[0];
+    const label = document.createElement(first ? 'button' : 'div');
+    label.className = 'q-label';
+    label.innerHTML = mark(item.label)
+      + (item.cf ? ' <span class="q-cf" title="artigo ainda não confirmado">†</span>' : '');
+    if (first) label.addEventListener('click', quickGo(() => goToQuickRef(first), inSearch));
+    body.appendChild(label);
+    for (const [cls, text] of [['q-text', item.text], ['q-obs', item.obs]]) {
+      if (!text) continue;
+      const div = document.createElement('div');
+      div.className = cls;
+      div.innerHTML = mark(text);
+      body.appendChild(div);
+    }
+    // a rito's steps (numbered by the CSS); a ficha's lines (in the search,
+    // those with the terms first). Divs, not li: the "+ N" button goes among them.
+    const lists = [];
+    if (item.steps) lists.push(['q-steps', item.steps, step => {
+      const line = document.createElement('div');
+      line.className = 'q-line';
+      line.innerHTML = mark(step);
+      return line;
+    }, ['passo', 'passos']]);
+    if (item.list) {
+      let lines = item.list;
+      if (inSearch) {
+        const re = indexMatches.regex;
+        const found = x => { re.lastIndex = 0; return re.test(x.text); };
+        lines = lines.filter(found).concat(lines.filter(x => !found(x)));
+      }
+      lists.push(['q-list', lines, x => {
+        const line = document.createElement('div');
+        line.className = 'q-line';
+        line.innerHTML = mark(x.text) + (x.tag ? ' <span class="q-tag">' + escapeHtml(x.tag) + '</span>' : '');
+        if (x.refs.length) line.appendChild(quickRefsEl(x.refs, inSearch));
+        return line;
+      }, ['linha', 'linhas']]);
+    }
+    for (const [cls, items, build, noun] of lists) {
+      const list = document.createElement('div');
+      list.className = cls;
+      if (inSearch) appendWithMore(list, items, QUICK_LIST_SHOWN, build, noun);
+      else items.forEach(x => list.appendChild(build(x)));
+      body.appendChild(list);
+    }
+    if (item.refs.length) body.appendChild(quickRefsEl(item.refs, inSearch));
+    el.appendChild(body);
+    return el;
+  }
+
+  // The consulta rápida in the Referências tab: its sections, with links to
+  // each one at the top; with a filter, the entries with its terms
+  function renderConsulta(filter) {
+    const toc = document.createElement('div');
+    toc.className = 'q-toc';
+    $indexContent.appendChild(toc);
+    for (const sec of CONSULTA_INDEX) {
+      const items = sec.items.filter(item => !filter
+        || textMatchesFilter(quickTexts(item).join(' ') + ' ' + sec.terms + ' ' + (item.terms || ''), filter));
+      if (!items.length) continue;
+      const head = document.createElement('div');
+      head.className = 'ref-group-title q-head';
+      head.textContent = sec.title;
+      $indexContent.appendChild(head);
+      const link = document.createElement('button');
+      link.className = 'q-toc-link';
+      link.textContent = sec.title + ' · ' + items.length;
+      link.addEventListener('click', () => head.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+      toc.appendChild(link);
+      for (const item of items) $indexContent.appendChild(quickItemEl(sec, item, escapeHtml, false));
+    }
+    if (!toc.childNodes.length) {
+      toc.className = 'q-empty';
+      toc.textContent = 'Nada na consulta rápida com esses termos.';
+    }
   }
 
   // "Art. 105, XII", "Art. 4-C ADT, I"
@@ -3756,7 +3934,9 @@
   }
 
   function renderReferencesIndex(filter) {
-    if (!REFERENCIAS_INDEX.length) {
+    // The consulta rápida first, then the categories of the referências
+    const cats = (CONSULTA_INDEX.length ? [{ category: 'Consulta rápida', consulta: true }] : []).concat(REFERENCIAS_INDEX);
+    if (!cats.length) {
       $indexContent.textContent = 'Nenhuma referência disponível.';
       return;
     }
@@ -3764,7 +3944,7 @@
     // Category buttons
     const catBar = document.createElement('div');
     catBar.className = 'ref-categories';
-    REFERENCIAS_INDEX.forEach((cat, idx) => {
+    cats.forEach((cat, idx) => {
       const btn = document.createElement('button');
       btn.className = 'ref-cat-btn' + (idx === currentRefCategory ? ' active' : '');
       btn.textContent = cat.category;
@@ -3777,8 +3957,12 @@
     $indexContent.appendChild(catBar);
 
     // Render groups/entries for active category
-    const cat = REFERENCIAS_INDEX[currentRefCategory];
+    const cat = cats[currentRefCategory];
     if (!cat) return;
+    if (cat.consulta) {
+      renderConsulta(filter);
+      return;
+    }
 
     for (const group of cat.groups) {
       const hasMatch = !filter || group.entries.some(e => {

@@ -12,6 +12,7 @@ def assemble(
     systematic_index: list[dict],
     subject_index: list[dict],
     referencias_index: list[dict],
+    consulta_index: list[dict],
     summaries_map: dict[str, str],
     info_html: str,
     base_dir: Path,
@@ -30,11 +31,13 @@ def assemble(
     sys_json = json.dumps(systematic_index, ensure_ascii=False, indent=2)
     subj_json = json.dumps(subject_index, ensure_ascii=False, indent=2)
     ref_json = json.dumps(referencias_index, ensure_ascii=False, indent=2)
+    consulta_json = json.dumps(consulta_index, ensure_ascii=False)
     summaries_json = json.dumps(summaries_map, ensure_ascii=False)
 
     js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", sys_json)
     js = js.replace("/*__SUBJECT_INDEX__*/[]", subj_json)
     js = js.replace("/*__REFERENCIAS_INDEX__*/[]", ref_json)
+    js = js.replace("/*__CONSULTA_INDEX__*/[]", consulta_json)
     js = js.replace("/*__SUMMARIES_MAP__*/{}", summaries_json)
 
     info_json = json.dumps(info_html, ensure_ascii=False)

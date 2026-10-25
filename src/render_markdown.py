@@ -411,6 +411,35 @@ class MarkdownRenderer:
 
         return "\n".join(lines) + "\n"
 
+    def render_consulta(self, secoes: list[dict]) -> str:
+        """A consulta rápida (src/consulta.py) em Markdown: prazos, quóruns, tempos, hipóteses, ritos."""
+        lines: list[str] = ["# Referências — consulta rápida"]
+
+        def arts(item: dict) -> str:
+            labels = [r["label"] for r in item.get("refs") or []]
+            return f" — {'; '.join(labels)}" if labels else ""
+
+        for sec in secoes:
+            lines.append(f"\n## {sec['title']}\n")
+            for item in sec["items"]:
+                if sec["kind"] == "valor":
+                    valor = " ".join(x for x in (item["v"], item["u"]) if x)
+                    obs = f" ({item['obs']})" if item.get("obs") else ""
+                    lines.append(f"- **{valor}** — {item['label']}{obs}{arts(item)}")
+                    continue
+                lines.append(f"\n### {item['label']}{arts(item)}\n")
+                if item.get("text"):
+                    lines.append(item["text"])
+                if item.get("obs"):
+                    lines.append(f"\n*{item['obs']}*")
+                for i, step in enumerate(item.get("steps") or [], 1):
+                    lines.append(f"{i}. {step}")
+                for sub in item.get("list") or []:
+                    tag = f" [{sub['tag']}]" if sub.get("tag") else ""
+                    lines.append(f"- {sub['text']}{tag}{arts(sub)}")
+
+        return "\n".join(lines) + "\n"
+
     @staticmethod
     def _html_to_markdown(html_text: str) -> str:
         """Converte HTML simples (de referências) para Markdown."""

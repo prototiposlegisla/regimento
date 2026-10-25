@@ -81,6 +81,7 @@ class ValidationReport:
             "vide": "Vides apontando para assuntos inexistentes",
             "espelhos": "Entradas espelhadas com dispositivos diferentes (A — B × B — A)",
             "remissoes": "Remissões entre artigos (citações não resolvidas)",
+            "consulta": "Consulta rápida (consulta-rapida.yaml)",
         }
 
         print(f"\n{'─' * 60}")
@@ -246,6 +247,27 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
     return subject_index, law_mapping
 
 
+def _carregar_consulta(args: argparse.Namespace, doc, report: ValidationReport) -> list[dict]:
+    """Seções da consulta rápida (src/consulta.py), com os artigos e os valores conferidos com o DOCX."""
+    from src import consulta
+
+    path = Path(args.consulta)
+    if not path.exists():
+        print("      → consulta-rapida.yaml não encontrado, consulta rápida vazia")
+        return []
+    try:
+        secoes = consulta.montar(consulta.carregar(path))
+    except Exception as e:  # yaml malformado: o build segue, com o erro no relatório
+        report.add("consulta", "erro", f"não foi possível ler o arquivo: {e}", str(path))
+        return []
+    avisos: list = []
+    consulta.conferir(secoes, doc, avisos)
+    for severity, message, context in avisos:
+        report.add("consulta", severity, message, context)
+    print(f"      → consulta rápida: {sum(len(s['items']) for s in secoes)} entradas em {len(secoes)} seções")
+    return consulta.para_o_site(secoes)
+
+
 def _build_once(
     *,
     args: argparse.Namespace,
@@ -363,22 +385,12 @@ def _build_once(
     for message, context in remissoes.avisos:
         report.add("remissoes", "aviso", message, context)
 
-    # ── 4. Parse referencias DOCX ────────────────────────────────────
-    print("[4/8] Parseando referências...")
-    from src.parse_referencias import parse_referencias
+    # ── 4. Referências: consulta rápida (yaml) e legislação correlata ──
+    print("[4/8] Montando referências...")
+    consulta_data = _carregar_consulta(args, doc, report)
 
-    ref_path = Path(args.referencias)
-    if ref_path.exists():
-        referencias_data = parse_referencias(ref_path)
-        entry_count = sum(
-            len(e["entries"]) for cat in referencias_data for e in cat["groups"]
-        )
-        print(f"      → {len(referencias_data)} categorias, {entry_count} entradas")
-    else:
-        print("      → DOCX de referências não encontrado, aba vazia")
-        referencias_data = []
-
-    # Legislação correlata (notas "L" do DOCX): uma categoria a mais na aba Referências
+    # Legislação correlata (notas "L" do DOCX): uma categoria da aba Referências
+    referencias_data: list[dict] = []
     from src.build_index import legislacao_index
     avisos_leg: list = []
     leg = legislacao_index(doc, avisos_leg)
@@ -434,6 +446,7 @@ def _build_once(
         systematic_index=systematic_index,
         subject_index=subject_list,
         referencias_index=referencias_data,
+        consulta_index=consulta_data,
         summaries_map=summaries_map,
         info_html=info_html,
         base_dir=BASE_DIR,
@@ -485,6 +498,12 @@ def _build_once(
             encoding="utf-8",
         )
         print(f"  → {debug_dir / 'referencias_index.json'}")
+
+        (debug_dir / "consulta_index.json").write_text(
+            json.dumps(consulta_data, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(f"  → {debug_dir / 'consulta_index.json'}")
 
         if report.issues:
             (debug_dir / "validation_report.json").write_text(
@@ -541,17 +560,9 @@ def _build_markdown(
             if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping and not el.law_prefix:
                 el.law_prefix = law_mapping[el.law_name]
 
-    # ── 4. Parse referências ──────────────────────────────────────
-    print("[4/5] Parseando referências...")
-    from src.parse_referencias import parse_referencias
-
-    ref_path = Path(args.referencias)
-    referencias_data: list[dict] = []
-    if ref_path.exists():
-        referencias_data = parse_referencias(ref_path)
-        print(f"      → {len(referencias_data)} categorias")
-    else:
-        print("      → DOCX de referências não encontrado")
+    # ── 4. Consulta rápida ────────────────────────────────────────
+    print("[4/5] Montando a consulta rápida...")
+    consulta_data = _carregar_consulta(args, doc, ValidationReport())
 
     # ── 5. Render Markdown ────────────────────────────────────────
     print("[5/5] Renderizando Markdown...")
@@ -570,8 +581,8 @@ def _build_markdown(
         (output_dir / "indice-remissivo.md").write_text(indice_md, encoding="utf-8")
         print(f"      → indice-remissivo.md ({len(indice_md) / 1024:.0f} KB)")
 
-    if referencias_data:
-        refs_md = renderer.render_referencias(referencias_data)
+    if consulta_data:
+        refs_md = renderer.render_consulta(consulta_data)
         (output_dir / "referencias.md").write_text(refs_md, encoding="utf-8")
         print(f"      → referencias.md ({len(refs_md) / 1024:.0f} KB)")
 
@@ -634,10 +645,11 @@ def main() -> int:
     # Defaults: config.local.toml → fallback local
     default_docx = sources.get("docx", str(BASE_DIR / "regimentoInterno.docx"))
     default_xlsx = sources.get("xlsx", str(BASE_DIR / "remissivo.xlsx"))
-    default_refs = sources.get("referencias", str(BASE_DIR / "referencias.docx"))
     default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.docx"))
     # Remissões implícitas (correlatos entre normas): ao lado do DOCX, salvo indicação
     default_remissoes = sources.get("remissoes", str(Path(default_docx).parent / "remissoes.xlsx"))
+    # Consulta rápida (prazos, quóruns...), o mesmo yaml da folha impressa: idem
+    default_consulta = sources.get("consulta", str(Path(default_docx).parent / "consulta-rapida.yaml"))
     default_private = output_cfg.get("private", "")
     default_chatbot = output_cfg.get("chatbot", "")
 
@@ -657,8 +669,8 @@ def main() -> int:
         help="Caminho do XLSX",
     )
     parser.add_argument(
-        "--referencias", default=default_refs,
-        help="Caminho do DOCX de referências",
+        "--consulta", default=default_consulta,
+        help="Arquivo da consulta rápida (consulta-rapida.yaml)",
     )
     parser.add_argument(
         "--informacoes", default=default_info,

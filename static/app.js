@@ -1672,7 +1672,6 @@
   const INDEX_GROUPS_SHOWN = 3;   // per index; the rest behind "+ N"
   const INDEX_ENTRIES_SHOWN = 2;  // per group (sub-subjects, prazos)
   const ART_LINKS_SHOWN = 6;      // a norm's provisions (legislação correlata)
-  const REFS_SHOWN = 4;           // a subject's articles shown beside it
   const LEGISLACAO = 'Legislação correlata';
   let indexItems = null;          // the indexes' entries and their normalized text
 
@@ -1919,12 +1918,17 @@
     return group;
   }
 
-  // "art. 46; LOM art. 13, I; +3"
+  // The articles, one per line with the rubrica, as the index's tab shows
+  // them: "art. 46 — Comissões Permanentes", "LOM art. 13, I — …"
   function refsHtml(refs) {
     if (!refs || !refs.length) return '';
-    const labels = formatRefsList(refs).map(r => r.label.replace(/,(?=\S)/g, ', '));   // "§1,I" → "§1, I"
-    const shown = labels.slice(0, REFS_SHOWN).join('; ') + (labels.length > REFS_SHOWN ? '; +' + (labels.length - REFS_SHOWN) : '');
-    return ' <span class="res-refs">' + escapeHtml(shown) + '</span>';
+    let html = '';
+    for (const r of formatRefsList(refs)) {
+      const label = r.label.replace(/,(?=\S)/g, ', ');   // "§1,I" → "§1, I"
+      html += '<span class="res-ref">' + escapeHtml(label)
+        + (r.hint ? '<span class="res-ref-hint"> — ' + indexMarkHtml(r.hint) + '</span>' : '') + '</span>';
+    }
+    return '<span class="res-refs">' + html + '</span>';
   }
 
   // The subject (or sub-subject) a "vide" points to ("ASSUNTO" or

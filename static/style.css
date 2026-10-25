@@ -1347,6 +1347,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 .res-idx:first-child { margin-top: 2px; }
 .res-idx-group .res-head { font-weight: 600; }
 .res-ctx, .res-refs { font-weight: 400; color: #666; font-size: 12px; }
+/* A subject's articles, one per line; a long rubrica wraps under itself */
+.res-refs { display: block; line-height: 1.4; }
+.res-ref { display: block; padding-left: 20px; text-indent: -10px; }
+.res-ref-hint { color: #999; }
 /* Text, not buttons: a group's title, an entry with nothing to open */
 .res-idx-title, .res-inert { cursor: default; }
 .res-idx-title:hover, .res-inert:hover { background: none; }

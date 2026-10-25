@@ -40,9 +40,9 @@
   let markersList = [];
   let searchFilter = true;
   let currentSearch = '';
-  let activeSubject = null;
-  let subjectIdx = 0;
-  let subjectFilter = true;
+  let activeSubject = null;      // the remissivo's subject in the search bar: { subject, refs }
+  let subjectOpening = false;    // it was just put there (doSearch goes to its start)
+  let subjectStartCard = null;   // and starts at this article (the one it was opened from)
   let zoomScale = 1;
   let zoomTimeout = null;
   let searchMatches = [];
@@ -65,11 +65,8 @@
   const $indexPanel = document.getElementById('index-panel');
   const $indexContent = document.getElementById('index-content');
   const $indexSearch = document.getElementById('index-search');
-  const $subjectPill = document.getElementById('subject-pill');
-  const $pillLabel = document.getElementById('pill-label');
-  const $pillCurrent = document.getElementById('pill-current');
-  const $pillDropdown = document.getElementById('pill-dropdown');
-  const $pillFilter = document.getElementById('pill-filter');
+  const $searchChip = document.getElementById('search-chip');
+  const $chipLabel = document.getElementById('chip-label');
   const $zoomIndicator = document.getElementById('zoom-indicator');
   const $searchNav = document.getElementById('search-nav');
   const $searchCounter = document.getElementById('search-counter');
@@ -188,7 +185,11 @@
       for (const hit of getCardHits(card)) {
         if (hitHasBox(hit)) { rect = hitRect(hit); break; }
       }
-      if (!rect) rect = card.getBoundingClientRect();
+      // None (a subject without text): its first dispositivo in the card
+      if (!rect) {
+        const detail = card.classList.contains('detail-highlight') ? null : card.querySelector('.detail-highlight');
+        rect = (detail || card).getBoundingClientRect();
+      }
       const target = window.scrollY + rect.top - getReadingLineY();
       scrollToY(Math.max(0, target), behavior);
       registerNearbyHits();
@@ -508,8 +509,7 @@
     const vh = window.innerHeight;
     const bandTop = -HIGHLIGHT_MARGIN_SCREENS * vh;
     const bandBottom = (1 + HIGHLIGHT_MARGIN_SCREENS) * vh;
-    // A subject filter opened afterwards (search filter off) hides matches
-    // without searching again; the binary search needs visible cards
+    // The binary search needs visible cards
     const matches = visibleOnly(searchMatches);
     for (let i = firstCardWhere(matches, r => r.bottom >= bandTop); i < matches.length; i++) {
       const card = matches[i];
@@ -741,9 +741,24 @@
     requestAnimationFrame(syncToScroll);
   }
 
+  // The subject's articles, as "lawPrefix:art" keys
+  function subjectKeys() {
+    return new Set(activeSubject.refs.map(r => (r.law_prefix || '') + ':' + r.art));
+  }
+
+  // An article asked for in the search bar (a43, aLO23...)
+  function goToArticle(target) {
+    revealCard(target);   // hidden by a filter: shown anyway
+    const targetY = target.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25;
+    scrollToY(targetY, 'smooth');
+    selectCard(target, true);
+  }
+
+  // Searches the search bar's terms, within the articles of its subject (if
+  // any); with a subject and no terms, its articles are the results
   function doSearch(term) {
     // A run for the input's current value supersedes the pending one; runs
-    // for an older term (currentSearch, from marker/subject filters) leave it
+    // for an older term (currentSearch, from marker filters) leave it
     // pending so the newer term still applies
     if (term === $searchInput.value.trim()) cancelPendingSearch();
     if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
@@ -751,112 +766,138 @@
     clearHighlights();
     const cards = getAllCards();
     const hiddenBefore = cards.filter(c => c.classList.contains('filtered-out'));
-
-    if (activeSubject && subjectFilter) {
-      applySubjectFilter();
-    } else {
-      cards.forEach(c => c.classList.remove('filtered-out'));
-    }
+    cards.forEach(c => c.classList.remove('filtered-out'));
 
     if (markerFilter && markersList.length > 0) {
       applyMarkerFilter();
     }
 
+    const opening = subjectOpening;
+    const startCard = subjectStartCard;
+    subjectOpening = false;
+    subjectStartCard = null;
     const query = classifyQuery(term);
-    $btnClearSearch.style.display = query.kind === 'empty' ? 'none' : 'flex';
+    $btnClearSearch.style.display = query.kind === 'empty' && !activeSubject ? 'none' : 'flex';
 
-    if (query.kind === 'empty' || query.kind === 'short') {
-      resetSearchNav();
-      if (hiddenBefore.some(c => !c.classList.contains('filtered-out'))) refreshScrollState();
-      return;
-    }
-
+    let navTarget = null;
     if (query.kind === 'nav') {
       const lawPrefix = query.artMatch[1] ? query.artMatch[1].toUpperCase() : '';
       const artNum = query.artMatch[2];
-      let target;
       if (lawPrefix) {
-        target = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
+        navTarget = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
       } else {
         // Search default (no data-law) first, then any
-        target = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
+        navTarget = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
               || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
       }
-      if (target) {
-        const targetY = target.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25;
-        scrollToY(targetY, 'smooth');
-        selectCard(target, true);
-      }
+    }
+
+    const text = query.kind === 'text';
+    if (!text && !activeSubject) {
+      if (navTarget) goToArticle(navTarget);
       resetSearchNav();
+      if (query.kind !== 'nav' && hiddenBefore.some(c => !c.classList.contains('filtered-out'))) refreshScrollState();
       return;
     }
 
-    const { phrases, words, includeFootnotes } = query;
-    const regex = buildHighlightRegex(phrases, words);
-    const articleCards = visibleOnly(getArticleCards());
-    const matchedCards = new Set();
-
-    for (const card of articleCards) {
-      const text = getCardText(card, includeFootnotes);
-      if (phrases.every(p => text.includes(p)) && words.every(t => text.includes(t))) {
-        matchedCards.add(card);
-        highlightText(card, regex, includeFootnotes);
-        // Open footnote boxes that contain highlights
-        if (includeFootnotes) {
-          for (const hit of getCardHits(card)) {
-            const box = hitElement(hit).closest('.footnote-box');
-            if (box) box.classList.add('open');
+    let articleCards = visibleOnly(getArticleCards());
+    if (activeSubject) {
+      const keys = subjectKeys();
+      articleCards = articleCards.filter(c => keys.has((c.dataset.law || '') + ':' + c.dataset.art));
+    }
+    let matched = articleCards;
+    if (text) {
+      const { phrases, words, includeFootnotes } = query;
+      const regex = buildHighlightRegex(phrases, words);
+      matched = [];
+      for (const card of articleCards) {
+        const cardText = getCardText(card, includeFootnotes);
+        if (phrases.every(p => cardText.includes(p)) && words.every(t => cardText.includes(t))) {
+          matched.push(card);
+          highlightText(card, regex, includeFootnotes);
+          // Open footnote boxes that contain highlights
+          if (includeFootnotes) {
+            for (const hit of getCardHits(card)) {
+              const box = hitElement(hit).closest('.footnote-box');
+              if (box) box.classList.add('open');
+            }
           }
         }
       }
+      // The same terms again (a filter or the subject changed): the same
+      // object, so the list keeps its indexes' part. The indexes are searched
+      // whole, a subject or not: they lead to other subjects.
+      const indexKey = JSON.stringify([phrases, words]);
+      if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
+    } else {
+      indexMatches = null;
     }
 
     if (searchFilter) {
+      const matchedSet = new Set(matched);
       for (const card of cards) {
         if (card.classList.contains('filtered-out')) continue;
-        if (card.classList.contains('card-titulo')) {
-          card.classList.add('filtered-out');
-          continue;
-        }
-        if (!matchedCards.has(card)) {
+        if (card.classList.contains('card-titulo') || !matchedSet.has(card)) {
           card.classList.add('filtered-out');
         }
       }
       showContextHeadings();
     }
 
-    searchMatches = articleCards.filter(c => matchedCards.has(c));
-    // The same terms again (a filter changed): the same object, so the list
-    // keeps its indexes' part
-    const indexKey = JSON.stringify([phrases, words]);
-    if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
-    searchIdx = 0;
-    // A new term shows its results (the sidebar, or on small screens the
-    // drawer, below the search bar), even if the list was closed for an
-    // earlier one. The same term run again (a filter changed) leaves it as is.
-    if (term !== resultsShownFor) {
-      resultsShownFor = term;
+    searchMatches = matched;
+    // A new search (terms, subject) shows its results (the sidebar, or on
+    // small screens the drawer, below the search bar), even if the list was
+    // closed for an earlier one. The same one run again (a filter changed)
+    // leaves it as is. A subject alone (just opened, or its terms cleared)
+    // goes straight to its articles, without the drawer over them.
+    const shownFor = (activeSubject ? activeSubject.subject : '') + '\u0000' + (text ? term : '');
+    if (shownFor !== resultsShownFor) {
+      resultsShownFor = shownFor;
       resultsHidden = false;
-      if (!resultsWide.matches) resultsDrawerOpen = true;
+      if (!resultsWide.matches) resultsDrawerOpen = text;
     }
     showResults();
 
-    if (searchMatches.length > 0) {
+    // Where it goes: the article asked for; the one the subject was opened
+    // from; the first result of new terms or of a subject just opened. Its
+    // terms cleared or a filter changed, the subject's reading goes on where
+    // it was (unless that article got hidden).
+    let i = 0;
+    let go = true;
+    if (navTarget) {
+      i = matched.indexOf(navTarget);
+    } else if (startCard && matched.includes(startCard)) {
+      i = matched.indexOf(startCard);
+    } else if (!text && !opening) {
+      go = !selectedCard || selectedCard.classList.contains('filtered-out');
+      i = go ? 0 : matched.indexOf(selectedCard);
+    }
+    searchIdx = i;
+
+    if (matched.length > 0) {
       $searchNav.classList.add('open');
       $searchNav.classList.remove('index-only');
       $searchInput.classList.add('has-nav');
       updateSearchCounter();
       updateSearchTicks();
-      scrollToFirstMark(searchMatches[0]);
-      selectCard(searchMatches[0], true);
+      if (navTarget) {
+        goToArticle(navTarget);
+      } else if (go) {
+        scrollToFirstMark(matched[i]);
+        selectCard(matched[i], true);
+      } else {
+        refreshScrollState();
+      }
     } else {
-      // Found only in the indexes: the counter (which opens the list) says so
-      const inIndex = indexMatches.count > 0;
-      $searchNav.classList.toggle('open', inIndex);
-      $searchNav.classList.toggle('index-only', inIndex);
-      $searchInput.classList.toggle('has-nav', inIndex);
-      if (inIndex) updateSearchCounter();
+      // Found only in the indexes, or nothing in the subject: the counter
+      // (which opens the list) says so
+      const shown = indexMatches !== null && indexMatches.count > 0 || activeSubject !== null;
+      $searchNav.classList.toggle('open', shown);
+      $searchNav.classList.toggle('index-only', shown);
+      $searchInput.classList.toggle('has-nav', shown);
+      if (shown) updateSearchCounter();
       updateSearchTicks();
+      if (navTarget) goToArticle(navTarget);
     }
     scheduleMinimap();
   }
@@ -901,6 +942,12 @@
   });
 
   $searchInput.addEventListener('keydown', (e) => {
+    // Backspace in the empty bar takes its subject out, as in a field of tags
+    if (e.key === 'Backspace' && activeSubject && !$searchInput.value) {
+      e.preventDefault();
+      removeSubject();
+      return;
+    }
     if (e.key !== 'Enter') return;
     flushPendingSearch();
     if (searchMatches.length) {
@@ -912,10 +959,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
-      if ($searchInput.value) {
-        $searchInput.value = '';
-        preserveScroll(() => doSearch(''));
-      }
+      if ($searchInput.value || activeSubject) clearSearchBar();
       $searchInput.focus();
     }
     if (e.ctrlKey && e.key === 'f') {
@@ -925,10 +969,14 @@
     }
   });
 
-  $btnClearSearch.addEventListener('click', () => {
+  // Clearing the bar takes out its terms and its subject
+  function clearSearchBar() {
     $searchInput.value = '';
+    closeSubject();
     preserveScroll(() => doSearch(''));
-  });
+  }
+
+  $btnClearSearch.addEventListener('click', clearSearchBar);
 
   $btnFilter.addEventListener('click', () => {
     searchFilter = !searchFilter;
@@ -936,9 +984,11 @@
     preserveScroll(() => doSearch($searchInput.value.trim()));
   });
 
+  // searchIdx is -1 when the selected article isn't one of the results
   function updateSearchCounter() {
-    $searchCounter.textContent = searchMatches.length ? (searchIdx + 1) + ' / ' + searchMatches.length
-      : (indexMatches ? indexMatches.count : 0) + ' no índice';
+    $searchCounter.textContent = searchMatches.length
+      ? (searchIdx < 0 ? '–' : searchIdx + 1) + ' / ' + searchMatches.length
+      : indexMatches && indexMatches.count ? indexMatches.count + ' no índice' : '0 no assunto';
   }
 
   function updateSearchTicks() {
@@ -997,7 +1047,8 @@
   function navigateSearch(delta) {
     flushPendingSearch();
     if (!searchMatches.length) return;
-    searchIdx = (searchIdx + delta + searchMatches.length) % searchMatches.length;
+    searchIdx = searchIdx < 0 ? (delta > 0 ? 0 : searchMatches.length - 1)
+      : (searchIdx + delta + searchMatches.length) % searchMatches.length;
     updateSearchCounter();
     updateTickCurrent();
     scrollToFirstMark(searchMatches[searchIdx]);
@@ -1023,6 +1074,7 @@
   // visible part.
   const $resultsPanel = document.getElementById('results-panel');
   const $resultsList = document.getElementById('results-list');
+  const $resultsTitle = document.getElementById('results-title');
   const $resultsSummary = document.getElementById('results-summary');
   const $resultsClose = document.getElementById('results-close');
   const $indexResultsLink = document.getElementById('index-results-link');
@@ -1245,16 +1297,20 @@
     const counts = [];
     if (nArt) counts.push(nArt + (nArt === 1 ? ' artigo' : ' artigos'));
     if (nPrec) counts.push(nPrec + (nPrec === 1 ? ' precedente' : ' precedentes'));
+    // A subject alone has no occurrences: its dispositivos are the entries
+    const text = classifyQuery(currentSearch).kind === 'text';
     const summary = [];
-    if (searchMatches.length) summary.push(counts.join(', '), hits + (hits === 1 ? ' ocorrência' : ' ocorrências'));
+    if (searchMatches.length) summary.push(counts.join(', '));
+    if (searchMatches.length && text) summary.push(hits + (hits === 1 ? ' ocorrência' : ' ocorrências'));
     if (nIndex) summary.push(nIndex + ' no índice');
     $resultsSummary.textContent = summary.join(' · ');
     if (nIndex && !keepIndex) appendIndexResults();
     if (!searchMatches.length) {
       const empty = document.createElement('div');
       empty.className = 'res-empty';
-      empty.textContent = nIndex ? 'Nenhum resultado no texto das normas'
-        : 'Nenhum resultado para “' + currentSearch + '”';
+      empty.textContent = (nIndex ? 'Nenhum resultado no texto das normas'
+        : text ? 'Nenhum resultado para “' + currentSearch + '”' : 'Nenhum artigo visível')
+        + (activeSubject ? ' em “' + activeSubject.subject + '”' : '');
       $resultsList.appendChild(empty);
       if (keepIndex) $resultsList.scrollTop = scrollTop;
       return;
@@ -1371,8 +1427,11 @@
   }
 
   // Dispositivos (paragraphs, notes) of a card with matches, in order. The
-  // summary and the law badge are shown in the group header instead.
+  // summary and the law badge are shown in the group header instead. A
+  // subject without terms: the ones it cites (none when it cites the whole
+  // article, which is the group header).
   function resultUnits(card) {
+    if (!getCardHits(card).length) return Array.from(card.querySelectorAll('.detail-highlight'));
     const units = [];
     const seen = new Set();
     for (const hit of getCardHits(card)) {
@@ -1889,14 +1948,14 @@
   }
 
   // A subject of the remissivo: its sub-subjects with the terms (and their
-  // "vide") and, found by its name, its articles and "vide"; each opens the
-  // subject pill with its articles
+  // "vide") and, found by its name, its articles and "vide"; each puts the
+  // subject in the search bar
   function buildSubjectResult(hit) {
     const { entry } = hit.it;
     const group = indexGroup(entry.subject);
     const allRefs = collectAllRefs(entry);
     group.appendChild(indexButton('res-head', indexMarkHtml(entry.subject) + (hit.byName ? refsHtml(entry.refs) : ''),
-      allRefs.length ? () => { openSubjectPill({ subject: entry.subject, refs: allRefs }); } : null));
+      allRefs.length ? () => { openSubject({ subject: entry.subject, refs: allRefs }); } : null));
     const items = [];
     for (const sub of hit.subs) {
       items.push({ sub });
@@ -1908,12 +1967,12 @@
       if (vide) {
         const target = findVide(vide);
         return indexButton('res-entry res-vide', 'vide ' + escapeHtml(target.label),
-          target.refs.length ? () => { openSubjectPill({ subject: target.label, refs: target.refs }); } : null);
+          target.refs.length ? () => { openSubject({ subject: target.label, refs: target.refs }); } : null);
       }
       const ch = sub.ch;
       const refs = subjectRefs(entry, ch.sub_subject);
       return indexButton('res-entry', '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs),
-        refs.length ? () => { openSubjectPill({ subject: entry.subject + ' — ' + ch.sub_subject, refs }); } : null);
+        refs.length ? () => { openSubject({ subject: entry.subject + ' — ' + ch.sub_subject, refs }); } : null);
     }, noun);
     return group;
   }
@@ -3386,8 +3445,7 @@
     const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
     if (!card) return null;
     // Hidden by the search filter alone: the section is read whole, without it
-    if (card.classList.contains('filtered-out') && searchFilter && !(activeSubject && subjectFilter)
-        && !(markerFilter && markersList.length > 0)) {
+    if (card.classList.contains('filtered-out') && searchFilter && !(markerFilter && markersList.length > 0)) {
       searchFilter = false;
       $btnFilter.classList.remove('active');
       doSearch($searchInput.value.trim());
@@ -3416,7 +3474,7 @@
   }
 
   function collectAllRefs(entry) {
-    // Collect all refs from entry (direct + children) for the pill
+    // Collect all refs from entry (direct + children) for the search bar
     const all = [];
     if (entry.refs) all.push(...entry.refs);
     if (entry.children) {
@@ -3495,8 +3553,7 @@
       if (allRefs.length > 0) {
         title.addEventListener('click', () => {
           closeIndex();
-          const pillEntry = { subject: entry.subject, refs: allRefs };
-          openSubjectPill(pillEntry);
+          openSubject({ subject: entry.subject, refs: allRefs });
         });
       } else {
         title.classList.add('no-refs');
@@ -3543,8 +3600,7 @@
           if (ch.refs && ch.refs.length > 0) {
             subTitle.addEventListener('click', ((child) => () => {
               closeIndex();
-              const pillEntry = { subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs };
-              openSubjectPill(pillEntry);
+              openSubject({ subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs });
             })(ch));
           } else {
             subTitle.classList.add('no-refs');
@@ -3713,175 +3769,62 @@
     }
   }
 
-  // ===== SUBJECT PILL =====
-  function openSubjectPill(entry, start = 0) {
+  // ===== SUBJECT IN THE SEARCH BAR =====
+  // A subject of the remissivo opened (from the index, the results list or an
+  // article's "No índice remissivo") goes into the search bar as a chip, in
+  // place of what was there: its articles are the results, and terms typed
+  // after it are searched within them. The bar's filter and arrows serve
+  // both; clearing the bar takes the subject out too.
+  function openSubject(entry, startCard = null) {
     activeSubject = entry;
-    subjectIdx = start;
-    subjectFilter = true;
-    $pillFilter.classList.add('active');
-    $subjectPill.classList.add('open');
-    document.body.classList.add('pill-open');
-    $pillLabel.textContent = entry.subject;
-    if (searchFilter) {
-      searchFilter = false;
-      $btnFilter.classList.remove('active');
-    }
-    doSearch($searchInput.value.trim());
-    updatePill();
-    applySubjectFilter();
+    subjectOpening = true;
+    subjectStartCard = startCard;
+    $chipLabel.textContent = entry.subject;
+    $searchChip.title = 'Índice remissivo: ' + entry.subject;
+    $searchChip.hidden = false;
+    $resultsTitle.textContent = 'Remissivo: ' + entry.subject;
+    updateChipSpace();
+    $searchInput.value = '';
     highlightAllSubjectDetails();
-    navigateToSubjectRef(start);
-    scheduleMinimap();
+    doSearch('');
   }
 
-  function closeSubjectPill() {
+  // The subject out of the bar (the caller searches again)
+  function closeSubject() {
+    if (!activeSubject) return;
     activeSubject = null;
-    $subjectPill.classList.remove('open');
-    document.body.classList.remove('pill-open');
-    $pillDropdown.classList.remove('open');
+    $searchChip.hidden = true;
+    $resultsTitle.textContent = 'Resultados';
+    updateChipSpace();
     clearDetailHighlight();
-    preserveScroll(() => {
-      getAllCards().forEach(c => c.classList.remove('filtered-out'));
-      if (currentSearch) doSearch(currentSearch);
-    });
-    scheduleMinimap();
   }
 
-  function updatePill() {
-    if (!activeSubject) return;
-    const ref = activeSubject.refs[subjectIdx];
-    $pillCurrent.textContent = pillRefLabel(ref);
+  function removeSubject() {
+    closeSubject();
+    preserveScroll(() => doSearch($searchInput.value.trim()));
   }
 
-  // "LOM:Art. 42, § 1º"; a precedente regimental, "Precedente nº 2/2004"
-  function pillRefLabel(ref) {
-    if (ref.law_prefix === 'PREC') return 'Precedente ' + precLabel(ref.art);
-    const prefix = ref.law_prefix ? ref.law_prefix + ':' : '';
-    // revoked provisions stay in the index, marked by the build ("revogado — ...")
-    const gone = /^(revogado|declarado inconstitucional)/.exec(ref.hint || '');
-    return prefix + 'Art. ' + ref.art + (ref.detail ? ', ' + ref.detail : '') + (gone ? ' (' + gone[1] + ')' : '');
+  // The input's text starts after the chip
+  const SEARCH_PLACEHOLDER = $searchInput.placeholder;
+  function updateChipSpace() {
+    $searchInput.style.paddingLeft = activeSubject ? ($searchChip.offsetWidth + 10) + 'px' : '';
+    $searchInput.placeholder = activeSubject ? 'Buscar neste assunto...' : SEARCH_PLACEHOLDER;
   }
 
-  function findRefTarget(ref) {
-    // Returns the most specific DOM element for a ref (card, caput <p>, or detail <p>)
-    let card;
-    if (ref.law_prefix) {
-      card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"][data-law="${ref.law_prefix}"]`);
-    } else {
-      card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"]:not([data-law])`)
-          || $cards.querySelector(`.card-artigo[data-art="${ref.art}"]`);
-    }
-    if (!card) return null;
-    if (!ref.detail) return card;
-    const dt = ref.detail.trim();
-    if (dt.toLowerCase() === 'caput') {
-      return card.querySelector('p:not(.art-para):not(.old-version)') || card;
-    }
-    for (const uid of card.querySelectorAll('.unit-id')) {
-      const path = uid.dataset.path || '';
-      const ut = uid.textContent.trim();
-      if (path === dt || ut === dt || (dt === '§ú' && ut === 'Parágrafo único')) {
-        return uid.closest('p') || card;
-      }
-    }
-    return card;
-  }
-
-  function navigateToSubjectRef(idx) {
-    if (!activeSubject) return;
-    subjectIdx = idx;
-    updatePill();
-    const ref = activeSubject.refs[idx];
-    const target = findRefTarget(ref);
-    if (!target) return;
-    const card = target.closest('.card') || target;
-    scrollToReadingLine(target);
-    selectCard(card, true);
-  }
-
-  function applySubjectFilter() {
-    if (!activeSubject) return;
-    const cards = getAllCards();
-    if (subjectFilter) {
-      // Build set of "lawPrefix:art" keys for precise matching
-      const refKeys = new Set(activeSubject.refs.map(r => (r.law_prefix || '') + ':' + r.art));
-      for (const card of cards) {
-        if (card.classList.contains('card-titulo')) {
-          card.classList.add('filtered-out');
-        } else if (card.dataset.art) {
-          const cardKey = (card.dataset.law || '') + ':' + card.dataset.art;
-          if (!refKeys.has(cardKey)) {
-            card.classList.add('filtered-out');
-          } else {
-            card.classList.remove('filtered-out');
-          }
-        } else {
-          card.classList.remove('filtered-out');
-        }
-      }
-      showContextHeadings();
-    } else {
-      cards.forEach(c => c.classList.remove('filtered-out'));
-    }
-  }
-
-  document.getElementById('pill-prev').addEventListener('click', () => {
-    if (!activeSubject) return;
-    subjectIdx = (subjectIdx - 1 + activeSubject.refs.length) % activeSubject.refs.length;
-    navigateToSubjectRef(subjectIdx);
+  // The subject's name, whole (the chip may cut it), atop its results
+  $chipLabel.addEventListener('click', () => $searchCounter.click());
+  document.getElementById('chip-remove').addEventListener('click', () => {
+    removeSubject();
+    $searchInput.focus({ preventScroll: true });
   });
-
-  document.getElementById('pill-next').addEventListener('click', () => {
-    if (!activeSubject) return;
-    subjectIdx = (subjectIdx + 1) % activeSubject.refs.length;
-    navigateToSubjectRef(subjectIdx);
-  });
-
-  $pillCurrent.addEventListener('click', (e) => {
-    e.stopPropagation();
-    $pillDropdown.classList.toggle('open');
-    renderPillDropdown();
-  });
-
-  function renderPillDropdown() {
-    if (!activeSubject) return;
-    $pillDropdown.innerHTML = '';
-    activeSubject.refs.forEach((ref, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'pill-dd-item' + (idx === subjectIdx ? ' current' : '');
-      btn.textContent = pillRefLabel(ref);
-      btn.addEventListener('click', () => {
-        $pillDropdown.classList.remove('open');
-        navigateToSubjectRef(idx);
-      });
-      $pillDropdown.appendChild(btn);
-    });
-  }
-
-  $pillFilter.addEventListener('click', () => {
-    subjectFilter = !subjectFilter;
-    $pillFilter.classList.toggle('active', subjectFilter);
-    preserveScroll(() => {
-      applySubjectFilter();
-      highlightAllSubjectDetails();
-      if (currentSearch) doSearch(currentSearch);
-    });
-    scheduleMinimap();
-  });
-
-  document.getElementById('pill-close').addEventListener('click', closeSubjectPill);
-
-  document.addEventListener('click', (e) => {
-    if (!$pillDropdown.contains(e.target) && e.target !== $pillCurrent) {
-      $pillDropdown.classList.remove('open');
-    }
-  });
+  // Its width is a share of the bar's
+  window.addEventListener('resize', () => { if (activeSubject) updateChipSpace(); });
 
   // ===== NO ÍNDICE REMISSIVO =====
   // At the end of each article, the subjects of the remissivo that cite it (or
   // one of its provisions), as the "Citado em:" line: labels via CSS, out of
   // the searchable text. The ones citing the whole article first; a click
-  // opens the subject pill on this article.
+  // puts the subject in the search bar, starting at this article.
   const IDX_BACK_SHOWN = 6;
 
   function renderIndexBacklinks() {
@@ -3939,10 +3882,7 @@
       return;
     }
     const it = t.idxEntry;
-    const card = t.closest('.card');
-    const key = (card.dataset.law || '') + ':' + card.dataset.art;
-    const i = it.refs.findIndex(r => (r.law_prefix || '') + ':' + r.art === key);
-    openSubjectPill({ subject: it.label, refs: it.refs }, Math.max(i, 0));
+    openSubject({ subject: it.label, refs: it.refs }, t.closest('.card'));
   }
 
   $cards.addEventListener('click', e => {

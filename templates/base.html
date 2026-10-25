@@ -16,6 +16,7 @@
   <button id="btn-index" title="Índice">☰</button>
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: a43 para ir ao Art. 43)" autocomplete="off">
+    <span id="search-chip" hidden><span id="chip-label"></span><button id="chip-remove" type="button" title="Tirar o assunto da busca" aria-label="Tirar o assunto da busca">&times;</button></span>
     <div id="search-nav">
       <button id="search-counter" type="button" title="Lista de resultados" aria-controls="results-panel" aria-expanded="false"></button>
       <button class="search-arrow" id="search-prev">&#8249;</button>
@@ -74,21 +75,6 @@
     <button id="results-close" title="Fechar lista de resultados" aria-label="Fechar lista de resultados">&times;</button>
   </div>
   <div id="results-list"></div>
-</div>
-
-<!-- SUBJECT PILL -->
-<div id="subject-pill">
-  <span id="pill-label"></span>
-  <div id="pill-controls">
-    <div id="pill-nav">
-      <button class="pill-arrow" id="pill-prev">&#8249;</button>
-      <span id="pill-current"></span>
-      <div id="pill-dropdown"></div>
-      <button class="pill-arrow" id="pill-next">&#8250;</button>
-    </div>
-    <button id="pill-filter" class="active" title="Filtrar artigos"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h14L10 7v5l-4 2V7z"/></svg></button>
-    <button id="pill-close" title="Fechar">&times;</button>
-  </div>
 </div>
 
 <!-- MINIMAP -->

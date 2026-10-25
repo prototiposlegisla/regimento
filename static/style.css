@@ -67,6 +67,32 @@ body {
 #search-input.has-nav { padding-right: 130px; }
 #search-input:focus { border-color: var(--selected-border); }
 
+/* A subject of the remissivo in the search bar; app.js gives the input room
+   for it. The color of the subject's dispositivos in the cards. */
+#search-chip {
+  position: absolute;
+  left: 4px;
+  max-width: 45%;
+  height: 28px;
+  padding: 0 2px 0 10px;
+  display: flex; align-items: center; gap: 2px;
+  background: #fff3bf; color: #5c4400;
+  border: 1px solid #f0d264; border-radius: 14px;
+  font-size: 13px; font-weight: 600;
+}
+#search-chip[hidden] { display: none; }
+#chip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+#chip-label::before { content: "Remissivo: "; font-weight: 400; }
+#chip-remove {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border: none; background: none; cursor: pointer;
+  border-radius: 50%;
+  font-size: 15px; color: #8a6d00;
+  display: flex; align-items: center; justify-content: center;
+}
+#chip-remove:hover { background: rgba(0,0,0,.08); }
+
 #btn-filter {
   position: absolute;
   right: 4px;
@@ -931,108 +957,6 @@ mark {
 }
 .ref-art-link:hover { text-decoration: underline; }
 
-/* ===== SUBJECT PILL (bottom) ===== */
-#subject-pill {
-  display: none;
-  position: fixed;
-  bottom: 16px;
-  left: 0; right: 0;
-  margin: 0 auto;
-  width: fit-content;
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.18);
-  padding: 8px 16px;
-  z-index: 180;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  max-width: calc(100vw - 32px);
-}
-#subject-pill.open { display: flex; flex-wrap: wrap; justify-content: center; }
-body.pill-open #cards-container { padding-bottom: 300px; }
-
-#pill-label {
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100vw - 80px);
-}
-
-#pill-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-#pill-nav {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  position: relative;
-}
-
-#pill-current {
-  padding: 4px 10px;
-  background: var(--selected-border);
-  color: #fff;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  min-width: 40px;
-  text-align: center;
-}
-
-#pill-dropdown {
-  display: none;
-  position: absolute;
-  bottom: 36px;
-  left: 0;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.15);
-  max-height: 200px;
-  overflow-y: auto;
-  min-width: 120px;
-  z-index: 190;
-}
-#pill-dropdown.open { display: block; }
-
-.pill-dd-item {
-  padding: 8px 14px;
-  cursor: pointer;
-  font-size: 14px;
-  border: none; background: none; width: 100%; text-align: left;
-}
-.pill-dd-item:hover { background: #f0f0f0; }
-.pill-dd-item.current { font-weight: 700; color: var(--selected-border); }
-
-.pill-arrow {
-  width: 28px; height: 28px;
-  border: none; background: #eee; border-radius: 50%;
-  cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-}
-.pill-arrow:hover { background: #ddd; }
-
-#pill-filter {
-  width: 28px; height: 28px;
-  border: none; background: #eee; border-radius: 50%;
-  cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-}
-#pill-filter.active { background: var(--selected-border); color: #fff; }
-
-#pill-close {
-  width: 28px; height: 28px;
-  border: none; background: #eee; border-radius: 50%;
-  cursor: pointer; font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
-}
-#pill-close:hover { background: #ddd; }
-
 /* ===== DETAIL HIGHLIGHT (subject index → specific paragraph) ===== */
 @keyframes detail-flash {
   from { background-color: #ffe066; }
@@ -1425,13 +1349,6 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   }
   /* Wrapping inside the cards column instead of over the sidebar */
   body.results-open #breadcrumb { max-width: 720px; }
-  body.results-open #subject-pill {
-    left: calc(var(--cards-left) + 360px);
-    right: auto;
-    margin: 0;
-    max-width: 688px;
-    transform: translateX(-50%);
-  }
 }
 
 /* Small screens: drawer, like the index panel */
@@ -1464,6 +1381,10 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
   #search-counter { padding: 6px 4px; }
+  #search-chip { max-width: 38%; }
+  #chip-label::before { content: none; }
+  /* No room for it between the chip and the counter */
+  #search-input.has-nav::placeholder { color: transparent; }
   #cards-container { padding: 8px; }
   .card { border-radius: 6px; }
   #header { padding: 8px; gap: 6px; }
@@ -1662,4 +1583,3 @@ body.pill-open #cards-container { padding-bottom: 300px; }
   padding: 7px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.25); cursor: pointer;
 }
 #rem-return.visible { display: block; }
-body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */

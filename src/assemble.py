@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 
@@ -16,7 +17,7 @@ def assemble(
     base_dir: Path,
     output_path: Path,
 ) -> None:
-    """Monta o dist/index.html final (self-contained)."""
+    """Monta o dist/index.html final (self-contained, exceto as fontes em fonts/)."""
     template_path = base_dir / "templates" / "base.html"
     css_path = base_dir / "static" / "style.css"
     js_path = base_dir / "static" / "app.js"
@@ -46,3 +47,13 @@ def assemble(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(final, encoding="utf-8")
+
+    # The web fonts go next to the page (style.css loads them from fonts/);
+    # without them it falls back to Georgia and the system sans
+    fonts_src = base_dir / "static" / "fonts"
+    if fonts_src.is_dir():
+        fonts_dst = output_path.parent / "fonts"
+        fonts_dst.mkdir(exist_ok=True)
+        for f in fonts_src.iterdir():
+            if f.is_file():
+                shutil.copyfile(f, fonts_dst / f.name)

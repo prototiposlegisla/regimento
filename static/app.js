@@ -13,13 +13,17 @@
   const INFO_HTML = /*__INFO_HTML__*/"";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
+  // The level colors come from style.css (:root --nivel-*), so a new palette
+  // there reaches the minimap and its tooltips too
+  const rootStyle = getComputedStyle(document.documentElement);
+  const cssVar = name => rootStyle.getPropertyValue(name).trim();
   const MINIMAP_COLORS = {
-    norma:   { bg: '#222',    text: '#fff' },
-    tit:     { bg: '#b71c1c', text: '#fff' },
-    cap:     { bg: '#f57c00', text: '#fff' },
-    sec:     { bg: '#fdd835', text: '#333' },
-    subsec:  { bg: '#2e7d32', text: '#fff' },
-    article: { bg: '#555',    text: '#fff' },
+    norma:   { bg: cssVar('--nivel-norma'),     text: '#fff' },
+    tit:     { bg: cssVar('--nivel-titulo'),    text: '#fff' },
+    cap:     { bg: cssVar('--nivel-capitulo'),  text: '#fff' },
+    sec:     { bg: cssVar('--nivel-secao'),     text: cssVar('--nivel-secao-texto') },
+    subsec:  { bg: cssVar('--nivel-subsecao'),  text: '#fff' },
+    article: { bg: cssVar('--rubrica'),         text: '#fff' },
   };
 
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
@@ -103,17 +107,19 @@
   // jumps rely on it. Per block: [fixed px, px per line], fitted against the
   // real layout at 1280 and 390 px wide (median error ~4% per card, the
   // page's total height within 1%).
-  const CARD_EST_BASE = 29;
+  // Refit whenever fonts, sizes or the card's bands change.
+  const CARD_EST_BASE = 18;
   const CARD_EST_CHAR_PX = 7.75;
   function cardBlockCoef(el) {
     const cl = el.classList;
     if (cl.contains('art-compact-label') || cl.contains('footnote-box')) return null;   // hidden
     if (cl.contains('law-badge')) return null;   // takes no height of its own
-    if (el.tagName === 'BR') return [37, 0];
-    if (cl.contains('old-version')) return [-2, 28];
-    if (cl.contains('rem-backlinks')) return [-4, 32.5];
-    if (cl.contains('art-summary')) return [40, 0];
-    return [1, 27];
+    if (el.tagName === 'BR') return [48, 0];
+    if (cl.contains('old-version')) return [-6, 30];
+    if (cl.contains('idx-backlinks')) return [48, 29];   // the band at the foot
+    if (cl.contains('rem-backlinks')) return [18, 0];
+    if (cl.contains('art-summary')) return [17, 0];      // the band at the top
+    return [0, 30];
   }
   function blockTextLength(el) {
     let n = el.textContent.length;
@@ -138,13 +144,13 @@
       });
     }
     const z = zoomScale;
-    const textWidth = $cards.clientWidth - 24 - 32 * z - 4;
+    const textWidth = $cards.clientWidth - 24 - 32 * z - 3;
     const charsPerLine = Math.max(10, textWidth / (CARD_EST_CHAR_PX * z));
     ALL_CARDS.forEach((card, i) => {
       let h = CARD_EST_BASE;
       for (const [fixed, perLine, n] of cardEstBlocks[i]) h += fixed + perLine * Math.ceil(n / charsPerLine);
-      // contain-intrinsic-size is the content height: the padding comes on top
-      card.style.setProperty('--card-h', Math.round(Math.max(4, h - 32) * z) + 'px');
+      // contain-intrinsic-size is the content height: padding and border come on top
+      card.style.setProperty('--card-h', Math.round(Math.max(4, (h - 32) * z - 3)) + 'px');
     });
   }
   // Heights remembered at the old zoom or width would stay wrong until each
@@ -3009,6 +3015,9 @@
   function showRemPop(trigger) {
     remPopTrigger = trigger;
     $remPop.replaceChildren(buildRemPanel(trigger));
+    // the kind's color (style.css), as in the pinned box
+    for (const c of [...$remPop.classList]) if (c.startsWith('t-')) $remPop.classList.remove(c);
+    if (trigger.dataset.tipo) $remPop.classList.add('t-' + trigger.dataset.tipo);
     $remPop.style.maxHeight = 'none';
     $remPop.classList.add('visible');
     // The side with more room, never over the trigger, the header or the breadcrumb
@@ -3043,13 +3052,21 @@
     $remPop.classList.remove('visible');
   }
 
+  // The chip (or citation) whose box is open stays marked until the box closes
+  const remBoxTrigger = new WeakMap();
+  function closeRemBox(box) {
+    const t = remBoxTrigger.get(box);
+    if (t) { t.classList.remove('rem-open'); t.setAttribute('aria-expanded', 'false'); }
+    box.remove();
+  }
+
   // Click/tap: pins the preview in a box under the provision (the only mode on touch)
   function toggleRemBox(trigger) {
     const p = trigger.closest('p') || trigger.closest('.rem-backlinks');
     const key = remKey(trigger);
     let after = p;
     for (let box = p.nextElementSibling; box && box.classList.contains('rem-box'); box = box.nextElementSibling) {
-      if (box.dataset.for === key) { box.remove(); return; }
+      if (box.dataset.for === key) { closeRemBox(box); return; }
       after = box;
     }
     const b = document.createElement('div');
@@ -3062,6 +3079,9 @@
     close.textContent = '×';
     b.append(close, buildRemPanel(trigger));
     after.after(b);   // after the boxes already open there, in reading order
+    remBoxTrigger.set(b, trigger);
+    trigger.classList.add('rem-open');
+    trigger.setAttribute('aria-expanded', 'true');
   }
 
   // Highlight the target once the smooth scroll gets there
@@ -3119,7 +3139,7 @@
     const close = e.target.closest('.rem-close');
     if (close) {
       e.stopPropagation();
-      close.closest('.rem-box').remove();
+      closeRemBox(close.closest('.rem-box'));
       return;
     }
     const t = e.target.closest('.rem');
@@ -3156,7 +3176,7 @@
       const imp = box.dataset.for.startsWith('imp:');
       const ref = imp ? box.dataset.for.slice(4) : box.dataset.for;
       const t = p && p.querySelector(`${imp ? '.rem-imp' : '.rem-exp'}[data-ref="${CSS.escape(ref)}"]`);
-      box.remove();
+      closeRemBox(box);
       if (t) t.focus({ preventScroll: true });
     } else return;
     e.preventDefault();
@@ -4306,11 +4326,11 @@
 
   function getMinimapColor(card) {
     if (card.classList.contains('card-titulo')) {
-      if (card.classList.contains('nivel-norma'))    return '#222';
-      if (card.classList.contains('nivel-titulo'))   return '#b71c1c';
-      if (card.classList.contains('nivel-capitulo')) return '#f57c00';
-      if (card.classList.contains('nivel-secao'))    return '#fdd835';
-      if (card.classList.contains('nivel-subsecao')) return '#2e7d32';
+      if (card.classList.contains('nivel-norma'))    return MINIMAP_COLORS.norma.bg;
+      if (card.classList.contains('nivel-titulo'))   return MINIMAP_COLORS.tit.bg;
+      if (card.classList.contains('nivel-capitulo')) return MINIMAP_COLORS.cap.bg;
+      if (card.classList.contains('nivel-secao'))    return MINIMAP_COLORS.sec.bg;
+      if (card.classList.contains('nivel-subsecao')) return MINIMAP_COLORS.subsec.bg;
       return '#999';
     }
     if (card.classList.contains('card-artigo')) return '#fff';
@@ -4344,15 +4364,24 @@
     const barW = w - pad * 2;
     const headings = [];
 
+    // Headings at least 2 px and drawn last: a heading is far shorter than a
+    // pixel here, and the article right after it would paint over it
+    const titles = [];
     for (const card of cards) {
       if (card.classList.contains('filtered-out')) continue;
       const y = card.offsetTop * scale;
-      const ch = Math.max(1, card.offsetHeight * scale);
-      const color = getMinimapColor(card);
-      ctx.fillStyle = color;
-      ctx.fillRect(pad, y, barW, ch);
-
+      const isTitle = card.classList.contains('card-titulo');
+      const ch = Math.max(isTitle ? 2 : 1, card.offsetHeight * scale);
+      if (isTitle) titles.push([y, ch, card]);
+      else {
+        ctx.fillStyle = getMinimapColor(card);
+        ctx.fillRect(pad, y, barW, ch);
+      }
       headings.push({ y, h: ch, card });
+    }
+    for (const [y, ch, card] of titles) {
+      ctx.fillStyle = getMinimapColor(card);
+      ctx.fillRect(pad, y, barW, ch);
     }
 
     minimapHeadings = headings;

@@ -49,6 +49,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+button, input { font-family: inherit; }   /* form controls don't inherit it by default */
 
 html { font-size: 15.5px; }
 
@@ -212,6 +213,7 @@ body {
   max-width: min(92vw, 820px);
   /* one continuous line of segments, each in its level's color */
   background: #fff;   /* where a narrow screen wraps the line */
+  border: 1px solid #9aa3af;   /* the white last segment against the page */
   padding: 0;
   font-size: 11px;
   font-weight: 600;
@@ -566,7 +568,7 @@ mark {
   border-radius: 2px;
 }
 .art-summary mark {
-  color: #1e1e30;
+  color: var(--rubrica);
 }
 @media print {
   /* ::highlight prints even without "background graphics"; keep <mark> alike */
@@ -589,12 +591,15 @@ mark {
   -webkit-user-select: none;
 }
 
+/* opened like a remissão's box: bordered, with the offset shadow, in its own color */
 .footnote-box {
+  --c: #b7950b;
   display: none;
-  background: #fff8dc;
-  border-left: 3px solid #f1c40f;
+  background: #fffbea;
+  border: 2px solid var(--c);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--c) 30%, transparent);
   padding: calc(10px * var(--zoom-scale));
-  margin-top: calc(6px * var(--zoom-scale));
+  margin: calc(6px * var(--zoom-scale)) 5px 5px 0;
   border-radius: 4px;
   font-size: calc(1rem * var(--zoom-scale));
   position: relative;
@@ -613,7 +618,7 @@ mark {
   background: #fef5e7; color: #935116; border: 1px solid #f5cba7;
 }
 .footnote-ref.leg-ref::before { content: attr(data-label); }
-.leg-box { background: #fdf6ec; border-left-color: #e59866; }
+.leg-box { --c: #935116; background: #fdf6ec; }   /* the color of its badge */
 .leg-list { margin: 4px 0 0; padding-left: 1.2em; }
 .leg-list li + li { margin-top: 4px; }
 #cards-container.compact .leg-ref { display: none; }
@@ -1263,7 +1268,7 @@ mark {
 .res-law {
   margin: 10px 4px 6px;
   padding: 3px 8px;
-  background: #222;
+  background: var(--nivel-norma);
   color: #fff;
   border-radius: 4px;
   font-size: 11px;
@@ -1544,13 +1549,13 @@ mark {
 .rem-imp.t-exc  { background: #fef5e7; color: #9c640c; border-color: #f8c471; }
 .rem-imp[data-status="proposta"] { border-style: dashed; opacity: .85; }
 /* the color of each kind (--c), for the open chip, its box and its note */
-.rem-imp, .rem-note, .rem-box { --c: #7d3c98; }   /* equivalent: the default kind */
-.rem-box:not([class*="t-"]) { --c: #2471a3; }     /* explicit citation */
-.rem-imp.t-det, .rem-note.t-det, .rem-box.t-det { --c: #117a65; }
-.rem-imp.t-fund, .rem-note.t-fund, .rem-box.t-fund { --c: #1e8449; }
-.rem-imp.t-div, .rem-note.t-div, .rem-box.t-div { --c: #c0392b; }
-.rem-imp.t-sim, .rem-note.t-sim, .rem-box.t-sim { --c: #2471a3; }
-.rem-imp.t-exc, .rem-note.t-exc, .rem-box.t-exc { --c: #ca6f1e; }
+.rem-imp, .rem-note, .rem-box, #rem-pop { --c: #7d3c98; }   /* equivalent: the default kind */
+.rem-box:not([class*="t-"]), #rem-pop:not([class*="t-"]) { --c: #2471a3; }   /* explicit citation */
+.t-det:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #117a65; }
+.t-fund:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #1e8449; }
+.t-div:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #c0392b; }
+.t-sim:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #2471a3; }
+.t-exc:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #ca6f1e; }
 /* the chip whose box is open */
 .rem-imp.rem-open {
   background: var(--c); border-color: var(--c); color: #fff;
@@ -1570,7 +1575,7 @@ mark {
   overscroll-behavior: contain;
   background: #fff;
   border: 1px solid #d6dbdf;
-  border-top: 3px solid #2e86c1;
+  border-top: 3px solid var(--c);
   border-radius: 6px;
   box-shadow: 0 6px 24px rgba(0,0,0,.18);
   font-size: 13.5px;
@@ -1637,7 +1642,7 @@ mark {
   overflow: hidden;
   font-size: calc(.95rem * var(--zoom-scale));
 }
-.rem-box .rem-foot button { background: var(--c); }
+.rem-box .rem-foot button, #rem-pop .rem-foot button { background: var(--c); }
 .rem-box .rem-close {
   position: absolute; top: 0; right: 0; z-index: 2;
   min-width: 32px; min-height: 32px;
@@ -1657,7 +1662,7 @@ mark {
 #rem-return {
   display: none; position: fixed; left: 50%; transform: translateX(-50%);
   bottom: 18px; z-index: 220;
-  background: #1b4f72; color: #fff; border: 0; border-radius: 18px;
+  background: var(--rubrica); color: #fff; border: 0; border-radius: 18px;
   padding: 7px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.25); cursor: pointer;
 }
 #rem-return.visible { display: block; }
@@ -70557,13 +70562,17 @@ mark {
   const INFO_HTML = "<p>Aceito sugestões! Kauê Negrão</p>\n<p>Esse é um Regimento referenciado.</p>\n<h3>Pesquisa</h3>\n<p>É possível usar prefixo a. Exemplo: a123</p>\n<h3>Marcadores</h3>\n<p>É possível criar marcadores.</p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
+  // The level colors come from style.css (:root --nivel-*), so a new palette
+  // there reaches the minimap and its tooltips too
+  const rootStyle = getComputedStyle(document.documentElement);
+  const cssVar = name => rootStyle.getPropertyValue(name).trim();
   const MINIMAP_COLORS = {
-    norma:   { bg: '#222',    text: '#fff' },
-    tit:     { bg: '#b71c1c', text: '#fff' },
-    cap:     { bg: '#f57c00', text: '#fff' },
-    sec:     { bg: '#fdd835', text: '#333' },
-    subsec:  { bg: '#2e7d32', text: '#fff' },
-    article: { bg: '#555',    text: '#fff' },
+    norma:   { bg: cssVar('--nivel-norma'),     text: '#fff' },
+    tit:     { bg: cssVar('--nivel-titulo'),    text: '#fff' },
+    cap:     { bg: cssVar('--nivel-capitulo'),  text: '#fff' },
+    sec:     { bg: cssVar('--nivel-secao'),     text: cssVar('--nivel-secao-texto') },
+    subsec:  { bg: cssVar('--nivel-subsecao'),  text: '#fff' },
+    article: { bg: cssVar('--rubrica'),         text: '#fff' },
   };
 
   // ===== MARKER COLOR PALETTE (fixed order for auto-assignment) =====
@@ -73555,6 +73564,9 @@ mark {
   function showRemPop(trigger) {
     remPopTrigger = trigger;
     $remPop.replaceChildren(buildRemPanel(trigger));
+    // the kind's color (style.css), as in the pinned box
+    for (const c of [...$remPop.classList]) if (c.startsWith('t-')) $remPop.classList.remove(c);
+    if (trigger.dataset.tipo) $remPop.classList.add('t-' + trigger.dataset.tipo);
     $remPop.style.maxHeight = 'none';
     $remPop.classList.add('visible');
     // The side with more room, never over the trigger, the header or the breadcrumb
@@ -74863,11 +74875,11 @@ mark {
 
   function getMinimapColor(card) {
     if (card.classList.contains('card-titulo')) {
-      if (card.classList.contains('nivel-norma'))    return '#222';
-      if (card.classList.contains('nivel-titulo'))   return '#b71c1c';
-      if (card.classList.contains('nivel-capitulo')) return '#f57c00';
-      if (card.classList.contains('nivel-secao'))    return '#fdd835';
-      if (card.classList.contains('nivel-subsecao')) return '#2e7d32';
+      if (card.classList.contains('nivel-norma'))    return MINIMAP_COLORS.norma.bg;
+      if (card.classList.contains('nivel-titulo'))   return MINIMAP_COLORS.tit.bg;
+      if (card.classList.contains('nivel-capitulo')) return MINIMAP_COLORS.cap.bg;
+      if (card.classList.contains('nivel-secao'))    return MINIMAP_COLORS.sec.bg;
+      if (card.classList.contains('nivel-subsecao')) return MINIMAP_COLORS.subsec.bg;
       return '#999';
     }
     if (card.classList.contains('card-artigo')) return '#fff';
@@ -74901,15 +74913,24 @@ mark {
     const barW = w - pad * 2;
     const headings = [];
 
+    // Headings at least 2 px and drawn last: a heading is far shorter than a
+    // pixel here, and the article right after it would paint over it
+    const titles = [];
     for (const card of cards) {
       if (card.classList.contains('filtered-out')) continue;
       const y = card.offsetTop * scale;
-      const ch = Math.max(1, card.offsetHeight * scale);
-      const color = getMinimapColor(card);
-      ctx.fillStyle = color;
-      ctx.fillRect(pad, y, barW, ch);
-
+      const isTitle = card.classList.contains('card-titulo');
+      const ch = Math.max(isTitle ? 2 : 1, card.offsetHeight * scale);
+      if (isTitle) titles.push([y, ch, card]);
+      else {
+        ctx.fillStyle = getMinimapColor(card);
+        ctx.fillRect(pad, y, barW, ch);
+      }
       headings.push({ y, h: ch, card });
+    }
+    for (const [y, ch, card] of titles) {
+      ctx.fillStyle = getMinimapColor(card);
+      ctx.fillRect(pad, y, barW, ch);
     }
 
     minimapHeadings = headings;

@@ -75,8 +75,9 @@ body {
 #search-input.has-nav { padding-right: 130px; }
 #search-input:focus { border-color: var(--selected-border); }
 
-/* A subject of the remissivo in the search bar; app.js gives the input room
-   for it. The color of the subject's dispositivos in the cards. */
+/* A subject of the remissivo, or the marked articles, in the search bar;
+   app.js gives the input room for it. A subject has the color of its
+   dispositivos in the cards; the markers, the color of their funnel. */
 #search-chip {
   position: absolute;
   left: 4px;
@@ -90,7 +91,9 @@ body {
 }
 #search-chip[hidden] { display: none; }
 #chip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-#chip-label::before { content: "Remissivo: "; font-weight: 400; }
+#search-chip[data-kind="subject"] #chip-label::before { content: "Remissivo: "; font-weight: 400; }
+#search-chip[data-kind="markers"] { background: #e3f0fb; color: #1b4f72; border-color: #9cc8ec; }
+#search-chip[data-kind="markers"] #chip-remove { color: #1b4f72; }
 #chip-remove {
   flex-shrink: 0;
   width: 22px; height: 22px;
@@ -1402,7 +1405,7 @@ mark {
 @media (max-width: 480px) {
   #search-counter { padding: 6px 4px; }
   #search-chip { max-width: 38%; }
-  #chip-label::before { content: none; }
+  #search-chip[data-kind="subject"] #chip-label::before { content: none; }
   /* No room for it between the chip and the counter */
   #search-input.has-nav::placeholder { color: transparent; }
   #cards-container { padding: 8px; }
@@ -65037,16 +65040,18 @@ mark {
   let markersList = [];
   let searchFilter = true;
   let currentSearch = '';
-  let activeSubject = null;      // the remissivo's subject in the search bar: { subject, refs }
-  let subjectOpening = false;    // it was just put there (doSearch goes to its start)
-  let subjectStartCard = null;   // and starts at this article (the one it was opened from)
+  // The chip in the search bar, whose articles the search runs within (one
+  // at a time): a subject of the remissivo { kind: 'subject', label, refs },
+  // or the marked articles { kind: 'markers', label }
+  let scope = null;
+  let scopeOpening = false;      // it was just put there (doSearch goes to its start)
+  let scopeStartCard = null;     // and starts at this article (the one it was opened from)
   let zoomScale = 1;
   let zoomTimeout = null;
   let searchMatches = [];
   let searchIdx = 0;
   let indexMatches = null;   // the indexes' entries with the search terms (see searchIndexes)
   let currentRefCategory = 0;
-  let markerFilter = false;
   let markerTooltipTimer = null;
   let footnoteTooltipTimer = null;
   let scrollRafId = null;
@@ -65263,10 +65268,10 @@ mark {
       for (const hit of getCardHits(card)) {
         if (hitHasBox(hit)) { rect = hitRect(hit); break; }
       }
-      // None (a subject without text): its first dispositivo in the card
+      // None (a chip without text): its first dispositivo in the card
       if (!rect) {
-        const detail = card.classList.contains('detail-highlight') ? null : card.querySelector('.detail-highlight');
-        rect = (detail || card).getBoundingClientRect();
+        const unit = card.classList.contains('scope-unit') ? null : card.querySelector('.scope-unit');
+        rect = (unit || card).getBoundingClientRect();
       }
       const target = window.scrollY + rect.top - getReadingLineY();
       scrollToY(Math.max(0, target), behavior);
@@ -65847,9 +65852,17 @@ mark {
     requestAnimationFrame(syncToScroll);
   }
 
-  // The subject's articles, as "lawPrefix:art" keys
-  function subjectKeys() {
-    return new Set(activeSubject.refs.map(r => (r.law_prefix || '') + ':' + r.art));
+  // The articles of the chip in the search bar, out of these cards
+  function inScope(cards) {
+    if (scope.kind === 'subject') {
+      const keys = new Set(scope.refs.map(r => (r.law_prefix || '') + ':' + r.art));
+      return cards.filter(c => keys.has((c.dataset.law || '') + ':' + c.dataset.art));
+    }
+    const marked = new Set(markersList.map(m => {
+      const el = $cards.querySelector(`.unit-id[data-uid="${m.uid}"]`);
+      return el && el.closest('.card-artigo');
+    }));
+    return cards.filter(c => marked.has(c));
   }
 
   // An article asked for in the search bar (a43, aLO23...)
@@ -65860,11 +65873,11 @@ mark {
     selectCard(target, true);
   }
 
-  // Searches the search bar's terms, within the articles of its subject (if
-  // any); with a subject and no terms, its articles are the results
+  // Searches the search bar's terms, within the articles of its chip (if
+  // any); with a chip and no terms, its articles are the results
   function doSearch(term) {
     // A run for the input's current value supersedes the pending one; runs
-    // for an older term (currentSearch, from marker filters) leave it
+    // for an older term (currentSearch, from marker changes) leave it
     // pending so the newer term still applies
     if (term === $searchInput.value.trim()) cancelPendingSearch();
     if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
@@ -65874,16 +65887,12 @@ mark {
     const hiddenBefore = cards.filter(c => c.classList.contains('filtered-out'));
     cards.forEach(c => c.classList.remove('filtered-out'));
 
-    if (markerFilter && markersList.length > 0) {
-      applyMarkerFilter();
-    }
-
-    const opening = subjectOpening;
-    const startCard = subjectStartCard;
-    subjectOpening = false;
-    subjectStartCard = null;
+    const opening = scopeOpening;
+    const startCard = scopeStartCard;
+    scopeOpening = false;
+    scopeStartCard = null;
     const query = classifyQuery(term);
-    $btnClearSearch.style.display = query.kind === 'empty' && !activeSubject ? 'none' : 'flex';
+    $btnClearSearch.style.display = query.kind === 'empty' && !scope ? 'none' : 'flex';
 
     let navTarget = null;
     if (query.kind === 'nav') {
@@ -65899,18 +65908,14 @@ mark {
     }
 
     const text = query.kind === 'text';
-    if (!text && !activeSubject) {
+    if (!text && !scope) {
       if (navTarget) goToArticle(navTarget);
       resetSearchNav();
       if (query.kind !== 'nav' && hiddenBefore.some(c => !c.classList.contains('filtered-out'))) refreshScrollState();
       return;
     }
 
-    let articleCards = visibleOnly(getArticleCards());
-    if (activeSubject) {
-      const keys = subjectKeys();
-      articleCards = articleCards.filter(c => keys.has((c.dataset.law || '') + ':' + c.dataset.art));
-    }
+    const articleCards = scope ? inScope(getArticleCards()) : getArticleCards();
     let matched = articleCards;
     if (text) {
       const { phrases, words, includeFootnotes } = query;
@@ -65930,9 +65935,9 @@ mark {
           }
         }
       }
-      // The same terms again (a filter or the subject changed): the same
+      // The same terms again (a filter or the chip changed): the same
       // object, so the list keeps its indexes' part. The indexes are searched
-      // whole, a subject or not: they lead to other subjects.
+      // whole, a chip or not: they lead to other subjects.
       const indexKey = JSON.stringify([phrases, words]);
       if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
     } else {
@@ -65951,12 +65956,12 @@ mark {
     }
 
     searchMatches = matched;
-    // A new search (terms, subject) shows its results (the sidebar, or on
+    // A new search (terms, chip) shows its results (the sidebar, or on
     // small screens the drawer, below the search bar), even if the list was
     // closed for an earlier one. The same one run again (a filter changed)
-    // leaves it as is. A subject alone (just opened, or its terms cleared)
+    // leaves it as is. A chip alone (just opened, or its terms cleared)
     // goes straight to its articles, without the drawer over them.
-    const shownFor = (activeSubject ? activeSubject.subject : '') + '\u0000' + (text ? term : '');
+    const shownFor = (scope ? scope.kind + ':' + scope.label : '') + '\u0000' + (text ? term : '');
     if (shownFor !== resultsShownFor) {
       resultsShownFor = shownFor;
       resultsHidden = false;
@@ -65964,9 +65969,9 @@ mark {
     }
     showResults();
 
-    // Where it goes: the article asked for; the one the subject was opened
-    // from; the first result of new terms or of a subject just opened. Its
-    // terms cleared or a filter changed, the subject's reading goes on where
+    // Where it goes: the article asked for; the one the chip was opened
+    // from; the first result of new terms or of a chip just opened. Its
+    // terms cleared or a filter changed, the chip's reading goes on where
     // it was (unless that article got hidden).
     let i = 0;
     let go = true;
@@ -65995,9 +66000,9 @@ mark {
         refreshScrollState();
       }
     } else {
-      // Found only in the indexes, or nothing in the subject: the counter
-      // (which opens the list) says so
-      const shown = indexMatches !== null && indexMatches.count > 0 || activeSubject !== null;
+      // Found only in the indexes, or nothing in the chip's articles: the
+      // counter (which opens the list) says so
+      const shown = indexMatches !== null && indexMatches.count > 0 || scope !== null;
       $searchNav.classList.toggle('open', shown);
       $searchNav.classList.toggle('index-only', shown);
       $searchInput.classList.toggle('has-nav', shown);
@@ -66048,10 +66053,10 @@ mark {
   });
 
   $searchInput.addEventListener('keydown', (e) => {
-    // Backspace in the empty bar takes its subject out, as in a field of tags
-    if (e.key === 'Backspace' && activeSubject && !$searchInput.value) {
+    // Backspace in the empty bar takes its chip out, as in a field of tags
+    if (e.key === 'Backspace' && scope && !$searchInput.value) {
       e.preventDefault();
-      removeSubject();
+      removeScope();
       return;
     }
     if (e.key !== 'Enter') return;
@@ -66065,7 +66070,7 @@ mark {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
-      if ($searchInput.value || activeSubject) clearSearchBar();
+      if ($searchInput.value || scope) clearSearchBar();
       $searchInput.focus();
     }
     if (e.ctrlKey && e.key === 'f') {
@@ -66075,10 +66080,10 @@ mark {
     }
   });
 
-  // Clearing the bar takes out its terms and its subject
+  // Clearing the bar takes out its terms and its chip
   function clearSearchBar() {
     $searchInput.value = '';
-    closeSubject();
+    closeScope();
     preserveScroll(() => doSearch(''));
   }
 
@@ -66094,7 +66099,8 @@ mark {
   function updateSearchCounter() {
     $searchCounter.textContent = searchMatches.length
       ? (searchIdx < 0 ? '–' : searchIdx + 1) + ' / ' + searchMatches.length
-      : indexMatches && indexMatches.count ? indexMatches.count + ' no índice' : '0 no assunto';
+      : indexMatches && indexMatches.count ? indexMatches.count + ' no índice'
+      : scope && scope.kind === 'markers' ? '0 nos marcados' : '0 no assunto';
   }
 
   function updateSearchTicks() {
@@ -66416,7 +66422,7 @@ mark {
       empty.className = 'res-empty';
       empty.textContent = (nIndex ? 'Nenhum resultado no texto das normas'
         : text ? 'Nenhum resultado para “' + currentSearch + '”' : 'Nenhum artigo visível')
-        + (activeSubject ? ' em “' + activeSubject.subject + '”' : '');
+        + (!scope ? '' : scope.kind === 'markers' ? ' nos marcados' : ' em “' + scope.label + '”');
       $resultsList.appendChild(empty);
       if (keepIndex) $resultsList.scrollTop = scrollTop;
       return;
@@ -66534,10 +66540,10 @@ mark {
 
   // Dispositivos (paragraphs, notes) of a card with matches, in order. The
   // summary and the law badge are shown in the group header instead. A
-  // subject without terms: the ones it cites (none when it cites the whole
-  // article, which is the group header).
+  // chip without terms: the ones the subject cites or that are marked (none
+  // when the subject cites the whole article, which is the group header).
   function resultUnits(card) {
-    if (!getCardHits(card).length) return Array.from(card.querySelectorAll('.detail-highlight'));
+    if (!getCardHits(card).length) return Array.from(card.querySelectorAll('.scope-unit'));
     const units = [];
     const seen = new Set();
     for (const hit of getCardHits(card)) {
@@ -67241,8 +67247,10 @@ mark {
     }
     saveMarkers();
     applyMarkers();
-    if (markerFilter) {
-      if (markersList.length === 0) markerFilter = false;
+    // In the bar, the marked articles follow (the last one unmarked, it goes)
+    if (scope && scope.kind === 'markers') {
+      if (markersList.length === 0) closeScope();
+      else markScopeUnits();
       preserveScroll(() => doSearch(currentSearch));
     }
     renderMarkerNav();
@@ -67250,40 +67258,19 @@ mark {
 
   function clearAllMarkers() {
     markersList = [];
-    markerFilter = false;
     saveMarkers();
     applyMarkers();
+    if (scope && scope.kind === 'markers') {
+      closeScope();
+      preserveScroll(() => doSearch(currentSearch));
+    }
     renderMarkerNav();
-    preserveScroll(() => doSearch(currentSearch));
   }
 
-  function applyMarkerFilter() {
-    const markedUids = new Set(markersList.map(m => m.uid));
-    const markedCards = new Set();
-    for (const uid of markedUids) {
-      const el = $cards.querySelector(`.unit-id[data-uid="${uid}"]`);
-      if (el) {
-        const card = el.closest('.card-artigo');
-        if (card) markedCards.add(card);
-      }
-    }
-    const cards = getAllCards();
-    for (const card of cards) {
-      if (card.classList.contains('filtered-out')) continue;
-      if (card.classList.contains('card-titulo')) {
-        card.classList.add('filtered-out');
-      } else if (card.classList.contains('card-artigo') && !markedCards.has(card)) {
-        card.classList.add('filtered-out');
-      }
-    }
-    showContextHeadings();
-  }
-
-  function toggleMarkerFilter() {
-    markerFilter = !markerFilter;
-    renderMarkerNav();
-    preserveScroll(() => doSearch(currentSearch));
-    scheduleMinimap();
+  // The funnel of the markers: the marked articles in the search bar, or out of it
+  function toggleMarkersScope() {
+    if (scope && scope.kind === 'markers') removeScope();
+    else openScope({ kind: 'markers', label: 'Marcados' });
   }
 
   function applyMarkers() {
@@ -67382,10 +67369,11 @@ mark {
     if (markersList.length > 0) {
       const filterBtn = document.createElement('button');
       filterBtn.id = 'marker-filter-btn';
-      filterBtn.className = markerFilter ? 'visible active' : 'visible';
+      const inBar = scope !== null && scope.kind === 'markers';
+      filterBtn.className = inBar ? 'visible active' : 'visible';
       filterBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h14L10 7v5l-4 2V7z"/></svg>';
-      filterBtn.title = 'Mostrar apenas artigos marcados';
-      filterBtn.addEventListener('click', toggleMarkerFilter);
+      filterBtn.title = inBar ? 'Tirar os marcados da busca' : 'Buscar nos artigos marcados';
+      filterBtn.addEventListener('click', toggleMarkersScope);
       $markerNav.appendChild(filterBtn);
 
       const clearBtn = document.createElement('button');
@@ -68551,7 +68539,7 @@ mark {
     const card = $cards.querySelector(`.card-titulo[data-section="${sectionId}"]`);
     if (!card) return null;
     // Hidden by the search filter alone: the section is read whole, without it
-    if (card.classList.contains('filtered-out') && searchFilter && !(markerFilter && markersList.length > 0)) {
+    if (card.classList.contains('filtered-out') && searchFilter) {
       searchFilter = false;
       $btnFilter.classList.remove('active');
       doSearch($searchInput.value.trim());
@@ -68832,17 +68820,27 @@ mark {
     }
   }
 
-  // ===== DETAIL HIGHLIGHT =====
-  function clearDetailHighlight() {
-    $cards.querySelectorAll('.detail-highlight').forEach(el => {
-      el.classList.remove('detail-highlight');
+  // ===== CHIP'S DISPOSITIVOS =====
+  // The dispositivos of the chip's articles that are the results without
+  // terms (.scope-unit): the subject's ones, highlighted, or the marked ones
+  function clearScopeUnits() {
+    $cards.querySelectorAll('.scope-unit').forEach(el => {
+      el.classList.remove('detail-highlight', 'scope-unit');
     });
   }
 
-  function highlightAllSubjectDetails() {
-    clearDetailHighlight();
-    if (!activeSubject) return;
-    for (const ref of activeSubject.refs) {
+  function markScopeUnits() {
+    clearScopeUnits();
+    if (!scope) return;
+    if (scope.kind === 'markers') {
+      for (const m of markersList) {
+        const el = $cards.querySelector(`.unit-id[data-uid="${m.uid}"]`);
+        const p = el && el.closest('p');
+        if (p) p.classList.add('scope-unit');
+      }
+      return;
+    }
+    for (const ref of scope.refs) {
       let card;
       if (ref.law_prefix) {
         card = $cards.querySelector(`.card-artigo[data-art="${ref.art}"][data-law="${ref.law_prefix}"]`);
@@ -68853,11 +68851,11 @@ mark {
       if (!card) continue;
       if (!ref.detail) {
         // Artigo inteiro
-        card.classList.add('detail-highlight');
+        card.classList.add('detail-highlight', 'scope-unit');
       } else if (ref.detail.trim().toLowerCase() === 'caput') {
         // Caput: first <p> that isn't .art-para
         const caput = card.querySelector('p:not(.art-para):not(.old-version)');
-        if (caput) caput.classList.add('detail-highlight');
+        if (caput) caput.classList.add('detail-highlight', 'scope-unit');
       } else {
         const dt = ref.detail.trim();
         let found = false;
@@ -68866,7 +68864,7 @@ mark {
           const ut = uid.textContent.trim();
           if (path === dt || ut === dt || (dt === '§ú' && ut === 'Parágrafo único')) {
             const p = uid.closest('p');
-            if (p) p.classList.add('detail-highlight');
+            if (p) p.classList.add('detail-highlight', 'scope-unit');
             found = true;
             break;
           }
@@ -68875,56 +68873,67 @@ mark {
     }
   }
 
-  // ===== SUBJECT IN THE SEARCH BAR =====
+  // ===== CHIP IN THE SEARCH BAR =====
   // A subject of the remissivo opened (from the index, the results list or an
-  // article's "No índice remissivo") goes into the search bar as a chip, in
-  // place of what was there: its articles are the results, and terms typed
-  // after it are searched within them. The bar's filter and arrows serve
-  // both; clearing the bar takes the subject out too.
-  function openSubject(entry, startCard = null) {
-    activeSubject = entry;
-    subjectOpening = true;
-    subjectStartCard = startCard;
-    $chipLabel.textContent = entry.subject;
-    $searchChip.title = 'Índice remissivo: ' + entry.subject;
+  // article's "No índice remissivo"), or the marked articles (the markers'
+  // funnel), go into the search bar as a chip, in place of what was there:
+  // its articles are the results, and terms typed after it are searched
+  // within them. The bar's filter and arrows serve both; clearing the bar
+  // takes the chip out too.
+  function openScope(chip, startCard = null) {
+    scope = chip;
+    scopeOpening = true;
+    scopeStartCard = startCard;
+    const subject = chip.kind === 'subject';
+    $searchChip.dataset.kind = chip.kind;
+    $chipLabel.textContent = subject ? chip.label : '\u2605 ' + chip.label;
+    $searchChip.title = subject ? 'Índice remissivo: ' + chip.label : 'Artigos marcados';
     $searchChip.hidden = false;
-    $resultsTitle.textContent = 'Remissivo: ' + entry.subject;
+    $resultsTitle.textContent = subject ? 'Remissivo: ' + chip.label : 'Artigos marcados';
     updateChipSpace();
     $searchInput.value = '';
-    highlightAllSubjectDetails();
+    markScopeUnits();
+    renderMarkerNav();
     doSearch('');
   }
 
-  // The subject out of the bar (the caller searches again)
-  function closeSubject() {
-    if (!activeSubject) return;
-    activeSubject = null;
+  function openSubject(entry, startCard = null) {
+    openScope({ kind: 'subject', label: entry.subject, refs: entry.refs }, startCard);
+  }
+
+  // The chip out of the bar (the caller searches again)
+  function closeScope() {
+    if (!scope) return;
+    const markers = scope.kind === 'markers';
+    scope = null;
     $searchChip.hidden = true;
     $resultsTitle.textContent = 'Resultados';
     updateChipSpace();
-    clearDetailHighlight();
+    clearScopeUnits();
+    if (markers) renderMarkerNav();
   }
 
-  function removeSubject() {
-    closeSubject();
+  function removeScope() {
+    closeScope();
     preserveScroll(() => doSearch($searchInput.value.trim()));
   }
 
   // The input's text starts after the chip
   const SEARCH_PLACEHOLDER = $searchInput.placeholder;
   function updateChipSpace() {
-    $searchInput.style.paddingLeft = activeSubject ? ($searchChip.offsetWidth + 10) + 'px' : '';
-    $searchInput.placeholder = activeSubject ? 'Buscar neste assunto...' : SEARCH_PLACEHOLDER;
+    $searchInput.style.paddingLeft = scope ? ($searchChip.offsetWidth + 10) + 'px' : '';
+    $searchInput.placeholder = !scope ? SEARCH_PLACEHOLDER
+      : scope.kind === 'markers' ? 'Buscar nos marcados...' : 'Buscar neste assunto...';
   }
 
-  // The subject's name, whole (the chip may cut it), atop its results
+  // The chip's name, whole (the chip may cut it), atop its results
   $chipLabel.addEventListener('click', () => $searchCounter.click());
   document.getElementById('chip-remove').addEventListener('click', () => {
-    removeSubject();
+    removeScope();
     $searchInput.focus({ preventScroll: true });
   });
   // Its width is a share of the bar's
-  window.addEventListener('resize', () => { if (activeSubject) updateChipSpace(); });
+  window.addEventListener('resize', () => { if (scope) updateChipSpace(); });
 
   // ===== NO ÍNDICE REMISSIVO =====
   // At the end of each article, the subjects of the remissivo that cite it (or

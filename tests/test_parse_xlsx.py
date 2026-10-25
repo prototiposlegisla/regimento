@@ -142,3 +142,16 @@ def test_referencia_repetida_aparece_uma_vez():
                                                                  SubjectRef("34", "II")])])
     (item,) = idx.to_list()
     assert [r["detail"] for r in item["children"][0]["refs"]] == ["II", "§ 1º"]
+
+
+def test_vide_em_cadeia_aponta_direto_para_o_destino():
+    from src.parse_xlsx import resolver_vides_em_cadeia
+    idx = SubjectIndex(entries=[
+        SubjectEntry("HOMENAGEM", "", [], vides=["HONRARIA"]),
+        SubjectEntry("HONRARIA", "", [], vides=["TÍTULOS HONORÍFICOS"]),
+        SubjectEntry("TÍTULOS HONORÍFICOS", "Concessão", [SubjectRef("347")]),
+        SubjectEntry("PRÊMIOS", "Concessão", [SubjectRef("47", "VI,a,6")], vides=["HONRARIA", "TÍTULOS HONORÍFICOS"]),
+    ])
+    assert resolver_vides_em_cadeia(idx) == 2
+    assert idx.entries[0].vides == ["TÍTULOS HONORÍFICOS"]
+    assert idx.entries[3].vides == ["TÍTULOS HONORÍFICOS"]

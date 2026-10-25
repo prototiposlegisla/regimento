@@ -335,8 +335,7 @@ def aplicar_propostas(index: SubjectIndex, propostas: list[Proposta], *, incluir
             existentes = {_ref_key(r) for r in alvo[0].refs}
             for r in refs:
                 if _ref_key(r) in existentes:
-                    avisos.append((f"{p.dispositivo!r} já está em {nome}", p.contexto))
-                    continue
+                    continue   # já está (ex.: parte de uma divisão que o destino já tinha)
                 if proposta:
                     r.proposta = p.id
                     r.hint = r.hint or (f"proposta {p.id}" if p.id else "proposta")
@@ -446,3 +445,34 @@ def aplicar_propostas(index: SubjectIndex, propostas: list[Proposta], *, incluir
     # Entradas que as propostas esvaziaram (tudo excluído, ou fundidas noutra que já existia)
     index.entries = [e for e in entries if id(e) not in esvaziadas or e.refs or e.vides]
     return aplicadas, propostas_aplicadas, avisos
+
+
+def resolver_vides_em_cadeia(index: SubjectIndex) -> int:
+    """Vide para um assunto que é só remissão (sem dispositivos nem subassuntos) passa a
+    apontar direto para os destinos dele ("Homenagem → HONRARIA → TÍTULOS HONORÍFICOS").
+
+    Retorna quantos vides foram reapontados.
+    """
+    so_vide: dict[str, list[str]] = {}
+    com_conteudo: set[str] = set()
+    for e in index.entries:
+        if e.refs or e.sub_subject:
+            com_conteudo.add(_chave(e.subject))
+    for e in index.entries:
+        a = _chave(e.subject)
+        if a not in com_conteudo and not e.sub_subject and e.vides:
+            so_vide.setdefault(a, []).extend(e.vides)
+    n = 0
+    for e in index.entries:
+        novos: list[str] = []
+        for v in e.vides:
+            alvo, vistos = [v], set()
+            while len(alvo) == 1 and "|" not in alvo[0] and _chave(alvo[0]) in so_vide \
+                    and _chave(alvo[0]) not in vistos and _chave(alvo[0]) != _chave(e.subject):
+                vistos.add(_chave(alvo[0]))
+                alvo = so_vide[_chave(alvo[0])]
+            if alvo != [v]:
+                n += 1
+            novos += [x for x in alvo if x not in novos and _chave(x) != _chave(e.subject)]
+        e.vides = novos
+    return n

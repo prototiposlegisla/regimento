@@ -132,7 +132,8 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
     (erro) ou a dispositivo inexistente, revogado ou só tachado (aviso).
     """
     import re as _re
-    from src.parse_xlsx import aplicar_propostas, carregar_propostas, parse_law_mapping, parse_xlsx
+    from src.parse_xlsx import (aplicar_propostas, carregar_propostas, parse_law_mapping, parse_xlsx,
+                                 resolver_vides_em_cadeia)
     from src.remissoes import ART_INEXISTENTE, REVOGADO, SUB_INEXISTENTE, TACHADO, _Corpus
 
     xlsx_path = Path(args.xlsx)
@@ -163,6 +164,7 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
             print(f"      → {n} propostas aplicadas" + (f" ({n_prop} com Status proposto)" if n_prop else ""))
             for message, context in avisos:
                 report.add("propostas", "aviso", message, context)
+        resolver_vides_em_cadeia(subject_index)
     except PermissionError:
         print("      ⚠ Não foi possível abrir remissivo.xlsx (arquivo em uso pelo Excel?)")
         print("        Feche a planilha e rode o build novamente.")

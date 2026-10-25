@@ -133,3 +133,43 @@ def structure_warnings(
         ):
             warnings.append(("Duas redações do caput sem tachado (falta tachar a antiga?)", ctx))
     return warnings
+
+
+# Sinais de caractere perdido na conversão do texto: ponto no lugar de letra ("dispos.o", ".s.rtigos",
+# "ser. complementado"), mojibake ("Ã§", "â€"), espaço antes de vírgula ou ponto e vírgula, pontuação dobrada.
+_ABREV = {"art.", "arts.", "inc.", "nº.", "fls.", "fl.", "pág.", "ex.", "p.", "ss.", "c.", "cf.", "obs.", "op.", "id."}
+_SUSPEITOS = [
+    re.compile(r"\b[a-zà-ú]{3,}\.[a-zà-ú]{1,4}\b|(?<= )\.[a-zà-ú]{1,3}\b|\b[a-zà-ú]{2,}\. [a-zà-ú]{3,}"),
+    re.compile(r"Ã[§£©¡³ºª¢µ‰‡]|Â[ºª°§]|â€|�"),
+    re.compile(r"\w\s+[,;]"),
+    re.compile(r",,|;;|(?<!\.)\.\.(?!\.)"),
+]
+
+
+def text_warnings(
+    doc: ParsedDocument,
+    known: set[tuple[str, str, str]] | frozenset = frozenset(),
+) -> list[tuple[str, str]]:
+    """Avisos de caractere perdido no texto dos dispositivos vigentes, como (mensagem, contexto), exceto os
+    de known = {(norma, artigo, trecho)}, com o trecho visto em volta do achado: erros que estão também no texto
+    oficial e ficam como estão."""
+    warnings: list[tuple[str, str]] = []
+    for el in doc.elements:
+        if not isinstance(el, ArticleBlock):
+            continue
+        ctx = f"{el.law_name or 'Regimento Interno'}, Art. {el.art_number}"
+        conhecidos = [t for n, a, t in known if n == (el.law_name or "Regimento Interno") and a == el.art_number]
+        for u in [el.caput, *el.children]:
+            if u is None or u.is_old_version:
+                continue
+            texto = u.full_text.replace("\xa0", " ")
+            for rx in _SUSPEITOS:
+                for m in rx.finditer(texto):
+                    trecho = m.group(0)
+                    if trecho.split(".")[0] + "." in _ABREV or re.search(r"\.(gov|br|com|org|sp|leg|html?|pdf)\b", trecho):
+                        continue
+                    janela = texto[max(0, m.start() - 25):m.end() + 25]
+                    if any(t in janela for t in conhecidos):
+                        continue
+                    warnings.append((f"Caractere perdido no texto? «…{janela}…»", ctx))
+    return warnings

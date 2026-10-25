@@ -236,12 +236,29 @@ def _norma_key(label: str) -> tuple:
             int(re.sub(r"\D", "", num.group(1)) or 0) if num else 0, low)
 
 
-def legislacao_index(doc: ParsedDocument) -> dict | None:
+def _norma_ident(nome: str):
+    """Esfera, tipo, número e ano da norma: a mesma norma escrita com e sem apelido ("... de 1966" ×
+    "... de 1966 (Código Tributário Nacional)") tem a mesma identidade. Sem número e ano, o próprio nome."""
+    m = re.match(r"(.*?)\bn\.?\s?[º°o]\.?\s*([\d.]+),?\s+de\b.*?(\d{4})", nome, re.I)
+    if not m:
+        return nome
+    low = m.group(1).lower()
+    esfera = "federal" if re.search(r"\bfederal\b", low) else "estadual" if re.search(r"\bestadual\b", low) else ""
+    tipo = re.sub(r"\b(federal|estadual|municipal)\b", "", low).strip()
+    return (esfera, re.sub(r"\s+", " ", tipo), m.group(2).replace(".", ""), m.group(3))
+
+
+def legislacao_index(doc: ParsedDocument, avisos: list | None = None) -> dict | None:
     """Categoria "Legislação correlata" da aba Referências: cada norma (nota "L") e os
-    dispositivos do Regimento e da Lei Orgânica a que ela se liga, com link para o artigo."""
+    dispositivos do Regimento e da Lei Orgânica a que ela se liga, com link para o artigo.
+    As notas são agrupadas pela norma (_norma_ident), não pelo nome escrito; o título é o nome
+    mais usado, preferindo o que tem apelido. Em avisos, (mensagem, contexto) para cada norma
+    escrita de mais de um jeito."""
     import html as _html
+    from collections import Counter
     from .remissoes import law_of
-    groups: dict[str, dict] = {}
+    groups: dict = {}
+    nomes: dict = {}
     for art in doc.elements:
         if not isinstance(art, ArticleBlock) or not art.caput:
             continue
@@ -262,7 +279,9 @@ def legislacao_index(doc: ParsedDocument) -> dict | None:
                 nome = full.split(" — ")[0].strip()
                 # the norm's name as the title; its ementa first, then the provisions
                 ementa = full[len(nome):].lstrip(" —").strip()
-                g = groups.setdefault(nome, {"title": nome, "entries": [
+                ident = _norma_ident(nome)
+                nomes.setdefault(ident, Counter())[nome] += 1
+                g = groups.setdefault(ident, {"title": nome, "entries": [
                     {"html": f"<i>{_html.escape(ementa)}</i>"}] if ementa else []})
                 entry = {"html": _html.escape(texto[:180] + ("…" if len(texto) > 180 else "")), "art_ref": ref}
                 if law != "RI":
@@ -272,5 +291,10 @@ def legislacao_index(doc: ParsedDocument) -> dict | None:
                 g["entries"].append(entry)
     if not groups:
         return None
+    for ident, cont in nomes.items():
+        groups[ident]["title"] = max(cont, key=lambda n: ("(" in n, cont[n]))
+        if len(cont) > 1 and avisos is not None:
+            avisos.append(("A mesma norma escrita de mais de um jeito: " + " × ".join(f"«{n}» ({c})" for n, c in cont.items()),
+                           groups[ident]["title"]))
     return {"category": "Legislação correlata",
-            "groups": [groups[k] for k in sorted(groups, key=_norma_key)]}
+            "groups": sorted(groups.values(), key=lambda g: _norma_key(g["title"]))}

@@ -81,6 +81,49 @@ class TestLegislacaoCorrelata:
         avisos = [m for m, _ in structure_warnings(doc)]
         assert any("Legislação correlata sem link" in m and "Decreto nº 1" in m for m in avisos)
 
+    def test_mesma_norma_com_e_sem_apelido_e_um_grupo_so(self):
+        doc = _doc()
+        doc.elements[0].children[0].legislacao.append(
+            _norma("Lei federal nº 5.172, de 25 de outubro de 1966", "Dispõe sobre o Sistema Tributário Nacional."))
+        doc.elements[1].children[0].legislacao.append(
+            _norma("Lei federal nº 5.172, de 25 de outubro de 1966 (Código Tributário Nacional)", "Dispõe."))
+        avisos = []
+        cat = legislacao_index(doc, avisos)
+        ctn = [g for g in cat["groups"] if "5.172" in g["title"]]
+        # um grupo só, com o nome que tem o apelido, e os dois dispositivos
+        assert [g["title"] for g in ctn] == ["Lei federal nº 5.172, de 25 de outubro de 1966 (Código Tributário Nacional)"]
+        assert [e["art_ref"] for e in ctn[0]["entries"] if e.get("art_ref")] == ["5, § 2º", "105, XXX"]
+        assert len(avisos) == 1 and "mais de um jeito" in avisos[0][0]
+
+
+class TestCaracterePerdido:
+    def _doc(self, texto):
+        u = DocumentUnit(UnitType.ARTIGO, "Art. 83", "lom83", [TextRun(texto)])
+        return ParsedDocument(elements=[ArticleBlock(art_number="83", caput=u, law_name="Lei Orgânica")])
+
+    @pytest.mark.parametrize("texto", [
+        "Art. 83 — além do previs.o nos arts. 37 e 39",
+        "de acordo com .s.rtigos 203 e 204",
+        "o  habeas corpus  , sendo paciente",
+        "e dá outras providências..",
+    ])
+    def test_avisa(self, texto):
+        from src.resolve_amendments import text_warnings
+        assert text_warnings(self._doc(texto))
+
+    @pytest.mark.parametrize("texto", [
+        "nos termos do art. 37 da Constituição, ver www.planalto.gov.br e C.P.I., instalada",
+        "observado o disposto no art. 38; e assim por diante...",
+    ])
+    def test_nao_avisa(self, texto):
+        from src.resolve_amendments import text_warnings
+        assert not text_warnings(self._doc(texto))
+
+    def test_erro_conhecido_do_texto_oficial(self):
+        from src.resolve_amendments import text_warnings
+        doc = self._doc("Art. 83 — além do previs.o nos arts. 37 e 39")
+        assert not text_warnings(doc, {("Lei Orgânica", "83", "previs.o")})
+
 
 class TestPrefixoL:
     """O Word pode gravar "L", o espaço e o nome da norma em runs diferentes (até dentro do link)."""

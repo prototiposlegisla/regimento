@@ -24,6 +24,18 @@ BASE_DIR = Path(__file__).parent
 # (norma, artigo, caminho do dispositivo)
 KNOWN_DUPLICATES: set[tuple[str, str, str]] = set()
 
+# Erros de digitação que estão também no texto oficial (PLP) e ficam como estão, por decisão do usuário
+# (25/10/2026); lista completa em FontesAtual/"Erros no texto das normas.md". (norma, artigo, trecho)
+KNOWN_TEXT_ERRORS: set[tuple[str, str, str]] = {
+    ("Lei Orgânica", "32", "Regimento ;"),
+    ("Lei Orgânica", "59", "dispos.o"),
+    ("Lei Orgânica", "83", "previs.o"),
+    ("Lei Orgânica", "200", "dispo.to .a"),
+    ("Lei Orgânica", "200", "ser. complementado"),
+    ("Lei Orgânica", "200", "estabelecid. .o"),
+    ("Lei Orgânica", "221", ".s.rtigos"),
+}
+
 
 # ── Validation report ────────────────────────────────────────────────────
 
@@ -61,6 +73,8 @@ class ValidationReport:
 
         cat_labels = {
             "docx": "Formatação do DOCX",
+            "texto": "Texto dos dispositivos (caractere perdido)",
+            "legislacao": "Legislação correlata (a mesma norma com nomes diferentes)",
             "formato": "Formato da planilha",
             "ref_cruzada": "Referências cruzadas (XLSX → DOCX)",
             "propostas": "Propostas do índice remissivo (aba Propostas)",
@@ -294,6 +308,9 @@ def _build_once(
     from src.resolve_amendments import structure_warnings
     for message, context in structure_warnings(doc, KNOWN_DUPLICATES):
         report.add("docx", "aviso", message, context)
+    from src.resolve_amendments import text_warnings
+    for message, context in text_warnings(doc, KNOWN_TEXT_ERRORS):
+        report.add("texto", "aviso", message, context)
 
     # ── 3. Parse XLSX ──────────────────────────────────────────────────
     print("[3/8] Parseando XLSX...")
@@ -363,7 +380,10 @@ def _build_once(
 
     # Legislação correlata (notas "L" do DOCX): uma categoria a mais na aba Referências
     from src.build_index import legislacao_index
-    leg = legislacao_index(doc)
+    avisos_leg: list = []
+    leg = legislacao_index(doc, avisos_leg)
+    for message, context in avisos_leg:
+        report.add("legislacao", "aviso", message, context)
     if leg:
         referencias_data.append(leg)
         print(f"      → legislação correlata: {len(leg['groups'])} normas, "

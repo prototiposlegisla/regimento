@@ -2948,7 +2948,10 @@
       n.className = 'rem-note t-' + tipo;
       const k = document.createElement('span');
       k.className = 'rem-kind';
-      k.textContent = REM_TIPO[tipo][trigger.dataset.side === 'tgt' ? 1 : 0];
+      // "correspondente" inside one norm (data-mesma: RI–RI, LOM–LOM) is no federal
+      // rule: parts of one procedure or parallel rules, linked both ways
+      k.textContent = tipo === 'sim' && trigger.dataset.mesma ? '⇄ Dispositivo correspondente'
+        : REM_TIPO[tipo][trigger.dataset.side === 'tgt' ? 1 : 0];
       n.appendChild(k);
       if (trigger.dataset.status === 'proposta') {
         const pr = document.createElement('span');

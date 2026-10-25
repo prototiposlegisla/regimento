@@ -379,6 +379,8 @@ class HTMLRenderer:
             label = f"{prefix} {other.law} {art}" + (f", {path}" if path else "")
             attrs = (f' data-ref="{html.escape(other.ref)}" data-tipo="{im.tipo}" data-side="{side}"'
                      f' data-nota="{html.escape(im.nota)}" data-label="{html.escape(label)}"')
+            if im.tipo == "sim" and im.origem.law == im.destino.law:
+                attrs += ' data-mesma="1"'   # "correspondente" na mesma norma: não é regra federal
             if im.proposta:
                 attrs += ' data-status="proposta"'
             out.append(f'<span class="rem rem-imp t-{im.tipo}" tabindex="0" role="button"{attrs}></span>')

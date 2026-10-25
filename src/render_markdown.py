@@ -14,14 +14,19 @@ from .remissoes import EXIBIVEIS, law_of
 class MarkdownRenderer:
     """Gera arquivos Markdown otimizados para consumo por LLMs."""
 
-    def __init__(self, remissoes=None, *, canonico: bool = False):
+    def __init__(self, remissoes=None, *, canonico: bool = False, indice=None):
         # Remissões explícitas: "(remete a: Art. 369 — síntese)" depois do dispositivo
         self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
         self._imp_by_unit = remissoes.implicitas_por_unidade() if remissoes else {}
         self._summaries: dict[tuple[str, str], str] = {}
         # Texto canônico para os outros projetos (src/canonico.py): sem links, com
-        # "*(revogado)*" no dispositivo revogado e "Art. 1 (ADT)" no lugar de "Art. ADT1"
+        # "*(revogado)*" no dispositivo revogado, "Art. 1 (ADT)" no lugar de "Art. ADT1",
+        # a sigla da norma em todo alvo ("RI art. 102", não "art. 102") e, no fim do
+        # artigo, quem o cita e as entradas do índice remissivo
+        # (indice: {(norma, art): [(entrada, caminho ou None = artigo inteiro)]})
         self._canonico = canonico
+        self._citado = remissoes.citado_em() if remissoes and canonico else {}
+        self._indice = indice or {}
 
     # ── Documento principal ───────────────────────────────────────────
 
@@ -60,6 +65,38 @@ class MarkdownRenderer:
     def _revogado(self, unit) -> str:
         return " *(revogado)*" if self._canonico and unit.is_revoked else ""
 
+    def _rotulo(self, alvo) -> str:
+        """Rótulo do alvo; no canônico, sempre com a sigla: "RI art. 102, § 5º", "LOM art. 29 (ADT)"."""
+        r = alvo.rotulo
+        if not self._canonico or alvo.law == PREC:
+            return r
+        r = re.sub(r"art\. ([^,\s]+) ADT", r"art. \1 (ADT)", r)
+        return f"RI {r}" if alvo.law == "RI" else r
+
+    @staticmethod
+    def _caminho_legivel(caminho: str) -> str:
+        return (caminho or "caput").replace("§ú", "parágrafo único").replace(",", ", ")
+
+    def _rodape_canonico(self, art: ArticleBlock) -> list[str]:
+        """Linhas do fim do artigo no canônico: *Citado em: …* e *No índice remissivo: …*."""
+        key = (law_of(art), art.art_number)
+        linhas = []
+        citado = self._citado.get(key, ())
+        if citado:
+            linhas.append(f"*Citado em: {' | '.join(self._rotulo(o) for o in citado)}*")
+        por_entrada: dict[str, list] = {}
+        for entrada, caminho in self._indice.get(key, ()):
+            lst = por_entrada.setdefault(entrada, [])
+            if caminho not in lst:
+                lst.append(caminho)
+        if por_entrada:
+            # as que citam o artigo inteiro primeiro, como no site
+            ordem = sorted(por_entrada, key=lambda e: (None not in por_entrada[e], e))
+            itens = [e if None in por_entrada[e] else
+                     f"{e} ({', '.join(self._caminho_legivel(c) for c in por_entrada[e])})" for e in ordem]
+            linhas.append(f"*No índice remissivo: {' | '.join(itens)}*")
+        return linhas
+
     def _remissoes_suffix(self, unit: DocumentUnit) -> str:
         """Sufixo com os dispositivos citados: *(remete a: Art. 369 — Promulgação...)*."""
         # by article: "LOM art. 18, III, IV e V — Perda do mandato"
@@ -72,7 +109,7 @@ class MarkdownRenderer:
                         g.append(a)
         items = []
         for (law, art), alvos in groups.items():
-            head = alvos[0].rotulo if law == PREC else alvos[0].rotulo.split(",")[0]
+            head = self._rotulo(alvos[0]) if law == PREC else self._rotulo(alvos[0]).split(",")[0]
             paths = [a.path.replace("§ú", "parágrafo único").replace(",", ", ") for a in alvos if a.path]
             tail = (", ".join(paths[:-1]) + " e " + paths[-1]) if len(paths) > 1 else "".join(paths)
             whole = any(not a.path for a in alvos)
@@ -97,13 +134,24 @@ class MarkdownRenderer:
                   "sim": ("tem como regra federal correspondente", "é a regra federal correspondente a"),
                   "exc": ("é exceção à regra geral de", "tem como exceção")}
 
+    @classmethod
+    def relacao(cls, im, side: str) -> str:
+        """Como o correlato se lê do lado side ("src" | "tgt"): "detalhado em", "diverge de"...
+
+        "correspondente" na mesma norma (RI–RI, LOM–LOM) não é regra federal: são partes de um
+        mesmo procedimento ou regras paralelas, ligadas nos dois sentidos.
+        """
+        if im.tipo == "sim" and im.origem.law == im.destino.law:
+            return "corresponde a"
+        return cls._IMP_WORDS[im.tipo][0 if side == "src" else 1]
+
     def _correlatos_suffix(self, unit: DocumentUnit) -> str:
         """Sufixo das remissões implícitas: *(correlatos: diverge de LOM art. 48, § 6º — nota)*."""
         items = []
         for im, side in self._imp_by_unit.get(id(unit), ()):
             other = im.destino if side == "src" else im.origem
-            words = self._IMP_WORDS[im.tipo][0 if side == "src" else 1]
-            items.append(f"{words} {other.rotulo}" + (f" — {im.nota}" if im.nota else ""))
+            words = self.relacao(im, side)
+            items.append(f"{words} {self._rotulo(other)}" + (f" — {im.nota}" if im.nota else ""))
         return f" *(correlatos: {' | '.join(items)})*" if items else ""
 
     def _render_heading(self, h: SectionHeading) -> str:
@@ -134,6 +182,8 @@ class MarkdownRenderer:
             parts.append(self._render_runs(child.runs).strip() + self._remissoes_suffix(child))
             for fn in child.footnotes:
                 parts.append(self._render_footnote(fn))
+        if self._canonico:
+            parts.extend(self._rodape_canonico(art))
         if art.source_url:
             parts.append(f"*Texto oficial: {art.source_url}*")
         return "\n\n".join(parts)
@@ -171,6 +221,9 @@ class MarkdownRenderer:
             parts.append(child_text)
             for fn in child.footnotes:
                 parts.append(self._render_footnote(fn))
+
+        if self._canonico:
+            parts.extend(self._rodape_canonico(art))
 
         # Old versions section
         old_versions = list(art.all_versions)
@@ -308,8 +361,7 @@ class MarkdownRenderer:
 
         return "\n".join(lines) + "\n"
 
-    @staticmethod
-    def _format_ref(ref: dict) -> str:
+    def _format_ref(self, ref: dict) -> str:
         art = ref["art"]
         detail = ref.get("detail", "")
         law_prefix = ref.get("law_prefix", "")
@@ -318,6 +370,11 @@ class MarkdownRenderer:
         label = f"Art. {art}"
         if law_prefix == "PREC":
             label = f"Precedente Regimental {prec_label(art)}"
+        elif self._canonico:
+            # como nos alvos do texto canônico: "RI art. 68, § 1º", "LOM art. 4-C (ADT)"
+            numero = f"{art[3:]} (ADT)" if art.startswith("ADT") else art
+            label = f"{law_prefix or 'RI'} art. {numero}"
+            detail = self._caminho_legivel(detail) if detail and detail != "caput" else detail
         elif law_prefix:
             label = f"Art. {law_prefix}:{art}"
         if detail:

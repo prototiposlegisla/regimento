@@ -566,7 +566,7 @@ def _build_canonico(args: argparse.Namespace) -> None:
     print(f"\n{'═' * 60}")
     print("  Build: texto canônico para os outros projetos (canonico/)")
     print(f"{'═' * 60}")
-    for line in canonico.gerar(Path(args.docx), Path(args.remissoes)):
+    for line in canonico.gerar(Path(args.docx), Path(args.remissoes), indice_xlsx=Path(args.xlsx)):
         print(f"      {line}")
 
 

@@ -6,8 +6,9 @@ import json
 
 import pytest
 
-from src.canonico import _linhas_jsonl
+from src.canonico import _linhas_jsonl, indice_por_artigo
 from src.models import ArticleBlock, DocumentUnit, ParsedDocument, SectionHeading, TextRun, UnitType
+from src.remissoes import detectar
 from src.render_markdown import MarkdownRenderer
 
 pytestmark = pytest.mark.unit
@@ -60,3 +61,54 @@ class TestJsonl:
         assert [d["caminho"] for d in a68["dispositivos"]] == ["", "§ 1º", "§ 1º,I"]
         assert a68["dispositivos"][2]["revogado"] is True and "revogado" not in a68["dispositivos"][1]
         assert regs[1]["adt"] is True and regs[2]["secao"] == []
+
+
+def _rede():
+    """O documento de teste com uma remissão explícita, dois correlatos e o índice remissivo."""
+    doc = _doc()
+    adt = doc.elements[3]
+    adt.caput.runs = [TextRun("Art. 1º - Transição, nos termos do art. 68.")]
+    linhas = [{"ID": "R1", "Origem": "LOM:41", "Destino": "68,§ 1º", "Tipo": "detalha", "Nota": "nota R1",
+               "Status": "aprovado", "Visibilidade": "", "linha": 2},
+              {"ID": "R2", "Origem": "68", "Destino": "ADT1", "Tipo": "correspondente", "Nota": "",
+               "Status": "aprovado", "Visibilidade": "", "linha": 3}]
+    remissoes = detectar(doc, implicitas=linhas)
+    indice = indice_por_artigo([
+        {"subject": "PEDIDO DE INFORMAÇÕES", "refs": [{"art": "68", "detail": ""}],
+         "children": [{"sub_subject": "Prazos", "refs": [{"art": "68", "detail": "§ 1º"},
+                                                         {"art": "41", "detail": "caput", "law_prefix": "LOM"}]}]},
+    ])
+    return doc, remissoes, indice
+
+
+class TestRede:
+    def test_jsonl_traz_as_ligacoes(self):
+        doc, remissoes, indice = _rede()
+        regs = {(r["norma"], r["art"]): r for r in map(json.loads, _linhas_jsonl(doc, remissoes, indice))}
+        a68, adt, lom41 = regs[("RI", "68")], regs[("RI", "1")], regs[("LOM", "41")]
+        assert a68["indice"] == ["PEDIDO DE INFORMAÇÕES"]
+        assert a68["citado_por"] == [{"norma": "RI", "art": "1", "caminho": "", "adt": True}]
+        p1 = a68["dispositivos"][1]
+        assert p1["indice"] == ["PEDIDO DE INFORMAÇÕES — Prazos"]
+        assert p1["correlatos"] == [{"relacao": "detalhado em", "tipo": "detalha", "norma": "LOM", "art": "41",
+                                     "caminho": "", "nota": "nota R1"}]
+        assert adt["dispositivos"][0]["remete_a"] == [{"norma": "RI", "art": "68", "caminho": ""}]
+        # "correspondente" dentro da mesma norma não é regra federal
+        assert adt["dispositivos"][0]["correlatos"][0]["relacao"] == "corresponde a"
+        assert lom41["dispositivos"][0]["indice"] == ["PEDIDO DE INFORMAÇÕES — Prazos"]
+        assert "indice" not in lom41
+
+    def test_markdown_com_sigla_citado_em_e_indice(self):
+        doc, remissoes, indice = _rede()
+        normas = MarkdownRenderer(remissoes, canonico=True, indice=indice).render_normas(doc)
+        lom, ri = normas["Lei Orgânica"], normas["Regimento Interno"]
+        assert "*(correlatos: detalha RI art. 68, § 1º — nota R1)*" in lom
+        assert "*(remete a: RI art. 68 — Pedido de informações)*" in ri
+        assert "*Citado em: RI art. 1 (ADT)*" in ri
+        assert "*No índice remissivo: PEDIDO DE INFORMAÇÕES | PEDIDO DE INFORMAÇÕES — Prazos (§ 1º)*" in ri
+        assert "*No índice remissivo: PEDIDO DE INFORMAÇÕES — Prazos (caput)*" in lom
+
+    def test_chatbot_sem_sigla_do_ri(self):
+        doc, remissoes, _ = _rede()
+        md = MarkdownRenderer(remissoes).render_document(doc)
+        assert "detalha art. 68, § 1º" in md and "Citado em" not in md

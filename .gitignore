@@ -7,3 +7,4 @@ dist/
 *.docx
 config.local.toml
 .claude/
+.playwright-mcp/

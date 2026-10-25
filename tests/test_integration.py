@@ -318,7 +318,8 @@ class TestLegislacaoCorrelata:
         units = [u for e in resolved_doc.elements if isinstance(e, ArticleBlock)
                  for u in [e.caput, *e.children] if u and u.legislacao]
         normas = [p for u in units for p in u.legislacao]
-        assert len(units) == pytest.approx(247, rel=0.10) and len(normas) == pytest.approx(399, rel=0.10)
+        # RI (02/10/2026) + LOM (25/10/2026, 465 ligações em 339 dispositivos)
+        assert len(units) == pytest.approx(588, rel=0.10) and len(normas) == pytest.approx(866, rel=0.10)
         assert all(any(r.hyperlink_url for r in p.runs) for p in normas)
         # a do exemplo do usuário
         a105 = next(e for e in resolved_doc.elements if isinstance(e, ArticleBlock)

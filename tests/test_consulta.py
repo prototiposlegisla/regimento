@@ -33,8 +33,10 @@ class TestArtigos:
         assert parse_arts("103 I o · 368") == [("RI", "103", "I,o"), ("RI", "368", "")]
         assert parse_arts("63 §4º") == [("RI", "63", "§ 4º")]
         assert parse_arts("177 §ún") == [("RI", "177", "§ú")]
-        # a norma vale até a próxima
+        # a norma vale entre vírgulas; depois de '·', volta ao RI
         assert parse_arts("LOM 48, 62 · RI 28") == [("LOM", "48", ""), ("LOM", "62", ""), ("RI", "28", "")]
+        assert parse_arts("LOM 22 · 117") == [("LOM", "22", ""), ("RI", "117", "")]
+        assert parse_arts("184 · PREC 2/2001") == [("RI", "184", ""), ("PREC", "2/2001", "")]
 
     def test_intervalos(self):
         assert parse_arts("10–11") == [("RI", "10", ""), ("RI", "11", "")]
@@ -59,6 +61,9 @@ class TestDestaque:
         ("admissão 3/5 (33) + perda 2/3 (37)", ("33 + 37", "admissão 3/5 + perda 2/3")),
         ("1h45", ("1h45", "")),
         ("quinzenal", ("quinzenal", "")),
+        ("5% eleitorado", ("5%", "eleitorado")),
+        ("maioria dos membros", ("maioria", "dos membros")),
+        ("> 30 d", ("> 30", "dias")),
     ])
     def test_valor(self, valor, esperado):
         assert destaque(valor) == esperado

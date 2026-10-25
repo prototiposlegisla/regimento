@@ -50,16 +50,28 @@ _LEI = {"RI": "RI", "LOM": "LOM", "LO": "LOM", "CF": "CF"}
 # ── artigos ─────────────────────────────────────────────────────────────
 
 def parse_arts(texto: str) -> list[tuple[str, str, str]]:
-    """'103 I o · 368' → [(RI, 103, 'I,o'), (RI, 368, '')]; a norma vale até a próxima ('LOM 48, 62 · RI 28').
+    """'103 I o · 368' → [(RI, 103, 'I,o'), (RI, 368, '')].
 
-    Separadores: '·', ',', ';', '/'. Intervalo de artigos ('10–11', '32–34') vira cada artigo; de
-    dispositivos ('§1º-§2º', 'II-IV', 'g-h'), o primeiro. Para no que não reconhece ('mín. 2').
+    Separadores: '·' e ';' entre referências, cada uma do RI salvo prefixo ('LOM 22 · 117' = LOM 22 e
+    RI 117); ',' e '/' entre artigos da mesma norma ('LOM 48, 62 · RI 28'). Intervalo de artigos
+    ('10–11', '32–34') vira cada artigo; de dispositivos ('§1º-§2º', 'II-IV', 'g-h'), o primeiro.
+    Para no que não reconhece ('mín. 2').
     """
     refs: list[tuple[str, str, str]] = []
-    lei = "RI"
     texto = re.sub(r"\(revog[^)]*\)", "", texto)
     texto = re.sub(r"(§\s*\d+º?)\s*[-–]\s*§?\s*\d+º?", r"\1", texto)   # '§1º-§2º' → '§1º'
-    for grupo in re.split(r"\s*[·,;/]\s*", texto):
+    # precedente regimental, 'PREC 2/2001': a barra não separa; a norma não passa adiante
+    texto = re.sub(r"PREC\.?\s*(\d+)\s*/\s*(\d{4})", r"PREC \1_\2", texto, flags=re.I)
+    grupos = [(i == 0, g) for seg in re.split(r"\s*[·;]\s*", texto)
+              for i, g in enumerate(re.split(r"\s*[,/]\s*", seg))]
+    lei = "RI"
+    for novo, grupo in grupos:
+        if novo:
+            lei = "RI"
+        mp = re.fullmatch(r"PREC (\d+)_(\d{4})", grupo.strip(), re.I)
+        if mp:
+            refs.append(("PREC", f"{int(mp.group(1))}/{mp.group(2)}", ""))
+            continue
         toks = grupo.replace("§", " § ").replace(":", " ").split()
         if toks and toks[0].upper() in _LEI:
             lei = _LEI[toks.pop(0).upper()]
@@ -104,6 +116,8 @@ def parse_arts(texto: str) -> list[tuple[str, str, str]]:
 
 
 def _ref_label(lei: str, art: str, path: str) -> str:
+    if lei == "PREC":
+        return f"Precedente nº {art}"
     rot = art[3:] + " ADT" if art.startswith("ADT") else art
     p = path.replace("§ú", "parágrafo único").replace(",", ", ")
     return (f"{lei} " if lei != "RI" else "") + f"art. {rot}" + (f", {p}" if p else "")
@@ -112,12 +126,16 @@ def _ref_label(lei: str, art: str, path: str) -> str:
 # ── o número em destaque ────────────────────────────────────────────────
 
 def destaque(valor: str) -> tuple[str, str]:
-    """O que vai grande e o que vai embaixo: 'absoluta (28)' → ('28', 'absoluta'); '15 d' → ('15', 'dias')."""
+    """O que vai grande e o que vai embaixo: 'absoluta (28)' → ('28', 'absoluta'); '15 d' → ('15', 'dias');
+    '5% eleitorado' → ('5%', 'eleitorado'); 'maioria dos membros' → ('maioria', 'dos membros')."""
     valor = valor.strip()
     nums = re.findall(r"\((\d+)\)", valor)
     if nums:
         return " + ".join(nums), re.sub(r"\s+", " ", re.sub(r"\s*\(\d+\)", "", valor)).strip()
-    m = re.fullmatch(r"(\d[\d\s/–+:,-]*\d|\d)(?:\s+(\D.*))?", valor)
+    m = re.fullmatch(r"(maioria)\s+(.+)", valor) or re.fullmatch(r"(\d+(?:,\d+)?%)\s*(.*)", valor)
+    if m:
+        return m.group(1), m.group(2)
+    m = re.fullmatch(r"((?:[<>≥≤]\s*)?\d[\d\s/–+:,-]*\d|(?:[<>≥≤]\s*)?\d)(?:\s+(\D.*))?", valor)
     if not m:
         return valor, ""
     n, resto = m.group(1), m.group(2) or ""
@@ -160,7 +178,7 @@ def _norm(s: str) -> str:
 
 
 def numero_no_texto(n: int, texto: str) -> bool:
-    if re.search(rf"(?<![\d.,]){n}(?![\d])", texto):
+    if re.search(rf"(?<![\d.,])0*{n}(?![\d])", texto):   # "05 dias"
         return True
     return any(re.search(rf"\b{f}\b", texto) for f in extenso(n))
 
@@ -300,10 +318,12 @@ def conferir(secoes: list[dict], doc, avisos: list) -> None:
                 bruto += " " + item.get("obs", "")
             # o nome da maioria ("especial") basta; sem nome, a fração ("1/3", "um terço", "terça parte")
             nomes = [w for w in ("absoluta", "simples", "especial", "qualificada") if w in _norm(bruto)]
-            faltam = [f"maioria {w}" for w in nomes if f"maioria {w}" not in texto]
+            fracoes = re.findall(r"\d+/\d+", bruto)
+            tem_fracao = [f for f in fracoes if f in texto or any(x in texto for x in FRACOES.get(f, ()))]
+            # a LOM escreve "3/5 dos membros" onde o RI diz "maioria especial": um ou outro basta
+            faltam = [] if nomes and tem_fracao else [f"maioria {w}" for w in nomes if f"maioria {w}" not in texto]
             if not nomes:
-                faltam += [f for f in re.findall(r"\d+/\d+", bruto)
-                           if f not in texto and not any(x in texto for x in FRACOES.get(f, ()))]
+                faltam += [f for f in fracoes if f not in tem_fracao]
             if sec["key"] not in CONFERE_QUORUM:
                 sem_fracao = re.sub(r"\d+/\d+", " ", bruto)
                 faltam += [str(n) for n in dict.fromkeys(int(x) for x in re.findall(r"\d+", sem_fracao))

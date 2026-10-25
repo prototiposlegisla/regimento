@@ -1,3 +1,3 @@
 @echo off
-python "C:\Users\kauen\Documents\ferramentas\legislasampa\regimento\build.py" --push
+python "%~dp0build.py" --push
 pause

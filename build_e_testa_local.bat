@@ -13,7 +13,9 @@ rem   build_e_testa_local.bat comparar   abre tambem a versao publicada
 rem                                      (docs\index.html) para comparar
 rem ============================================================================
 
-set "REGIMENTO=C:\Users\kauen\Documents\ferramentas\legislasampa\regimento"
+rem pasta deste .bat, sem a barra final
+set "REGIMENTO=%~dp0"
+set "REGIMENTO=%REGIMENTO:~0,-1%"
 set "SAIDA=%REGIMENTO%\dist\teste\index.html"
 set "PYTHONIOENCODING=utf-8"
 

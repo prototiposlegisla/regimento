@@ -2,10 +2,11 @@
 # config.local.toml é gitignored — não será versionado.
 
 [sources]
-docx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/regimentoInterno.docx"
-xlsx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/remissivo.xlsx"
-referencias = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/referencias.docx"
+docx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/regimentoInterno.docx"
+xlsx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/remissivo.xlsx"
+referencias = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/referencias.docx"
+informacoes = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/informacoes.docx"
 
 [output]
 private = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Regimento arquivo/index.html"
-chatbot = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Fontes/para o chatbot"
+chatbot = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/para o chatbot"

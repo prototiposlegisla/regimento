@@ -1521,6 +1521,22 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 .rem-back::before { content: attr(data-label); }
 #cards-container.compact .rem-backlinks { display: none; }
+/* "No índice remissivo:" — the subjects that cite the article; labels via CSS */
+.idx-back, .idx-more {
+  display: inline-block;
+  max-width: 100%;
+  margin: 2px 0 2px 4px;
+  padding: 0 7px;
+  border-radius: 10px;
+  line-height: 1.6;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  background: #f6f2e8; color: #6e5a2b; border: 1px solid #e8dfc8;
+}
+.idx-back::before, .idx-more::before { content: attr(data-label); }
+.idx-more { background: none; border-style: dashed; }
+.idx-backlinks:not(.open) .idx-extra { display: none; }
 /* implicit: a badge at the end of the provision, on both sides; label via CSS */
 .rem-imp {
   display: inline-block;
@@ -17953,7 +17969,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     "subject": "CASSAÇÃO DE MANDATO DE PREFEITO",
     "children": [
       {
-        "sub_subject": "Admissão da acusação: quórum de 3/5 e Comissão Processante",
+        "sub_subject": "Admissão da acusação: quorum de 3/5 e Comissão Processante",
         "refs": [
           {
             "art": "72",
@@ -18023,7 +18039,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
-        "sub_subject": "Julgamento: quórum de 2/3",
+        "sub_subject": "Julgamento: quorum de 2/3",
         "refs": [
           {
             "art": "72",
@@ -18362,6 +18378,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "63",
             "detail": ""
+          },
+          {
+            "art": "177",
+            "detail": "I"
+          },
+          {
+            "art": "79",
+            "detail": ""
           }
         ]
       },
@@ -18681,6 +18705,19 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "63",
             "detail": ""
+          },
+          {
+            "art": "47",
+            "detail": "II,a"
+          },
+          {
+            "art": "47",
+            "detail": "II,b"
+          },
+          {
+            "art": "138",
+            "detail": "§ 1º,II",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -20072,34 +20109,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     "refs": [
       {
         "art": "38",
-        "detail": "I"
+        "detail": "I",
+        "hint": "conceito e finalidade"
       },
       {
         "art": "39",
-        "detail": ""
-      },
-      {
-        "art": "40",
-        "detail": ""
-      },
-      {
-        "art": "41",
-        "detail": ""
-      },
-      {
-        "art": "42",
-        "detail": ""
-      },
-      {
-        "art": "43",
-        "detail": ""
-      },
-      {
-        "art": "44",
-        "detail": ""
-      },
-      {
-        "art": "45",
         "detail": ""
       },
       {
@@ -20108,170 +20122,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       },
       {
         "art": "47",
-        "detail": ""
-      },
-      {
-        "art": "48",
-        "detail": ""
-      },
-      {
-        "art": "49",
-        "detail": ""
-      },
-      {
-        "art": "50",
-        "detail": ""
-      },
-      {
-        "art": "51",
-        "detail": ""
-      },
-      {
-        "art": "52",
-        "detail": ""
-      },
-      {
-        "art": "53",
-        "detail": ""
-      },
-      {
-        "art": "54",
-        "detail": ""
-      },
-      {
-        "art": "55",
-        "detail": ""
-      },
-      {
-        "art": "56",
-        "detail": ""
-      },
-      {
-        "art": "57",
-        "detail": ""
-      },
-      {
-        "art": "58",
-        "detail": ""
-      },
-      {
-        "art": "59",
-        "detail": ""
-      },
-      {
-        "art": "60",
-        "detail": ""
-      },
-      {
-        "art": "61",
-        "detail": ""
-      },
-      {
-        "art": "62",
-        "detail": ""
-      },
-      {
-        "art": "63",
-        "detail": ""
-      },
-      {
-        "art": "64",
-        "detail": ""
-      },
-      {
-        "art": "65",
-        "detail": ""
-      },
-      {
-        "art": "66",
-        "detail": ""
-      },
-      {
-        "art": "67",
-        "detail": ""
-      },
-      {
-        "art": "68",
-        "detail": ""
-      },
-      {
-        "art": "69",
-        "detail": ""
-      },
-      {
-        "art": "70",
-        "detail": ""
-      },
-      {
-        "art": "71",
-        "detail": ""
-      },
-      {
-        "art": "72",
-        "detail": ""
-      },
-      {
-        "art": "73",
-        "detail": ""
-      },
-      {
-        "art": "74",
-        "detail": ""
-      },
-      {
-        "art": "75",
-        "detail": ""
-      },
-      {
-        "art": "76",
-        "detail": ""
-      },
-      {
-        "art": "77",
-        "detail": ""
-      },
-      {
-        "art": "78",
-        "detail": ""
-      },
-      {
-        "art": "79",
-        "detail": ""
-      },
-      {
-        "art": "80",
-        "detail": ""
-      },
-      {
-        "art": "81",
-        "detail": ""
-      },
-      {
-        "art": "82",
-        "detail": ""
-      },
-      {
-        "art": "83",
-        "detail": ""
-      },
-      {
-        "art": "84",
-        "detail": ""
-      },
-      {
-        "art": "85",
-        "detail": ""
-      },
-      {
-        "art": "86",
-        "detail": ""
-      },
-      {
-        "art": "87",
-        "detail": ""
-      },
-      {
-        "art": "88",
         "detail": ""
       }
     ],
@@ -20535,6 +20385,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "62",
             "detail": "§ú"
+          },
+          {
+            "art": "56",
+            "detail": "",
+            "hint": "relatório da subcomissão"
           }
         ]
       },
@@ -20635,7 +20490,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       },
       {
         "sub_subject": "Deliberação conclusiva",
-        "refs": [],
+        "refs": [
+          {
+            "art": "81",
+            "detail": "",
+            "hint": "cabimento e projetos excluídos"
+          },
+          {
+            "art": "82",
+            "detail": "",
+            "hint": "recurso de 1/10 ao Plenário"
+          },
+          {
+            "art": "83",
+            "detail": "",
+            "hint": "pareceres divergentes: plenária conjunta"
+          },
+          {
+            "art": "84",
+            "detail": "",
+            "hint": "quando se considera aprovada e vai à sanção"
+          }
+        ],
         "vides": [
           "DELIBERAÇÃO CONCLUSIVA"
         ]
@@ -20684,6 +20560,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "84",
             "detail": "I"
+          },
+          {
+            "art": "84",
+            "detail": ""
           }
         ]
       },
@@ -20936,23 +20816,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "46",
-            "detail": "I"
+            "detail": "I",
+            "hint": "estudar matérias e dar-lhes parecer"
           },
           {
             "art": "47",
-            "detail": "I,a"
+            "detail": "I,a",
+            "hint": "parecer obrigatório da CCJ sobre constitucionalidade"
           },
           {
             "art": "50",
-            "detail": "VI"
+            "detail": "VI",
+            "hint": "distribuição aos relatores por rodízio"
           },
           {
             "art": "50",
-            "detail": "XI"
+            "detail": "XI",
+            "hint": "assinatura dos pareceres pelo Presidente"
           },
           {
             "art": "63",
-            "detail": ""
+            "detail": "",
+            "hint": "prazo de 15 dias, prorrogável por 8"
           },
           {
             "art": "64",
@@ -20960,15 +20845,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "65",
-            "detail": ""
+            "detail": "",
+            "hint": "outro processo requisitado: prazo suspenso até 5 dias úteis"
           },
           {
             "art": "66",
-            "detail": ""
+            "detail": "",
+            "hint": "audiência pública: prazo sobrestado por 30 dias úteis"
           },
           {
             "art": "67",
-            "detail": ""
+            "detail": "",
+            "hint": "prazos vencidos: pode ir à Ordem do Dia sem parecer"
           },
           {
             "art": "68",
@@ -20980,11 +20868,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "70",
-            "detail": ""
+            "detail": "",
+            "hint": "ordem: CCJ primeiro, Finanças por último"
           },
           {
             "art": "71",
-            "detail": ""
+            "detail": "",
+            "hint": "parecer conjunto em reunião conjunta"
           },
           {
             "art": "72",
@@ -21024,15 +20914,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "171",
-            "detail": "§ 3º"
+            "detail": "§ 3º",
+            "hint": "pauta só com proposições com parecer"
           },
           {
             "art": "173",
-            "detail": "§ 4º"
+            "detail": "§ 4º",
+            "hint": "discussão e votação só após parecer"
           },
           {
             "art": "173",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "urgência: parecer até a sessão seguinte"
+          },
+          {
+            "art": "62",
+            "detail": "",
+            "hint": "deliberação por maioria dos votos"
           }
         ]
       },
@@ -21131,6 +21029,15 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "50",
             "detail": "XV"
+          },
+          {
+            "art": "51",
+            "detail": ""
+          },
+          {
+            "art": "1/2015",
+            "detail": "",
+            "law_prefix": "PREC"
           }
         ]
       },
@@ -21398,7 +21305,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
-        "sub_subject": "Reunião conjunta: quórum e deliberação",
+        "sub_subject": "Reunião conjunta: quorum e deliberação",
         "refs": [
           {
             "art": "1/2001",
@@ -22266,6 +22173,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "230",
             "detail": "",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "7",
+            "detail": "",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -22333,42 +22245,17 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "law_prefix": "LOM"
           },
           {
-            "art": "194",
-            "detail": "caput",
-            "law_prefix": "LOM"
-          },
-          {
-            "art": "194",
-            "detail": "I",
-            "law_prefix": "LOM"
-          },
-          {
-            "art": "194",
-            "detail": "II",
-            "law_prefix": "LOM"
-          },
-          {
-            "art": "194",
-            "detail": "III",
-            "law_prefix": "LOM"
-          },
-          {
-            "art": "194",
-            "detail": "IV",
-            "law_prefix": "LOM"
-          },
-          {
-            "art": "194",
-            "detail": "V",
-            "law_prefix": "LOM"
-          },
-          {
             "art": "197",
             "detail": "",
             "law_prefix": "LOM"
           },
           {
             "art": "ADT2",
+            "detail": "",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "194",
             "detail": "",
             "law_prefix": "LOM"
           }
@@ -22923,7 +22810,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
-        "sub_subject": "Lei: iniciativa da Câmara e quórum",
+        "sub_subject": "Lei: iniciativa da Câmara e quorum",
         "refs": [
           {
             "art": "37",
@@ -23225,7 +23112,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "28",
-            "detail": "II"
+            "detail": ""
           },
           {
             "art": "105",
@@ -23234,6 +23121,32 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "295",
             "detail": "§ú,II"
+          },
+          {
+            "art": "29",
+            "detail": ""
+          },
+          {
+            "art": "386",
+            "detail": ""
+          },
+          {
+            "art": "387",
+            "detail": ""
+          },
+          {
+            "art": "388",
+            "detail": ""
+          },
+          {
+            "art": "14",
+            "detail": "XII",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "48",
+            "detail": "§ 6º",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -25008,6 +24921,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "236",
             "detail": ""
+          },
+          {
+            "art": "358",
+            "detail": "§ 1º"
           }
         ]
       },
@@ -25277,6 +25194,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "32",
             "detail": "§ 2º,VII",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "75",
+            "detail": "§ 5º"
+          },
+          {
+            "art": "84",
+            "detail": "I"
           }
         ]
       },
@@ -25796,6 +25721,19 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "295",
             "detail": "§ú,I"
+          },
+          {
+            "art": "103",
+            "detail": "III,b"
+          },
+          {
+            "art": "237",
+            "detail": "§ú,III"
+          },
+          {
+            "art": "40",
+            "detail": "§ 5º,II",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -26240,63 +26178,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       {
         "art": "276",
         "detail": ""
-      },
-      {
-        "art": "277",
-        "detail": ""
-      },
-      {
-        "art": "278",
-        "detail": ""
-      },
-      {
-        "art": "279",
-        "detail": ""
-      },
-      {
-        "art": "280",
-        "detail": ""
-      },
-      {
-        "art": "281",
-        "detail": ""
-      },
-      {
-        "art": "282",
-        "detail": ""
-      },
-      {
-        "art": "283",
-        "detail": ""
-      },
-      {
-        "art": "284",
-        "detail": ""
-      },
-      {
-        "art": "285",
-        "detail": ""
-      },
-      {
-        "art": "286",
-        "detail": ""
-      },
-      {
-        "art": "40",
-        "detail": "§ 2º",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "247",
-        "detail": "§ 2º"
-      },
-      {
-        "art": "17",
-        "detail": "I,h"
-      },
-      {
-        "art": "140",
-        "detail": "V"
       }
     ],
     "children": [
@@ -26343,6 +26224,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "282",
             "detail": ""
+          },
+          {
+            "art": "283",
+            "detail": ""
           }
         ]
       },
@@ -26356,6 +26241,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "231",
             "detail": ""
+          },
+          {
+            "art": "164",
+            "detail": "IV"
+          },
+          {
+            "art": "164",
+            "detail": "§ 2º"
+          },
+          {
+            "art": "306",
+            "detail": "V,i"
           }
         ]
       },
@@ -26369,6 +26266,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "262",
             "detail": ""
+          },
+          {
+            "art": "306",
+            "detail": "V,b"
+          },
+          {
+            "art": "306",
+            "detail": "V,e"
           }
         ]
       },
@@ -26416,6 +26321,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "227",
             "detail": ""
+          },
+          {
+            "art": "169",
+            "detail": ""
+          },
+          {
+            "art": "306",
+            "detail": "V,j"
           }
         ]
       },
@@ -26544,6 +26457,25 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "37",
             "detail": "§ú"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Interrupção do orador",
+        "refs": [
+          {
+            "art": "281",
+            "detail": ""
+          },
+          {
+            "art": "17",
+            "detail": "I,h",
+            "hint": "orador que se desvia da questão"
+          },
+          {
+            "art": "140",
+            "detail": "V",
+            "hint": "só por aparte se interrompe o orador"
           }
         ]
       },
@@ -26819,6 +26751,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "37",
             "detail": ""
+          },
+          {
+            "art": "279",
+            "detail": "",
+            "hint": "autor e relatores: mais 15 min, a pedido de 1/3"
           }
         ]
       },
@@ -27697,7 +27634,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
-        "sub_subject": "Falta de quórum: sessões sucessivas",
+        "sub_subject": "Falta de quorum: sessões sucessivas",
         "refs": [
           {
             "art": "4",
@@ -28159,6 +28096,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "340",
+            "detail": ""
+          },
+          {
+            "art": "272",
             "detail": ""
           }
         ]
@@ -30747,22 +30688,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     "subject": "INICIATIVA POPULAR",
     "refs": [
       {
-        "art": "233",
-        "detail": "§ 2º"
-      },
-      {
-        "art": "234",
-        "detail": "§ 1º,V"
-      },
-      {
-        "art": "234",
-        "detail": "§ 2º"
-      },
-      {
-        "art": "315",
-        "detail": ""
-      },
-      {
         "art": "316",
         "detail": ""
       },
@@ -30771,62 +30696,15 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "detail": ""
       },
       {
-        "art": "318",
-        "detail": ""
-      },
-      {
-        "art": "319",
-        "detail": ""
-      },
-      {
-        "art": "320",
-        "detail": ""
-      },
-      {
-        "art": "321",
-        "detail": ""
-      },
-      {
-        "art": "322",
-        "detail": ""
-      },
-      {
-        "art": "323",
-        "detail": ""
-      },
-      {
         "art": "44",
         "detail": "",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "44",
-        "detail": "§ 1º",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "44",
-        "detail": "I",
         "law_prefix": "LOM"
       },
       {
         "art": "5",
         "detail": "§ 1º,II",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "85",
-        "detail": "IV"
-      },
-      {
-        "art": "37",
-        "detail": "",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "36",
-        "detail": "III",
-        "law_prefix": "LOM"
+        "law_prefix": "LOM",
+        "hint": "forma de exercício do poder pelo povo"
       }
     ],
     "children": [
@@ -30836,6 +30714,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "320",
             "detail": "§ 1º"
+          },
+          {
+            "art": "85",
+            "detail": "IV",
+            "hint": "obrigatória, para defesa oral da propositura"
           }
         ]
       },
@@ -31112,6 +30995,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "44",
             "detail": "§ 1º",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "315",
+            "detail": ""
           }
         ]
       },
@@ -31658,6 +31545,32 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "368",
             "detail": "§ 1º"
+          },
+          {
+            "art": "257",
+            "detail": ""
+          },
+          {
+            "art": "261",
+            "detail": "§ 1º"
+          },
+          {
+            "art": "268",
+            "detail": ""
+          },
+          {
+            "art": "360",
+            "detail": ""
+          },
+          {
+            "art": "42",
+            "detail": "caput",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "42",
+            "detail": "§ 6º",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -32415,15 +32328,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "102",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "conceito: mais da metade dos membros"
           },
           {
             "art": "102",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "presença para qualquer deliberação do Plenário"
           },
           {
             "art": "103",
-            "detail": "I"
+            "detail": "I",
+            "hint": "rol de matérias do Regimento"
           },
           {
             "art": "247",
@@ -32431,7 +32347,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "324",
-            "detail": "II"
+            "detail": "II",
+            "hint": "convocação no recesso pelos Vereadores"
           },
           {
             "art": "368",
@@ -32439,79 +32356,96 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "393",
-            "detail": "§ú"
+            "detail": "§ú",
+            "hint": "aprovação da reforma do Regimento"
           },
           {
             "art": "40",
             "detail": "caput",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "presença para votar a Ordem do Dia"
           },
           {
             "art": "40",
             "detail": "§ 3º",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "rol de matérias da Lei Orgânica"
           },
           {
             "art": "42",
             "detail": "§ 5º",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "rejeição de veto"
           },
           {
             "art": "163",
-            "detail": ""
+            "detail": "",
+            "hint": "presença para deliberar no Prolongamento"
           },
           {
             "art": "31",
             "detail": "II",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "convocação no recesso pelos Vereadores"
           },
           {
             "art": "86",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "criação ou extinção de empresas e autarquias"
           },
           {
             "art": "ADT26",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "lei sobre benefícios do RPPS"
           },
           {
             "art": "4",
-            "detail": ""
+            "detail": "",
+            "hint": "presença para eleger a Mesa na instalação"
           },
           {
             "art": "10",
-            "detail": ""
+            "detail": "",
+            "hint": "eleição da Mesa em primeiro escrutínio"
           },
           {
             "art": "32",
-            "detail": ""
+            "detail": "",
+            "hint": "representação para destituir membro da Mesa"
           },
           {
             "art": "24",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "presença para eleição da Mesa"
           },
           {
             "art": "1",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "referendo de reunião fora da sede"
           },
           {
             "art": "183",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "requerimento para sustar a sessão ordinária"
           },
           {
             "art": "202",
-            "detail": ""
+            "detail": "",
+            "hint": "requerimento de sessão permanente"
           },
           {
             "art": "215",
-            "detail": ""
+            "detail": "",
+            "hint": "reapresentação de projeto rejeitado"
           },
           {
             "art": "28",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "reapresentação de projeto rejeitado"
           }
         ]
       },
@@ -33147,6 +33081,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "312",
             "detail": "§ 4º"
+          },
+          {
+            "art": "295",
+            "detail": "§ú,I"
+          },
+          {
+            "art": "306",
+            "detail": "V,g"
           }
         ]
       },
@@ -33420,127 +33362,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "detail": ""
       },
       {
-        "art": "7",
-        "detail": ""
-      },
-      {
         "art": "8",
         "detail": ""
       },
       {
-        "art": "9",
-        "detail": ""
-      },
-      {
-        "art": "10",
-        "detail": ""
-      },
-      {
-        "art": "11",
-        "detail": ""
-      },
-      {
-        "art": "12",
-        "detail": ""
-      },
-      {
         "art": "13",
-        "detail": ""
-      },
-      {
-        "art": "14",
-        "detail": ""
-      },
-      {
-        "art": "15",
-        "detail": ""
-      },
-      {
-        "art": "16",
-        "detail": ""
-      },
-      {
-        "art": "17",
-        "detail": ""
-      },
-      {
-        "art": "18",
-        "detail": ""
-      },
-      {
-        "art": "19",
-        "detail": ""
-      },
-      {
-        "art": "20",
-        "detail": ""
-      },
-      {
-        "art": "21",
-        "detail": ""
-      },
-      {
-        "art": "22",
-        "detail": ""
-      },
-      {
-        "art": "23",
-        "detail": ""
-      },
-      {
-        "art": "24",
-        "detail": ""
-      },
-      {
-        "art": "25",
-        "detail": ""
-      },
-      {
-        "art": "26",
-        "detail": ""
-      },
-      {
-        "art": "27",
-        "detail": ""
-      },
-      {
-        "art": "28",
-        "detail": ""
-      },
-      {
-        "art": "29",
-        "detail": ""
-      },
-      {
-        "art": "30",
-        "detail": ""
-      },
-      {
-        "art": "31",
-        "detail": ""
-      },
-      {
-        "art": "32",
-        "detail": ""
-      },
-      {
-        "art": "33",
-        "detail": ""
-      },
-      {
-        "art": "34",
-        "detail": ""
-      },
-      {
-        "art": "35",
-        "detail": ""
-      },
-      {
-        "art": "36",
-        "detail": ""
-      },
-      {
-        "art": "37",
         "detail": ""
       }
     ],
@@ -33978,6 +33804,43 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Presidente",
+        "refs": [
+          {
+            "art": "16",
+            "detail": ""
+          },
+          {
+            "art": "17",
+            "detail": ""
+          },
+          {
+            "art": "18",
+            "detail": ""
+          },
+          {
+            "art": "19",
+            "detail": ""
+          },
+          {
+            "art": "20",
+            "detail": ""
+          },
+          {
+            "art": "21",
+            "detail": ""
+          },
+          {
+            "art": "22",
+            "detail": ""
+          },
+          {
+            "art": "23",
+            "detail": ""
+          }
+        ]
+      },
+      {
         "sub_subject": "Promulgação",
         "refs": [
           {
@@ -34061,6 +33924,15 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Secretários",
+        "refs": [
+          {
+            "art": "26",
+            "detail": ""
+          }
+        ]
+      },
+      {
         "sub_subject": "Suplentes",
         "refs": [
           {
@@ -34097,6 +33969,19 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "4/1993",
             "detail": "",
             "law_prefix": "PREC"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Vice-Presidentes",
+        "refs": [
+          {
+            "art": "24",
+            "detail": ""
+          },
+          {
+            "art": "25",
+            "detail": ""
           }
         ]
       }
@@ -34604,6 +34489,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "230",
             "detail": "",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "81",
+            "detail": "§ 2º",
             "law_prefix": "LOM"
           }
         ]
@@ -35445,74 +35335,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   {
     "subject": "ORÇAMENTO",
     "refs": [
-      {
-        "art": "329",
-        "detail": ""
-      },
-      {
-        "art": "330",
-        "detail": ""
-      },
-      {
-        "art": "331",
-        "detail": ""
-      },
-      {
-        "art": "332",
-        "detail": ""
-      },
-      {
-        "art": "333",
-        "detail": ""
-      },
-      {
-        "art": "334",
-        "detail": ""
-      },
-      {
-        "art": "335",
-        "detail": ""
-      },
-      {
-        "art": "336",
-        "detail": ""
-      },
-      {
-        "art": "337",
-        "detail": ""
-      },
-      {
-        "art": "338",
-        "detail": ""
-      },
-      {
-        "art": "339",
-        "detail": ""
-      },
-      {
-        "art": "340",
-        "detail": ""
-      },
-      {
-        "art": "341",
-        "detail": ""
-      },
-      {
-        "art": "342",
-        "detail": ""
-      },
-      {
-        "art": "343",
-        "detail": ""
-      },
-      {
-        "art": "344",
-        "detail": ""
-      },
-      {
-        "art": "345",
-        "detail": ""
-      },
       {
         "art": "346",
         "detail": ""
@@ -36701,7 +36523,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "177",
-            "detail": ""
+            "detail": "I"
           },
           {
             "art": "312",
@@ -36729,6 +36551,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "67",
+            "detail": ""
+          },
+          {
+            "art": "63",
             "detail": ""
           }
         ]
@@ -36795,6 +36621,22 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "138",
             "detail": "§ 1º,II",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "338",
+            "detail": "§ú"
+          },
+          {
+            "art": "338",
+            "detail": "§ú,I"
+          },
+          {
+            "art": "47",
+            "detail": "II"
+          },
+          {
+            "art": "63",
+            "detail": ""
           }
         ]
       },
@@ -36882,23 +36724,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "46",
-            "detail": "I"
+            "detail": "I",
+            "hint": "competência para estudar e opinar"
           },
           {
             "art": "47",
-            "detail": "I,a"
+            "detail": "I,a",
+            "hint": "CCJ: parecer obrigatório de constitucionalidade"
           },
           {
             "art": "50",
-            "detail": "VI"
+            "detail": "VI",
+            "hint": "distribuição aos relatores por rodízio"
           },
           {
             "art": "50",
-            "detail": "XI"
+            "detail": "XI",
+            "hint": "assinatura do parecer pelo Presidente"
           },
           {
             "art": "62",
-            "detail": ""
+            "detail": "",
+            "hint": "deliberação por maioria dos votos"
           },
           {
             "art": "63",
@@ -36930,11 +36777,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "70",
-            "detail": ""
+            "detail": "",
+            "hint": "ordem: CCJ primeiro, Finanças por último"
           },
           {
             "art": "71",
-            "detail": ""
+            "detail": "",
+            "hint": "parecer conjunto em reunião conjunta"
           },
           {
             "art": "72",
@@ -36946,7 +36795,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "75",
-            "detail": ""
+            "detail": "",
+            "hint": "manifestação dos membros: 5 min"
           },
           {
             "art": "76",
@@ -36974,15 +36824,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "171",
-            "detail": "§ 3º"
+            "detail": "§ 3º",
+            "hint": "pauta só com proposições com parecer"
           },
           {
             "art": "173",
-            "detail": "§ 4º"
+            "detail": "§ 4º",
+            "hint": "urgência: votação exige prévio parecer"
           },
           {
             "art": "173",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "urgência: parecer até a sessão seguinte"
           }
         ]
       },
@@ -37206,88 +37059,109 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "63",
-            "detail": ""
+            "detail": "",
+            "hint": "regra geral: 15 dias, prorrogáveis por 8"
           },
           {
             "art": "64",
-            "detail": ""
+            "detail": "",
+            "hint": "devolução com ou sem parecer"
           },
           {
             "art": "65",
-            "detail": ""
+            "detail": "",
+            "hint": "outro processo requisitado: até 5 dias úteis"
           },
           {
             "art": "66",
-            "detail": ""
+            "detail": "",
+            "hint": "audiências públicas: sobrestamento por 30 dias úteis"
           },
           {
             "art": "67",
-            "detail": ""
+            "detail": "",
+            "hint": "inclusão na Ordem do Dia sem parecer"
           },
           {
             "art": "270",
-            "detail": ""
+            "detail": "",
+            "hint": "substitutivo de Plenário: 48 horas"
           },
           {
             "art": "321",
-            "detail": ""
+            "detail": "",
+            "hint": "propositura popular: 7 dias após audiência"
           },
           {
             "art": "338",
-            "detail": ""
+            "detail": "",
+            "hint": "emendas orçamentárias: mesmos prazos do art. 63"
           },
           {
             "art": "363",
-            "detail": ""
+            "detail": "",
+            "hint": "veto: 10 dias por Comissão"
           },
           {
             "art": "364",
-            "detail": ""
+            "detail": "",
+            "hint": "veto com vários aspectos: 15 dias"
           },
           {
             "art": "68",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "suspensão por pedido de informações"
           },
           {
             "art": "32",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "Processante na destituição da Mesa: 20 dias"
           },
           {
             "art": "34",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "CCJ na destituição da Mesa: 3 dias"
           },
           {
             "art": "73",
-            "detail": ""
+            "detail": "",
+            "hint": "inaplicáveis à propositura popular"
           },
           {
             "art": "173",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "urgência: até a sessão ordinária seguinte"
           },
           {
             "art": "312",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "CCJ, recurso contra o Presidente: 2 dias úteis"
           },
           {
             "art": "355",
-            "detail": ""
+            "detail": "",
+            "hint": "CCJ na indicação ao TCM: 5 dias úteis"
           },
           {
             "art": "390",
-            "detail": "§ 3º"
+            "detail": "§ 3º",
+            "hint": "denúncia contra o Prefeito: 10 dias"
           },
           {
             "art": "253",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "redação do vencido: 5 dias"
           },
           {
             "art": "258",
-            "detail": ""
+            "detail": "",
+            "hint": "redação final com emendas: 5 dias"
           },
           {
             "art": "41",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "audiências que sobrestam o prazo"
           }
         ]
       },
@@ -37526,11 +37400,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "262",
             "detail": ""
-          },
-          {
-            "art": "26",
-            "detail": "§ú",
-            "law_prefix": "LOM"
           }
         ]
       }
@@ -37946,6 +37815,19 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "183-A",
             "detail": "§ 2º"
+          },
+          {
+            "art": "183-A",
+            "detail": "§ 5º"
+          },
+          {
+            "art": "ADT4-D",
+            "detail": ""
+          },
+          {
+            "art": "1/2020",
+            "detail": "",
+            "law_prefix": "PREC"
           }
         ]
       },
@@ -37985,6 +37867,36 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "167",
             "detail": "§ 3º"
+          },
+          {
+            "art": "17",
+            "detail": "I,q"
+          },
+          {
+            "art": "170",
+            "detail": "",
+            "hint": "início da Ordem do Dia: 1h45"
+          },
+          {
+            "art": "174",
+            "detail": ""
+          },
+          {
+            "art": "175",
+            "detail": ""
+          },
+          {
+            "art": "176",
+            "detail": ""
+          },
+          {
+            "art": "177",
+            "detail": ""
+          },
+          {
+            "art": "178",
+            "detail": "",
+            "hint": "pauta esgotada: encerramento dos trabalhos"
           }
         ]
       },
@@ -39258,6 +39170,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "40",
             "detail": "§ 1º",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "183-A",
+            "detail": "§ 6º"
           }
         ]
       },
@@ -39343,6 +39259,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "ADT4",
+            "detail": "",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "ADT5",
             "detail": "",
             "law_prefix": "LOM"
           }
@@ -39470,6 +39391,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "ADT2",
             "detail": "",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "151",
+            "detail": "§ 1º,III",
             "law_prefix": "LOM"
           }
         ]
@@ -39790,6 +39716,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "15",
             "detail": "§ 2º",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "172",
+            "detail": "II"
+          },
+          {
+            "art": "3",
+            "detail": ""
           }
         ]
       },
@@ -42390,11 +42324,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "50",
-            "detail": "XIX"
+            "detail": "XIX",
+            "hint": "fiscalização pelo Presidente da Comissão"
           },
           {
             "art": "63",
-            "detail": ""
+            "detail": "",
+            "hint": "parecer de Comissão: 15 dias, prorrogáveis por 8"
           },
           {
             "art": "64",
@@ -42402,11 +42338,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "65",
-            "detail": ""
+            "detail": "",
+            "hint": "suspensão por 5 dias úteis: requisição de processo"
           },
           {
             "art": "66",
-            "detail": ""
+            "detail": "",
+            "hint": "sobrestamento por 30 dias úteis: audiências públicas"
           },
           {
             "art": "67",
@@ -42414,24 +42352,29 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "68",
-            "detail": ""
+            "detail": "",
+            "hint": "pedido de informações suspende o prazo de parecer"
           },
           {
             "art": "82",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "informações ao Legislativo: 30 dias"
           },
           {
             "art": "338",
-            "detail": ""
+            "detail": "",
+            "hint": "emendas ao orçamento: prazos do art. 63"
           },
           {
             "art": "32",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "destituição: Comissão Processante, 20 dias"
           },
           {
             "art": "34",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "parecer da CCJ na destituição: 3 dias"
           },
           {
             "art": "73",
@@ -42439,47 +42382,58 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "173",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "urgência aprovada: parecer até a sessão seguinte"
           },
           {
             "art": "270",
-            "detail": ""
+            "detail": "",
+            "hint": "substitutivo de Plenário: parecer em 48 horas"
           },
           {
             "art": "312",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "parecer da CCJ sobre recurso: 2 dias úteis"
           },
           {
             "art": "355",
-            "detail": ""
+            "detail": "",
+            "hint": "indicação ao TCM: CCJ em 5 dias úteis"
           },
           {
             "art": "363",
-            "detail": "§ú"
+            "detail": "§ú",
+            "hint": "parecer sobre veto: 10 dias"
           },
           {
             "art": "364",
-            "detail": ""
+            "detail": "",
+            "hint": "veto com aspectos múltiplos: 15 dias"
           },
           {
             "art": "390",
-            "detail": "§ 3º"
+            "detail": "§ 3º",
+            "hint": "denúncia contra o Prefeito: parecer em 10 dias"
           },
           {
             "art": "321",
-            "detail": ""
+            "detail": "",
+            "hint": "propositura popular: deliberação em 7 dias"
           },
           {
             "art": "253",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "redação do vencido na primeira discussão: 5 dias"
           },
           {
             "art": "258",
-            "detail": ""
+            "detail": "",
+            "hint": "redação do vencido na segunda discussão: 5 dias"
           },
           {
             "art": "129",
-            "detail": "§ 3º"
+            "detail": "§ 3º",
+            "hint": "cassação: arquivamento após 90 dias"
           }
         ]
       },
@@ -43471,7 +43425,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       },
       {
         "art": "235",
-        "detail": ""
+        "detail": "",
+        "hint": "iniciativa privativa do Prefeito"
       },
       {
         "art": "236",
@@ -43482,127 +43437,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "detail": ""
       },
       {
-        "art": "238",
-        "detail": ""
-      },
-      {
-        "art": "239",
-        "detail": ""
-      },
-      {
-        "art": "240",
-        "detail": ""
-      },
-      {
-        "art": "241",
-        "detail": ""
-      },
-      {
         "art": "242",
-        "detail": ""
-      },
-      {
-        "art": "243",
-        "detail": ""
-      },
-      {
-        "art": "244",
-        "detail": ""
-      },
-      {
-        "art": "245",
-        "detail": ""
-      },
-      {
-        "art": "246",
-        "detail": ""
-      },
-      {
-        "art": "247",
-        "detail": ""
-      },
-      {
-        "art": "248",
-        "detail": ""
-      },
-      {
-        "art": "249",
-        "detail": ""
-      },
-      {
-        "art": "250",
-        "detail": ""
-      },
-      {
-        "art": "251",
-        "detail": ""
-      },
-      {
-        "art": "252",
-        "detail": ""
-      },
-      {
-        "art": "253",
-        "detail": ""
-      },
-      {
-        "art": "254",
-        "detail": ""
-      },
-      {
-        "art": "255",
-        "detail": ""
-      },
-      {
-        "art": "256",
-        "detail": ""
-      },
-      {
-        "art": "257",
-        "detail": ""
-      },
-      {
-        "art": "258",
-        "detail": ""
-      },
-      {
-        "art": "259",
-        "detail": ""
-      },
-      {
-        "art": "260",
-        "detail": ""
-      },
-      {
-        "art": "261",
-        "detail": ""
-      },
-      {
-        "art": "262",
-        "detail": ""
-      },
-      {
-        "art": "263",
-        "detail": ""
-      },
-      {
-        "art": "264",
-        "detail": ""
-      },
-      {
-        "art": "265",
-        "detail": ""
-      },
-      {
-        "art": "266",
-        "detail": ""
-      },
-      {
-        "art": "267",
-        "detail": ""
-      },
-      {
-        "art": "268",
         "detail": ""
       }
     ],
@@ -44250,6 +44085,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "38",
             "detail": "",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "2/2002",
+            "detail": "",
+            "law_prefix": "PREC"
           }
         ]
       },
@@ -44402,6 +44242,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "358",
             "detail": "§ 1º"
+          },
+          {
+            "art": "236",
+            "detail": ""
           }
         ]
       },
@@ -44425,10 +44269,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "18",
             "detail": "VI"
-          },
-          {
-            "art": "234",
-            "detail": ""
           },
           {
             "art": "257",
@@ -44762,17 +44602,20 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "44",
             "detail": "",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "5% do eleitorado para projetos, 1% para plebiscito"
           },
           {
             "art": "44",
             "detail": "§ 1º",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "tramitação especial e urgente, defesa oral"
           },
           {
             "art": "5",
             "detail": "§ 1º,II",
-            "law_prefix": "LOM"
+            "law_prefix": "LOM",
+            "hint": "emenda à LOM e lei de interesse local"
           }
         ]
       },
@@ -45217,6 +45060,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "330",
             "detail": ""
+          },
+          {
+            "art": "171",
+            "detail": "§ 4º"
           }
         ]
       },
@@ -45432,6 +45279,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "275",
             "detail": "§ 4º"
+          },
+          {
+            "art": "223",
+            "detail": "XIII"
           }
         ]
       },
@@ -45830,6 +45681,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "314",
             "detail": ""
+          },
+          {
+            "art": "313",
+            "detail": "§ 3º"
           }
         ]
       },
@@ -46333,6 +46188,15 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "169",
             "detail": ""
+          },
+          {
+            "art": "26",
+            "detail": "I"
+          },
+          {
+            "art": "40",
+            "detail": "",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -48298,91 +48162,8 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     "subject": "SANÇÃO",
     "refs": [
       {
-        "art": "360",
-        "detail": ""
-      },
-      {
-        "art": "361",
-        "detail": ""
-      },
-      {
-        "art": "362",
-        "detail": ""
-      },
-      {
-        "art": "363",
-        "detail": ""
-      },
-      {
-        "art": "364",
-        "detail": ""
-      },
-      {
-        "art": "365",
-        "detail": ""
-      },
-      {
-        "art": "366",
-        "detail": ""
-      },
-      {
-        "art": "367",
-        "detail": ""
-      },
-      {
-        "art": "368",
-        "detail": ""
-      },
-      {
-        "art": "369",
-        "detail": ""
-      },
-      {
-        "art": "370",
-        "detail": ""
-      },
-      {
-        "art": "371",
-        "detail": "",
-        "hint": "revogado"
-      },
-      {
-        "art": "42",
-        "detail": "§ 1º",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "42",
-        "detail": "§ 1º-A",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "40",
-        "detail": "§ 3º,XIV",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "42",
-        "detail": "§ 5º",
-        "law_prefix": "LOM"
-      },
-      {
         "art": "42",
         "detail": "",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "69",
-        "detail": "III",
-        "law_prefix": "LOM"
-      },
-      {
-        "art": "18",
-        "detail": "VI"
-      },
-      {
-        "art": "42",
-        "detail": "§ 7º",
         "law_prefix": "LOM"
       }
     ],
@@ -48492,6 +48273,21 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Promulgação",
+        "refs": [
+          {
+            "art": "370",
+            "detail": "",
+            "hint": "emendas à LOM, decretos legislativos e resoluções"
+          },
+          {
+            "art": "371",
+            "detail": "",
+            "hint": "revogado — registro dos atos promulgados"
+          }
+        ]
+      },
+      {
         "sub_subject": "Tácita",
         "refs": [
           {
@@ -48515,6 +48311,70 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "18",
             "detail": "VI"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Veto",
+        "refs": [
+          {
+            "art": "361",
+            "detail": "",
+            "hint": "prazo de 15 dias úteis"
+          },
+          {
+            "art": "362",
+            "detail": "",
+            "hint": "deliberação em 30 dias"
+          },
+          {
+            "art": "363",
+            "detail": ""
+          },
+          {
+            "art": "364",
+            "detail": ""
+          },
+          {
+            "art": "365",
+            "detail": ""
+          },
+          {
+            "art": "366",
+            "detail": ""
+          },
+          {
+            "art": "367",
+            "detail": ""
+          },
+          {
+            "art": "368",
+            "detail": "",
+            "hint": "rejeição por maioria absoluta"
+          },
+          {
+            "art": "42",
+            "detail": "§ 1º",
+            "law_prefix": "LOM",
+            "hint": "15 dias úteis, motivos em 48 horas"
+          },
+          {
+            "art": "42",
+            "detail": "§ 1º-A",
+            "law_prefix": "LOM",
+            "hint": "veto parcial: texto integral do dispositivo"
+          },
+          {
+            "art": "40",
+            "detail": "§ 3º,XIV",
+            "law_prefix": "LOM",
+            "hint": "rejeição por maioria absoluta"
+          },
+          {
+            "art": "42",
+            "detail": "§ 5º",
+            "law_prefix": "LOM",
+            "hint": "turno único em 30 dias, maioria absoluta"
           }
         ]
       }
@@ -51159,320 +51019,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "detail": ""
       },
       {
-        "art": "133",
-        "detail": ""
-      },
-      {
-        "art": "134",
-        "detail": ""
-      },
-      {
-        "art": "135",
-        "detail": ""
-      },
-      {
-        "art": "136",
-        "detail": ""
-      },
-      {
-        "art": "137",
-        "detail": ""
-      },
-      {
-        "art": "138",
-        "detail": ""
-      },
-      {
-        "art": "139",
-        "detail": ""
-      },
-      {
-        "art": "140",
-        "detail": ""
-      },
-      {
-        "art": "141",
-        "detail": ""
-      },
-      {
-        "art": "142",
-        "detail": ""
-      },
-      {
-        "art": "143",
-        "detail": ""
-      },
-      {
-        "art": "144",
-        "detail": ""
-      },
-      {
-        "art": "145",
-        "detail": ""
-      },
-      {
-        "art": "146",
-        "detail": ""
-      },
-      {
-        "art": "147",
-        "detail": ""
-      },
-      {
-        "art": "148",
-        "detail": ""
-      },
-      {
-        "art": "149",
-        "detail": ""
-      },
-      {
-        "art": "150",
-        "detail": ""
-      },
-      {
-        "art": "151",
-        "detail": ""
-      },
-      {
-        "art": "152",
-        "detail": ""
-      },
-      {
         "art": "153",
-        "detail": ""
-      },
-      {
-        "art": "154",
-        "detail": ""
-      },
-      {
-        "art": "155",
-        "detail": ""
-      },
-      {
-        "art": "156",
-        "detail": ""
-      },
-      {
-        "art": "157",
-        "detail": ""
-      },
-      {
-        "art": "158",
-        "detail": ""
-      },
-      {
-        "art": "159",
-        "detail": ""
-      },
-      {
-        "art": "160",
-        "detail": ""
-      },
-      {
-        "art": "161",
-        "detail": ""
-      },
-      {
-        "art": "162",
-        "detail": "",
-        "hint": "revogado"
-      },
-      {
-        "art": "163",
-        "detail": ""
-      },
-      {
-        "art": "164",
-        "detail": ""
-      },
-      {
-        "art": "165",
-        "detail": ""
-      },
-      {
-        "art": "166",
-        "detail": ""
-      },
-      {
-        "art": "167",
-        "detail": ""
-      },
-      {
-        "art": "168",
-        "detail": ""
-      },
-      {
-        "art": "169",
-        "detail": ""
-      },
-      {
-        "art": "170",
-        "detail": ""
-      },
-      {
-        "art": "171",
-        "detail": ""
-      },
-      {
-        "art": "172",
-        "detail": ""
-      },
-      {
-        "art": "173",
-        "detail": ""
-      },
-      {
-        "art": "174",
-        "detail": ""
-      },
-      {
-        "art": "175",
-        "detail": ""
-      },
-      {
-        "art": "176",
-        "detail": ""
-      },
-      {
-        "art": "177",
-        "detail": ""
-      },
-      {
-        "art": "178",
-        "detail": ""
-      },
-      {
-        "art": "179",
-        "detail": ""
-      },
-      {
-        "art": "180",
-        "detail": ""
-      },
-      {
-        "art": "181",
-        "detail": ""
-      },
-      {
-        "art": "182",
-        "detail": ""
-      },
-      {
-        "art": "183",
-        "detail": ""
-      },
-      {
-        "art": "183-A",
-        "detail": ""
-      },
-      {
-        "art": "184",
-        "detail": ""
-      },
-      {
-        "art": "185",
-        "detail": ""
-      },
-      {
-        "art": "186",
-        "detail": ""
-      },
-      {
-        "art": "187",
-        "detail": ""
-      },
-      {
-        "art": "188",
-        "detail": ""
-      },
-      {
-        "art": "189",
-        "detail": ""
-      },
-      {
-        "art": "190",
-        "detail": ""
-      },
-      {
-        "art": "191",
-        "detail": ""
-      },
-      {
-        "art": "192",
-        "detail": ""
-      },
-      {
-        "art": "193",
-        "detail": ""
-      },
-      {
-        "art": "194",
-        "detail": ""
-      },
-      {
-        "art": "195",
-        "detail": ""
-      },
-      {
-        "art": "196",
-        "detail": ""
-      },
-      {
-        "art": "197",
-        "detail": ""
-      },
-      {
-        "art": "198",
-        "detail": ""
-      },
-      {
-        "art": "199",
-        "detail": ""
-      },
-      {
-        "art": "200",
-        "detail": ""
-      },
-      {
-        "art": "201",
-        "detail": ""
-      },
-      {
-        "art": "202",
-        "detail": ""
-      },
-      {
-        "art": "203",
-        "detail": ""
-      },
-      {
-        "art": "204",
-        "detail": ""
-      },
-      {
-        "art": "205",
-        "detail": ""
-      },
-      {
-        "art": "206",
-        "detail": ""
-      },
-      {
-        "art": "207",
-        "detail": ""
-      },
-      {
-        "art": "208",
-        "detail": ""
-      },
-      {
-        "art": "209",
-        "detail": ""
-      },
-      {
-        "art": "210",
         "detail": ""
       }
     ],
@@ -51626,6 +51173,68 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Explicação Pessoal",
+        "refs": [
+          {
+            "art": "179",
+            "detail": ""
+          },
+          {
+            "art": "180",
+            "detail": ""
+          },
+          {
+            "art": "181",
+            "detail": ""
+          }
+        ]
+      },
+      {
+        "sub_subject": "Extraordinária",
+        "refs": [
+          {
+            "art": "183",
+            "detail": ""
+          },
+          {
+            "art": "184",
+            "detail": ""
+          },
+          {
+            "art": "185",
+            "detail": ""
+          },
+          {
+            "art": "186",
+            "detail": ""
+          },
+          {
+            "art": "187",
+            "detail": ""
+          },
+          {
+            "art": "188",
+            "detail": ""
+          },
+          {
+            "art": "189",
+            "detail": ""
+          },
+          {
+            "art": "190",
+            "detail": ""
+          },
+          {
+            "art": "191",
+            "detail": ""
+          },
+          {
+            "art": "192",
+            "detail": ""
+          }
+        ]
+      },
+      {
         "sub_subject": "Folha de presença",
         "refs": [
           {
@@ -51648,6 +51257,28 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Grande Expediente",
+        "refs": [
+          {
+            "art": "159",
+            "detail": ""
+          },
+          {
+            "art": "160",
+            "detail": ""
+          },
+          {
+            "art": "161",
+            "detail": ""
+          },
+          {
+            "art": "162",
+            "detail": "",
+            "hint": "revogado — líder ocupa a tribuna do ausente"
+          }
+        ]
+      },
+      {
         "sub_subject": "Justificação de ausência",
         "refs": [
           {
@@ -51666,6 +51297,62 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "1",
             "detail": "§ 1º"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Ordem do Dia",
+        "refs": [
+          {
+            "art": "170",
+            "detail": ""
+          },
+          {
+            "art": "171",
+            "detail": ""
+          },
+          {
+            "art": "172",
+            "detail": ""
+          },
+          {
+            "art": "173",
+            "detail": ""
+          },
+          {
+            "art": "174",
+            "detail": ""
+          },
+          {
+            "art": "175",
+            "detail": ""
+          },
+          {
+            "art": "176",
+            "detail": ""
+          },
+          {
+            "art": "177",
+            "detail": ""
+          }
+        ]
+      },
+      {
+        "sub_subject": "Ordinária",
+        "refs": [
+          {
+            "art": "151",
+            "detail": "",
+            "hint": "terças a quintas, 15h, quatro horas"
+          },
+          {
+            "art": "152",
+            "detail": ""
+          },
+          {
+            "art": "155",
+            "detail": "",
+            "hint": "não convocação a pedido da maioria absoluta"
           }
         ]
       },
@@ -51769,6 +51456,19 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Pequeno Expediente",
+        "refs": [
+          {
+            "art": "157",
+            "detail": ""
+          },
+          {
+            "art": "158",
+            "detail": ""
+          }
+        ]
+      },
+      {
         "sub_subject": "Permanente",
         "refs": [
           {
@@ -51781,6 +51481,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "206",
+            "detail": ""
+          },
+          {
+            "art": "202",
+            "detail": ""
+          },
+          {
+            "art": "203",
             "detail": ""
           }
         ]
@@ -51813,6 +51521,39 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "15",
             "detail": "",
             "law_prefix": "LOM"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Prolongamento do Expediente",
+        "refs": [
+          {
+            "art": "163",
+            "detail": ""
+          },
+          {
+            "art": "164",
+            "detail": ""
+          },
+          {
+            "art": "165",
+            "detail": ""
+          },
+          {
+            "art": "166",
+            "detail": ""
+          },
+          {
+            "art": "167",
+            "detail": ""
+          },
+          {
+            "art": "168",
+            "detail": ""
+          },
+          {
+            "art": "169",
+            "detail": ""
           }
         ]
       },
@@ -51898,6 +51639,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "150",
             "detail": ""
+          },
+          {
+            "art": "154",
+            "detail": "",
+            "hint": "expediente publicado mesmo sem sessão"
           }
         ]
       },
@@ -51928,6 +51674,48 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "2/2019",
             "detail": "",
             "law_prefix": "PREC"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Secreta",
+        "refs": [
+          {
+            "art": "195",
+            "detail": ""
+          },
+          {
+            "art": "196",
+            "detail": ""
+          },
+          {
+            "art": "197",
+            "detail": ""
+          },
+          {
+            "art": "198",
+            "detail": ""
+          },
+          {
+            "art": "200",
+            "detail": ""
+          },
+          {
+            "art": "201",
+            "detail": ""
+          }
+        ]
+      },
+      {
+        "sub_subject": "Solene",
+        "refs": [
+          {
+            "art": "193",
+            "detail": ""
+          },
+          {
+            "art": "194",
+            "detail": ""
           }
         ]
       },
@@ -51969,6 +51757,27 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "138",
+            "detail": ""
+          }
+        ]
+      },
+      {
+        "sub_subject": "Tribuna Popular",
+        "refs": [
+          {
+            "art": "207",
+            "detail": ""
+          },
+          {
+            "art": "208",
+            "detail": ""
+          },
+          {
+            "art": "209",
+            "detail": ""
+          },
+          {
+            "art": "210",
             "detail": ""
           }
         ]
@@ -52468,6 +52277,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "1/2004",
             "detail": "",
             "law_prefix": "PREC"
+          },
+          {
+            "art": "40",
+            "detail": "",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -52494,14 +52308,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "1/2004",
             "detail": "",
             "law_prefix": "PREC"
-          },
-          {
-            "art": "67",
-            "detail": ""
-          },
-          {
-            "art": "239",
-            "detail": "§ 1º"
           }
         ]
       },
@@ -52810,6 +52616,24 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "272",
             "detail": ""
+          },
+          {
+            "art": "ADT4-H",
+            "detail": ""
+          },
+          {
+            "art": "183-A",
+            "detail": ""
+          },
+          {
+            "art": "29",
+            "detail": "§ 5º",
+            "law_prefix": "LOM"
+          },
+          {
+            "art": "1/2020",
+            "detail": "",
+            "law_prefix": "PREC"
           }
         ]
       }
@@ -53068,127 +52892,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       {
         "art": "152",
         "detail": ""
-      },
-      {
-        "art": "153",
-        "detail": ""
-      },
-      {
-        "art": "154",
-        "detail": ""
-      },
-      {
-        "art": "155",
-        "detail": ""
-      },
-      {
-        "art": "156",
-        "detail": ""
-      },
-      {
-        "art": "157",
-        "detail": ""
-      },
-      {
-        "art": "158",
-        "detail": ""
-      },
-      {
-        "art": "159",
-        "detail": ""
-      },
-      {
-        "art": "160",
-        "detail": ""
-      },
-      {
-        "art": "161",
-        "detail": ""
-      },
-      {
-        "art": "162",
-        "detail": "",
-        "hint": "revogado"
-      },
-      {
-        "art": "163",
-        "detail": ""
-      },
-      {
-        "art": "164",
-        "detail": ""
-      },
-      {
-        "art": "165",
-        "detail": ""
-      },
-      {
-        "art": "166",
-        "detail": ""
-      },
-      {
-        "art": "167",
-        "detail": ""
-      },
-      {
-        "art": "168",
-        "detail": ""
-      },
-      {
-        "art": "169",
-        "detail": ""
-      },
-      {
-        "art": "170",
-        "detail": ""
-      },
-      {
-        "art": "171",
-        "detail": ""
-      },
-      {
-        "art": "172",
-        "detail": ""
-      },
-      {
-        "art": "173",
-        "detail": ""
-      },
-      {
-        "art": "174",
-        "detail": ""
-      },
-      {
-        "art": "175",
-        "detail": ""
-      },
-      {
-        "art": "176",
-        "detail": ""
-      },
-      {
-        "art": "177",
-        "detail": ""
-      },
-      {
-        "art": "178",
-        "detail": ""
-      },
-      {
-        "art": "179",
-        "detail": ""
-      },
-      {
-        "art": "180",
-        "detail": ""
-      },
-      {
-        "art": "181",
-        "detail": ""
-      },
-      {
-        "art": "182",
-        "detail": ""
       }
     ],
     "children": [
@@ -53253,6 +52956,16 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Cópia de pronunciamentos",
+        "refs": [
+          {
+            "art": "156",
+            "detail": "",
+            "hint": "no máximo cinco cópias"
+          }
+        ]
+      },
+      {
         "sub_subject": "Duração",
         "refs": [
           {
@@ -53290,6 +53003,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         ]
       },
       {
+        "sub_subject": "Explicação Pessoal",
+        "refs": [
+          {
+            "art": "179",
+            "detail": ""
+          },
+          {
+            "art": "180",
+            "detail": ""
+          },
+          {
+            "art": "181",
+            "detail": ""
+          }
+        ]
+      },
+      {
         "sub_subject": "Funcionamento",
         "refs": [
           {
@@ -53312,6 +53042,33 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "29",
             "detail": "",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "154",
+            "detail": "",
+            "hint": "expediente publicado mesmo sem sessão"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Grande Expediente",
+        "refs": [
+          {
+            "art": "159",
+            "detail": ""
+          },
+          {
+            "art": "160",
+            "detail": ""
+          },
+          {
+            "art": "161",
+            "detail": ""
+          },
+          {
+            "art": "162",
+            "detail": "",
+            "hint": "revogado — líder ocupa a tribuna do ausente"
           }
         ]
       },
@@ -53354,6 +53111,45 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "167",
             "detail": "§ 3º"
+          },
+          {
+            "art": "170",
+            "detail": "",
+            "hint": "início da Ordem do Dia: 1h45"
+          },
+          {
+            "art": "174",
+            "detail": ""
+          },
+          {
+            "art": "175",
+            "detail": ""
+          },
+          {
+            "art": "176",
+            "detail": ""
+          },
+          {
+            "art": "177",
+            "detail": ""
+          },
+          {
+            "art": "178",
+            "detail": "",
+            "hint": "pauta esgotada: encerramento dos trabalhos"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Pequeno Expediente",
+        "refs": [
+          {
+            "art": "157",
+            "detail": ""
+          },
+          {
+            "art": "158",
+            "detail": ""
           }
         ]
       },
@@ -53383,6 +53179,39 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "337",
+            "detail": ""
+          }
+        ]
+      },
+      {
+        "sub_subject": "Prolongamento do Expediente",
+        "refs": [
+          {
+            "art": "163",
+            "detail": ""
+          },
+          {
+            "art": "164",
+            "detail": ""
+          },
+          {
+            "art": "165",
+            "detail": ""
+          },
+          {
+            "art": "166",
+            "detail": ""
+          },
+          {
+            "art": "167",
+            "detail": ""
+          },
+          {
+            "art": "168",
+            "detail": ""
+          },
+          {
+            "art": "169",
             "detail": ""
           }
         ]
@@ -55168,6 +54997,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "38",
             "detail": "",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "330",
+            "detail": ""
+          },
+          {
+            "art": "331",
+            "detail": ""
           }
         ]
       },
@@ -57677,19 +57514,23 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
         "refs": [
           {
             "art": "75",
-            "detail": ""
+            "detail": "",
+            "hint": "membro de Comissão sobre o relatório: 5 min"
           },
           {
             "art": "86",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "expositor em audiência obrigatória: 20 min"
           },
           {
             "art": "86",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "interpelação ao expositor da audiência: 3 min"
           },
           {
             "art": "180",
-            "detail": ""
+            "detail": "",
+            "hint": "explicação pessoal: 5 min"
           },
           {
             "art": "209",
@@ -57717,15 +57558,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "265",
-            "detail": "§ú"
+            "detail": "§ú",
+            "hint": "matéria com discussão reaberta: 5 min"
           },
           {
             "art": "277",
-            "detail": "§ 5º"
+            "detail": "§ 5º",
+            "hint": "cessão de tempo: comunicação verbal do cedente"
           },
           {
             "art": "277",
-            "detail": "§ 6º"
+            "detail": "§ 6º",
+            "hint": "cedente não se reinscreve na mesma fase"
           },
           {
             "art": "279",
@@ -57733,11 +57577,13 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "280",
-            "detail": ""
+            "detail": "",
+            "hint": "ausente: reinscrição; perde o tempo restante"
           },
           {
             "art": "290",
-            "detail": ""
+            "detail": "",
+            "hint": "encaminhamento de votação: 5 min, art. 306, VIII"
           },
           {
             "art": "304",
@@ -57757,51 +57603,63 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           },
           {
             "art": "350",
-            "detail": ""
+            "detail": "",
+            "hint": "projeto de título honorífico: 15 min"
           },
           {
             "art": "366",
-            "detail": "§ú"
+            "detail": "§ú",
+            "hint": "discussão de veto: 15 min"
           },
           {
             "art": "383",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "interpelação ao Secretário Municipal: 5 min"
           },
           {
             "art": "383",
-            "detail": "§ 2º"
+            "detail": "§ 2º",
+            "hint": "resposta do Secretário Municipal: 10 min"
           },
           {
             "art": "383",
-            "detail": "§ 3º"
+            "detail": "§ 3º",
+            "hint": "reinscrição para nova interpelação ao Secretário"
           },
           {
             "art": "386",
-            "detail": "§ 1º"
+            "detail": "§ 1º",
+            "hint": "parecer sobre contas: 15 min"
           },
           {
             "art": "17",
-            "detail": "I,i"
+            "detail": "I,i",
+            "hint": "Presidente adverte orador com tempo esgotado"
           },
           {
             "art": "37",
-            "detail": ""
+            "detail": "",
+            "hint": "destituição da Mesa: 15 ou 120 min"
           },
           {
             "art": "157",
-            "detail": ""
+            "detail": "",
+            "hint": "Pequeno Expediente: 5 min por orador"
           },
           {
             "art": "160",
-            "detail": ""
+            "detail": "",
+            "hint": "Grande Expediente: 15 min por orador"
           },
           {
             "art": "147",
-            "detail": "§ 6º"
+            "detail": "§ 6º",
+            "hint": "discussão da ata: 5 min, uma vez"
           },
           {
             "art": "168",
-            "detail": ""
+            "detail": "",
+            "hint": "requerimentos do Prolongamento do Expediente: 5 min"
           }
         ]
       },
@@ -57953,108 +57811,18 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     "subject": "VEREADOR",
     "refs": [
       {
-        "art": "106",
-        "detail": ""
-      },
-      {
-        "art": "107",
-        "detail": ""
-      },
-      {
-        "art": "108",
-        "detail": ""
-      },
-      {
-        "art": "109",
-        "detail": ""
-      },
-      {
-        "art": "110",
-        "detail": ""
-      },
-      {
-        "art": "111",
-        "detail": ""
-      },
-      {
-        "art": "112",
-        "detail": ""
-      },
-      {
-        "art": "113",
-        "detail": ""
-      },
-      {
-        "art": "114",
-        "detail": ""
-      },
-      {
-        "art": "115",
-        "detail": ""
-      },
-      {
-        "art": "116",
-        "detail": ""
-      },
-      {
-        "art": "117",
-        "detail": ""
-      },
-      {
-        "art": "118",
-        "detail": ""
-      },
-      {
         "art": "119",
         "detail": ""
       },
       {
         "art": "120",
-        "detail": ""
+        "detail": "",
+        "hint": "prerrogativas do Líder"
       },
       {
         "art": "121",
-        "detail": ""
-      },
-      {
-        "art": "122",
-        "detail": ""
-      },
-      {
-        "art": "123",
-        "detail": ""
-      },
-      {
-        "art": "124",
-        "detail": ""
-      },
-      {
-        "art": "125",
-        "detail": ""
-      },
-      {
-        "art": "126",
-        "detail": ""
-      },
-      {
-        "art": "127",
-        "detail": ""
-      },
-      {
-        "art": "128",
-        "detail": ""
-      },
-      {
-        "art": "129",
-        "detail": ""
-      },
-      {
-        "art": "130",
-        "detail": ""
-      },
-      {
-        "art": "131",
-        "detail": ""
+        "detail": "",
+        "hint": "Líder e Vice-Líderes do Governo"
       }
     ],
     "children": [
@@ -58133,6 +57901,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "106",
             "detail": "§ 1º"
+          },
+          {
+            "art": "106",
+            "detail": "§ 3º"
           }
         ]
       },
@@ -58890,6 +58662,19 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "191",
             "detail": "II"
+          },
+          {
+            "art": "3",
+            "detail": "§ 1º"
+          },
+          {
+            "art": "3",
+            "detail": "§ 2º"
+          },
+          {
+            "art": "15",
+            "detail": "§ 2º",
+            "law_prefix": "LOM"
           }
         ]
       },
@@ -59001,6 +58786,11 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "21",
             "detail": "",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "123",
+            "detail": "",
+            "hint": "verba de representação do Presidente"
           }
         ]
       },
@@ -60422,72 +60212,6 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
       {
         "art": "288",
         "detail": ""
-      },
-      {
-        "art": "289",
-        "detail": ""
-      },
-      {
-        "art": "290",
-        "detail": ""
-      },
-      {
-        "art": "291",
-        "detail": ""
-      },
-      {
-        "art": "292",
-        "detail": ""
-      },
-      {
-        "art": "293",
-        "detail": ""
-      },
-      {
-        "art": "294",
-        "detail": ""
-      },
-      {
-        "art": "295",
-        "detail": ""
-      },
-      {
-        "art": "296",
-        "detail": ""
-      },
-      {
-        "art": "297",
-        "detail": "",
-        "hint": "revogado"
-      },
-      {
-        "art": "298",
-        "detail": "",
-        "hint": "revogado"
-      },
-      {
-        "art": "299",
-        "detail": ""
-      },
-      {
-        "art": "300",
-        "detail": ""
-      },
-      {
-        "art": "301",
-        "detail": ""
-      },
-      {
-        "art": "302",
-        "detail": ""
-      },
-      {
-        "art": "303",
-        "detail": ""
-      },
-      {
-        "art": "304",
-        "detail": ""
       }
     ],
     "children": [
@@ -60732,6 +60456,14 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "14",
             "detail": "XIX",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "183-A",
+            "detail": "III"
+          },
+          {
+            "art": "288",
+            "detail": "§ 2º,III"
           }
         ]
       },
@@ -60763,6 +60495,25 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "225",
             "detail": "VII"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Declaração de voto",
+        "refs": [
+          {
+            "art": "302",
+            "detail": ""
+          },
+          {
+            "art": "303",
+            "detail": "",
+            "hint": "uma só vez, após votar todas as peças"
+          },
+          {
+            "art": "304",
+            "detail": "",
+            "hint": "5 min, sem apartes"
           }
         ]
       },
@@ -61039,6 +60790,10 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "40",
             "detail": "",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "ADT4-H",
+            "detail": ""
           }
         ]
       },
@@ -61058,6 +60813,26 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
             "art": "29",
             "detail": "§ 5º",
             "law_prefix": "LOM"
+          },
+          {
+            "art": "183-A",
+            "detail": "§ 6º"
+          },
+          {
+            "art": "183-A",
+            "detail": "§ 7º"
+          },
+          {
+            "art": "183-A",
+            "detail": "§ 8º"
+          },
+          {
+            "art": "272",
+            "detail": ""
+          },
+          {
+            "art": "ADT4-H",
+            "detail": ""
           }
         ]
       },
@@ -61384,6 +61159,16 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
           {
             "art": "294",
             "detail": "§ 2º"
+          }
+        ]
+      },
+      {
+        "sub_subject": "Voto do Presidente",
+        "refs": [
+          {
+            "art": "289",
+            "detail": "",
+            "hint": "eleição da Mesa, quorum qualificado, empate"
           }
         ]
       }
@@ -69008,9 +68793,9 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   }
 
   // ===== SUBJECT PILL =====
-  function openSubjectPill(entry) {
+  function openSubjectPill(entry, start = 0) {
     activeSubject = entry;
-    subjectIdx = 0;
+    subjectIdx = start;
     subjectFilter = true;
     $pillFilter.classList.add('active');
     $subjectPill.classList.add('open');
@@ -69024,7 +68809,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     updatePill();
     applySubjectFilter();
     highlightAllSubjectDetails();
-    navigateToSubjectRef(0);
+    navigateToSubjectRef(start);
     scheduleMinimap();
   }
 
@@ -69169,6 +68954,88 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
     if (!$pillDropdown.contains(e.target) && e.target !== $pillCurrent) {
       $pillDropdown.classList.remove('open');
     }
+  });
+
+  // ===== NO ÍNDICE REMISSIVO =====
+  // At the end of each article, the subjects of the remissivo that cite it (or
+  // one of its provisions), as the "Citado em:" line: labels via CSS, out of
+  // the searchable text. The ones citing the whole article first; a click
+  // opens the subject pill on this article.
+  const IDX_BACK_SHOWN = 6;
+
+  function renderIndexBacklinks() {
+    const byArt = new Map();   // "LOM:42" → [{label, refs, whole}]
+    const add = (label, own, refs) => {
+      const items = new Map();
+      for (const r of own) {
+        const key = (r.law_prefix || '') + ':' + r.art;
+        if (!items.has(key)) items.set(key, { label, refs, whole: false });
+        if (!r.detail || r.detail === 'caput') items.get(key).whole = true;
+      }
+      for (const [key, it] of items) {
+        if (!byArt.has(key)) byArt.set(key, []);
+        byArt.get(key).push(it);
+      }
+    };
+    for (const entry of SUBJECT_INDEX) {
+      if (entry.refs) add(entry.subject, entry.refs, collectAllRefs(entry));
+      for (const ch of entry.children || []) {
+        add(entry.subject + ' — ' + ch.sub_subject, ch.refs, subjectRefs(entry, ch.sub_subject));
+      }
+    }
+    for (const card of ARTICLE_CARDS) {
+      const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
+      if (!items) continue;
+      items.sort((a, b) => (b.whole - a.whole) || a.label.localeCompare(b.label, 'pt-BR'));
+      const line = document.createElement('div');
+      line.className = 'rem-backlinks idx-backlinks';
+      line.dataset.label = 'No índice remissivo:';
+      items.forEach((it, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'idx-back' + (i >= IDX_BACK_SHOWN ? ' idx-extra' : '');
+        chip.tabIndex = 0;
+        chip.setAttribute('role', 'button');
+        chip.dataset.label = it.label;
+        chip.idxEntry = it;
+        line.appendChild(chip);
+      });
+      if (items.length > IDX_BACK_SHOWN) {
+        const more = document.createElement('span');
+        more.className = 'idx-more';
+        more.tabIndex = 0;
+        more.setAttribute('role', 'button');
+        more.dataset.label = '+ ' + (items.length - IDX_BACK_SHOWN);
+        line.appendChild(more);
+      }
+      card.appendChild(line);
+    }
+  }
+
+  function onIndexBack(t) {
+    if (t.classList.contains('idx-more')) {
+      t.parentNode.classList.add('open');
+      t.remove();
+      return;
+    }
+    const it = t.idxEntry;
+    const card = t.closest('.card');
+    const key = (card.dataset.law || '') + ':' + card.dataset.art;
+    const i = it.refs.findIndex(r => (r.law_prefix || '') + ':' + r.art === key);
+    openSubjectPill({ subject: it.label, refs: it.refs }, Math.max(i, 0));
+  }
+
+  $cards.addEventListener('click', e => {
+    const t = e.target.closest('.idx-back, .idx-more');
+    if (!t) return;
+    e.stopPropagation();
+    onIndexBack(t);
+  });
+  $cards.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const t = e.target.classList && (e.target.classList.contains('idx-back') || e.target.classList.contains('idx-more'));
+    if (!t) return;
+    e.preventDefault();
+    onIndexBack(e.target);
   });
 
   // ===== PINCH-TO-ZOOM =====
@@ -69708,6 +69575,7 @@ body.pill-open #rem-return { bottom: 76px; }   /* above the Remissivo pill */
   try {
     if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);
   } catch (e) {}
+  renderIndexBacklinks();
   loadMarkers();
   applyMarkers();
   renderMarkerNav();

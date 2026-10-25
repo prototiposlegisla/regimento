@@ -1513,6 +1513,22 @@ body.pill-open #cards-container { padding-bottom: 300px; }
 }
 .rem-back::before { content: attr(data-label); }
 #cards-container.compact .rem-backlinks { display: none; }
+/* "No índice remissivo:" — the subjects that cite the article; labels via CSS */
+.idx-back, .idx-more {
+  display: inline-block;
+  max-width: 100%;
+  margin: 2px 0 2px 4px;
+  padding: 0 7px;
+  border-radius: 10px;
+  line-height: 1.6;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  background: #f6f2e8; color: #6e5a2b; border: 1px solid #e8dfc8;
+}
+.idx-back::before, .idx-more::before { content: attr(data-label); }
+.idx-more { background: none; border-style: dashed; }
+.idx-backlinks:not(.open) .idx-extra { display: none; }
 /* implicit: a badge at the end of the provision, on both sides; label via CSS */
 .rem-imp {
   display: inline-block;

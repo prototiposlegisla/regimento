@@ -3714,9 +3714,9 @@
   }
 
   // ===== SUBJECT PILL =====
-  function openSubjectPill(entry) {
+  function openSubjectPill(entry, start = 0) {
     activeSubject = entry;
-    subjectIdx = 0;
+    subjectIdx = start;
     subjectFilter = true;
     $pillFilter.classList.add('active');
     $subjectPill.classList.add('open');
@@ -3730,7 +3730,7 @@
     updatePill();
     applySubjectFilter();
     highlightAllSubjectDetails();
-    navigateToSubjectRef(0);
+    navigateToSubjectRef(start);
     scheduleMinimap();
   }
 
@@ -3875,6 +3875,88 @@
     if (!$pillDropdown.contains(e.target) && e.target !== $pillCurrent) {
       $pillDropdown.classList.remove('open');
     }
+  });
+
+  // ===== NO ÍNDICE REMISSIVO =====
+  // At the end of each article, the subjects of the remissivo that cite it (or
+  // one of its provisions), as the "Citado em:" line: labels via CSS, out of
+  // the searchable text. The ones citing the whole article first; a click
+  // opens the subject pill on this article.
+  const IDX_BACK_SHOWN = 6;
+
+  function renderIndexBacklinks() {
+    const byArt = new Map();   // "LOM:42" → [{label, refs, whole}]
+    const add = (label, own, refs) => {
+      const items = new Map();
+      for (const r of own) {
+        const key = (r.law_prefix || '') + ':' + r.art;
+        if (!items.has(key)) items.set(key, { label, refs, whole: false });
+        if (!r.detail || r.detail === 'caput') items.get(key).whole = true;
+      }
+      for (const [key, it] of items) {
+        if (!byArt.has(key)) byArt.set(key, []);
+        byArt.get(key).push(it);
+      }
+    };
+    for (const entry of SUBJECT_INDEX) {
+      if (entry.refs) add(entry.subject, entry.refs, collectAllRefs(entry));
+      for (const ch of entry.children || []) {
+        add(entry.subject + ' — ' + ch.sub_subject, ch.refs, subjectRefs(entry, ch.sub_subject));
+      }
+    }
+    for (const card of ARTICLE_CARDS) {
+      const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
+      if (!items) continue;
+      items.sort((a, b) => (b.whole - a.whole) || a.label.localeCompare(b.label, 'pt-BR'));
+      const line = document.createElement('div');
+      line.className = 'rem-backlinks idx-backlinks';
+      line.dataset.label = 'No índice remissivo:';
+      items.forEach((it, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'idx-back' + (i >= IDX_BACK_SHOWN ? ' idx-extra' : '');
+        chip.tabIndex = 0;
+        chip.setAttribute('role', 'button');
+        chip.dataset.label = it.label;
+        chip.idxEntry = it;
+        line.appendChild(chip);
+      });
+      if (items.length > IDX_BACK_SHOWN) {
+        const more = document.createElement('span');
+        more.className = 'idx-more';
+        more.tabIndex = 0;
+        more.setAttribute('role', 'button');
+        more.dataset.label = '+ ' + (items.length - IDX_BACK_SHOWN);
+        line.appendChild(more);
+      }
+      card.appendChild(line);
+    }
+  }
+
+  function onIndexBack(t) {
+    if (t.classList.contains('idx-more')) {
+      t.parentNode.classList.add('open');
+      t.remove();
+      return;
+    }
+    const it = t.idxEntry;
+    const card = t.closest('.card');
+    const key = (card.dataset.law || '') + ':' + card.dataset.art;
+    const i = it.refs.findIndex(r => (r.law_prefix || '') + ':' + r.art === key);
+    openSubjectPill({ subject: it.label, refs: it.refs }, Math.max(i, 0));
+  }
+
+  $cards.addEventListener('click', e => {
+    const t = e.target.closest('.idx-back, .idx-more');
+    if (!t) return;
+    e.stopPropagation();
+    onIndexBack(t);
+  });
+  $cards.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const t = e.target.classList && (e.target.classList.contains('idx-back') || e.target.classList.contains('idx-more'));
+    if (!t) return;
+    e.preventDefault();
+    onIndexBack(e.target);
   });
 
   // ===== PINCH-TO-ZOOM =====
@@ -4414,6 +4496,7 @@
   try {
     if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);
   } catch (e) {}
+  renderIndexBacklinks();
   loadMarkers();
   applyMarkers();
   renderMarkerNav();

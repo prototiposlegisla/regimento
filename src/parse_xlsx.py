@@ -447,6 +447,46 @@ def aplicar_propostas(index: SubjectIndex, propostas: list[Proposta], *, incluir
     return aplicadas, propostas_aplicadas, avisos
 
 
+_PALAVRAS_VAZIAS = {"a", "o", "as", "os", "de", "da", "do", "das", "dos", "e", "em", "na", "no",
+                    "nas", "nos", "ao", "aos", "para", "por", "pela", "pelo"}
+
+
+def _radical(w: str) -> str:
+    """Singular grosseiro, sem acento: "sessões" → "sessao", "pareceres" → "parecer"."""
+    import unicodedata
+    w = "".join(c for c in unicodedata.normalize("NFD", w) if not unicodedata.combining(c))
+    for fim, troca in (("oes", "ao"), ("aes", "ao"), ("ais", "al"), ("eis", "el")):
+        if w.endswith(fim):
+            return w[: -len(fim)] + troca
+    if w.endswith("es") and len(w) > 4 and w[-3] in "rzs":
+        return w[:-2]
+    return w[:-1] if w.endswith("s") and len(w) > 3 else w
+
+
+def _palavras(s: str) -> frozenset[str]:
+    return frozenset(_radical(w) for w in re.findall(r"[^\W\d_]+", s.lower()) if w not in _PALAVRAS_VAZIAS)
+
+
+def espelhos(index: SubjectIndex) -> list[list[dict]]:
+    """Pares de entradas em que o assunto de uma é o subassunto da outra e vice-versa
+    ("LEI — Promulgação" / "PROMULGAÇÃO — De Lei"): devem levar os mesmos dispositivos.
+
+    Retorna os pares [{nome, assunto, sub, refs: set[(prefixo, artigo, detalhe)]}, {...}].
+    """
+    por_chave: dict[tuple[frozenset, frozenset], dict] = {}
+    for e in index.entries:
+        if not e.sub_subject:
+            continue
+        chave = (_palavras(e.subject), _palavras(e.sub_subject))
+        if not all(chave) or chave[0] == chave[1]:
+            continue
+        m = por_chave.setdefault(chave, {"nome": e.display_name(), "assunto": e.subject,
+                                         "sub": e.sub_subject, "refs": set()})
+        m["refs"] |= {_ref_key(r) for r in e.refs}
+    return [[m, por_chave[(b, a)]] for (a, b), m in por_chave.items()
+            if (b, a) in por_chave and m["nome"] < por_chave[(b, a)]["nome"]]
+
+
 def resolver_vides_em_cadeia(index: SubjectIndex) -> int:
     """Vide para um assunto que é só remissão (sem dispositivos nem subassuntos) passa a
     apontar direto para os destinos dele ("Homenagem → HONRARIA → TÍTULOS HONORÍFICOS").

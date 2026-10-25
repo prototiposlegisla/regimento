@@ -65,6 +65,7 @@ class ValidationReport:
             "ref_cruzada": "Referências cruzadas (XLSX → DOCX)",
             "propostas": "Propostas do índice remissivo (aba Propostas)",
             "vide": "Vides apontando para assuntos inexistentes",
+            "espelhos": "Entradas espelhadas com dispositivos diferentes (A — B × B — A)",
             "remissoes": "Remissões entre artigos (citações não resolvidas)",
         }
 
@@ -132,7 +133,7 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
     (erro) ou a dispositivo inexistente, revogado ou só tachado (aviso).
     """
     import re as _re
-    from src.parse_xlsx import (aplicar_propostas, carregar_propostas, parse_law_mapping, parse_xlsx,
+    from src.parse_xlsx import (aplicar_propostas, carregar_propostas, espelhos, parse_law_mapping, parse_xlsx,
                                  resolver_vides_em_cadeia)
     from src.remissoes import ART_INEXISTENTE, REVOGADO, SUB_INEXISTENTE, TACHADO, _Corpus
 
@@ -218,6 +219,14 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
                     resto = ref.hint or (a.summary if a is not None else "")
                     ref.hint = "revogado" + (f" — {resto}" if resto else "")
         entry.refs = mantidas
+
+    # "LEI — Promulgação" e "PROMULGAÇÃO — De Lei" são a mesma entrada vista de dois lados
+    for a, b in espelhos(subject_index):
+        for x, y in ((a, b), (b, a)):
+            falta = sorted(x["refs"] - y["refs"])
+            if falta:
+                labels = ", ".join((f"{p}:" if p else "") + art + (f",{d}" if d else "") for p, art, d in falta)
+                report.add("espelhos", "aviso", f"{labels} — só em {x['nome']}", f"espelho: {y['nome']}")
 
     print(f"      → {len({e.subject for e in subject_index.entries})} assuntos")
     return subject_index, law_mapping

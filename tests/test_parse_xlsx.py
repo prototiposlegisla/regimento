@@ -155,3 +155,21 @@ def test_vide_em_cadeia_aponta_direto_para_o_destino():
     assert resolver_vides_em_cadeia(idx) == 2
     assert idx.entries[0].vides == ["TÍTULOS HONORÍFICOS"]
     assert idx.entries[3].vides == ["TÍTULOS HONORÍFICOS"]
+
+
+def test_espelhos_pares_com_assunto_e_subassunto_trocados():
+    from src.parse_xlsx import espelhos
+    idx = SubjectIndex(entries=[
+        SubjectEntry("LEI", "Promulgação", [SubjectRef("360")]),
+        SubjectEntry("PROMULGAÇÃO", "De Lei", [SubjectRef("360"), SubjectRef("42", law_prefix="LOM")]),
+        SubjectEntry("COMISSÕES PERMANENTES", "Pareceres", [SubjectRef("63")]),
+        SubjectEntry("PARECER", "De Comissão Permanente", [SubjectRef("63")]),
+        # o mesmo assunto visto por um tema, não o espelho
+        SubjectEntry("TRÂNSITO", "Parecer da Comissão de Trânsito", [SubjectRef("47", "V,a,6")]),
+        SubjectEntry("PARECER", "Da Comissão de Trânsito", [SubjectRef("47", "V")]),
+    ])
+    pares = {frozenset(m["nome"] for m in par): par for par in espelhos(idx)}
+    assert set(pares) == {frozenset({"LEI — Promulgação", "PROMULGAÇÃO — De Lei"}),
+                          frozenset({"COMISSÕES PERMANENTES — Pareceres", "PARECER — De Comissão Permanente"})}
+    lei = {m["nome"]: m["refs"] for m in pares[frozenset({"LEI — Promulgação", "PROMULGAÇÃO — De Lei"})]}
+    assert lei["PROMULGAÇÃO — De Lei"] - lei["LEI — Promulgação"] == {("LOM", "42", "")}

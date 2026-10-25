@@ -95,6 +95,72 @@
     return cards.filter(c => !c.classList.contains('filtered-out'));
   }
 
+  // ===== CARD HEIGHT ESTIMATES (content-visibility) =====
+  // Off-screen cards are not laid out (style.css), so until drawn once they
+  // take the height estimated here; the minimap, the search ticks and long
+  // jumps rely on it. Per block: [fixed px, px per line], fitted against the
+  // real layout at 1280 and 390 px wide (median error ~4% per card, the
+  // page's total height within 1%).
+  const CARD_EST_BASE = 29;
+  const CARD_EST_CHAR_PX = 7.75;
+  function cardBlockCoef(el) {
+    const cl = el.classList;
+    if (cl.contains('art-compact-label') || cl.contains('footnote-box')) return null;   // hidden
+    if (cl.contains('law-badge')) return null;   // takes no height of its own
+    if (el.tagName === 'BR') return [37, 0];
+    if (cl.contains('old-version')) return [-2, 28];
+    if (cl.contains('rem-backlinks')) return [-4, 32.5];
+    if (cl.contains('art-summary')) return [40, 0];
+    return [1, 27];
+  }
+  function blockTextLength(el) {
+    let n = el.textContent.length;
+    for (const r of el.querySelectorAll('[data-label]')) {   // chips drawn by ::before
+      if (r.classList.contains('idx-extra')) continue;   // behind the "+ N" until opened
+      n += r.dataset.label.length + 3;
+    }
+    return n;
+  }
+  // Per card, [fixed px, px per line, characters] of each block: read once
+  // (the text does not change), so a pinch zoom only redoes the arithmetic
+  let cardEstBlocks = null;
+  function estimateCardHeights() {
+    if (!cardEstBlocks) {
+      cardEstBlocks = ALL_CARDS.map(card => {
+        const blocks = [];
+        for (const el of card.children) {
+          const coef = cardBlockCoef(el);
+          if (coef) blocks.push([coef[0], coef[1], coef[1] ? blockTextLength(el) : 0]);
+        }
+        return blocks;
+      });
+    }
+    const z = zoomScale;
+    const textWidth = $cards.clientWidth - 24 - 32 * z - 4;
+    const charsPerLine = Math.max(10, textWidth / (CARD_EST_CHAR_PX * z));
+    ALL_CARDS.forEach((card, i) => {
+      let h = CARD_EST_BASE;
+      for (const [fixed, perLine, n] of cardEstBlocks[i]) h += fixed + perLine * Math.ceil(n / charsPerLine);
+      // contain-intrinsic-size is the content height: the padding comes on top
+      card.style.setProperty('--card-h', Math.round(Math.max(4, h - 32) * z) + 'px');
+    });
+  }
+  // Heights remembered at the old zoom or width would stay wrong until each
+  // card is drawn again: once the zoom or width settles, make the browser
+  // forget them (callers re-estimate first)
+  let cardSizeResetTimer;
+  function forgetCardHeights() {
+    clearTimeout(cardSizeResetTimer);
+    cardSizeResetTimer = setTimeout(() => {
+      preserveScroll(() => $cards.classList.add('cv-reset'));
+      // The remembered sizes are dropped at the next rendering update
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        preserveScroll(() => $cards.classList.remove('cv-reset'));
+        scheduleMinimap();
+      }));
+    }, 400);
+  }
+
   const whenIdle = window.requestIdleCallback || (cb => setTimeout(() => {
     const start = performance.now();
     cb({ timeRemaining: () => Math.max(0, 10 - (performance.now() - start)) });
@@ -142,22 +208,37 @@
     if (behavior === 'smooth' && Math.abs(top - window.scrollY) > FAR_SCROLL_SCREENS * window.innerHeight) {
       behavior = 'instant';
     }
-    const racesSmoothScroll = smoothScrolling;
     // Only a smooth scroll that actually moves ends with a 'scrollend'
     const root = document.documentElement;
     const dest = Math.max(0, Math.min(top, root.scrollHeight - root.clientHeight));
     smoothScrolling = behavior === 'smooth' && Math.abs(dest - window.scrollY) >= 1;
     window.scrollTo({ top, behavior });
-    if (behavior !== 'instant' || !racesSmoothScroll) return;
-    // A jump made while an earlier smooth scroll is still animating lands one
-    // animation step past the target (Chrome): put it back
-    const landed = window.scrollY;
-    let frames = 3;
-    requestAnimationFrame(function keep() {
+    if (behavior === 'instant') holdLanding(call);
+    else if (smoothScrolling) window.addEventListener('scrollend', () => holdLanding(call), { once: true });
+  }
+
+  // Cards drawn for the first time around the landing spot change height
+  // (estimate → real, see estimateCardHeights) and push what was just put on
+  // screen. Hold the card under the reading line where it landed until they
+  // settle. This also undoes a jump made while an earlier smooth scroll is
+  // still animating, which lands one animation step past the target (Chrome).
+  function holdLanding(call) {
+    const anchor = findSelectionCard();
+    if (!anchor) return;
+    const want = anchor.getBoundingClientRect().top;
+    let frames = 0, still = 0;
+    requestAnimationFrame(function hold() {
       if (call !== scrollToYCall) return;
-      if (Math.abs(window.scrollY - landed) >= 1) window.scrollTo({ top: landed, behavior: 'instant' });
-      if (--frames) requestAnimationFrame(keep);
+      const delta = anchor.getBoundingClientRect().top - want;
+      if (Math.abs(delta) >= 1) { window.scrollBy({ top: delta, behavior: 'instant' }); still = 0; }
+      else still++;
+      if (++frames < 40 && still < 4) requestAnimationFrame(hold);
     });
+  }
+  // The reader taking over the scroll ends any hold (capture: before a key
+  // or click handler starts a new one)
+  for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+    window.addEventListener(type, cancelScrollCorrection, { capture: true, passive: true });
   }
 
   // ===== SCROLL SELECTION =====
@@ -404,6 +485,34 @@
     if (best && best !== selectedCard) selectCard(best, false);
     applyBreadcrumb(bc);
     applyMinimapViewport(viewport);
+  }
+
+  // A card drawn for the first time above the screen changes height
+  // (estimate → real). Chrome's scroll anchoring keeps the text being read
+  // still; WebKit (so every iOS browser) lets it jump. There, compensate by
+  // hand right after layout and before paint (ResizeObserver), and only when
+  // first draws are all that changed: zoom, filters and the compact mode
+  // move the cards themselves.
+  const UA = navigator.userAgent;
+  if (/AppleWebKit\//.test(UA) && !/Chrome\/|Edg\//.test(UA) && window.ResizeObserver) {
+    const lastHeight = new Map();
+    const firstDraws = new ResizeObserver(entries => {
+      let shift = 0, onlyFirstDraws = true;
+      for (const e of entries) {
+        const card = e.target;
+        const h = e.borderBoxSize[0].blockSize;
+        const before = lastHeight.get(card);
+        lastHeight.set(card, h);
+        if (before === undefined) continue;
+        const estimate = parseFloat(card.style.getPropertyValue('--card-h')) + 32 * zoomScale;
+        if (Math.abs(before - estimate) > 1) { onlyFirstDraws = false; continue; }
+        if (card.getBoundingClientRect().top < 0) shift += h - before;
+      }
+      if (onlyFirstDraws && shift && Math.abs(shift) < window.innerHeight / 2) {
+        window.scrollBy({ top: shift, behavior: 'instant' });
+      }
+    });
+    ALL_CARDS.forEach(card => firstDraws.observe(card));
   }
 
   let scrollTick = false;
@@ -3907,7 +4016,9 @@
     preserveScroll(() => {
       zoomScale = Math.max(0.4, Math.min(2.5, scale));
       document.documentElement.style.setProperty('--zoom-scale', zoomScale);
+      estimateCardHeights();
     });
+    forgetCardHeights();
 
     $zoomIndicator.textContent = Math.round(zoomScale * 100) + '%';
     $zoomIndicator.classList.add('show');
@@ -3986,7 +4097,7 @@
     if (card && !card.classList.contains('filtered-out')) {
       const rect = card.getBoundingClientRect();
       const target = window.scrollY + rect.top - getReadingLineY();
-      window.scrollTo({ top: Math.max(0, target), behavior: 'instant' });
+      scrollToY(Math.max(0, target), 'instant');
     }
     updateBreadcrumb();
     if (searchMatches.length) updateSearchTicks();
@@ -4423,10 +4534,25 @@
     });
   }
 
-  // Resize → rebuild minimap
+  // Resize → rebuild minimap (and re-estimate card heights for the new width)
+  let estimatedWidth = $cards.clientWidth;
   window.addEventListener('resize', () => {
+    if ($cards.clientWidth !== estimatedWidth) {
+      estimatedWidth = $cards.clientWidth;
+      preserveScroll(estimateCardHeights);
+      forgetCardHeights();
+    }
     scheduleMinimap();
   });
+
+  // Cards drawn for the first time replace their estimate with the real
+  // height: redraw the minimap once they stop changing (not per scroll stop,
+  // as programmatic scrolls end every frame)
+  let minimapStaleTimer;
+  $cards.addEventListener('contentvisibilityautostatechange', () => {
+    clearTimeout(minimapStaleTimer);
+    minimapStaleTimer = setTimeout(scheduleMinimap, 500);
+  }, true);
 
   // ===== INIT =====
   try {
@@ -4437,6 +4563,10 @@
     if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);
   } catch (e) {}
   renderIndexBacklinks();
+  // After everything that adds blocks to the cards (the saved zoom above
+  // already estimated without the backlinks)
+  cardEstBlocks = null;
+  estimateCardHeights();
   loadMarkers();
   applyMarkers();
   renderMarkerNav();

@@ -236,6 +236,18 @@ body {
 
 .card.filtered-out { display: none; }
 
+/* Cards far from the screen are neither laid out nor painted: load and zoom
+   stop redoing the layout of the whole ~500k px page. Until drawn once, an
+   off-screen card takes the height app.js estimates (--card-h); after that the
+   browser remembers its real height (auto). */
+@property --card-h { syntax: '<length>'; inherits: false; initial-value: 300px; }
+.card { content-visibility: auto; contain-intrinsic-size: auto var(--card-h); }
+/* Without auto the remembered heights are dropped (after zoom or a new width) */
+#cards-container.cv-reset .card { contain-intrinsic-size: var(--card-h); }
+/* Compact mode is short: draw it all, and remember none of its heights */
+#cards-container.compact .card { content-visibility: visible; contain-intrinsic-size: none; }
+@media print { .card { content-visibility: visible; } }
+
 .card-titulo {
   font-weight: 700;
   text-align: center;

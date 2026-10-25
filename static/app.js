@@ -12,6 +12,9 @@
 
   const SUMMARIES_MAP = /*__SUMMARIES_MAP__*/{};
 
+  // Notes of the correlates, each once; a badge carries its index (data-n)
+  const CORRELATO_NOTAS = /*__CORRELATO_NOTAS__*/[];
+
   const INFO_HTML = /*__INFO_HTML__*/"";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
@@ -2963,7 +2966,8 @@
   // "18,VI"; several separated by ";"), and data-rev / data-tach = the revoked or
   // struck ones. A correlate in another norm (implicit remissão) is a badge
   // (span.rem-imp) at the end of the provision, on both sides, with data-tipo
-  // (eq / det / fund / div), data-side (src / tgt) and data-nota. The preview is
+  // (eq / det / fund / div), data-side (src / tgt) and data-n (its note in
+  // CORRELATO_NOTAS: the badge is on both sides, the note only once). The preview is
   // built from the target's card in this same page, so it always shows the
   // wording in force. Hover (desktop) shows a floating preview; click/tap or
   // Enter pins a box under the provision.
@@ -3137,7 +3141,7 @@
         pr.textContent = 'proposta, ainda não revisada';
         n.appendChild(pr);
       }
-      if (trigger.dataset.nota) n.appendChild(document.createTextNode(trigger.dataset.nota));
+      if (trigger.dataset.n) n.appendChild(document.createTextNode(CORRELATO_NOTAS[+trigger.dataset.n]));
       wrap.appendChild(n);
     }
     for (const g of groups) {

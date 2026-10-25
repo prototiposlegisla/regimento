@@ -242,10 +242,13 @@ class TestImplicitas:
         doc = _doc()
         res = detectar(doc, implicitas=[_linha(1, "369", "LOM:18,III", tipo="diverge",
                                                nota="O RI diz 60 dias; a LOM diz 120.")])
-        html = HTMLRenderer(res).render(doc)
+        renderer = HTMLRenderer(res)
+        html = renderer.render(doc)
         assert ('class="rem rem-imp t-div" tabindex="0" role="button" data-ref="LOM:18,III" data-tipo="div"'
-                ' data-side="src" data-nota="O RI diz 60 dias; a LOM diz 120." data-label="≠ LOM 18, III"') in html
-        assert 'data-ref="369" data-tipo="div" data-side="tgt"' in html
+                ' data-side="src" data-n="0" data-label="≠ LOM 18, III"') in html
+        assert 'data-ref="369" data-tipo="div" data-side="tgt" data-n="0"' in html
+        # a nota vai uma vez só, para os dois selos
+        assert renderer.notas == ["O RI diz 60 dias; a LOM diz 120."]
         md = MarkdownRenderer(res).render_document(doc)
         assert "*(correlatos: diverge de LOM art. 18, III — O RI diz 60 dias; a LOM diz 120.)*" in md
 
@@ -254,7 +257,7 @@ class TestImplicitas:
         res = detectar(doc, implicitas=[_linha(1, "368", "369", tipo="exceção", nota="O 368 abre exceção.")])
         assert not [m for m, ctx in res.avisos if "remissoes.xlsx" in ctx] and res.implicitas[0].tipo == "exc"
         html = HTMLRenderer(res).render(doc)
-        assert 'data-tipo="exc" data-side="src" data-nota="O 368 abre exceção." data-label="regra geral: RI 369"' in html
+        assert 'data-tipo="exc" data-side="src" data-n="0" data-label="regra geral: RI 369"' in html
         assert 'data-ref="368" data-tipo="exc" data-side="tgt"' in html and 'data-label="exceção: RI 368"' in html
         md = MarkdownRenderer(res).render_document(doc)
         assert "*(correlatos: é exceção à regra geral de art. 369 — O 368 abre exceção.)*" in md

@@ -17,6 +17,7 @@ def assemble(
     info_html: str,
     base_dir: Path,
     output_path: Path,
+    correlato_notas: list[str] = (),
 ) -> None:
     """Monta o dist/index.html final (self-contained, exceto as fontes em fonts/)."""
     template_path = base_dir / "templates" / "base.html"
@@ -27,18 +28,17 @@ def assemble(
     css = css_path.read_text(encoding="utf-8")
     js = js_path.read_text(encoding="utf-8")
 
-    # Inject data into JS placeholders
-    sys_json = json.dumps(systematic_index, ensure_ascii=False, indent=2)
-    subj_json = json.dumps(subject_index, ensure_ascii=False, indent=2)
-    ref_json = json.dumps(referencias_index, ensure_ascii=False, indent=2)
-    consulta_json = json.dumps(consulta_index, ensure_ascii=False)
-    summaries_json = json.dumps(summaries_map, ensure_ascii=False)
+    # Inject data into JS placeholders, without indentation (the page is not read by hand;
+    # intermediate/ keeps the indented JSON for debugging)
+    def dumps(data) -> str:
+        return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
 
-    js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", sys_json)
-    js = js.replace("/*__SUBJECT_INDEX__*/[]", subj_json)
-    js = js.replace("/*__REFERENCIAS_INDEX__*/[]", ref_json)
-    js = js.replace("/*__CONSULTA_INDEX__*/[]", consulta_json)
-    js = js.replace("/*__SUMMARIES_MAP__*/{}", summaries_json)
+    js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", dumps(systematic_index))
+    js = js.replace("/*__SUBJECT_INDEX__*/[]", dumps(subject_index))
+    js = js.replace("/*__REFERENCIAS_INDEX__*/[]", dumps(referencias_index))
+    js = js.replace("/*__CONSULTA_INDEX__*/[]", dumps(consulta_index))
+    js = js.replace("/*__SUMMARIES_MAP__*/{}", dumps(summaries_map))
+    js = js.replace("/*__CORRELATO_NOTAS__*/[]", dumps(list(correlato_notas)))
 
     info_json = json.dumps(info_html, ensure_ascii=False)
     js = js.replace("/*__INFO_HTML__*/\"\"", info_json)

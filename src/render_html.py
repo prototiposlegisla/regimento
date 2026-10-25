@@ -28,6 +28,9 @@ class HTMLRenderer:
         self._cited_by = remissoes.citado_em() if remissoes else {}
         # Remissões implícitas: um selo no fim do dispositivo, nos dois lados
         self._imp_by_unit = remissoes.implicitas_por_unidade() if remissoes else {}
+        # Notas dos correlatos, cada uma uma vez: o selo está nos dois lados e leva só o número
+        self.notas: list[str] = []
+        self._nota_n: dict[str, int] = {}
 
     def render(self, doc: ParsedDocument) -> str:
         """Renderiza todos os elementos do documento."""
@@ -377,8 +380,14 @@ class HTMLRenderer:
                 (f"ADT {other.art[3:]}" if other.art.startswith("ADT") else other.art)
             path = other.path.replace("§ú", "p.ú.").replace(",", ", ")
             label = f"{prefix} {other.law} {art}" + (f", {path}" if path else "")
-            attrs = (f' data-ref="{html.escape(other.ref)}" data-tipo="{im.tipo}" data-side="{side}"'
-                     f' data-nota="{html.escape(im.nota)}" data-label="{html.escape(label)}"')
+            attrs = f' data-ref="{html.escape(other.ref)}" data-tipo="{im.tipo}" data-side="{side}"'
+            if im.nota:
+                # a nota vai uma vez só para a página (CORRELATO_NOTAS); o selo leva o número dela
+                n = self._nota_n.setdefault(im.nota, len(self.notas))
+                if n == len(self.notas):
+                    self.notas.append(im.nota)
+                attrs += f' data-n="{n}"'
+            attrs += f' data-label="{html.escape(label)}"'
             if im.tipo == "sim" and im.origem.law == im.destino.law:
                 attrs += ' data-mesma="1"'   # "correspondente" na mesma norma: não é regra federal
             if im.proposta:
@@ -516,6 +525,7 @@ class HTMLRenderer:
         return f'    <p class="{cls}"{ident_attr}>{text}{note}</p>'
 
 
-def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None) -> str:
+def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None) -> tuple[str, list[str]]:
+    """(HTML dos cards, notas dos correlatos que os selos citam por número)."""
     renderer = HTMLRenderer(remissoes)
-    return renderer.render(doc)
+    return renderer.render(doc), renderer.notas

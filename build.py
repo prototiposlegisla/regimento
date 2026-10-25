@@ -424,7 +424,7 @@ def _build_once(
     print("[7/8] Renderizando cards HTML...")
     from src.render_html import render_cards
 
-    cards_html = render_cards(doc, remissoes)
+    cards_html, correlato_notas = render_cards(doc, remissoes)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
     # ── 8. Assemble ────────────────────────────────────────────────────
@@ -448,6 +448,7 @@ def _build_once(
         referencias_index=referencias_data,
         consulta_index=consulta_data,
         summaries_map=summaries_map,
+        correlato_notas=correlato_notas,
         info_html=info_html,
         base_dir=BASE_DIR,
         output_path=output_path,

@@ -14,11 +14,14 @@ from .remissoes import EXIBIVEIS, law_of
 class MarkdownRenderer:
     """Gera arquivos Markdown otimizados para consumo por LLMs."""
 
-    def __init__(self, remissoes=None):
+    def __init__(self, remissoes=None, *, canonico: bool = False):
         # Remissões explícitas: "(remete a: Art. 369 — síntese)" depois do dispositivo
         self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
         self._imp_by_unit = remissoes.implicitas_por_unidade() if remissoes else {}
         self._summaries: dict[tuple[str, str], str] = {}
+        # Texto canônico para os outros projetos (src/canonico.py): sem links, com
+        # "*(revogado)*" no dispositivo revogado e "Art. 1 (ADT)" no lugar de "Art. ADT1"
+        self._canonico = canonico
 
     # ── Documento principal ───────────────────────────────────────────
 
@@ -33,6 +36,29 @@ class MarkdownRenderer:
             elif isinstance(el, ArticleBlock):
                 parts.append(self._render_article(el))
         return "\n\n".join(parts) + "\n"
+
+    def render_normas(self, doc: ParsedDocument) -> dict[str, str]:
+        """Renderiza cada norma num Markdown à parte: {nome da norma: texto}.
+
+        A norma começa no título com data_section "norma…" ("Regimento Interno",
+        "Lei Orgânica"...), que abre o texto dela.
+        """
+        self._summaries = {(law_of(a), a.art_number): a.summary
+                           for a in doc.elements if isinstance(a, ArticleBlock)}
+        normas: dict[str, list[str]] = {}
+        atual: list[str] | None = None
+        for el in doc.elements:
+            if isinstance(el, SectionHeading):
+                if el.data_section.startswith("norma"):
+                    atual = normas.setdefault(el.text, [])
+                if atual is not None:
+                    atual.append(self._render_heading(el))
+            elif isinstance(el, ArticleBlock) and atual is not None:
+                atual.append(self._render_article(el))
+        return {nome: "\n\n".join(parts) + "\n" for nome, parts in normas.items()}
+
+    def _revogado(self, unit) -> str:
+        return " *(revogado)*" if self._canonico and unit.is_revoked else ""
 
     def _remissoes_suffix(self, unit: DocumentUnit) -> str:
         """Sufixo com os dispositivos citados: *(remete a: Art. 369 — Promulgação...)*."""
@@ -119,18 +145,21 @@ class MarkdownRenderer:
 
         # H4 heading with article number and optional summary
         art_label = art.art_number
+        if self._canonico and art.is_adt:
+            art_label = re.sub(r"^ADT", "", art_label) + " (ADT)"
         if art.law_prefix:
             art_label = f"{art.law_prefix}:{art_label}"
         heading = f"#### Art. {art_label}"
         if art.summary:
             heading += f" — {art.summary}"
+        heading += self._revogado(art)
         parts.append(heading)
 
         # Current caput
         if art.caput:
             caput_text = self._render_runs_after_identifier(art.caput)
             if caput_text.strip():
-                parts.append(caput_text + self._remissoes_suffix(art.caput))
+                parts.append(caput_text + self._revogado(art.caput) + self._remissoes_suffix(art.caput))
             for fn in art.caput.footnotes:
                 parts.append(self._render_footnote(fn))
 
@@ -160,7 +189,7 @@ class MarkdownRenderer:
         indent = self._get_indent(child)
         identifier = child.identifier
         body = self._render_runs_after_identifier(child)
-        return f"{indent}**{identifier}** — {body}{self._remissoes_suffix(child)}"
+        return f"{indent}**{identifier}** — {body}{self._revogado(child)}{self._remissoes_suffix(child)}"
 
     @staticmethod
     def _get_indent(unit: DocumentUnit) -> str:
@@ -220,7 +249,7 @@ class MarkdownRenderer:
             # Replace non-breaking space
             text = text.replace("\xa0", " ")
 
-            if run.hyperlink_url:
+            if run.hyperlink_url and not self._canonico:
                 text = f"[{text}]({run.link_url})"
             # hyperlink_anchor → plain text (no link target in markdown)
 

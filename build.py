@@ -559,6 +559,17 @@ def _build_markdown(
     print(f"\n✓ {label} pronto em {elapsed:.1f}s → {output_dir}")
 
 
+def _build_canonico(args: argparse.Namespace) -> None:
+    """Grava canonico/, o texto que os outros projetos leem (ver src/canonico.py)."""
+    from src import canonico
+
+    print(f"\n{'═' * 60}")
+    print("  Build: texto canônico para os outros projetos (canonico/)")
+    print(f"{'═' * 60}")
+    for line in canonico.gerar(Path(args.docx), Path(args.remissoes)):
+        print(f"      {line}")
+
+
 def _auto_commit_and_push() -> None:
     """Faz git add + commit + push de docs/index.html."""
     public_html = BASE_DIR / "docs" / "index.html"
@@ -696,6 +707,7 @@ def main() -> int:
             label="Versão pública (sem notas privadas)",
         )
         all_reports.append(r)
+        _build_canonico(args)
 
     if build_private:
         r = _build_once(

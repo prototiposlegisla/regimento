@@ -44,7 +44,7 @@ FRACOES = {"1/2": ("metade",), "1/3": ("um terco", "terca parte"), "2/3": ("dois
 UNIDADES = {"d": "dias", "h": "horas"}
 
 _ROMANO = re.compile(r"^[IVXL]+$")
-_LEI = {"RI": "RI", "LOM": "LOM", "LO": "LOM", "CF": "CF"}
+_LEI = {"RI": "RI", "LOM": "LOM", "LO": "LOM", "CE": "CE", "CF": "CF"}
 
 
 # ── artigos ─────────────────────────────────────────────────────────────

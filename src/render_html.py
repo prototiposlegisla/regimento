@@ -291,6 +291,8 @@ class HTMLRenderer:
         # Remove identifier + separator from start (tolerating leading spaces and
         # \xa0 inside the identifier: "  Art.\xa029. O Município...")
         escaped = r"\s*" + re.escape(ident).replace(r"\ ", r"\s*")
+        # o identificador é "Art. 144"; no texto da Constituição Estadual (ALESP), "Artigo 144 -"
+        escaped = escaped.replace(r"Art\.", r"Art(?:\.|igo)", 1)
         patterns = [
             escaped + r"\s*[-–—.]\s*",
             escaped + r"\s+",
@@ -390,6 +392,8 @@ class HTMLRenderer:
             attrs += f' data-label="{html.escape(label)}"'
             if im.tipo == "sim" and im.origem.law == im.destino.law:
                 attrs += ' data-mesma="1"'   # "correspondente" na mesma norma: não é regra federal
+            elif im.tipo == "sim" and im.destino.law == "CE":
+                attrs += ' data-esfera="estadual"'   # a regra correspondente é a do Estado
             if im.proposta:
                 attrs += ' data-status="proposta"'
             out.append(f'<span class="rem rem-imp t-{im.tipo}" tabindex="0" role="button"{attrs}></span>')

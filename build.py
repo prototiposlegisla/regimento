@@ -22,7 +22,12 @@ BASE_DIR = Path(__file__).parent
 
 # Números repetidos que o próprio texto normativo tem (não é redação antiga sem tachar):
 # (norma, artigo, caminho do dispositivo)
-KNOWN_DUPLICATES: set[tuple[str, str, str]] = set()
+# Na CE 175, § 1º, as alíneas vêm dentro dos itens ("2 - ... a) ... b) ..." e "3 - ... a) ... b) ..."),
+# e o caminho do dispositivo (§, inciso, alínea, item) não tem lugar para a alínea do item
+KNOWN_DUPLICATES: set[tuple[str, str, str]] = {
+    ("Constituição Estadual", "175", "§ 1º,a"),
+    ("Constituição Estadual", "175", "§ 1º,b"),
+}
 
 # Erros de digitação que estão também no texto oficial (PLP) e ficam como estão, por decisão do usuário
 # (25/10/2026); lista completa em FontesAtual/"Erros no texto das normas.md". (norma, artigo, trecho)
@@ -35,6 +40,7 @@ KNOWN_TEXT_ERRORS: set[tuple[str, str, str]] = {
     ("Lei Orgânica", "200", "estabelecid. .o"),
     ("Lei Orgânica", "221", ".s.rtigos"),
     ("Regimento Interno", "156", "160 ,§ 6°"),
+    ("Constituição Estadual", "74", "Estado , o Defensor"),   # espaço antes do trecho tachado (ADI 6517), como na ALESP
 }
 
 

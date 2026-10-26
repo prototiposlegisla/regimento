@@ -44,3 +44,22 @@ origem = "LOM:96,§ú"
 trecho = "X, XII, XIII, XV, XVI, XVII, XVIII, XIX, XX, XXII, XXIII, XXV, XXVI, XXVII, XXVIII, XXX e XXXI"
 alvos = ["CF:7,X", "CF:7,XII", "CF:7,XIII", "CF:7,XV", "CF:7,XVI", "CF:7,XVII", "CF:7,XVIII", "CF:7,XIX", "CF:7,XX", "CF:7,XXII", "CF:7,XXIII", "CF:7,XXV", "CF:7,XXVI", "CF:7,XXVII", "CF:7,XXVIII", "CF:7,XXX", "CF:7,XXXI"]
 motivo = "'IX. X': o ponto no lugar da vírgula (está no texto oficial) interrompe a lista de incisos do art. 7º da CF"
+
+# Constituição Estadual (ALESP): o qualificador vem depois da alínea entre aspas
+# ("artigo 155, § 2°, XII, "g", da Constituição Federal"), e a detecção o perde
+
+[[ignorar]]
+origem = "CE:163,§ 6º"
+trecho = "artigo 155, § 2°, XII"
+motivo = "é o art. 155, § 2º, XII, \"g\", da Constituição Federal, fora da página"
+
+[[ignorar]]
+origem = "CE:222,§ú,2"
+trecho = "artigos 158, I e II, e 159, I"
+motivo = "são os arts. 158, I e II, e 159, I, \"b\", da Constituição Federal, fora da página"
+
+[[definir]]
+origem = "CE:163,III,c"
+trecho = "alínea \"b\""
+alvos = ["CE:163,III,b"]
+motivo = "a alínea \"b\" do mesmo inciso III, que a detecção relativa não acha"

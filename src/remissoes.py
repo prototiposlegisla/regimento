@@ -29,8 +29,10 @@ from pathlib import Path
 from typing import Optional
 
 from .models import PREC, ArticleBlock, DocumentUnit, ParsedDocument, prec_label, unit_path
+from .parse_docx import _NOTA_ALESP
 
-LAW_SHORT = {"Regimento Interno": "RI", "Lei Orgânica": "LOM", "Constituição Federal": "CF"}
+LAW_SHORT = {"Regimento Interno": "RI", "Lei Orgânica": "LOM", "Constituição Estadual": "CE",
+             "Constituição Federal": "CF"}
 
 # Status de um alvo. Os três primeiros viram gatilho no site.
 RESOLVIDO = "resolvido"
@@ -45,7 +47,7 @@ EXIBIVEIS = (RESOLVIDO, REVOGADO, TACHADO)
 
 @dataclass
 class Alvo:
-    law: str     # "RI", "LOM", "CF", "PREC"
+    law: str     # "RI", "LOM", "CE", "CF", "PREC"
     art: str     # "369", "42", "ADT29", "2/2004" (precedente)
     path: str    # "" (artigo inteiro), "§ 7º", "II,a"
     status: str = RESOLVIDO
@@ -150,11 +152,12 @@ RE_NOTE_PAREN = re.compile(
     r"\((?:\s*)(Reda[çc][ãa]o|Inclu[íi]d|Inserid|Acrescentad|Renumerad|Revogad|Vide|vide|Alterad|"
     r"Suprimid|Com\s+reda|Regulamentad|Numera|Declarad|Promulgad|Em\s+vigor|Artigo\s+inclu|"
     r"Par[áa]grafo\s+inclu|Inciso\s+inclu|Texto|Ver\s|Nova\s+reda|Acrescid|Suspens|Efic[áa]cia|Adin|ADI\b|"
-    r"Novamente|Restabelecid|Reestabelecid)",
+    r"Novamente|Restabelecid|Reestabelecid)" + "|" + _NOTA_ALESP,
 )
 
 RE_LEAD_ID = re.compile(
     r"^\s*(?:Art\.\s*\d+\s*[º°ª]?\s*(?:[-–]\s*[A-H]|[A-H])?\s*[-–—.]?"
+    r"|Artigo\s+\d+\s*[º°ª]?\s*(?:-[A-H])?\s*[-–]"      # CE (ALESP); "Artigo 307, inciso III" é citação
     r"|§\s*\d+\s*\.?\s*[º°ª]?\s*(?:[-–]\s*[A-Z])?\s*[-–—.]?"
     r"|Par[áa]grafo\s+[úu]nico\s*[-–—.:]?"
     r"|l?[IVXLC]+\s*[-–—]"
@@ -558,7 +561,9 @@ _QUALIFIERS = [
     ("EXT", r"(?:da|desta)\s+(?:Emenda\s+(?:[àa]\s+)?Constitui[çc][ãa]o(?:\s+Federal)?|Emenda\s+Constitucional|EC)"
             r"\s*(?:n[º°.]?\s*)?\d+"),
     ("EXT", r"das\s+suas\s+Disposi[çc][õo]es\s+Transit[óo]rias"),
-    ("EXT", r"(?:da|na)\s+Constitui[çc][ãa]o\s+(?:Estadual|do\s+Estado)"),
+    ("CE", r"(?:da|na)\s+Constitui[çc][ãa]o\s+(?:Estadual|do\s+Estado)"),
+    # "desta Constituição": a própria norma, no texto da CE ou da CF
+    ("CONST", r"(?:desta|nesta)\s+Constitui[çc][ãa]o(?!\s+(?:Federal|Estadual|do\s+Estado|da\s+Rep))"),
     ("CF", r"(?:da|desta|na)\s+Constitui[çc][ãa]o(?:\s+(?:Federal|da\s+Rep[úu]blica))?(?!\s+Estadual)"),
     ("EXT", r"da\s+Resolu[çc][ãa]o\s*(?:n[º°a.]?\s*)?\d+"),
     ("EXT", r"da\s+Lei\s+(?:Federal\s+|Complementar\s+|Municipal\s+|Estadual\s+)?(?:n[º°.]?\s*)?[\d.]+"),
@@ -692,6 +697,8 @@ def _link_norma(url: Optional[str]) -> Optional[str]:
         return "LOM"
     if re.search(r"planalto\.gov\.br/ccivil_03/constituicao/constituicao", url, re.I):
         return "CF"
+    if re.search(r"al\.sp\.gov\.br/repositorio/legislacao/constituicao/1989/", url, re.I):
+        return "CE"
     return "OUTRA"
 
 
@@ -765,8 +772,8 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
             special = r.get("special")
             rpath = r["path"]
             target_art = r["art"]
-            if target_art is None and special is None and qkind not in (None, "REL_ART", "RI", "LOM", "CF", "LOMADT",
-                                                                        "RIADT"):
+            if target_art is None and special is None and qkind not in (None, "REL_ART", "RI", "LOM", "CE", "CF",
+                                                                        "CONST", "LOMADT", "RIADT"):
                 rem.classe = "externa"          # "inciso II do referido artigo" (de outra norma)
                 continue
             if target_art is None and special is None:
@@ -793,8 +800,10 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
                 continue
             if qkind in (None, "REL_ART"):
                 target_law = "RI" if prec else law
-            elif qkind in ("RI", "LOM", "CF"):
+            elif qkind in ("RI", "LOM", "CE", "CF"):
                 target_law = qkind
+            elif qkind == "CONST":
+                target_law = law if law in ("CE", "CF") else "CF"
             elif qkind == "RIADT":
                 # "Artigos 183-A e 4D do Ato das Disposições Transitórias": o do ADT, se existe
                 target_law = "RI"
@@ -816,8 +825,8 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
                     status_extra = AMBIGUA
                 elif adt_exists:
                     target_art = "ADT" + target_art
-            if target_law == "CF" and (target_law, target_art) not in corpus.arts:
-                rem.classe = "externa"          # CF fora do recorte (arts. 29-31)
+            if target_law in ("CE", "CF") and (target_law, target_art) not in corpus.arts:
+                rem.classe = "externa"          # artigo das Constituições fora do recorte do site
                 continue
             alvo = corpus.resolve(target_law, target_art, _path_key(rpath))
             if status_extra:

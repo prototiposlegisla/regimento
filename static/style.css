@@ -1698,6 +1698,7 @@ button.q-label:hover { color: #2c6fa6; }
   padding: 1px 5px; border-radius: 3px; background: #d6eaf8; color: #1b4f72;
 }
 .rem-head .rem-law.LOM { background: #fdebd0; color: #7e5109; }
+.rem-head .rem-law.CE { background: #d6eaf8; color: #1b4f72; }
 .rem-head .rem-law.CF { background: #d5f5e3; color: #145a32; }
 .rem-head .rem-law.PREC { background: #f6ddcc; color: #6e2c00; }
 .rem-head .rem-sint { font-weight: 400; color: #566573; }

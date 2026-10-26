@@ -29,10 +29,11 @@ RE_TITULO = re.compile(r"^T[ÍI]TULO\s+", re.IGNORECASE)
 RE_CAPITULO = re.compile(r"^CAP[ÍI]TULO\s+", re.IGNORECASE)
 RE_SECAO = re.compile(r"^SE[ÇC][ÃA]O\s+", re.IGNORECASE)
 RE_SUBSECAO = re.compile(r"^SUBSE[ÇC][ÃA]O\s+", re.IGNORECASE)
-# Matches: Art. 43, Art. 183-A, Art. 4ºA, Art. 4º-C.
+# Matches: Art. 43, Art. 183-A, Art. 4ºA, Art. 4º-C. and, in the Constituição Estadual
+# (ALESP), "Artigo 144 -" / "Artigo 145-A -" (only with the dash: "Artigo 307, inciso III" is text)
 # Group 1 = number, Group 2 = ordinal mark, Group 3/4 = optional letter suffix
 RE_ARTIGO = re.compile(
-    r"^Art\.\s*(\d+)([ºª°])?\s*"
+    r"^(?:Art\.|Artigo\s+(?=\d+\s*[ºª°]?\s*(?:-[A-H])?\s*[-–]))\s*(\d+)([ºª°])?\s*"
     r"(?:[-–]([A-H])(?=[.\s\xa0])|([A-H])(?=\s*[-–—.]))?",
 )
 RE_PARAGRAFO_UNICO = re.compile(r"^Par[aá]grafo\s+[uú]nico", re.IGNORECASE)
@@ -61,9 +62,16 @@ RE_DGT_MARKER = re.compile(
     r"DISPOSI[ÇC][ÕO]ES\s+GERAIS\s+E\s+TRANSIT[ÓO]RIAS",
     re.IGNORECASE,
 )
+# Notas da compilação da ALESP (Constituição Estadual), que nomeiam o dispositivo antes do verbo:
+# "(§ 2° com redação dada pela Emenda Constitucional n° 47, de 14/03/2019)", "("Caput" acrescentado
+# pela ...)", "(Item 1 declarado inconstitucional, em controle concentrado, ...)", "(Expressão "..."
+# declarada inconstitucional ...)", "(O Supremo Tribunal Federal, nos autos da ADI n° 4163, conferiu ...)"
+_NOTA_ALESP = (r"\(\s*(?:\"Caput\"|Caput|§\s*\d+|Par[áa]grafo\s+[úu]nico|Incisos?\s|Ite(?:m|ns)\s|Al[íi]neas?\s|"
+               r"Express[õã]|Artigos?\s|Emenda\s+Constitucional|O\s+Supremo|Refer[êe]ncia\s)[^()]*?"
+               r"(?:reda[çc][ãa]o|acrescentad|revogad|declarad|inconstitucional|transformad|suspens|conferiu|julgou)")
 RE_AMENDMENT = re.compile(
     r"\((Reda[çc][ãa]o\s+dada|Revogad[oa]|Reda[çc][ãa]o\s+reestabelecida|"
-    r"Acrescentad[oa]|Renumerad[oa]|Inclu[ií]d[oa])",
+    r"Acrescentad[oa]|Renumerad[oa]|Inclu[ií]d[oa])" + "|" + _NOTA_ALESP,
     re.IGNORECASE,
 )
 RE_NORMA = re.compile(r"^NORMA:\s*(.+)", re.IGNORECASE)
@@ -90,13 +98,13 @@ def prec_number(m: re.Match) -> str:
 RE_NOTE_START = re.compile(
     r"\(\s*(?:Reda[çc][ãa]o|Inclu[ií]d|Inserid|Acrescentad|Revogad|Renumerad|Alterad|"
     r"Vide\b|Suprimid|Declarad|Adin\b|ADI\b|Precedente|NR\)|Vig[êe]ncia|Produ[çc][ãa]o|"
-    r"Novamente|Designad|Restabelecid|Reestabelecid)",
+    r"Novamente|Designad|Restabelecid|Reestabelecid)" + "|" + _NOTA_ALESP,
     re.IGNORECASE,
 )
 # Identificador no início do dispositivo, com o separador: "Art. 5º -", "§ 1º-A.", "IV —", "b)"
 RE_LEADING_IDENT = re.compile(
-    r"^\s*(?:Art\.?\s*\d+\s*[ºª°]?(?:-?[A-H](?=[.\s\xa0\-–—]))?|[§Ss]\s*\d+\s*\.?\s*[ºª°]?(?:-[A-H]\b)?|"
-    r"Par[aá]grafo\s+[uú]nico|l?[IVXLC]+(?=\s*[-–—])|[a-z]\)|\d+\s*\)|\d+(?=\s*[-–—]))"
+    r"^\s*(?:Art\.?\s*\d+\s*[ºª°]?(?:-?[A-H](?=[.\s\xa0\-–—]))?|Artigo\s+\d+\s*[ºª°]?(?:-[A-H])?(?=\s*[-–])|[§Ss]\s*\d+\s*\.?\s*[ºª°]?(?:-[A-H]\b)?|"
+    r"Par[aá]grafo\s+[uú]nico|l?[IVXLC]+(?:-[A-H])?(?=\s*[-–—])|[a-z]\)|\d+\s*\)|\d+(?=\s*[-–—]))"
     r"\s*[-–—.:]?\s*",
     re.IGNORECASE,
 )
@@ -557,7 +565,8 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
         elif RE_INCISO.match(text):
             ut = UnitType.INCISO
             # Extract roman numeral
-            m3 = re.match(r"^(l?[IVXLC]+)", text)
+            # "XX-A - texto" (inciso acrescentado, na CE)
+            m3 = re.match(r"^(l?[IVXLC]+(?:-[A-H](?=\s*[-–—]))?)", text)
             raw = m3.group(1) if m3 else ""
             # Fix common typo: lowercase L at start = I
             if raw.startswith("l"):
@@ -1065,4 +1074,6 @@ def _extract_amendment_note(runs: list[TextRun]) -> str:
 
 
 def _is_revoked_text(text: str) -> bool:
-    return bool(re.search(r"\(Revogad[oa]", text, re.IGNORECASE))
+    # também a nota da ALESP que nomeia o dispositivo: "(Inciso III revogado pela Emenda ...)"
+    return bool(re.search(r"\(Revogad[oa]|\((?:\"?Caput\"?|§\s*\d+[º°]?|Par[áa]grafo\s+[úu]nico|Inciso|Item|Al[íi]nea|Artigo)"
+                          r"\s[^()]{0,30}?revogad[oa]s?\s+pel", text, re.IGNORECASE))

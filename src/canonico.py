@@ -3,7 +3,8 @@
 O build do site grava, a cada versão pública, uma pasta canonico/ com o texto que
 os demais projetos do legislasampa leem — nunca o intermediate/, que é só depuração:
 
-  regimento-interno.md, lei-organica.md, constituicao-federal-trechos.md,
+  regimento-interno.md, lei-organica.md, constituicao-estadual-trechos.md,
+  constituicao-federal-trechos.md,
   precedentes-regimentais.md   para a IA ler e buscar ("#### Art. 68 — título")
   indice-remissivo.md          o índice remissivo, por assunto
   normas.jsonl                 para programas: um artigo por linha, com a rede de ligações
@@ -38,6 +39,7 @@ DESTINO = BASE_DIR / "canonico"
 NORMAS = {
     "Regimento Interno": ("regimento-interno.md", "RI"),
     "Lei Orgânica": ("lei-organica.md", "LOM"),
+    "Constituição Estadual": ("constituicao-estadual-trechos.md", "CE"),
     "Constituição Federal": ("constituicao-federal-trechos.md", "CF"),
     "Precedentes Regimentais": ("precedentes-regimentais.md", "PREC"),
 }
@@ -232,10 +234,10 @@ Cada artigo começa por `#### Art. N — título` (no Ato das Disposições Tran
 Depois do texto de cada dispositivo pode vir a rede de ligações:
 
 - *(remete a: …)* — os dispositivos que o texto cita;
-- *(correlatos: …)* — dispositivos ligados pelo conteúdo, sem citação, com a relação lida deste lado ("mesma regra que", "detalha" / "detalhado em", "tem fundamento em" / "é fundamento de", "diverge de", "tem como regra federal correspondente" / "é a regra federal correspondente a", "é exceção à regra geral de" / "tem como exceção" e, dentro da mesma norma, "corresponde a": partes de um mesmo procedimento ou regras paralelas) e uma nota que explica a ligação;
+- *(correlatos: …)* — dispositivos ligados pelo conteúdo, sem citação, com a relação lida deste lado ("mesma regra que", "detalha" / "detalhado em", "tem fundamento em" / "é fundamento de", "diverge de", "tem como regra federal correspondente" / "é a regra federal correspondente a" (com a CE, "regra estadual"), "é exceção à regra geral de" / "tem como exceção" e, dentro da mesma norma, "corresponde a": partes de um mesmo procedimento ou regras paralelas) e uma nota que explica a ligação;
 - *(legislação correlata: …)* — leis e decretos que tratam do assunto.
 
-Todo alvo traz a sigla da norma — `RI art. 102, § 5º`, `LOM art. 18`, `CF art. 47`, `LOM art. 29 (ADT)` —, também quando é da mesma norma do arquivo. No fim do artigo podem vir *Citado em: …* (os dispositivos de outros artigos que o citam) e *No índice remissivo: …* (as entradas do índice que o citam; entre parênteses, quando citam só alguns dispositivos), e depois as *Versões anteriores deste artigo*, marcadas *[Versão supersedida]* — que não são texto vigente.
+Todo alvo traz a sigla da norma — `RI art. 102, § 5º`, `LOM art. 18`, `CE art. 144`, `CF art. 47`, `LOM art. 29 (ADT)` —, também quando é da mesma norma do arquivo. No fim do artigo podem vir *Citado em: …* (os dispositivos de outros artigos que o citam) e *No índice remissivo: …* (as entradas do índice que o citam; entre parênteses, quando citam só alguns dispositivos), e depois as *Versões anteriores deste artigo*, marcadas *[Versão supersedida]* — que não são texto vigente.
 
 Para achar um artigo: buscar `#### Art. 68 ` (com o espaço) no arquivo da norma.
 
@@ -255,7 +257,7 @@ Um artigo por linha, só com a redação vigente:
                   {{"caminho": "§ 1º,II", "id": "II", "tipo": "INCISO", "texto": "...", "revogado": true}}]}}
 ```
 
-- `norma`: RI, LOM, CF ou PREC; `art`: o número sem "Art." ("4-A"; no ADT, o número com `"adt": true`).
+- `norma`: RI, LOM, CE (Constituição do Estado de São Paulo), CF ou PREC; `art`: o número sem "Art." ("4-A"; no ADT, o número com `"adt": true`).
 - `caminho`: a posição do dispositivo no artigo (`""` é o caput; "§ 1º,II,a"; "§ú" é o parágrafo único).
 - `remete_a`, `correlatos`, `citado_por`: endereços no mesmo formato (`norma`, `art`, `caminho`; `caminho` `""` = o artigo inteiro ou o caput). O alvo pode trazer `"revogado": true` ou `"redacao_anterior": true` (a citação aponta para redação já substituída).
 - `correlatos`: `relacao` é a ligação lida a partir deste dispositivo (as mesmas frases do Markdown); `tipo` é o nome na planilha (mesma regra, detalha, fundamento, diverge, correspondente, exceção).

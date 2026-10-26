@@ -2976,6 +2976,7 @@
   const REM_SOURCES = {
     RI: 'https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=168&TipArq=1',
     LOM: 'https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?ID=68&TipArq=1',
+    CE: 'https://www.al.sp.gov.br/repositorio/legislacao/constituicao/1989/compilacao-constituicao-0-05.10.1989.html',
     CF: 'https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm',
   };
   const $header = document.getElementById('header');
@@ -3038,6 +3039,7 @@
     }
     const base = REM_SOURCES[g.law];
     if (!base) return null;
+    if (g.law === 'CE') return base;   // the ALESP page has no anchors
     if (!g.art.startsWith('ADT')) return base + '#art' + g.art.replace('-', '');
     const n = g.art.slice(3);
     if (g.law === 'LOM') return base + '#' + encodeURIComponent('DisposiçõesTransitóriasart' + n);
@@ -3132,7 +3134,9 @@
       k.className = 'rem-kind';
       // "correspondente" inside one norm (data-mesma: RI–RI, LOM–LOM) is no federal
       // rule: parts of one procedure or parallel rules, linked both ways
+      // and with the Constituição Estadual (data-esfera) it is the state rule
       k.textContent = tipo === 'sim' && trigger.dataset.mesma ? '⇄ Dispositivo correspondente'
+        : tipo === 'sim' && trigger.dataset.esfera && trigger.dataset.side !== 'tgt' ? '⇄ Regra estadual correspondente'
         : REM_TIPO[tipo][trigger.dataset.side === 'tgt' ? 1 : 0];
       n.appendChild(k);
       if (trigger.dataset.status === 'proposta') {

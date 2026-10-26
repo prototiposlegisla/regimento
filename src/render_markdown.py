@@ -139,11 +139,14 @@ class MarkdownRenderer:
         """Como o correlato se lê do lado side ("src" | "tgt"): "detalhado em", "diverge de"...
 
         "correspondente" na mesma norma (RI–RI, LOM–LOM) não é regra federal: são partes de um
-        mesmo procedimento ou regras paralelas, ligadas nos dois sentidos.
+        mesmo procedimento ou regras paralelas, ligadas nos dois sentidos; com destino na CE, é a
+        regra estadual.
         """
         if im.tipo == "sim" and im.origem.law == im.destino.law:
             return "corresponde a"
-        return cls._IMP_WORDS[im.tipo][0 if side == "src" else 1]
+        words = cls._IMP_WORDS[im.tipo][0 if side == "src" else 1]
+        # o destino da Constituição Estadual é a regra estadual correspondente
+        return words.replace("federal", "estadual") if im.tipo == "sim" and im.destino.law == "CE" else words
 
     def _correlatos_suffix(self, unit: DocumentUnit) -> str:
         """Sufixo das remissões implícitas: *(correlatos: diverge de LOM art. 48, § 6º — nota)*."""
@@ -267,6 +270,8 @@ class MarkdownRenderer:
 
         # tolera espaço inicial e \xa0 dentro do identificador ("  Art.\xa029. O Município...")
         escaped = r"\s*" + re.escape(ident).replace(r"\ ", r"\s*")
+        # o identificador é "Art. 144"; no texto da Constituição Estadual (ALESP), "Artigo 144 -"
+        escaped = escaped.replace(r"Art\.", r"Art(?:\.|igo)", 1)
         patterns = [
             escaped + r"\s*[-–—.]\s*",
             escaped + r"\s+",

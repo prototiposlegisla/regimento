@@ -997,11 +997,34 @@ mark {
   margin: 12px 0 4px;
   letter-spacing: .3px;
 }
+/* Legislação correlata: each norm's name in a dark band, like the rubrica,
+   so the passage from one norm to the next stands out */
+.ref-law-title {
+  background: var(--rubrica);
+  color: #fff;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin: 20px 0 2px;
+}
 .ref-entry {
   padding: 6px 0;
   font-size: 13px;
   line-height: 1.5;
   border-bottom: 1px solid #f0f0f0;
+}
+/* ...and its ementa right under it, in a gray band joined to the name's */
+.ref-law-title:has(+ .ref-law-ementa) { border-radius: 4px 4px 0 0; margin-bottom: 0; }
+.ref-law-ementa {
+  background: #e4e6ea;
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 0 0 4px 4px;
+  border-bottom: none;
+  margin-bottom: 2px;
 }
 .ref-entry b { color: #c0392b; }
 .ref-art-link {

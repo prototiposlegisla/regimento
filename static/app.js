@@ -3977,7 +3977,7 @@
 
       if (group.title) {
         const titleEl = document.createElement('div');
-        titleEl.className = 'ref-group-title';
+        titleEl.className = 'ref-group-title' + (cat.category === LEGISLACAO ? ' ref-law-title' : '');
         titleEl.textContent = group.title;
         $indexContent.appendChild(titleEl);
       }
@@ -3987,7 +3987,8 @@
         if (filter && !textMatchesFilter(entryText, filter) && !textMatchesFilter(group.title, filter)) continue;
 
         const entryEl = document.createElement('div');
-        entryEl.className = 'ref-entry';
+        // In the legislação, the entry without an article is the norm's ementa
+        entryEl.className = 'ref-entry' + (cat.category === LEGISLACAO && !entry.art_ref ? ' ref-law-ementa' : '');
 
         const textSpan = document.createElement('span');
         textSpan.innerHTML = entry.html;

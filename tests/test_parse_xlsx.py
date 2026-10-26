@@ -184,3 +184,56 @@ def test_espelhos_pares_com_assunto_e_subassunto_trocados():
                           frozenset({"COMISSÕES PERMANENTES — Pareceres", "PARECER — De Comissão Permanente"})}
     lei = {m["nome"]: m["refs"] for m in pares[frozenset({"LEI — Promulgação", "PROMULGAÇÃO — De Lei"})]}
     assert lei["PROMULGAÇÃO — De Lei"] - lei["LEI — Promulgação"] == {("LOM", "42", "")}
+
+
+def test_espelho_que_remete_ao_outro_lado_nao_conta():
+    from src.parse_xlsx import espelhos
+    idx = SubjectIndex(entries=[
+        SubjectEntry("PROPOSIÇÕES", "Publicação", [], vides=["PUBLICAÇÃO|De proposições"]),
+        SubjectEntry("PUBLICAÇÃO", "De proposições", [SubjectRef("216")]),
+    ])
+    assert espelhos(idx) == []
+
+
+def _arts(*arts):
+    return [SubjectRef(a) for a in arts]
+
+
+def test_duplicatas_mesmo_tema_em_duas_casas():
+    from src.parse_xlsx import duplicatas
+    idx = SubjectIndex(entries=[
+        # nome contido e 4 de 5: o mesmo tema arquivado sob a sessão em geral
+        SubjectEntry("SESSÃO DA CÂMARA", "Extraordinária", _arts("183", "184", "185", "186", "187")),
+        SubjectEntry("SESSÃO EXTRAORDINÁRIA", "", _arts("183", "184", "185", "186", "188", "189")),
+        # mesma lista, nomes sem relação
+        SubjectEntry("ORDEM DO DIA", "Organização", _arts("171", "172", "173")),
+        SubjectEntry("PAUTA", "Elaboração", _arts("171", "172", "173")),
+        # parecidas, mas o nome de uma não cabe no da outra
+        SubjectEntry("VOTAÇÃO", "Secreta", _arts("293", "294", "295", "296")),
+        SubjectEntry("VOTO", "Secreto", _arts("293", "294", "295", "297")),
+        # o espelho tem a sua conferência
+        SubjectEntry("LEI", "Promulgação", _arts("360", "361", "362")),
+        SubjectEntry("PROMULGAÇÃO", "De Lei", _arts("360", "361", "362")),
+        # com menos de 3 dispositivos, não conta
+        SubjectEntry("A", "X", _arts("1", "2")),
+        SubjectEntry("B", "X", _arts("1", "2")),
+    ])
+    achadas = {(a["nome"], b["nome"], c) for a, b, c in duplicatas(idx)}
+    assert achadas == {("SESSÃO DA CÂMARA — Extraordinária", "SESSÃO EXTRAORDINÁRIA", 4),
+                       ("ORDEM DO DIA — Organização", "PAUTA — Elaboração", 3)}
+    assert {(a["nome"], b["nome"]) for a, b, _ in duplicatas(idx, [["PAUTA — Elaboração", "ordem do dia — organização"]])} \
+        == {("SESSÃO DA CÂMARA — Extraordinária", "SESSÃO EXTRAORDINÁRIA")}
+
+
+def test_espelhos_declarados_e_excecoes(tmp_path):
+    from src.parse_xlsx import carregar_excecoes_indice, espelhos_declarados
+    arq = tmp_path / "indice_excecoes.toml"
+    arq.write_text('[[espelho]]\nentradas = ["AUDIÊNCIA PÚBLICA — Convocação", "COMISSÕES PERMANENTES — Audiências", '
+                   '"NÃO EXISTE"]\nmotivo = "x"\n\n[[distintos]]\nentradas = ["SÓ UMA"]\n', encoding="utf-8")
+    exc = carregar_excecoes_indice(arq)
+    assert exc["distintos"] == []                  # grupo de uma entrada só não vale
+    assert carregar_excecoes_indice(tmp_path / "nao.toml") == {"espelho": [], "distintos": []}
+    idx = SubjectIndex(entries=[SubjectEntry("AUDIÊNCIA PÚBLICA", "Convocação", _arts("86")),
+                                SubjectEntry("COMISSÕES PERMANENTES", "Audiências", _arts("86", "87"))])
+    (par,) = espelhos_declarados(idx, [g["entradas"] for g in exc["espelho"]])
+    assert par[1]["refs"] - par[0]["refs"] == {("", "87", "")}

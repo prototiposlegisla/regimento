@@ -1,0 +1,222 @@
+# Entradas do índice remissivo com listas parecidas de propósito.
+#
+# Regra do índice: um tema, uma casa. O tema fica detalhado numa entrada e as outras ficam
+# com a linha e um vide para ela (SESSÃO ORDINÁRIA — Grande Expediente → GRANDE EXPEDIENTE),
+# porque listas copiadas acabam divergindo. O build avisa (categoria "duplicatas") quando duas
+# entradas de assuntos diferentes têm a mesma lista, ou quando uma tem o nome contido no da
+# outra e ≥ 80% da lista dela (src/parse_xlsx.duplicatas). Os espelhos que o build reconhece
+# sozinho (LEI — Promulgação × PROMULGAÇÃO — De Lei) já ficam de fora.
+#
+# Declare aqui só o que fica de propósito:
+#
+#   [[espelho]]    o cruzamento de dois conceitos visto de cada lado, com nomes que o build não
+#                  reconhece como espelho: as entradas levam os mesmos dispositivos, e o build
+#                  confere (categoria "espelhos");
+#   [[distintos]]  temas diferentes que coincidem nos dispositivos (entes diferentes sob a mesma
+#                  regra, um recorte de um tema mais amplo): cada um fica com a sua lista.
+#
+# entradas: os nomes como no site, "ASSUNTO — Subassunto" ou "ASSUNTO"; num grupo com mais de
+#           duas, vale para todos os pares
+# motivo:   por que ficam assim
+#
+# O build avisa quando um nome daqui não está no índice (foi renomeado ou remetido).
+
+# ── Fase 7 (26/10/2026) ──
+
+[[espelho]]
+entradas = ["ATA DAS SESSÕES — Sessão secreta", "SESSÃO SECRETA — Ata"]
+motivo = "cruzamento A — B × B — A que o detector não pegou; as listas já coincidem"
+
+[[espelho]]
+entradas = ["AUDIÊNCIA PÚBLICA — Solicitada por eleitores ou entidades", "ELEITOR — Requerimento de audiência pública"]
+motivo = "cruzamento de audiência pública e eleitor visto de cada lado; a união só acrescenta o 87, I ao lado da audiência"
+
+[[espelho]]
+entradas = ["BENS MUNICIPAIS — Transferência ao FUNPREV", "PREVIDÊNCIA MUNICIPAL — Transferência de bens e direitos ao FUNPREV"]
+motivo = "cruzamento de bens municipais e previdência visto de cada lado (FUNPREV remete a PREVIDÊNCIA MUNICIPAL); listas iguais"
+
+[[espelho]]
+entradas = ["COMISSÃO DE FINANÇAS E ORÇAMENTO — Apreciação de contas", "CONTAS — Parecer da Comissão de Finanças e Orçamento"]
+motivo = "o parecer da Comissão de Finanças e Orçamento sobre as contas, visto da Comissão e das CONTAS; listas iguais"
+
+[[espelho]]
+entradas = ["ORDEM DO DIA — Na sessão extraordinária", "SESSÃO EXTRAORDINÁRIA — Ordem do Dia"]
+motivo = "cruzamento de dois assuntos com vida própria; a casa recebe o 171, § 3º e o espelho também"
+
+[[espelho]]
+entradas = ["PARECER — Recurso", "RECURSOS — Contra pareceres de comissões"]
+motivo = "recurso contra parecer de comissão visto de PARECER e de RECURSOS; as listas já são iguais"
+
+[[espelho]]
+entradas = ["PARTICIPAÇÃO POPULAR — Saúde: controle social", "SAÚDE — Participação da comunidade e controle social"]
+motivo = "cruzamento de PARTICIPAÇÃO POPULAR e SAÚDE, ambos assuntos com vida própria; listas já iguais"
+
+[[espelho]]
+entradas = ["VETO — Votação", "VOTAÇÃO — De vetos"]
+motivo = "espelho já com a mesma lista"
+
+[[distintos]]
+entradas = ["ADMINISTRAÇÃO MUNICIPAL — Criação e organização", "AUTARQUIA MUNICIPAL — Criação", "EMPRESA PÚBLICA — Criação", "FUNDAÇÃO INSTITUÍDA OU MANTIDA PELO PODER MUNICIPAL — Criação", "SOCIEDADE DE ECONOMIA MISTA — Criação", "ÓRGÃO PÚBLICO — Criação"]
+motivo = "entes diferentes sob a mesma regra geral de criação por lei; ADMINISTRAÇÃO MUNICIPAL é a visão de conjunto e ÓRGÃO PÚBLICO o recorte da administração direta"
+
+[[distintos]]
+entradas = ["COMISSÃO DE CONSTITUIÇÃO, JUSTIÇA E LEGISLAÇÃO PARTICIPATIVA — Parecer contrário", "PARECER — Recurso", "PROJETO DE LEI — Rejeitado"]
+motivo = "o parecer contrário da CCJ (efeito: rejeição) é recorte da competência da CCJ; o projeto de lei rejeitado inclui renovação e reapresentação (215, LOM 28); o recurso contra parecer é outro instituto"
+
+[[distintos]]
+entradas = ["COMISSÃO DE CONSTITUIÇÃO, JUSTIÇA E LEGISLAÇÃO PARTICIPATIVA — Processo de destituição de membro da mesa", "DESTITUIÇÃO — De membros da mesa", "MEMBROS DA MESA — Destituição", "RESOLUÇÃO — De destituição de Membro da Mesa", "VOTAÇÃO — Destituição de Membro da Mesa"]
+motivo = "recortes legítimos: o papel da CCJ no processo, a resolução de destituição como espécie de resolução e a votação da destituição como espécie de votação"
+
+[[distintos]]
+entradas = ["COMISSÃO DE FINANÇAS E ORÇAMENTO — Apreciação de contas", "CONTAS"]
+motivo = "revistas na Fase 7 em decisões separadas (G019); cada uma fica com a sua lista"
+
+[[distintos]]
+entradas = ["COMISSÃO EXTRAORDINÁRIA DE APOIO AO DESENVOLVIMENTO DO TURISMO, DO LAZER, DA GASTRONOMIA, DA HOSPITALIDADE E DOS EVENTOS", "COMISSÃO EXTRAORDINÁRIA DE INOVAÇÃO, TECNOLOGIA E CIDADE INTELIGENTE", "COMISSÃO EXTRAORDINÁRIA PERMANENTE DE DEFESA DOS DIREITOS DA CRIANÇA, DO ADOLESCENTE E DA JUVENTUDE", "COMISSÃO EXTRAORDINÁRIA PERMANENTE DE DEFESA DOS DIREITOS HUMANOS E CIDADANIA", "COMISSÃO EXTRAORDINÁRIA PERMANENTE DE MEIO AMBIENTE E DOS DIREITOS DOS ANIMAIS", "COMISSÃO EXTRAORDINÁRIA PERMANENTE DE RELAÇÕES INTERNACIONAIS", "COMISSÃO EXTRAORDINÁRIA PERMANENTE DE SEGURANÇA PÚBLICA", "COMISSÃO EXTRAORDINÁRIA PERMANENTE DO IDOSO E DE ASSISTÊNCIA SOCIAL", "COMISSÕES EXTRAORDINÁRIAS — Normas aplicáveis das Comissões Permanentes"]
+motivo = "oito Comissões Extraordinárias diferentes sob a mesma regra (38, §§ 1º a 4º, e as normas das Permanentes); a entrada I é o recorte da norma de aplicação"
+
+[[distintos]]
+entradas = ["COMISSÕES PERMANENTES — Criação e funcionamento", "COMISSÕES TEMPORÁRIAS — Criação e funcionamento", "CONSELHOS — Criação e funcionamento"]
+motivo = "entes diferentes sob a mesma regra geral (RI 105, XVI; LOM 13, XVIII e 14, XXI); a das Comissões Permanentes tem ainda os dispositivos próprios (RI 38; LOM 32 e 41)"
+
+[[distintos]]
+entradas = ["COMISSÕES PERMANENTES — Proibições", "SESSÃO ORDINÁRIA — Proibição de reunião de Comissão Permanente"]
+motivo = "Proibições é o tema amplo (inclui a vedação de opinar fora da atribuição, art. 48); a da SESSÃO ORDINÁRIA é o recorte da reunião durante a sessão e suas exceções (57, § 2º; 141, II; 270, § 6º)"
+
+[[distintos]]
+entradas = ["COMISSÕES PERMANENTES — Reunião conjunta: quorum e deliberação", "QUORUM — Na reunião de Comissão", "VOTAÇÃO — Pelas comissões"]
+motivo = "a reunião conjunta tem casa em COMISSÕES PERMANENTES (REUNIÃO CONJUNTA e CONGRESSO DE COMISSÕES remetem para lá) e esta linha é recorte dela; quorum e votação são temas diferentes que se cruzam nos mesmos artigos"
+
+[[distintos]]
+entradas = ["COMPETÊNCIA — Município", "MUNICÍPIO — Competência", "EDUCAÇÃO — Competência do Município", "HABITAÇÃO — Competência do Município", "IMPOSTOS — Competência do Município"]
+motivo = "COMPETÊNCIA — Município × MUNICÍPIO — Competência é o espelho da competência geral; educação, habitação e impostos são recortes legítimos por matéria, cada um no seu tema"
+
+[[distintos]]
+entradas = ["CONTAS", "CONTAS DA MESA"]
+motivo = "CONTAS em geral (Prefeito, Mesa e Tribunal) e as contas da Mesa como recorte com regras próprias (28, 29)"
+
+[[distintos]]
+entradas = ["DISCUSSÃO — Requerimento não sujeito a discussão", "VOTAÇÃO — Encaminhamento: vedação", "VOTO — Declaração de: vedação"]
+motivo = "três vedações diferentes (discussão, encaminhamento, declaração de voto) que a mesma fórmula regimental costuma enumerar juntas; 168, 227 e 231 admitem discussão e só vedam encaminhamento e declaração"
+
+[[distintos]]
+entradas = ["INICIATIVA POPULAR — Plebiscito e referendo", "PLEBISCITO — Iniciativa", "REFERENDO — Iniciativa"]
+motivo = "cada instituto tem a sua iniciativa (316, IV só plebiscito; 316, V só referendo) e a de INICIATIVA POPULAR é a soma exata das duas; listas já coerentes; o art. 45 da LOM é iniciativa também do Executivo e de 1/3 dos vereadores"
+
+[[distintos]]
+entradas = ["POSSE — De Prefeito", "PREFEITO — Posse", "PREFEITO — Renúncia", "VICE-PREFEITO — Posse", "VICE-PREFEITO — Renúncia"]
+motivo = "posse e renúncia são temas diferentes, e Prefeito e Vice são entes diferentes; POSSE — De Prefeito e PREFEITO — Posse seguem como espelho"
+
+[[distintos]]
+entradas = ["POSSE — De vereador", "VEREADOR — Posse", "SUPLENTE DE VEREADORES — Posse"]
+motivo = "o Suplente é ente diferente; sua posse fica no assunto próprio, mesmo contida na lista geral de posse"
+
+[[distintos]]
+entradas = ["PREFEITO — Afastamento", "VICE-PREFEITO — Afastamento"]
+motivo = "entes diferentes sob a mesma regra"
+
+[[distintos]]
+entradas = ["PREFEITO — Ausência do Município: autorização", "VICE-PREFEITO — Ausência do Município: autorização"]
+motivo = "entes diferentes sob a mesma regra"
+
+[[distintos]]
+entradas = ["PREFEITO — Licença: concessão", "VICE-PREFEITO — Licença: concessão"]
+motivo = "entes diferentes sob a mesma regra"
+
+[[distintos]]
+entradas = ["PREFEITO — Mandato: perda", "VICE-PREFEITO — Mandato: perda"]
+motivo = "pessoas diferentes; o Vice tem só os casos que lhe são aplicáveis"
+
+[[distintos]]
+entradas = ["PREFEITO — Responsabilidade", "VICE-PREFEITO — Responsabilidade"]
+motivo = "pessoas diferentes sob o mesmo regime; 391 e LOM 74 (extinção pela Mesa) são só do Prefeito"
+
+[[distintos]]
+entradas = ["PREFEITO — Substituição", "PREFEITO — Vacância do cargo", "VICE-PREFEITO — Vacância do cargo"]
+motivo = "substituição e vacância são temas diferentes, e Prefeito e Vice são entes diferentes"
+
+[[distintos]]
+entradas = ["PREFEITO — Subsídio: fixação", "VEREADOR — Subsídio: fixação", "VICE-PREFEITO — Subsídio: fixação"]
+motivo = "entes diferentes sob a mesma regra de fixação"
+
+[[distintos]]
+entradas = ["SECRETÁRIO MUNICIPAL — Nomeação", "SUBPREFEITO — Nomeação"]
+motivo = "cargos diferentes sob a mesma regra de nomeação do art. 76 da LOM"
+
+[[distintos]]
+entradas = ["SESSÃO DA CÂMARA — Presidência do vereador mais idoso", "VEREADOR — Mais idosos"]
+motivo = "a presidência da sessão pelo mais idoso é recorte legítimo do tema mais amplo do Vereador mais idoso, que inclui Comissões e desempate na eleição da Mesa"
+
+# ── Fase 7: decisões aprovadas na revisão do usuário (26/10/2026) ──
+
+[[espelho]]
+entradas = ["AUDIÊNCIA PÚBLICA — Convocação pelas Comissões Permanentes", "COMISSÕES PERMANENTES — Audiências Públicas"]
+motivo = "audiência pública e Comissões Permanentes têm vida própria; a entrada é o ponto em que se encontram"
+
+[[espelho]]
+entradas = ["CASSAÇÃO DE MANDATO DE PREFEITO — Denúncia: leitura e Comissão Especial", "COMISSÕES ESPECIAIS — De avaliação de denúncia contra o Prefeito"]
+motivo = "a Comissão Especial que avalia a denúncia é o ponto de encontro entre a cassação e as comissões especiais"
+
+[[espelho]]
+entradas = ["COMISSÃO DE CONSTITUIÇÃO, JUSTIÇA E LEGISLAÇÃO PARTICIPATIVA — Parecer contrário", "RECURSOS — Contra pareceres de comissões"]
+motivo = "o recurso contra o parecer contrário da CCJ visto pela Comissão e pelos RECURSOS"
+
+[[espelho]]
+entradas = ["COMISSÕES PERMANENTES — Composição", "MEMBROS DE COMISSÃO — Comissões permanentes"]
+motivo = "quem compõe as Comissões Permanentes, visto de cada lado"
+
+[[espelho]]
+entradas = ["COMISSÕES TEMPORÁRIAS — Designação de membros", "MEMBROS DE COMISSÃO — Temporária"]
+motivo = "a designação dos membros das Comissões Temporárias vista de cada lado"
+
+[[espelho]]
+entradas = ["DELIBERAÇÃO CONCLUSIVA — Recurso ao Plenário", "RECURSOS — Contra deliberação das comissões"]
+motivo = "recurso de 1/10 contra a deliberação conclusiva, visto pela DELIBERAÇÃO CONCLUSIVA e pelos RECURSOS"
+
+[[espelho]]
+entradas = ["ORÇAMENTO — Votação", "VOTAÇÃO — De projetos de Leis Orçamentárias"]
+motivo = "cruzamento de ORÇAMENTO e VOTAÇÃO, ambos com vida própria"
+
+[[espelho]]
+entradas = ["PRESIDENTE DA CÂMARA — Recurso às decisões", "RECURSOS — Às decisões do Presidente"]
+motivo = "cruzamento de PRESIDENTE DA CÂMARA e RECURSOS visto de cada lado"
+
+[[espelho]]
+entradas = ["PRESIDENTE DA CÂMARA — Substituição", "VICE-PRESIDENTE DA CÂMARA — Substituição"]
+motivo = "a substituição do Presidente pelos Vice-Presidentes vista de cada lado"
+
+[[espelho]]
+entradas = ["PROJETOS — Inclusão obrigatória na Ordem do Dia", "SOBRESTAMENTO — Projeto do Prefeito em regime de urgência"]
+motivo = "o projeto do Prefeito em urgência visto pela inclusão obrigatória e pelo sobrestamento; não se remete porque o nome de PROJETOS é mais amplo que o de SOBRESTAMENTO"
+
+[[espelho]]
+entradas = ["REQUERIMENTO — De anulação de convocação de sessão ordinária", "SESSÃO ORDINÁRIA — Anulação de convocação"]
+motivo = "a anulação só se faz por requerimento; cruzamento de REQUERIMENTO e SESSÃO ORDINÁRIA"
+
+[[distintos]]
+entradas = ["INICIATIVA POPULAR — Plebiscito e referendo", "PLEBISCITO", "REFERENDO"]
+motivo = "o pedido popular de consulta é recorte de cada instituto, que tem também a convocação pela Câmara"
+
+[[distintos]]
+entradas = ["PRECEDENTE REGIMENTAL — Comissões: reunião conjunta e parecer conjunto", "REUNIÃO CONJUNTA"]
+motivo = "PRECEDENTE REGIMENTAL lista só os precedentes; REUNIÃO CONJUNTA tem também os artigos"
+
+[[distintos]]
+entradas = ["PROMULGAÇÃO", "PROJETO DE LEI — Sanção e promulgação"]
+motivo = "a entrada do projeto de lei cobre também a sanção"
+
+[[distintos]]
+entradas = ["PROMULGAÇÃO — Pelo Presidente da Câmara na omissão do Prefeito", "PRESIDENTE DA CÂMARA — Promulgação"]
+motivo = "o Presidente promulga também resoluções e decretos legislativos; a omissão do Prefeito é recorte"
+
+[[distintos]]
+entradas = ["REQUERIMENTO — De preferência para votação", "PREFERÊNCIA"]
+motivo = "o requerimento é um caminho para a preferência; PREFERÊNCIA tem também a preferência regimental"
+
+[[distintos]]
+entradas = ["TRAMITAÇÃO — De vetos", "VETO"]
+motivo = "VETO cobre o instituto inteiro; a tramitação é recorte"
+
+[[distintos]]
+entradas = ["VOTAÇÃO — De vetos", "VETO"]
+motivo = "VETO cobre o instituto inteiro; a votação é recorte"

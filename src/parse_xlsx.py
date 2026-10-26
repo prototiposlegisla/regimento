@@ -471,6 +471,8 @@ def espelhos(index: SubjectIndex) -> list[list[dict]]:
     """Pares de entradas em que o assunto de uma é o subassunto da outra e vice-versa
     ("LEI — Promulgação" / "PROMULGAÇÃO — De Lei"): devem levar os mesmos dispositivos.
 
+    Um lado que ficou só com o vide para o outro (um tema, uma casa) não é mais espelho.
+
     Retorna os pares [{nome, assunto, sub, refs: set[(prefixo, artigo, detalhe)]}, {...}].
     """
     por_chave: dict[tuple[frozenset, frozenset], dict] = {}
@@ -481,10 +483,91 @@ def espelhos(index: SubjectIndex) -> list[list[dict]]:
         if not all(chave) or chave[0] == chave[1]:
             continue
         m = por_chave.setdefault(chave, {"nome": e.display_name(), "assunto": e.subject,
-                                         "sub": e.sub_subject, "refs": set()})
+                                         "sub": e.sub_subject, "refs": set(), "vides": set()})
         m["refs"] |= {_ref_key(r) for r in e.refs}
+        m["vides"] |= {_chave(v.replace("|", " — ")) for v in e.vides}
+
+    def remete(x: dict, y: dict) -> bool:
+        return not x["refs"] and _chave(y["nome"]) in x["vides"]
+
     return [[m, por_chave[(b, a)]] for (a, b), m in por_chave.items()
-            if (b, a) in por_chave and m["nome"] < por_chave[(b, a)]["nome"]]
+            if (b, a) in por_chave and m["nome"] < por_chave[(b, a)]["nome"]
+            and not remete(m, por_chave[(b, a)]) and not remete(por_chave[(b, a)], m)]
+
+
+def _entradas_por_nome(index: SubjectIndex) -> dict[str, dict]:
+    """{nome em minúsculas: {nome, assunto, sub, refs}}; linhas repetidas de uma entrada se somam."""
+    out: dict[str, dict] = {}
+    for e in index.entries:
+        m = out.setdefault(_chave(e.display_name()), {"nome": e.display_name(), "assunto": e.subject,
+                                                       "sub": e.sub_subject, "refs": set()})
+        m["refs"] |= {_ref_key(r) for r in e.refs}
+    return out
+
+
+def carregar_excecoes_indice(path: str | Path) -> dict[str, list[dict]]:
+    """indice_excecoes.toml → {"espelho": [{entradas, motivo}], "distintos": [...]} (sem o arquivo: listas vazias)."""
+    import tomllib
+
+    path = Path(path)
+    dados = tomllib.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    return {tipo: [g for g in dados.get(tipo, []) if len(g.get("entradas", [])) >= 2]
+            for tipo in ("espelho", "distintos")}
+
+
+def espelhos_declarados(index: SubjectIndex, grupos: list[list[str]]) -> list[list[dict]]:
+    """Os pares de cada grupo [[espelho]] de indice_excecoes.toml — o cruzamento de dois conceitos com
+    nomes que espelhos() não reconhece ("AUDIÊNCIA PÚBLICA — Convocação pelas Comissões Permanentes" /
+    "COMISSÕES PERMANENTES — Audiências Públicas"). Mesmo formato de espelhos(); nome que não está
+    no índice fica de fora."""
+    por_nome = _entradas_por_nome(index)
+    pares = []
+    for g in grupos:
+        membros = [por_nome[_chave(n)] for n in g if _chave(n) in por_nome]
+        pares += [[a, b] for i, a in enumerate(membros) for b in membros[i + 1:]]
+    return pares
+
+
+def duplicatas(index: SubjectIndex, aceitos: list[list[str]] = (), minimo: int = 3) -> list[tuple[dict, dict, int]]:
+    """Entradas de assuntos diferentes que parecem o mesmo tema em duas casas ("um tema, uma casa": o tema
+    fica detalhado numa entrada e as outras remetem com vide). Acusa dois casos, com ao menos `minimo`
+    dispositivos na menor:
+      - as mesmas listas;
+      - ≥ 80% da menor na maior, com as palavras do nome de uma contidas nas da outra
+        ("SESSÃO DA CÂMARA — Extraordinária" / "SESSÃO EXTRAORDINÁRIA").
+    Ficam de fora os espelhos e os pares de um mesmo grupo de `aceitos` ([[espelho]] e [[distintos]]
+    de indice_excecoes.toml). Retorna [(menor, maior, em comum)], no formato de espelhos().
+    """
+    por_nome = _entradas_por_nome(index)
+    ja_vistos = {frozenset((a["nome"], b["nome"])) for a, b in espelhos(index)}
+    grupo_de: dict[str, set[int]] = {}
+    for i, g in enumerate(aceitos):
+        for n in g:
+            grupo_de.setdefault(_chave(n), set()).add(i)
+
+    candidatas = [m for m in por_nome.values() if len(m["refs"]) >= minimo]
+    por_ref: dict[tuple, list[dict]] = {}
+    for m in candidatas:
+        for r in m["refs"]:
+            por_ref.setdefault(r, []).append(m)
+    comum: dict[tuple[str, str], int] = {}
+    for ms in por_ref.values():
+        for i, a in enumerate(ms):
+            for b in ms[i + 1:]:
+                k = (a["nome"], b["nome"])
+                comum[k] = comum.get(k, 0) + 1
+
+    out = []
+    for (na, nb), c in comum.items():
+        a, b = por_nome[_chave(na)], por_nome[_chave(nb)]
+        if a["assunto"] == b["assunto"] or frozenset((na, nb)) in ja_vistos \
+                or grupo_de.get(_chave(na), set()) & grupo_de.get(_chave(nb), set()):
+            continue
+        menor, maior = sorted((a, b), key=lambda m: (len(m["refs"]), m["nome"]))
+        pa, pb = (_palavras(m["assunto"]) | _palavras(m["sub"]) for m in (a, b))
+        if a["refs"] == b["refs"] or (c >= 0.8 * len(menor["refs"]) and (pa <= pb or pb <= pa)):
+            out.append((menor, maior, c))
+    return sorted(out, key=lambda t: (t[0]["nome"], t[1]["nome"]))
 
 
 def resolver_vides_em_cadeia(index: SubjectIndex) -> int:

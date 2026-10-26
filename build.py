@@ -87,6 +87,7 @@ class ValidationReport:
             "propostas": "Propostas do índice remissivo (aba Propostas)",
             "vide": "Vides apontando para assuntos inexistentes",
             "espelhos": "Entradas espelhadas com dispositivos diferentes (A — B × B — A)",
+            "duplicatas": "O mesmo tema detalhado em duas entradas (um tema, uma casa)",
             "indice_vazio": "Subassuntos do índice sem dispositivo nem vide",
             "remissoes": "Remissões entre artigos (citações não resolvidas)",
             "consulta": "Consulta rápida (consulta-rapida.yaml)",
@@ -156,7 +157,8 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
     (erro) ou a dispositivo inexistente, revogado ou só tachado (aviso).
     """
     import re as _re
-    from src.parse_xlsx import (aplicar_propostas, carregar_propostas, espelhos, parse_law_mapping, parse_xlsx,
+    from src.parse_xlsx import (aplicar_propostas, carregar_excecoes_indice, carregar_propostas, duplicatas,
+                                 espelhos, espelhos_declarados, parse_law_mapping, parse_xlsx,
                                  resolver_vides_em_cadeia, vides_com_nome_exato)
     from src.remissoes import ART_INEXISTENTE, REVOGADO, SUB_INEXISTENTE, TACHADO, _Corpus
 
@@ -248,12 +250,26 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
             report.add("indice_vazio", "aviso", entry.display_name(), "sem dispositivo nem vide")
 
     # "LEI — Promulgação" e "PROMULGAÇÃO — De Lei" são a mesma entrada vista de dois lados
-    for a, b in espelhos(subject_index):
+    excecoes = carregar_excecoes_indice(BASE_DIR / "indice_excecoes.toml")
+    nomes = {" ".join(e.display_name().split()).lower() for e in subject_index.entries}
+    for tipo, grupos in excecoes.items():
+        for g in grupos:
+            for n in g["entradas"]:
+                if " ".join(n.split()).lower() not in nomes:
+                    report.add("duplicatas", "aviso", f"{n} — não está no índice", f"indice_excecoes.toml, [[{tipo}]]")
+    for a, b in espelhos(subject_index) + espelhos_declarados(subject_index,
+                                                              [g["entradas"] for g in excecoes["espelho"]]):
         for x, y in ((a, b), (b, a)):
             falta = sorted(x["refs"] - y["refs"])
             if falta:
                 labels = ", ".join((f"{p}:" if p else "") + art + (f",{d}" if d else "") for p, art, d in falta)
                 report.add("espelhos", "aviso", f"{labels} — só em {x['nome']}", f"espelho: {y['nome']}")
+
+    # um tema, uma casa: o mesmo tema detalhado em dois lugares acaba com listas divergentes
+    for menor, maior, comum in duplicatas(subject_index, [g["entradas"] for gs in excecoes.values() for g in gs]):
+        quanto = "a mesma lista" if menor["refs"] == maior["refs"] else f"{comum} de {len(menor['refs'])} em comum"
+        report.add("duplicatas", "aviso", f"{menor['nome']} × {maior['nome']} ({quanto})",
+                   "centralize numa e deixe vide na outra, ou declare em indice_excecoes.toml")
 
     print(f"      → {len({e.subject for e in subject_index.entries})} assuntos")
     return subject_index, law_mapping

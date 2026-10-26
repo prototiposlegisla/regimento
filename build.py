@@ -34,6 +34,7 @@ KNOWN_TEXT_ERRORS: set[tuple[str, str, str]] = {
     ("Lei Orgânica", "200", "ser. complementado"),
     ("Lei Orgânica", "200", "estabelecid. .o"),
     ("Lei Orgânica", "221", ".s.rtigos"),
+    ("Regimento Interno", "156", "160 ,§ 6°"),
 }
 
 
@@ -80,6 +81,7 @@ class ValidationReport:
             "propostas": "Propostas do índice remissivo (aba Propostas)",
             "vide": "Vides apontando para assuntos inexistentes",
             "espelhos": "Entradas espelhadas com dispositivos diferentes (A — B × B — A)",
+            "indice_vazio": "Subassuntos do índice sem dispositivo nem vide",
             "remissoes": "Remissões entre artigos (citações não resolvidas)",
             "consulta": "Consulta rápida (consulta-rapida.yaml)",
         }
@@ -149,7 +151,7 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
     """
     import re as _re
     from src.parse_xlsx import (aplicar_propostas, carregar_propostas, espelhos, parse_law_mapping, parse_xlsx,
-                                 resolver_vides_em_cadeia)
+                                 resolver_vides_em_cadeia, vides_com_nome_exato)
     from src.remissoes import ART_INEXISTENTE, REVOGADO, SUB_INEXISTENTE, TACHADO, _Corpus
 
     xlsx_path = Path(args.xlsx)
@@ -181,6 +183,7 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
             for message, context in avisos:
                 report.add("propostas", "aviso", message, context)
         resolver_vides_em_cadeia(subject_index)
+        vides_com_nome_exato(subject_index)
     except PermissionError:
         print("      ⚠ Não foi possível abrir remissivo.xlsx (arquivo em uso pelo Excel?)")
         print("        Feche a planilha e rode o build novamente.")
@@ -234,6 +237,9 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
                     resto = ref.hint or (a.summary if a is not None else "")
                     ref.hint = "revogado" + (f" — {resto}" if resto else "")
         entry.refs = mantidas
+        # subassunto sem dispositivo nem vide: o leitor vê a linha e não tem para onde ir
+        if entry.sub_subject and not entry.refs and not entry.vides:
+            report.add("indice_vazio", "aviso", entry.display_name(), "sem dispositivo nem vide")
 
     # "LEI — Promulgação" e "PROMULGAÇÃO — De Lei" são a mesma entrada vista de dois lados
     for a, b in espelhos(subject_index):

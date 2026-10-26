@@ -1,5 +1,5 @@
 {
-  "total_articles": 854,
+  "total_articles": 855,
   "articles": [
     {
       "law": "Regimento Interno",
@@ -10757,6 +10757,7 @@
         "art7XII",
         "art7XII_2",
         "art7XIII",
+        "art7XIII_2",
         "art7XIV",
         "art7XV",
         "art7XVI",
@@ -10786,18 +10787,23 @@
         "art7XXXIII_2",
         "art7XXXIV",
         "art7pu_2",
-        "art7pu_3"
+        "art7pu_3",
+        "art7p1_2",
+        "art7p2_2",
+        "art7p3"
       ],
-      "children_count": 44,
+      "children_count": 48,
       "versions_count": 0,
       "old_versions": [
         "art7XII",
+        "art7XIII",
         "art7XXV",
         "art7XXIX",
         "art7XXIXa",
         "art7XXIXb",
         "art7XXXIII",
-        "art7pu_2"
+        "art7pu_2",
+        "art7pu_3"
       ],
       "has_summary": true
     },
@@ -11615,11 +11621,13 @@
         "art40p4II_2",
         "art40p4III_2",
         "art40p4_6",
+        "art40p4_7",
         "art40p4A",
         "art40p4B",
         "art40p4C",
         "art40p5_4",
         "art40p5_5",
+        "art40p5A",
         "art40p6",
         "art40p6_2",
         "art40p6_3",
@@ -11664,7 +11672,7 @@
         "art40p22IX",
         "art40p22X"
       ],
-      "children_count": 71,
+      "children_count": 73,
       "versions_count": 15,
       "old_versions": [
         "art40p1_4",
@@ -11683,6 +11691,7 @@
         "art40p4I_3",
         "art40p4II_2",
         "art40p4III_2",
+        "art40p4_6",
         "art40p5_4",
         "art40p6",
         "art40p6_2",
@@ -12691,6 +12700,18 @@
     },
     {
       "law": "Constituição Federal",
+      "art_number": "149-A",
+      "is_adt": false,
+      "uids": [
+        "art149-A",
+        "art149-Apu"
+      ],
+      "children_count": 1,
+      "versions_count": 1,
+      "has_summary": true
+    },
+    {
+      "law": "Constituição Federal",
       "art_number": "150",
       "is_adt": false,
       "uids": [
@@ -13619,6 +13640,7 @@
         "art198I",
         "art198II",
         "art198III",
+        "art198IV",
         "art198p1",
         "art198p2",
         "art198p2I",
@@ -13635,6 +13657,8 @@
         "art198p3IV",
         "art198p3IV_2",
         "art198p4",
+        "art198p4A",
+        "art198p4B",
         "art198p5",
         "art198p5_2",
         "art198p6",
@@ -13642,13 +13666,14 @@
         "art198p8",
         "art198p9",
         "art198p10",
+        "art198p10_2",
         "art198p11",
         "art198p12",
         "art198p13",
         "art198p14",
         "art198p15"
       ],
-      "children_count": 31,
+      "children_count": 35,
       "versions_count": 0,
       "old_versions": [
         "art198p2I",
@@ -13656,7 +13681,8 @@
         "art198p2III",
         "art198p3I",
         "art198p3IV",
-        "art198p5"
+        "art198p5",
+        "art198p10"
       ],
       "has_summary": true
     },
@@ -13727,6 +13753,7 @@
         "art201p7II_2",
         "art201p8_3",
         "art201p8_4",
+        "art201p8A",
         "art201p9_2",
         "art201p9_3",
         "art201p9A",
@@ -13742,7 +13769,7 @@
         "art201p15",
         "art201p16"
       ],
-      "children_count": 37,
+      "children_count": 38,
       "versions_count": 15,
       "old_versions": [
         "art201I_2",

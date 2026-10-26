@@ -112,3 +112,14 @@ class TestRede:
         doc, remissoes, _ = _rede()
         md = MarkdownRenderer(remissoes).render_document(doc)
         assert "detalha art. 68, § 1º" in md and "Citado em" not in md
+
+
+def test_trecho_tachado_de_dispositivo_vigente_fica_fora_do_texto():
+    from src.canonico import _dispositivo
+    u = DocumentUnit(UnitType.ARTIGO, "Art. 33", "lom33",
+                     [TextRun("Art. 33 - As CPIs serão criadas mediante requerimento de 1/3, "),
+                      TextRun("aprovados por maioria absoluta,", strike=True), TextRun(" para apuração de fato.")])
+    d = _dispositivo(u, "")
+    assert d["texto"] == "Art. 33 - As CPIs serão criadas mediante requerimento de 1/3, para apuração de fato."
+    assert d["tachado"] == ["aprovados por maioria absoluta,"]
+    assert "tachado" not in _dispositivo(DocumentUnit(UnitType.ARTIGO, "Art. 1º", "a1", [TextRun("Art. 1º - Vale.")]), "")

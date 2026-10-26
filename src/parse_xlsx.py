@@ -516,3 +516,33 @@ def resolver_vides_em_cadeia(index: SubjectIndex) -> int:
             novos += [x for x in alvo if x not in novos and _chave(x) != _chave(e.subject)]
         e.vides = novos
     return n
+
+
+def vides_com_nome_exato(index: SubjectIndex) -> int:
+    """Cada vide passa a mostrar o assunto e o subassunto como estão escritos no destino
+    ("SERVIDOR PÚBLICO|vantagens" → "SERVIDOR PÚBLICO|Vantagens"): o site acha o destino sem
+    acento e sem caixa, mas mostrava a grafia do vide. Retorna quantos vides mudaram."""
+    import unicodedata
+
+    def k(s: str) -> str:
+        s = unicodedata.normalize("NFD", _chave(s))
+        return "".join(c for c in s if not unicodedata.combining(c))
+
+    assuntos: dict[str, str] = {}
+    subs: dict[tuple[str, str], str] = {}
+    for e in index.entries:
+        assuntos.setdefault(k(e.subject), e.subject)
+        if e.sub_subject:
+            subs.setdefault((k(e.subject), k(e.sub_subject)), e.sub_subject)
+    n = 0
+    for e in index.entries:
+        novos = []
+        for v in e.vides:
+            a, _, s = v.partition("|")
+            nome = assuntos.get(k(a), a.strip())
+            if s.strip():
+                nome += "|" + subs.get((k(a), k(s)), s.strip())
+            n += nome != v
+            novos.append(nome)
+        e.vides = novos
+    return n

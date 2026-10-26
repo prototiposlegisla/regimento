@@ -15,10 +15,10 @@ pytestmark = pytest.mark.integration
 
 class TestArticleCounts:
     def test_total_artigos_regulares(self, resolved_doc):
-        """781 artigos regulares (Regimento + Lei Orgânica + 140 da CF), fora os precedentes."""
+        """782 artigos regulares (Regimento + Lei Orgânica + 141 da CF), fora os precedentes."""
         arts = [e for e in resolved_doc.elements
                 if isinstance(e, ArticleBlock) and not e.is_adt and e.law_prefix != "PREC"]
-        assert len(arts) == 781
+        assert len(arts) == 782
 
     def test_artigos_por_lei(self, resolved_doc):
         """Distribuição por lei: RI=397, LO=244, CF=138 (os artigos relevantes para o RI e a LOM)."""
@@ -26,17 +26,17 @@ class TestArticleCounts:
         by_law = Counter(a.law_name for a in arts)
         assert by_law["Regimento Interno"] == 397
         assert by_law["Lei Orgânica"] == 244
-        assert by_law["Constituição Federal"] == 140
+        assert by_law["Constituição Federal"] == 141
 
     def test_artigos_letrados(self, resolved_doc):
-        """12 artigos letrados: RI 183-A e 212-A; LOM 55-A, 69-A, 101-A, 149-A, 229-A e 229-B; CF 29-A, 156-A, 163-A e 216-A."""
+        """13 artigos letrados: RI 183-A e 212-A; LOM 55-A, 69-A, 101-A, 149-A, 229-A e 229-B; CF 29-A, 149-A, 156-A, 163-A e 216-A."""
         lettered = {
             (e.law_name, e.art_number) for e in resolved_doc.elements
             if isinstance(e, ArticleBlock) and not e.is_adt and "-" in e.art_number
         }
         expected = {("Regimento Interno", n) for n in ("183-A", "212-A")}
         expected |= {("Lei Orgânica", n) for n in ("55-A", "69-A", "101-A", "149-A", "229-A", "229-B")}
-        expected |= {("Constituição Federal", n) for n in ("29-A", "156-A", "163-A", "216-A")}
+        expected |= {("Constituição Federal", n) for n in ("29-A", "149-A", "156-A", "163-A", "216-A")}
         assert lettered == expected
 
     def test_artigos_adt(self, resolved_doc):
@@ -45,12 +45,12 @@ class TestArticleCounts:
         assert Counter(a.law_name for a in adts) == {"Regimento Interno": 14, "Lei Orgânica": 39}
 
     def test_artigos_com_versoes(self, resolved_doc):
-        """74 artigos com múltiplas versões do caput."""
+        """75 artigos com múltiplas versões do caput."""
         versioned = [
             e for e in resolved_doc.elements
             if isinstance(e, ArticleBlock) and len(e.all_versions) > 0
         ]
-        assert len(versioned) == 74
+        assert len(versioned) == 75
 
 
 # ── Dispositivos conferidos na Fase 0 ───────────────────────────────────

@@ -38,3 +38,9 @@ origem = "CF:29,XIV"
 trecho = "art. 28, parágrafo único"
 alvos = ["CF:28,§ 1º"]
 motivo = "o parágrafo único do art. 28 foi renumerado § 1º pela EC 19/1998; o texto do Planalto do art. 29, XIV não foi atualizado"
+
+[[definir]]
+origem = "LOM:96,§ú"
+trecho = "X, XII, XIII, XV, XVI, XVII, XVIII, XIX, XX, XXII, XXIII, XXV, XXVI, XXVII, XXVIII, XXX e XXXI"
+alvos = ["CF:7,X", "CF:7,XII", "CF:7,XIII", "CF:7,XV", "CF:7,XVI", "CF:7,XVII", "CF:7,XVIII", "CF:7,XIX", "CF:7,XX", "CF:7,XXII", "CF:7,XXIII", "CF:7,XXV", "CF:7,XXVI", "CF:7,XXVII", "CF:7,XXVIII", "CF:7,XXX", "CF:7,XXXI"]
+motivo = "'IX. X': o ponto no lugar da vírgula (está no texto oficial) interrompe a lista de incisos do art. 7º da CF"

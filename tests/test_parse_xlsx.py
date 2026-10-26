@@ -157,6 +157,17 @@ def test_vide_em_cadeia_aponta_direto_para_o_destino():
     assert idx.entries[3].vides == ["TÍTULOS HONORÍFICOS"]
 
 
+def test_vide_mostra_o_nome_como_esta_no_destino():
+    from src.parse_xlsx import vides_com_nome_exato
+    idx = SubjectIndex(entries=[
+        SubjectEntry("SERVIDOR PÚBLICO", "Vantagens", [SubjectRef("LOM:92")]),
+        SubjectEntry("GRATIFICAÇÃO", "", [], vides=["servidor publico|vantagens", "SERVIDOR PÚBLICO",
+                                                     "ASSUNTO QUE NÃO EXISTE|x"]),
+    ])
+    assert vides_com_nome_exato(idx) == 1
+    assert idx.entries[1].vides == ["SERVIDOR PÚBLICO|Vantagens", "SERVIDOR PÚBLICO", "ASSUNTO QUE NÃO EXISTE|x"]
+
+
 def test_espelhos_pares_com_assunto_e_subassunto_trocados():
     from src.parse_xlsx import espelhos
     idx = SubjectIndex(entries=[

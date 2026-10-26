@@ -113,8 +113,17 @@ def _texto(runs) -> str:
 
 
 def _dispositivo(unit: DocumentUnit, caminho: str, rede=({}, {}), indice: list[str] | None = None) -> dict:
-    d = {"caminho": caminho, "id": unit.identifier, "tipo": unit.unit_type.value,
-         "texto": unit.full_text.replace("\xa0", " ").strip()}
+    texto = unit.full_text.replace("\xa0", " ").strip()
+    # trecho tachado dentro de dispositivo vigente (suspenso por ADIN, por exemplo): fica fora do
+    # texto em vigor e vai à parte, como o ~~…~~ dos Markdown
+    tachado = [r.text.replace("\xa0", " ").strip() for r in unit.runs if r.strike and r.text.strip()]
+    if tachado and any(not r.strike and r.text.strip() for r in unit.runs):
+        texto = re.sub(r" {2,}", " ", "".join(r.text for r in unit.runs if not r.strike).replace("\xa0", " ")).strip()
+    else:
+        tachado = []
+    d = {"caminho": caminho, "id": unit.identifier, "tipo": unit.unit_type.value, "texto": texto}
+    if tachado:
+        d["tachado"] = tachado
     if unit.is_revoked:
         d["revogado"] = True
     if unit.amendment_note:
@@ -251,6 +260,7 @@ Um artigo por linha, só com a redação vigente:
 - `remete_a`, `correlatos`, `citado_por`: endereços no mesmo formato (`norma`, `art`, `caminho`; `caminho` `""` = o artigo inteiro ou o caput). O alvo pode trazer `"revogado": true` ou `"redacao_anterior": true` (a citação aponta para redação já substituída).
 - `correlatos`: `relacao` é a ligação lida a partir deste dispositivo (as mesmas frases do Markdown); `tipo` é o nome na planilha (mesma regra, detalha, fundamento, diverge, correspondente, exceção).
 - `indice`: as entradas do índice remissivo ("ASSUNTO" ou "ASSUNTO — Subassunto"). No dispositivo, as que o citam; no artigo, as que citam o artigo inteiro.
+- `tachado`: os trechos tachados de um dispositivo vigente (suspensos por ADIN, por exemplo), que ficam fora do `texto`; no Markdown, entre `~~`.
 - `revogado`, `adt` e as listas só aparecem quando há o que mostrar.
 
 Para saber se a pasta está em dia: `python -m src.canonico --check` no projeto `regimento` (exit 1 se o DOCX ou uma das planilhas for mais novo).

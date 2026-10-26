@@ -84,8 +84,8 @@ entradas = ["COMISSÕES PERMANENTES — Proibições", "SESSÃO ORDINÁRIA — P
 motivo = "Proibições é o tema amplo (inclui a vedação de opinar fora da atribuição, art. 48); a da SESSÃO ORDINÁRIA é o recorte da reunião durante a sessão e suas exceções (57, § 2º; 141, II; 270, § 6º)"
 
 [[distintos]]
-entradas = ["COMISSÕES PERMANENTES — Reunião conjunta: quorum e deliberação", "QUORUM — Na reunião de Comissão", "VOTAÇÃO — Pelas comissões"]
-motivo = "a reunião conjunta tem casa em COMISSÕES PERMANENTES (REUNIÃO CONJUNTA e CONGRESSO DE COMISSÕES remetem para lá) e esta linha é recorte dela; quorum e votação são temas diferentes que se cruzam nos mesmos artigos"
+entradas = ["REUNIÃO CONJUNTA — Quorum e deliberação", "QUORUM — Na reunião de Comissão", "VOTAÇÃO — Pelas comissões"]
+motivo = "o quorum da reunião conjunta é recorte de REUNIÃO CONJUNTA; quorum e votação são temas diferentes que se cruzam nos mesmos artigos"
 
 [[distintos]]
 entradas = ["COMPETÊNCIA — Município", "MUNICÍPIO — Competência", "EDUCAÇÃO — Competência do Município", "HABITAÇÃO — Competência do Município", "IMPOSTOS — Competência do Município"]
@@ -96,7 +96,7 @@ entradas = ["CONTAS", "CONTAS DA MESA"]
 motivo = "CONTAS em geral (Prefeito, Mesa e Tribunal) e as contas da Mesa como recorte com regras próprias (28, 29)"
 
 [[distintos]]
-entradas = ["DISCUSSÃO — Requerimento não sujeito a discussão", "VOTAÇÃO — Encaminhamento: vedação", "VOTO — Declaração de: vedação"]
+entradas = ["DISCUSSÃO — Requerimento não sujeito a discussão", "VOTAÇÃO — Encaminhamento: vedação", "DECLARAÇÃO DE VOTO"]
 motivo = "três vedações diferentes (discussão, encaminhamento, declaração de voto) que a mesma fórmula regimental costuma enumerar juntas; 168, 227 e 231 admitem discussão e só vedam encaminhamento e declaração"
 
 [[distintos]]
@@ -220,3 +220,9 @@ motivo = "VETO cobre o instituto inteiro; a tramitação é recorte"
 [[distintos]]
 entradas = ["VOTAÇÃO — De vetos", "VETO"]
 motivo = "VETO cobre o instituto inteiro; a votação é recorte"
+
+# ── Fase 7: pendências (26/10/2026) ──
+
+[[espelho]]
+entradas = ["AUDIÊNCIA PÚBLICA — Para propositura de iniciativa popular", "INICIATIVA POPULAR — Audiências públicas"]
+motivo = "a audiência pública da propositura popular vista pela AUDIÊNCIA PÚBLICA e pela INICIATIVA POPULAR"

@@ -608,6 +608,12 @@ def _classify_one(p: _RawParagraph) -> _ClassifiedParagraph:
 
 # ── Construção do documento ─────────────────────────────────────────────
 
+# Ordem em que as normas disputam os uids repetidos ("art5p1", "art5p1_2"...): a de entrada no
+# site, não a de agora no DOCX. Os marcadores salvos no navegador são por uid; assim, mudar uma
+# norma de lugar (a CE, que entrou depois da CF, vem antes dela) não muda o uid de nada.
+UID_ORDEM_NORMAS = ("Regimento Interno", "Lei Orgânica", "Constituição Federal", "Constituição Estadual",
+                    "Precedentes Regimentais")
+
 def _build_document(
     classified: list[_ClassifiedParagraph],
     footnotes_map: dict[int, list[FootnotePara]] | None = None,
@@ -637,7 +643,9 @@ def _build_document(
     in_prec = False  # in the Precedentes Regimentais section
     prec_par = 0     # paragraph counter inside the current precedent (uids)
     uid_ctx: list[str] = ["", "", "", ""]  # [para, inciso, alinea, sub_alinea]
-    seen_uids: set[str] = set()  # global dedup for collision detection
+    # (norma, uid, dispositivo): o desempate dos uids repetidos é feito no fim, na UID_ORDEM_NORMAS;
+    # dispositivo None = uid só reservado (caput, precedente)
+    uid_eventos: list[tuple[str, str, DocumentUnit | None]] = []
 
     # Section ID counters (globally unique)
     titulo_count = 0
@@ -684,7 +692,7 @@ def _build_document(
                 private_counter[0] = 0
                 art_num = prec_number(m_prec)
                 uid = f"art{PREC}{art_num.replace('/', '-')}"
-                seen_uids.add(uid)
+                uid_eventos.append((current_law_name, uid, None))
                 prec_par = 0
                 current_article = ArticleBlock(
                     art_number=art_num,
@@ -907,7 +915,7 @@ def _build_document(
 
             # Reset hierarchical uid context for each new/merged article
             uid_ctx = ["", "", "", ""]
-            seen_uids.add(uid_prefix)
+            uid_eventos.append((current_law_name, uid_prefix, None))
 
             i += 1
             continue
@@ -926,13 +934,6 @@ def _build_document(
             art_num = current_article.art_number
             uid_prefix = f"art{art_num}" if not current_article.is_adt else f"artADT{art_num.replace('ADT', '')}"
             uid = _make_hierarchical_uid(uid_prefix, cp, uid_ctx)
-            # Deduplicate: append counter if collision
-            base_uid = uid
-            n = 2
-            while uid in seen_uids:
-                uid = f"{base_uid}_{n}"
-                n += 1
-            seen_uids.add(uid)
 
             amendment = _extract_amendment_note(cp.runs)
 
@@ -952,6 +953,7 @@ def _build_document(
             # Always keep children in document order (old versions
             # are distinguished by is_old_version flag)
             current_article.children.append(unit)
+            uid_eventos.append((current_law_name, uid, unit))
 
             i += 1
             continue
@@ -962,6 +964,18 @@ def _build_document(
     # Flush last article
     if current_article:
         doc.elements.append(current_article)
+
+    # Desempate dos uids repetidos: "_2", "_3"... na ordem das normas (estável dentro de cada uma)
+    ordem = {n: k for k, n in enumerate(UID_ORDEM_NORMAS)}
+    seen_uids: set[str] = set()
+    for _, uid, unit in sorted(uid_eventos, key=lambda ev: ordem.get(ev[0], len(ordem))):
+        if unit is not None:
+            n = 2
+            while uid in seen_uids:
+                uid = f"{unit.uid}_{n}"
+                n += 1
+            unit.uid = uid
+        seen_uids.add(uid)
 
     return doc
 

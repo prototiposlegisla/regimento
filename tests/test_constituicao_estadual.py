@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from src.models import ArticleBlock, DocumentUnit, ParsedDocument, TextRun, UnitType
-from src.parse_docx import _classify_one, _is_revoked_text, note_tail_spans
+from src.parse_docx import _build_document, _classify_one, _is_revoked_text, note_tail_spans
 from src.remissoes import detectar
 from src.render_html import HTMLRenderer
 from src.render_markdown import MarkdownRenderer
@@ -49,6 +49,29 @@ class TestFormatoAlesp:
     def test_revogado_pela_nota_da_alesp(self):
         assert _is_revoked_text("VIII - Revogado. (Inciso VIII revogado pela Emenda Constitucional n° 21, de 14/02/2006)")
         assert not _is_revoked_text("§1° - texto (§1° com redação dada pela Emenda Constitucional n° 21, revogado o parágrafo único)")
+
+
+class TestPosicaoDaCE:
+    """A CE vem antes da CF no DOCX, mas os uids repetidos se desempatam na ordem de entrada
+    das normas no site: mudar a CE de lugar não muda o uid (os marcadores salvos são por uid)."""
+
+    def _uids(self, make_raw, ordem):
+        secoes = {
+            "CF": ["Art. 5º Todos são iguais perante a lei.", "§ 1º As normas têm aplicação imediata."],
+            "CE": ["Artigo 5° - São Poderes do Estado.", "§1° - É vedado a qualquer dos Poderes delegar."],
+        }
+        nomes = {"CF": "Constituição Federal", "CE": "Constituição Estadual"}
+        raw = []
+        for sigla in ordem:
+            raw.append(_classify_one(make_raw(f"NORMA: {nomes[sigla]}", is_centered=True)))
+            raw += [_classify_one(make_raw(t)) for t in secoes[sigla]]
+        doc = _build_document(raw)
+        return {(e.law_name, c.identifier): c.uid for e in doc.elements if isinstance(e, ArticleBlock)
+                for c in e.children}
+
+    def test_uid_nao_depende_da_posicao(self, make_raw):
+        assert self._uids(make_raw, ["CF", "CE"]) == self._uids(make_raw, ["CE", "CF"])
+        assert self._uids(make_raw, ["CE", "CF"])[("Constituição Federal", "§ 1º")] == "art5p1"
 
 
 # ── Remissões e correlatos ──────────────────────────────────────────────

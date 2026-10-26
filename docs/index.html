@@ -200,17 +200,43 @@ body {
 }
 
 /* ===== BREADCRUMB (scroll context) ===== */
-#breadcrumb {
+/* A full-width bar, so every % below is of the viewport. The breadcrumb may
+   span the free band between --bc-l and --bc-r: centered on the cards column
+   (--bc-c) while it fits, pushed toward the wider side when it doesn't, and
+   wrapped only when wider than the whole band. The ::before/::after spacers
+   hold the difference between the two sides of --bc-c and shrink first. */
+#breadcrumb-bar {
+  --bc-l: 8px;
+  --bc-r: 8px;
+  --bc-c: 50%;
   position: fixed;
   top: calc(var(--header-h) + 6px);
-  left: 50%;
+  left: 0;
+  right: 0;
   z-index: 190;
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none;
+}
+#breadcrumb-bar::before,
+#breadcrumb-bar::after {
+  content: '';
+  flex: 0 1 max(0px, 2 * var(--bc-c) - 100% + var(--bc-r) - var(--bc-l));
+  margin-left: var(--bc-l);
+}
+#breadcrumb-bar::after {
+  flex-basis: max(0px, 100% - var(--bc-r) + var(--bc-l) - 2 * var(--bc-c));
+  margin-left: 0;
+  margin-right: var(--bc-r);
+}
+#breadcrumb {
+  flex: none;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 4px;
-  width: max-content;
-  max-width: min(92vw, 820px);
+  max-width: calc(100% - var(--bc-l) - var(--bc-r));
   /* one continuous line of segments, each in its level's color */
   background: #fff;   /* where a narrow screen wraps the line */
   border: 1px solid #9aa3af;   /* the white last segment against the page */
@@ -223,13 +249,13 @@ body {
   box-shadow: 0 3px 10px -4px rgba(20,30,45,.45);
   cursor: default;
   opacity: 0;
-  transform: translateX(-50%) translateY(-8px);
+  transform: translateY(-8px);
   transition: opacity .2s ease, transform .2s ease;
   pointer-events: none;
 }
 #breadcrumb.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
   pointer-events: auto;
 }
 .bc-item {
@@ -1506,12 +1532,14 @@ button.q-label:hover { color: #2c6fa6; }
   body.results-open #cards-container {
     margin-left: var(--cards-left);
   }
-  body.results-open #breadcrumb,
   body.results-open #zoom-indicator {
     left: calc(var(--cards-left) + 360px);
   }
-  /* Wrapping inside the cards column instead of over the sidebar */
-  body.results-open #breadcrumb { max-width: 720px; }
+  /* Between the sidebar and the minimap, centered on the cards column */
+  body.results-open #breadcrumb-bar {
+    --bc-l: calc(var(--results-w) + 24px);
+    --bc-c: calc(var(--cards-left) + 360px);
+  }
 }
 
 /* Small screens: drawer, like the index panel */
@@ -1535,6 +1563,7 @@ button.q-label:hover { color: #2c6fa6; }
 
 @media (min-width: 1024px) {
   #minimap { display: block; }
+  #breadcrumb-bar { --bc-r: 56px; }
   #marker-nav { right: 56px; }
   #search-ticks { right: 0; width: 48px; }
   #search-ticks .tick { width: 48px; opacity: 0.7; }
@@ -1789,7 +1818,7 @@ button.q-label:hover { color: #2c6fa6; }
 </div>
 
 <!-- BREADCRUMB (scroll context) -->
-<div id="breadcrumb"></div>
+<div id="breadcrumb-bar"><div id="breadcrumb"></div></div>
 
 <!-- READING LINE -->
 <div id="reading-line"></div>

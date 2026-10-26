@@ -768,6 +768,7 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
             rem.classe = "externa"
             found.append(rem)
             continue
+        fora_do_recorte = False
         for r in _build_refs(cl):
             special = r.get("special")
             rpath = r["path"]
@@ -780,7 +781,7 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
                 # relativa, no próprio artigo: "§ 2º deste artigo", "inciso I"
                 rem.classe = "relativa"
                 rem.mesmo_artigo = True
-                alvo = _resolve_relative(corpus, law, art.art_number, unit, rpath)
+                alvo = _resolve_relative(corpus, law, art.art_number, unit, rpath, no_dispositivo=qkind is None)
                 if qkind not in (None, "REL_ART"):
                     alvo.status = AMBIGUA       # "§ 2º da Lei Orgânica", sem o artigo
                 rem.alvos.append(alvo)
@@ -826,23 +827,40 @@ def _detect_unit(corpus: _Corpus, art: ArticleBlock, unit: DocumentUnit, path: s
                 elif adt_exists:
                     target_art = "ADT" + target_art
             if target_law in ("CE", "CF") and (target_law, target_art) not in corpus.arts:
-                rem.classe = "externa"          # artigo das Constituições fora do recorte do site
+                # artigo das Constituições fora do recorte do site: sai só ele; os outros da lista
+                # que estão na página continuam com link (CF 37, § 10: "arts. 40, 42 ou 142")
+                fora_do_recorte = True
                 continue
             alvo = corpus.resolve(target_law, target_art, _path_key(rpath))
             if status_extra:
                 alvo.status = status_extra
             rem.alvos.append(alvo)
+        if fora_do_recorte and not rem.alvos:
+            rem.classe = "externa"
         if rem.alvos or rem.classe == "externa":
             found.append(rem)
     return found
 
 
-def _resolve_relative(corpus: _Corpus, law: str, art: str, unit: DocumentUnit, rpath: dict) -> Alvo:
+def _resolve_relative(corpus: _Corpus, law: str, art: str, unit: DocumentUnit, rpath: dict,
+                      no_dispositivo: bool = False) -> Alvo:
     special = [k for k, v in rpath.items() if v in RELATIVE_WORDS]
     if not special:
         if rpath.get("PAR") == "*" or rpath.get("INC") == "*":
             return corpus.resolve(law, art, "")
-        return corpus.resolve(law, art, _path_key(rpath))
+        key = _path_key(rpath)
+        if no_dispositivo and key and "PAR" not in rpath:
+            # "inciso XII" num inciso do § 2º é o inciso XII do § 2º, se ele existir (CF 155, § 2º, VI); só depois
+            # o do artigo. No próprio parágrafo, "o imposto previsto no inciso I" é o inciso do caput (CF 155,
+            # § 1º): por isso o dispositivo que cita não entra como prefixo. "inciso I deste artigo" vem com
+            # no_dispositivo=False
+            atual = next((p for u, p in corpus.units[(law, art)] if u is unit), "")
+            partes = [x for x in atual.split(",") if x]
+            for k in range(len(partes) - 1, 0, -1):
+                alvo = corpus.resolve(law, art, ",".join(partes[:k] + [key]))
+                if alvo.status != SUB_INEXISTENTE:
+                    return alvo
+        return corpus.resolve(law, art, key)
     kind = special[0]
     lst = corpus.units[(law, art)]
     idx = next((i for i, (u, _) in enumerate(lst) if u is unit), None)

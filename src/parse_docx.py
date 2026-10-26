@@ -411,12 +411,17 @@ def _is_predominantly_struck(runs: list[TextRun]) -> bool:
     tachado. A exigência maior preserva o dispositivo vigente com só um trecho
     tachado (ex.: parte declarada inconstitucional).
     """
+    text = "".join(r.text for r in runs)
+    mask = [r.strike for r in runs for _ in r.text]
+    # corpo vigente seguido só de notas tachadas (a ALESP tacha o histórico de liminar cassada:
+    # "(Eficácia suspensa ...)"): as notas não fazem do texto em vigor uma redação antiga (CE 126)
+    k = mask.index(True) if True in mask else len(text)
+    if sum(1 for c in text[:k] if not c.isspace()) >= 30 and text[k:].lstrip().startswith("("):
+        return False
     strike_chars = sum(len(r.text.strip()) for r in runs if r.strike)
     total_chars = sum(len(r.text.strip()) for r in runs)
     if total_chars > 0 and strike_chars > total_chars * 0.5:
         return True
-    text = "".join(r.text for r in runs)
-    mask = [r.strike for r in runs for _ in r.text]
     m_ident = RE_LEADING_IDENT.match(text)
     start = m_ident.end() if m_ident else 0
     tail = note_tail_spans(text)
@@ -1087,7 +1092,15 @@ def _extract_amendment_note(runs: list[TextRun]) -> str:
     return ""
 
 
+_RX_DECLARADO = re.compile(
+    r"^\s*(?:Artigo\s+\d+[°º]?(?:-[A-Z])?|§\s*\d+[°º]?|Parágrafo único|[IVXLC]+(?:-[A-Z])?|\d+|[a-z]\))\s*[-–—.]?\s*"
+    r"Declarad[oa]s?\s+inconstitucional", re.I)
+
+
 def _is_revoked_text(text: str) -> bool:
+    # o dispositivo da CE cujo corpo é só "Declarado inconstitucional, em controle concentrado, ..." conta como revogado
+    if _RX_DECLARADO.match(text):
+        return True
     # também a nota da ALESP que nomeia o dispositivo: "(Inciso III revogado pela Emenda ...)"
     return bool(re.search(r"\(Revogad[oa]|\((?:\"?Caput\"?|§\s*\d+[º°]?|Par[áa]grafo\s+[úu]nico|Inciso|Item|Al[íi]nea|Artigo)"
                           r"\s[^()]{0,30}?revogad[oa]s?\s+pel", text, re.IGNORECASE))

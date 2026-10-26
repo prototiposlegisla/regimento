@@ -130,3 +130,57 @@ class TestRemissoesCE:
         md = MarkdownRenderer(res).render_document(doc)
         assert "tem como regra estadual correspondente CE art. 241" in md
         assert "é a regra estadual correspondente a LOM art. 200" in md
+
+
+# ── Correções da 4ª sessão do laboratório (o44, o45, o46, o50, o52) ─────
+
+class TestCorrecoesDaCE:
+    def test_declarado_inconstitucional_conta_como_revogado(self):
+        """o45: o corpo do dispositivo é só a declaração da ALESP."""
+        assert _is_revoked_text("§ 6º - Declarado inconstitucional, em controle concentrado, pelo Supremo Tribunal "
+                                "Federal. (ADI n° 1021)")
+        assert not _is_revoked_text("I - nas infrações penais comuns, o Vice-Governador (Expressão \"o Defensor "
+                                    "Público-Geral\" declarada inconstitucional pelo STF)")
+
+    def test_notas_tachadas_da_alesp_nao_tornam_antigo_o_texto_vigente(self):
+        """o46: CE 126, com o histórico de liminar cassada tachado depois do texto em vigor."""
+        from src.parse_docx import _is_predominantly_struck
+        runs = [TextRun("Artigo 126 - O Regime Próprio de Previdência Social dos servidores terá caráter contributivo. "),
+                TextRun("(Eficácia suspensa por força de liminar concedida na ADI 2044985-25.2020) (Liminar suspensa "
+                        "por decisão proferida na SL 1305) (... extinguiu o processo sem resolução do mérito ...)",
+                        strike=True)]
+        assert _is_predominantly_struck(runs) is False
+
+    def test_alinea_dentro_do_item_numerado(self):
+        """o50: CE 9, § 5º — "1 - ... a) b) c)" e "2 - ..."; no RI, o item segue dentro da alínea."""
+        from src.models import unit_path
+        ctx = [""] * 4
+        seq = [(UnitType.PARAGRAFO_NUM, "§ 5º"), (UnitType.ITEM_NUM, "1"), (UnitType.ALINEA, "a)"),
+               (UnitType.ALINEA, "c)"), (UnitType.ITEM_NUM, "2")]
+        paths = [unit_path(_u(t, i, "x", i), ctx) for t, i in seq]
+        assert paths == ["§ 5º", "§ 5º,1", "§ 5º,1,a", "§ 5º,1,c", "§ 5º,2"]
+        ctx = [""] * 4
+        seq = [(UnitType.INCISO, "V"), (UnitType.ALINEA, "j)"), (UnitType.ITEM_NUM, "1")]
+        assert [unit_path(_u(t, i, "x", i), ctx) for t, i in seq] == ["V", "V,j", "V,j,1"]
+
+    def test_artigo_fora_da_pagina_nao_leva_os_outros_da_lista(self):
+        """o44: "artigos 241 e 999 desta Constituição": o 241 continua com link."""
+        doc = _doc()
+        doc.elements[1].caput = _u(UnitType.ARTIGO, "Art. 115", "art115",
+                                   "Artigo 115 - Observados os artigos 241 e 999 desta Constituição:")
+        assert _alvos(detectar(doc), "CE:115") == ["CE:241"]
+
+    def test_inciso_citado_dentro_do_paragrafo(self):
+        """o52: "inciso II" num inciso do § 2º é o do § 2º; no próprio parágrafo, o do caput."""
+        art = ArticleBlock(
+            art_number="155", law_name="Constituição Federal", law_prefix="CF",
+            caput=_u(UnitType.ARTIGO, "Art. 155", "art155", "Art. 155. Compete aos Estados instituir impostos sobre:"),
+            children=[_u(UnitType.INCISO, "I", "art155I", "I - transmissão causa mortis;"),
+                      _u(UnitType.INCISO, "II", "art155II", "II - circulação de mercadorias;"),
+                      _u(UnitType.PARAGRAFO_NUM, "§ 2º", "art155p2", "§ 2º O imposto previsto no inciso II atenderá:"),
+                      _u(UnitType.INCISO, "I", "art155p2I", "I - será não cumulativo;"),
+                      _u(UnitType.INCISO, "II", "art155p2II", "II - a isenção, salvo o disposto no inciso I:")])
+        res = detectar(ParsedDocument(elements=[art]))
+        alvos = lambda o: [a.ref for r in res.remissoes if r.origem.ref == o for a in r.alvos]   # no mesmo artigo
+        assert alvos("CF:155,§ 2º") == ["CF:155,II"]
+        assert alvos("CF:155,§ 2º,II") == ["CF:155,§ 2º,I"]

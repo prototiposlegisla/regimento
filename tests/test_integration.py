@@ -15,18 +15,18 @@ pytestmark = pytest.mark.integration
 
 class TestArticleCounts:
     def test_total_artigos_regulares(self, resolved_doc):
-        """946 artigos regulares (Regimento + Lei Orgânica + 164 da CE + 141 da CF), fora os precedentes."""
+        """947 artigos regulares (Regimento + Lei Orgânica + 165 da CE + 141 da CF), fora os precedentes."""
         arts = [e for e in resolved_doc.elements
                 if isinstance(e, ArticleBlock) and not e.is_adt and e.law_prefix != "PREC"]
-        assert len(arts) == 946
+        assert len(arts) == 947
 
     def test_artigos_por_lei(self, resolved_doc):
-        """Distribuição por lei: RI=397, LO=244, CE=164, CF=141 (da CE e da CF, os artigos relevantes para o RI e a LOM)."""
+        """Distribuição por lei: RI=397, LO=244, CE=165, CF=141 (da CE e da CF, os artigos relevantes para o RI e a LOM)."""
         arts = [e for e in resolved_doc.elements if isinstance(e, ArticleBlock) and not e.is_adt]
         by_law = Counter(a.law_name for a in arts)
         assert by_law["Regimento Interno"] == 397
         assert by_law["Lei Orgânica"] == 244
-        assert by_law["Constituição Estadual"] == 164
+        assert by_law["Constituição Estadual"] == 165
         assert by_law["Constituição Federal"] == 141
 
     def test_artigos_letrados(self, resolved_doc):

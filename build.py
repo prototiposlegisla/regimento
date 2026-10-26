@@ -21,13 +21,9 @@ if sys.stdout.encoding != "utf-8":
 BASE_DIR = Path(__file__).parent
 
 # Números repetidos que o próprio texto normativo tem (não é redação antiga sem tachar):
-# (norma, artigo, caminho do dispositivo)
-# Na CE 175, § 1º, as alíneas vêm dentro dos itens ("2 - ... a) ... b) ..." e "3 - ... a) ... b) ..."),
-# e o caminho do dispositivo (§, inciso, alínea, item) não tem lugar para a alínea do item
-KNOWN_DUPLICATES: set[tuple[str, str, str]] = {
-    ("Constituição Estadual", "175", "§ 1º,a"),
-    ("Constituição Estadual", "175", "§ 1º,b"),
-}
+# (norma, artigo, caminho do dispositivo). As alíneas dentro dos itens da CE 175, § 1º, que estavam aqui,
+# ganharam caminho próprio no unit_path ("§ 1º,2,a", "§ 1º,3,a")
+KNOWN_DUPLICATES: set[tuple[str, str, str]] = set()
 
 # Erros de digitação que estão também no texto oficial (PLP) e ficam como estão, por decisão do usuário
 # (25/10/2026); lista completa em FontesAtual/"Erros no texto das normas.md". (norma, artigo, trecho)

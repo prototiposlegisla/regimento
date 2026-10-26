@@ -63,3 +63,15 @@ origem = "CE:163,III,c"
 trecho = "alínea \"b\""
 alvos = ["CE:163,III,b"]
 motivo = "a alínea \"b\" do mesmo inciso III, que a detecção relativa não acha"
+
+[[definir]]
+origem = "CE:222,§ú,1"
+trecho = "artigos 157 e 159, I, \"a\", e II, da Constituição Federal"
+alvos = ["CF:159,I,a", "CF:159,II"]
+motivo = "o qualificador 'da Constituição Federal' vem no fim da lista, depois do 'artigo 165 da Constituição Estadual': a detecção lia CE 157 e CE 159 (a CF 157 está fora da página) (o44)"
+
+[[definir]]
+origem = "CE:237"
+trecho = "artigo 205 e seguintes da Constituição Federal"
+alvos = ["CF:205"]
+motivo = "'artigo 205 e seguintes da Constituição Federal' não virava link para a CF 205 (o44)"

@@ -103,8 +103,22 @@ def unit_path(unit: DocumentUnit, ctx: list[str]) -> str:
     """Caminho do dispositivo no artigo ("§ 1º,II,a", "§ú,I"), como no data-path do site.
 
     ctx = [parágrafo, inciso, alínea, item], atualizado aqui; "" para o caput e o resto.
+
+    A CE põe item numerado direto no parágrafo e alíneas dentro dele (CE 9, § 5º: "1 - ... a) b) c)" e
+    "2 - ..."); o RI, a LOM e a CF seguem inciso > alínea > item. O item aberto sem alínea acima fica marcado
+    com "#" em ctx[3]: a alínea seguinte entra sob ele e o item seguinte volta ao nível dele.
     """
     t = unit.unit_type
+    if t == UnitType.ITEM_NUM:
+        m = re.match(r"(\d+)", unit.identifier)
+        n = m.group(1) if m else unit.identifier
+        if not ctx[2] or ctx[3].startswith("#"):
+            ctx[2:] = ["", "#" + n]
+            return ",".join(p for p in ctx[:2] + [n] if p)
+    if t == UnitType.ALINEA and ctx[3].startswith("#"):
+        ctx[2] = re.sub(r"\)$", "", unit.identifier)
+        return ",".join(p for p in ctx[:2] + [ctx[3][1:], ctx[2]] if p)
+    ctx[:] = [c if not c.startswith("#") else "" for c in ctx]
     if t in (UnitType.PARAGRAFO_UNICO, UnitType.PARAGRAFO_NUM):
         ctx[:] = ["§ú" if t == UnitType.PARAGRAFO_UNICO else unit.identifier, "", "", ""]
     elif t == UnitType.INCISO:

@@ -1483,7 +1483,6 @@ button.q-label:hover { color: #2c6fa6; }
 .res-artlinks > .res-artlink { color: #2c6fa6; font-weight: 600; }
 .res-artlink:hover { text-decoration: underline; }
 .res-vide { color: #666; font-style: italic; }
-.res-count { color: #999; font-size: 12px; }
 .res-expand.res-idx-more { padding-left: 9px; margin-bottom: 2px; }
 .res-idx-part + .res-law { margin-top: 14px; }
 #search-nav.index-only .search-arrow { display: none; }

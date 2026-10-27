@@ -1992,18 +1992,27 @@
     // Subjects found by their name first, then those found by a sub-subject
     // (names also by the stem, as the fichas: "apartes" finds APARTE; those
     // with the very word first: "comissões", COMISSÕES before COMISSÃO DE...).
-    // Found by its name, a subject brings all its sub-subjects (rest: those
-    // without the terms), so it doesn't look smaller than it is ("veto": none
-    // of VETO's sub-subjects says veto)
-    const byName = [], byStemName = [], bySub = [];
+    // Found by its name, a subject brings all its sub-subjects, those with
+    // the terms first, so it doesn't look smaller than it is ("veto": none of
+    // VETO's sub-subjects says veto). The subject named just the query, in any
+    // number, before all ("prefeito": PREFEITO before CASSAÇÃO DE MANDATO DE
+    // PREFEITO, which it would follow in alphabetical order)
+    const nameIsQuery = [], byName = [], byStemName = [], bySub = [];
     const hasName = text => has(text) || byStem(text);
+    const stems = text => text.split(' ').map(stem).join(' ');
+    const queryStems = stems(query);
     for (const it of subj) {
       const exact = has(it.text);
       const self = exact || byStem(it.text);
       const subs = it.children.filter(c => hasName(self ? c.text : c.withSubject));
-      if (self) (exact ? byName : byStemName).push({ it, subs, rest: it.children.filter(c => !subs.includes(c)), byName: true });
-      else if (subs.length) bySub.push({ it, subs, rest: [], byName: false });
+      const hit = { it, subs: subs.concat(it.children.filter(c => !subs.includes(c))), byName: true };
+      if (self && stems(it.text) === queryStems) nameIsQuery.push(hit);
+      else if (self) (exact ? byName : byStemName).push(hit);
+      else if (subs.length) bySub.push({ it, subs, byName: false });
     }
+    // the very word before another number ("comissão": COMISSÃO, then COMISSÕES)
+    nameIsQuery.sort((a, b) => (b.it.text === query) - (a.it.text === query));
+    byName.unshift(...nameIsQuery);
     byName.push(...byStemName);
 
     const refHits = [];
@@ -2146,9 +2155,8 @@
   }
 
   // A subject of the remissivo: its sub-subjects with the terms (and their
-  // "vide") and, found by its name, its articles, its other sub-subjects
-  // (just the name and how many provisions: "— Tramitação (5)") and its
-  // "vide"; each puts the subject in the search bar
+  // "vide") and, found by its name, its articles, all its sub-subjects and
+  // its "vide"; each puts the subject in the search bar
   function buildSubjectResult(hit) {
     const { entry } = hit.it;
     const group = indexGroup(entry.subject);
@@ -2160,15 +2168,14 @@
       items.push({ sub });
       for (const vide of sub.ch.vides || []) items.push({ vide });
     }
-    for (const sub of hit.rest) items.push({ sub, brief: true });
     if (hit.byName) for (const vide of entry.vides || []) items.push({ vide });
-    // "+ 5 subassuntos", "+ 5 subassuntos, 1 vide", "+ 2 outros"
+    // "+ 5 subassuntos", "+ 12 subassuntos, 3 vide", "+ 2 outros"
     const more = hidden => {
       const subs = hidden.filter(item => item.sub).length, vides = hidden.length - subs;
-      if (!hit.rest.length || !subs) return '+ ' + hidden.length + ' ' + (subs === hidden.length ? 'subassunto' : 'outro') + (hidden.length > 1 ? 's' : '');
+      if (!subs) return '+ ' + vides + (vides > 1 ? ' outros' : ' outro');
       return '+ ' + subs + ' subassunto' + (subs > 1 ? 's' : '') + (vides ? ', ' + vides + ' vide' : '');
     };
-    appendWithMore(group, items, INDEX_ENTRIES_SHOWN, ({ sub, vide, brief }) => {
+    appendWithMore(group, items, INDEX_ENTRIES_SHOWN, ({ sub, vide }) => {
       if (vide) {
         const target = findVide(vide);
         return indexButton('res-entry res-vide', 'vide ' + escapeHtml(target.label),
@@ -2176,10 +2183,7 @@
       }
       const ch = sub.ch;
       const refs = subjectRefs(entry, ch.sub_subject);
-      const html = brief
-        ? '— ' + escapeHtml(ch.sub_subject) + (refs.length ? ' <span class="res-count">(' + refs.length + ')</span>' : '')
-        : '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs);
-      return indexButton('res-entry' + (brief ? ' res-brief' : ''), html,
+      return indexButton('res-entry', '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs),
         refs.length ? () => { openSubject({ subject: entry.subject + ' — ' + ch.sub_subject, refs }); } : null);
     }, more);
     return group;

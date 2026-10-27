@@ -20,8 +20,13 @@ from .models import (
 class HTMLRenderer:
     """Gera HTML dos cards com a mesma estrutura do index.html original."""
 
-    def __init__(self, remissoes: Optional["Resultado"] = None):
+    def __init__(self, remissoes: Optional["Resultado"] = None, busca: Optional[dict[tuple[str, str], str]] = None,
+                 cf_ce: Optional[set[tuple[str, str]]] = None):
         self.footnote_counter = 0
+        # Pares CF × CE de texto igual (remissoes_cf_ce.toml): os dois correlatos do mesmo dispositivo viram um selo
+        self._cf_ce = cf_ce or set()
+        # Forma certa dos erros do texto oficial, que a busca lê junto com o texto do card (data-busca)
+        self._busca = busca or {}
         self._leg_ids: dict[int, str] = {}   # legislação correlata: id(unit) -> "L1", "L2"...
         # Remissões explícitas: os trechos citados viram gatilho de uma prévia
         self._rem_by_unit = remissoes.por_unidade() if remissoes else {}
@@ -73,6 +78,9 @@ class HTMLRenderer:
         law_attr = ""
         if art.law_prefix:
             law_attr = f' data-law="{html.escape(art.law_prefix)}"'
+        busca = self._busca.get((art.law_prefix or "RI", art.art_number))
+        if busca:
+            law_attr += f' data-busca="{html.escape(busca)}"'
         parts: list[str] = []
         parts.append(
             f'  <div class="card card-artigo{revoked_cls}" data-art="{art_num}"{law_attr}>'
@@ -373,31 +381,65 @@ class HTMLRenderer:
                    "sim": ("⇄", "⇄"), "exc": ("regra geral:", "exceção:")}
 
     def _render_correlatos(self, unit: DocumentUnit) -> str:
-        """Selos das remissões implícitas do dispositivo (rótulo e nota em atributos: fora da busca)."""
+        """Selos das remissões implícitas do dispositivo (rótulo e nota em atributos: fora da busca). Correlatos do
+        mesmo tipo com a CF e com a CE de um par de texto igual (remissoes_cf_ce.toml) saem num selo só (o49)."""
+        itens = list(self._imp_by_unit.get(id(unit), ()))
+        outro = lambda im, side: im.destino if side == "src" else im.origem
+        juntos: dict[int, tuple] = {}     # índice do correlato com a CF -> (correlato com a CE, lado)
+        usados: set[int] = set()
+        if self._cf_ce:
+            for i, (im, side) in enumerate(itens):
+                if outro(im, side).law != "CF":
+                    continue
+                for j, (im2, side2) in enumerate(itens):
+                    if j in usados or side2 != side or im2.tipo != im.tipo or outro(im2, side2).law != "CE":
+                        continue
+                    if (outro(im, side).ref, outro(im2, side2).ref) in self._cf_ce:
+                        juntos[i] = (im2, side2)
+                        usados.add(j)
+                        break
         out = []
-        for im, side in self._imp_by_unit.get(id(unit), ()):
-            other = im.destino if side == "src" else im.origem
-            prefix = self.CHIP_PREFIX[im.tipo][0 if side == "src" else 1]
-            art = f"DGT {other.art[3:]}" if other.art.startswith("ADT") and other.law == "LOM" else \
-                (f"ADT {other.art[3:]}" if other.art.startswith("ADT") else other.art)
-            path = other.path.replace("§ú", "p.ú.").replace(",", ", ")
-            label = f"{prefix} {other.law} {art}" + (f", {path}" if path else "")
-            attrs = f' data-ref="{html.escape(other.ref)}" data-tipo="{im.tipo}" data-side="{side}"'
-            if im.nota:
-                # a nota vai uma vez só para a página (CORRELATO_NOTAS); o selo leva o número dela
-                n = self._nota_n.setdefault(im.nota, len(self.notas))
-                if n == len(self.notas):
-                    self.notas.append(im.nota)
-                attrs += f' data-n="{n}"'
-            attrs += f' data-label="{html.escape(label)}"'
-            if im.tipo == "sim" and im.origem.law == im.destino.law:
-                attrs += ' data-mesma="1"'   # "correspondente" na mesma norma: não é regra federal
-            elif im.tipo == "sim" and im.destino.law == "CE":
-                attrs += ' data-esfera="estadual"'   # a regra correspondente é a do Estado
-            if im.proposta:
-                attrs += ' data-status="proposta"'
-            out.append(f'<span class="rem rem-imp t-{im.tipo}" tabindex="0" role="button"{attrs}></span>')
+        for i, (im, side) in enumerate(itens):
+            if i in usados:
+                continue
+            par = juntos.get(i)
+            out.append(self._selo(im, side, par[0] if par else None))
         return "".join(out)
+
+    def _rotulo_alvo(self, other) -> str:
+        art = f"DGT {other.art[3:]}" if other.art.startswith("ADT") and other.law == "LOM" else             (f"ADT {other.art[3:]}" if other.art.startswith("ADT") else other.art)
+        path = other.path.replace("§ú", "p.ú.").replace(",", ", ")
+        return f"{other.law} {art}" + (f", {path}" if path else "")
+
+    def _selo(self, im, side: str, ce=None) -> str:
+        """Um selo de correlato; com ce, o correlato com a CE de texto igual ao da CF vai junto (dois links, uma nota)."""
+        other = im.destino if side == "src" else im.origem
+        prefix = self.CHIP_PREFIX[im.tipo][0 if side == "src" else 1]
+        label = f"{prefix} {self._rotulo_alvo(other)}"
+        ref = other.ref
+        nota = im.nota
+        if ce is not None:
+            other_ce = ce.destino if side == "src" else ce.origem
+            label += f" · {self._rotulo_alvo(other_ce)}"
+            ref += ";" + other_ce.ref
+            nota = (nota.rstrip() + " " if nota else "") + "A CE repete a regra, para o Estado."
+        attrs = f' data-ref="{html.escape(ref)}" data-tipo="{im.tipo}" data-side="{side}"'
+        if nota:
+            # a nota vai uma vez só para a página (CORRELATO_NOTAS); o selo leva o número dela
+            n = self._nota_n.setdefault(nota, len(self.notas))
+            if n == len(self.notas):
+                self.notas.append(nota)
+            attrs += f' data-n="{n}"'
+        attrs += f' data-label="{html.escape(label)}"'
+        if im.tipo == "sim" and im.origem.law == im.destino.law:
+            attrs += ' data-mesma="1"'   # "correspondente" na mesma norma: não é regra federal
+        elif im.tipo == "sim" and ce is not None:
+            attrs += ' data-esfera="ambas"'   # as regras federal e estadual correspondentes, juntas
+        elif im.tipo == "sim" and im.destino.law == "CE":
+            attrs += ' data-esfera="estadual"'   # a regra correspondente é a do Estado
+        if im.proposta or (ce is not None and ce.proposta):
+            attrs += ' data-status="proposta"'
+        return f'<span class="rem rem-imp t-{im.tipo}" tabindex="0" role="button"{attrs}></span>'
 
     @staticmethod
     def _open_mark(rem: "Remissao") -> str:
@@ -529,7 +571,11 @@ class HTMLRenderer:
         return f'    <p class="{cls}"{ident_attr}>{text}{note}</p>'
 
 
-def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None) -> tuple[str, list[str]]:
-    """(HTML dos cards, notas dos correlatos que os selos citam por número)."""
-    renderer = HTMLRenderer(remissoes)
+def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None,
+                 busca: Optional[dict[tuple[str, str], str]] = None,
+                 cf_ce: Optional[set[tuple[str, str]]] = None) -> tuple[str, list[str]]:
+    """(HTML dos cards, notas dos correlatos que os selos citam por número); busca: as formas certas dos erros do
+    texto oficial por (norma, artigo), para o atributo data-busca do card; cf_ce: os pares CF × CE de texto igual,
+    cujos correlatos saem num selo só."""
+    renderer = HTMLRenderer(remissoes, busca, cf_ce)
     return renderer.render(doc), renderer.notas

@@ -1,0 +1,217 @@
+# Busca pela forma certa dos erros do texto oficial (laboratório das remissões, o81; aprovado pelo usuário em 27/10/2026)
+#
+# O texto do site fica fiel à fonte (PLP, ALESP): o erro de digitação que está lá não se corrige no DOCX
+# ("Erros no texto das normas.md", em FontesAtual). Mas o erro esconde o dispositivo de quem busca a palavra certa
+# ("prorrogação" não acha o art. 144, que diz "prorrogração"). Para cada erro desta lista, o build grava a forma certa
+# no card do artigo (data-busca), que a busca lê junto com o texto; o leitor continua vendo o texto fiel.
+#
+# norma: RI, LOM, CE; art: como no card (data-art: "144", "183-A", "ADT1"); errado: o trecho como está no texto (o
+# build avisa se não o achar mais, porque o erro pode ter sido corrigido na fonte); certo: a forma que a busca acha.
+# Erros só de acento ficam fora: a busca já os ignora.
+
+# Seção 1 de "Erros no texto das normas.md": digitação (o78, L408)
+[[erro]]
+norma = "RI"
+art = "32"
+errado = "lerá início"
+certo = "terá início"
+
+[[erro]]
+norma = "RI"
+art = "144"
+errado = "prorrogração"
+certo = "prorrogação"
+
+[[erro]]
+norma = "RI"
+art = "183-A"
+errado = "pareces"
+certo = "pareceres"
+
+[[erro]]
+norma = "RI"
+art = "197"
+errado = "inicar"
+certo = "iniciar"
+
+[[erro]]
+norma = "RI"
+art = "350"
+errado = "respeclivo"
+certo = "respectivo"
+
+[[erro]]
+norma = "RI"
+art = "86"
+errado = "apar teado"
+certo = "aparteado"
+
+[[erro]]
+norma = "RI"
+art = "393"
+errado = "maior absoluta"
+certo = "maioria absoluta"
+
+[[erro]]
+norma = "LOM"
+art = "84"
+errado = "aobtenção"
+certo = "a obtenção"
+
+[[erro]]
+norma = "LOM"
+art = "ADT1"
+errado = "compromissso"
+certo = "compromisso"
+
+[[erro]]
+norma = "LOM"
+art = "ADT4"
+errado = "adminstrativas"
+certo = "administrativas"
+
+[[erro]]
+norma = "LOM"
+art = "ADT8"
+errado = "de.ta"
+certo = "desta"
+
+# Erros já listados antes (L80, o18; varredura da CE)
+[[erro]]
+norma = "LOM"
+art = "59"
+errado = "dispos.o"
+certo = "disposto"
+
+[[erro]]
+norma = "LOM"
+art = "83"
+errado = "previs.o"
+certo = "previsto"
+
+[[erro]]
+norma = "LOM"
+art = "200"
+errado = "dispo.to .a"
+certo = "disposto na"
+
+[[erro]]
+norma = "LOM"
+art = "200"
+errado = "ser. complementado"
+certo = "será complementado"
+
+[[erro]]
+norma = "LOM"
+art = "200"
+errado = "estabelecid. .o"
+certo = "estabelecido no"
+
+[[erro]]
+norma = "LOM"
+art = "221"
+errado = ".s.rtigos"
+certo = "os artigos"
+
+[[erro]]
+norma = "LOM"
+art = "48"
+errado = "executadas as nomeações"
+certo = "excetuadas as nomeações"
+
+[[erro]]
+norma = "LOM"
+art = "48"
+errado = "se que tenha havido deliberação"
+certo = "sem que tenha havido deliberação"
+
+[[erro]]
+norma = "RI"
+art = "55"
+errado = "as suntos"
+certo = "assuntos"
+
+[[erro]]
+norma = "RI"
+art = "274"
+errado = "defenda de plano"
+certo = "deferida de plano"
+
+# Palavras partidas por hífen de quebra de linha da composição original (o67, L352)
+[[erro]]
+norma = "RI"
+art = "17"
+errado = "prece-dentes"
+certo = "precedentes"
+
+[[erro]]
+norma = "RI"
+art = "17"
+errado = "repre-sentantes"
+certo = "representantes"
+
+[[erro]]
+norma = "RI"
+art = "98"
+errado = "ex-ternos"
+certo = "externos"
+
+[[erro]]
+norma = "RI"
+art = "120"
+errado = "comunica-ções"
+certo = "comunicações"
+
+[[erro]]
+norma = "RI"
+art = "125"
+errado = "as-segurado"
+certo = "assegurado"
+
+[[erro]]
+norma = "RI"
+art = "143"
+errado = "obrigato-riamente"
+certo = "obrigatoriamente"
+
+[[erro]]
+norma = "RI"
+art = "274"
+errado = "Ex-pediente"
+certo = "Expediente"
+
+[[erro]]
+norma = "RI"
+art = "306"
+errado = "Ve-reador"
+certo = "Vereador"
+
+[[erro]]
+norma = "RI"
+art = "308"
+errado = "pu-blicada"
+certo = "publicada"
+
+[[erro]]
+norma = "RI"
+art = "310"
+errado = "mes-ma"
+certo = "mesma"
+
+[[erro]]
+norma = "RI"
+art = "329"
+errado = "en-viados"
+certo = "enviados"
+
+[[erro]]
+norma = "RI"
+art = "374"
+errado = "privativa-mente"
+certo = "privativamente"
+
+[[erro]]
+norma = "RI"
+art = "374"
+errado = "ou-tros"
+certo = "outros"

@@ -736,6 +736,9 @@
       let text = '';
       const walker = cardTextWalker(card, includeFootnotes);
       while (walker.nextNode()) text += walker.currentNode.data;
+      // the right form of the official text's typos (data-busca): the search finds the
+      // provision by the right word, and the reader still sees the faithful text
+      if (card.dataset.busca) text += ' \u0000 ' + card.dataset.busca;
       entry[i] = stripAccents(text.toLowerCase()).replace(/\xa0/g, ' ');
     }
     return entry[i];
@@ -3219,8 +3222,10 @@
       k.className = 'rem-kind';
       // "correspondente" inside one norm (data-mesma: RI–RI, LOM–LOM) is no federal
       // rule: parts of one procedure or parallel rules, linked both ways
-      // and with the Constituição Estadual (data-esfera) it is the state rule
+      // and with the Constituição Estadual (data-esfera) it is the state rule; a CF and a
+      // CE of the same wording in one badge (data-esfera="ambas") are the two rules
       k.textContent = tipo === 'sim' && trigger.dataset.mesma ? '⇄ Dispositivo correspondente'
+        : tipo === 'sim' && trigger.dataset.esfera === 'ambas' && trigger.dataset.side !== 'tgt' ? '⇄ Regras federal e estadual correspondentes'
         : tipo === 'sim' && trigger.dataset.esfera && trigger.dataset.side !== 'tgt' ? '⇄ Regra estadual correspondente'
         : REM_TIPO[tipo][trigger.dataset.side === 'tgt' ? 1 : 0];
       n.appendChild(k);

@@ -396,6 +396,15 @@ def _build_once(
                 for v in el.all_versions:
                     v.uid = v.uid.replace("art", f"art{lp}", 1)
 
+    # Forma certa dos erros do texto oficial, para a busca achar o dispositivo pela palavra certa (o81); depois dos prefixos, que separam o RI 32 da LOM 32
+    from src.resolve_amendments import formas_de_busca
+    import tomllib
+    arq_erros = BASE_DIR / "erros_texto_busca.toml"
+    erros = tomllib.loads(arq_erros.read_text(encoding="utf-8")).get("erro", []) if arq_erros.exists() else []
+    busca_erros, avisos_busca = formas_de_busca(doc, erros)
+    for message, context in avisos_busca:
+        report.add("texto", "aviso", message, context)
+
     # Remissões explícitas: citações a outros artigos ("artigo 369"), com prévia no site
     from src.remissoes import detectar, carregar_excecoes, carregar_implicitas, mudancas_desde_ultimo_build
     remissoes = detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml"),
@@ -448,7 +457,15 @@ def _build_once(
     print("[7/8] Renderizando cards HTML...")
     from src.render_html import render_cards
 
-    cards_html, correlato_notas = render_cards(doc, remissoes)
+    # Pares CF × CE de texto igual: os dois correlatos do mesmo dispositivo saem num selo só (o49)
+    arq_cf_ce = BASE_DIR / "remissoes_cf_ce.toml"
+    cf_ce = set()
+    if arq_cf_ce.exists():
+        from src.remissoes import _parse_ref
+        for par in tomllib.loads(arq_cf_ce.read_text(encoding="utf-8")).get("igual", []):
+            norm = lambda r: (lambda law, art, path: (f"{law}:" if law != "RI" else "") + art + (f",{path}" if path else ""))(*_parse_ref(r))
+            cf_ce.add((norm(par["cf"]), norm(par["ce"])))
+    cards_html, correlato_notas = render_cards(doc, remissoes, busca_erros, cf_ce)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
     # ── 8. Assemble ────────────────────────────────────────────────────

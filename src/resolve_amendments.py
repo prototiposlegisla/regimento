@@ -173,3 +173,29 @@ def text_warnings(
                         continue
                     warnings.append((f"Caractere perdido no texto? «…{janela}…»", ctx))
     return warnings
+
+
+def formas_de_busca(
+    doc: ParsedDocument,
+    erros: list[dict],
+) -> tuple[dict[tuple[str, str], str], list[tuple[str, str]]]:
+    """Formas certas dos erros do texto oficial, para a busca (erros_texto_busca.toml): {(norma, artigo): "forma
+    certa · outra"}, com norma "RI", "LOM", "CE"... como no card, e os avisos dos erros que não estão mais no texto
+    (o erro pode ter sido corrigido na fonte: tirar da lista)."""
+    textos: dict[tuple[str, str], str] = {}
+    for el in doc.elements:
+        if isinstance(el, ArticleBlock):
+            partes = [u.full_text for u in [el.caput, *el.children] if u is not None and not u.is_old_version]
+            textos[(el.law_prefix or "RI", el.art_number)] = " ".join(partes).replace("\xa0", " ").lower()
+    formas: dict[tuple[str, str], list[str]] = {}
+    avisos: list[tuple[str, str]] = []
+    for e in erros:
+        chave = (e["norma"], e["art"])
+        if chave not in textos:
+            avisos.append((f"Artigo inexistente: «{e['errado']}»", f"erros_texto_busca.toml, {e['norma']} {e['art']}"))
+        elif e["errado"].lower() not in textos[chave]:
+            avisos.append((f"Erro não achado no texto (corrigido na fonte?): «{e['errado']}»",
+                           f"erros_texto_busca.toml, {e['norma']} {e['art']}"))
+        else:
+            formas.setdefault(chave, []).append(e["certo"])
+    return {k: " · ".join(v) for k, v in formas.items()}, avisos

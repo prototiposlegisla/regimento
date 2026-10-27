@@ -1,0 +1,324 @@
+# CF e CE de texto igual (laboratório das remissões, o49; opção (a) aprovada pelo usuário em 27/10/2026)
+#
+# A CE copia muitas regras da CF trocando os órgãos (Assembleia por Congresso, Governador por Presidente). Quando um
+# dispositivo do RI ou da LOM tem correlato, do mesmo tipo, com a CF e com a CE de um par desta lista, o site mostra
+# um selo só, com os dois links, a nota da CF e "A CE repete a regra, para o Estado.". Os pares saíram do critério
+# da L200 (semelhança de palavras de 0,6 ou mais) e passaram por um cético que leu os dois textos: ficaram só os que
+# repetem a regra (79 de 120); os 41 em que a CE muda algo (quórum, prazo, item, ressalva) ficam com dois selos.
+# Endereços como na planilha remissoes.xlsx.
+
+[[igual]]
+cf = "CF:145,§ 1º"
+ce = "CE:160,§ 1º"
+
+[[igual]]
+cf = "CF:145,§ 2º"
+ce = "CE:160,§ 2º"
+
+[[igual]]
+cf = "CF:150,§ 6º"
+ce = "CE:163,§ 6º"
+
+[[igual]]
+cf = "CF:165,§ 8º"
+ce = "CE:174,§ 8º"
+
+[[igual]]
+cf = "CF:166,§ 4º"
+ce = "CE:175,§ 2º"
+
+[[igual]]
+cf = "CF:166,§ 5º"
+ce = "CE:175,§ 3º"
+
+[[igual]]
+cf = "CF:166,§ 7º"
+ce = "CE:175,§ 4º"
+
+[[igual]]
+cf = "CF:166,§ 8º"
+ce = "CE:175,§ 5º"
+
+[[igual]]
+cf = "CF:167,II"
+ce = "CE:176,II"
+
+[[igual]]
+cf = "CF:167,III"
+ce = "CE:176,III"
+
+[[igual]]
+cf = "CF:167,IX"
+ce = "CE:176,IX"
+
+[[igual]]
+cf = "CF:167,V"
+ce = "CE:176,V"
+
+[[igual]]
+cf = "CF:168"
+ce = "CE:171"
+
+[[igual]]
+cf = "CF:199,§ 2º"
+ce = "CE:220,§ 6º"
+
+[[igual]]
+cf = "CF:2"
+ce = "CE:5"
+
+[[igual]]
+cf = "CF:215"
+ce = "CE:259"
+
+[[igual]]
+cf = "CF:216"
+ce = "CE:260"
+
+[[igual]]
+cf = "CF:217,§ 3º"
+ce = "CE:265"
+
+[[igual]]
+cf = "CF:28,§ 1º"
+ce = "CE:42"
+
+[[igual]]
+cf = "CF:37,IX"
+ce = "CE:115,X"
+
+[[igual]]
+cf = "CF:37,V"
+ce = "CE:115,V"
+
+[[igual]]
+cf = "CF:37,VI"
+ce = "CE:115,VI"
+
+[[igual]]
+cf = "CF:37,XX"
+ce = "CE:115,XXII"
+
+[[igual]]
+cf = "CF:37,XXI"
+ce = "CE:117"
+
+[[igual]]
+cf = "CF:39,§ 5º"
+ce = "CE:124,§ 4º"
+
+[[igual]]
+cf = "CF:40"
+ce = "CE:126"
+
+[[igual]]
+cf = "CF:40,§ 13º"
+ce = "CE:126,§ 13º"
+
+[[igual]]
+cf = "CF:40,§ 16º"
+ce = "CE:126,§ 16º"
+
+[[igual]]
+cf = "CF:40,§ 3º"
+ce = "CE:126,§ 3º"
+
+[[igual]]
+cf = "CF:40,§ 6º"
+ce = "CE:126,§ 6º-A"
+
+[[igual]]
+cf = "CF:40,§ 8º"
+ce = "CE:126,§ 8º-A"
+
+[[igual]]
+cf = "CF:47"
+ce = "CE:10,§ 1º"
+
+[[igual]]
+cf = "CF:48,X"
+ce = "CE:19,III"
+
+[[igual]]
+cf = "CF:48,XI"
+ce = "CE:19,VI"
+
+[[igual]]
+cf = "CF:49,VI"
+ce = "CE:20,XX"
+
+[[igual]]
+cf = "CF:49,XI"
+ce = "CE:20,XXI"
+
+[[igual]]
+cf = "CF:51,III"
+ce = "CE:20,II"
+
+[[igual]]
+cf = "CF:52,XII"
+ce = "CE:20,II"
+
+[[igual]]
+cf = "CF:53"
+ce = "CE:14"
+
+[[igual]]
+cf = "CF:53,§ 6º"
+ce = "CE:14,§ 6º"
+
+[[igual]]
+cf = "CF:55"
+ce = "CE:16"
+
+[[igual]]
+cf = "CF:55,I"
+ce = "CE:16,I"
+
+[[igual]]
+cf = "CF:55,VI"
+ce = "CE:16,VI"
+
+[[igual]]
+cf = "CF:55,§ 1º"
+ce = "CE:16,§ 1º"
+
+[[igual]]
+cf = "CF:55,§ 3º"
+ce = "CE:16,§ 3º"
+
+[[igual]]
+cf = "CF:56,I"
+ce = "CE:17,I"
+
+[[igual]]
+cf = "CF:56,II"
+ce = "CE:17,II"
+
+[[igual]]
+cf = "CF:56,§ 1º"
+ce = "CE:17,§ 1º"
+
+[[igual]]
+cf = "CF:56,§ 2º"
+ce = "CE:17,§ 2º"
+
+[[igual]]
+cf = "CF:58,§ 2º,IV"
+ce = "CE:13,§ 1º,7"
+
+[[igual]]
+cf = "CF:61"
+ce = "CE:24"
+
+[[igual]]
+cf = "CF:61,§ 1º,II,c"
+ce = "CE:24,§ 2º,4"
+
+[[igual]]
+cf = "CF:66,§ 1º"
+ce = "CE:28,§ 1º"
+
+[[igual]]
+cf = "CF:66,§ 5º"
+ce = "CE:28,§ 7º"
+
+[[igual]]
+cf = "CF:70"
+ce = "CE:32"
+
+[[igual]]
+cf = "CF:70,§ú"
+ce = "CE:32,§ú"
+
+[[igual]]
+cf = "CF:71,I"
+ce = "CE:33,I"
+
+[[igual]]
+cf = "CF:71,III"
+ce = "CE:33,III"
+
+[[igual]]
+cf = "CF:71,IX"
+ce = "CE:33,X"
+
+[[igual]]
+cf = "CF:71,VIII"
+ce = "CE:33,IX"
+
+[[igual]]
+cf = "CF:71,XI"
+ce = "CE:33,XII"
+
+[[igual]]
+cf = "CF:71,§ 1º"
+ce = "CE:33,§ 1º"
+
+[[igual]]
+cf = "CF:71,§ 4º"
+ce = "CE:33,§ 3º"
+
+[[igual]]
+cf = "CF:72"
+ce = "CE:34"
+
+[[igual]]
+cf = "CF:72,§ 1º"
+ce = "CE:34,§ 1º"
+
+[[igual]]
+cf = "CF:72,§ 2º"
+ce = "CE:34,§ 2º"
+
+[[igual]]
+cf = "CF:74,I"
+ce = "CE:35,I"
+
+[[igual]]
+cf = "CF:74,II"
+ce = "CE:35,II"
+
+[[igual]]
+cf = "CF:74,III"
+ce = "CE:35,IV"
+
+[[igual]]
+cf = "CF:74,IV"
+ce = "CE:35,V"
+
+[[igual]]
+cf = "CF:78,§ú"
+ce = "CE:43,§ú"
+
+[[igual]]
+cf = "CF:79"
+ce = "CE:38"
+
+[[igual]]
+cf = "CF:81"
+ce = "CE:41"
+
+[[igual]]
+cf = "CF:83"
+ce = "CE:44"
+
+[[igual]]
+cf = "CF:84,II"
+ce = "CE:47,II"
+
+[[igual]]
+cf = "CF:84,III"
+ce = "CE:47,XI"
+
+[[igual]]
+cf = "CF:84,V"
+ce = "CE:47,IV"
+
+[[igual]]
+cf = "CF:84,VI,a"
+ce = "CE:47,XIX,a"
+
+[[igual]]
+cf = "CF:87"
+ce = "CE:51"

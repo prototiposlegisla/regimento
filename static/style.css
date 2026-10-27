@@ -1647,6 +1647,20 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-backlinks::before { display: block; margin: 0 0 3px 4px; font-size: .9em; font-weight: 600; color: #8a7a52; }
 .idx-back { background: #fff; color: #5f4f26; border-color: #ddd2b6; }
 .idx-more { color: #5f4f26; border-color: #ddd2b6; }
+/* the entry whose box is open, and its box: the dispositivos with their dicas */
+.idx-back.rem-open {
+  background: #8a7a52; border-color: #8a7a52; color: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #8a7a52 25%, transparent);
+}
+.rem-head .rem-law.IDX { background: #efe7d2; color: #5f4f26; }
+.idx-backlinks > .rem-box, .idx-list { color: #2b2b2b; }
+.idx-list .idx-line { padding: 1px 6px; margin: 0 -6px; border-radius: 3px; cursor: pointer; }
+.idx-list .idx-line:hover, .idx-list .idx-line:focus-visible { background: #f6f2e8; outline: none; }
+.idx-list .idx-here { background: #f3ecd9; box-shadow: inset 3px 0 0 #8a7a52; }
+.idx-list .ref-hint { color: #7b7b7b; }
+.idx-list .idx-sub { margin: 7px 0 1px; font-weight: 600; font-size: .92em; color: #6e5a2b; }
+.idx-list .idx-vides { font-size: .9em; font-style: italic; color: #888; }
+.rem-foot .idx-count { color: #7f8c8d; }
 /* implicit: a badge at the end of the provision, on both sides; label via CSS */
 .rem-imp {
   display: inline-block;
@@ -1677,6 +1691,7 @@ button.q-label:hover { color: #2c6fa6; }
 .t-div:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #c0392b; }
 .t-sim:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #2471a3; }
 .t-exc:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #ca6f1e; }
+.t-idx:is(.rem-box, #rem-pop) { --c: #8a7a52; }   /* an entry of the índice remissivo */
 /* the chip whose box is open */
 .rem-imp.rem-open {
   background: var(--c); border-color: var(--c); color: #fff;

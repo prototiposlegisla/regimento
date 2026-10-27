@@ -950,7 +950,9 @@
       // object, so the list keeps its indexes' part. The indexes are searched
       // whole, a chip or not: they lead to other subjects.
       const indexKey = JSON.stringify([phrases, words]);
-      if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey);
+      // the query as typed (without quotes nor the "r " prefix), for the fichas' search terms
+      const typed = normIndexText((includeFootnotes ? term.replace(/^\s*r\s+/i, '') : term).replace(/"/g, ' ')).trim();
+      if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey, typed);
     } else {
       indexMatches = null;
     }
@@ -1855,6 +1857,7 @@
   const INDEX_GROUPS_SHOWN = 3;   // per index; the rest behind "+ N"
   const QUICK_SHOWN = 4;          // entries of the consulta rápida
   const QUICK_LIST_SHOWN = 3;     // lines of a ficha (cabe aparte, a rito's steps)
+  const QUICK_TEMA_SHOWN = 8;     // lines of a tema (Grande Expediente: duration, time, apartes...)
   const INDEX_ENTRIES_SHOWN = 2;  // per group (sub-subjects, prazos)
   const ART_LINKS_SHOWN = 6;      // a norm's provisions (legislação correlata)
   const LEGISLACAO = 'Legislação correlata';
@@ -1923,8 +1926,9 @@
     for (const sec of CONSULTA_INDEX) {
       for (const item of sec.items) {
         const own = normIndexText(quickTexts(item).join(FIELD_SEP));
-        quick.push({ sec, item, own, label: normIndexText(item.label),
-                     text: own + FIELD_SEP + normIndexText(sec.terms + ' ' + (item.terms || '')) });
+        const terms = normIndexText(item.terms || '');
+        quick.push({ sec, item, own, label: normIndexText(item.label), terms,
+                     text: own + FIELD_SEP + normIndexText(sec.terms) + FIELD_SEP + terms });
       }
     }
     return indexItems = { sys, subj, refs, quick };
@@ -1932,28 +1936,75 @@
 
   // The indexes' entries with every phrase and word (as parseSearchTerms
   // returns them): {sections: [{title, hits, build}], count, regex, key}
-  function searchIndexes(phrases, words, regex, key) {
+  function searchIndexes(phrases, words, regex, key, typed) {
     const has = text => phrases.every(p => text.includes(p)) && words.every(w => text.includes(w));
     const { sys, subj, refs, quick } = getIndexItems();
 
-    // Those with more of the terms in their own text first, more yet in the
-    // label ("prazo vista": the pedido de vista before every other prazo;
-    // "aparte": the shorter label, cabe aparte, before the tempos that mention it)
+    // Those with more of the terms in their own text (or in their search terms,
+    // the synonyms: "derrubada" for the veto) first, more yet in the label
+    // ("prazo vista": the pedido de vista before every other prazo;
+    // "aparte": the shorter label, cabe aparte, before the tempos that mention it;
+    // a tema with every term in its name before all: "posse", the ficha of the posse)
     const terms = phrases.concat(words);
-    const quickHits = quick.filter(it => has(it.text))
-      .map((it, i) => ({ it, i, score: terms.reduce((n, t) => n + (it.label.includes(t) ? 2 : it.own.includes(t) ? 1 : 0), 0) }))
+    // a ficha is found also by the word's stem, in another number or gender
+    // ("prejudicado": the ficha "Proposição prejudicada"; "apartes": the ficha "Aparte")
+    // (the stem starts a word and ends it within 3 letters: "comissão" finds
+    // "Comissões", not "Subcomissões"; "público" finds "pública", not "publicação")
+    // (only words of letters: "1/5" and "§" are matched as typed; -ão/-ões and -al/-ais leave a stem of 3 letters
+    // or more, "moções" finds "Moção"; the plural -s and the last vowel, 4 or more: "meses" doesn't find "mesa")
+    const stem = w => {
+      if (w.length < 5) return w;
+      const m = w.replace(/(oes|aos|aes|ao|ais|eis|al|el)$/, '');
+      if (m !== w) return m.length >= 3 ? m : w;
+      const s = w.replace(/(es|s)$/, '').replace(/[aoe]$/, '');
+      return s.length >= 4 ? s : w;
+    };
+    // (a word of up to 3 letters, often a sigla, is the whole word or its plural: "PL" doesn't find "Plano")
+    const stemRes = words.map(w => !/^[a-z]+$/.test(w) ? null
+      : w.length <= 3 ? new RegExp('(^|[^a-z0-9])' + w + 's?($|[^a-z0-9])')
+      : new RegExp('(^|[^a-z0-9])(' + stem(w) + '[a-z]{0,3}|' + w + ')($|[^a-z0-9])'));
+    const wordIn = (k, text) => stemRes[k] ? stemRes[k].test(text) : text.includes(words[k]);
+    const isTema = it => it.sec.key === 'temas';
+    const byStem = text => phrases.every(p => text.includes(p)) && words.every((w, k) => wordIn(k, text));
+    // in a ficha's name a word counts only from a word's start ("lei" is not in "Eleição")
+    // (and so does a word of up to 3 letters in any name: "PL" is not in "Plano Diretor")
+    const inLabel = (it, k) => k >= phrases.length && (isTema(it) || words[k - phrases.length].length <= 3)
+      ? wordIn(k - phrases.length, it.label) : it.label.includes(terms[k]);
+    // a connective of the query needs not be in the name: "prazo do parecer" names "Prazos de parecer das Comissões"
+    const CONNECTIVES = new Set(['a', 'o', 'e', 'as', 'os', 'ao', 'aos', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
+      'para', 'por', 'pelo', 'pela', 'com', 'um', 'uma']);
+    const loose = k => k >= phrases.length && CONNECTIVES.has(terms[k]) && terms.some(t => !CONNECTIVES.has(t));
+    const temaNamed = it => isTema(it) && terms.every((t, k) => loose(k) || inLabel(it, k)) ? 1 : 0;
+    // a ficha whose search terms have the whole query, as typed ("caso omisso", "sorteado"), from a word's start,
+    // before those that only mention it, unless the query is a single word many fichas list ("sessão", "prazo"):
+    // there the name decides
+    const query = (typed || terms.join(' ')).trim();
+    const queryRe = query ? new RegExp('(^|[^a-z0-9])' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      + (query.length <= 3 ? '($|[^a-z0-9])' : '')) : null;
+    const termedBy = queryRe ? quick.filter(it => isTema(it) && queryRe.test(it.terms)).length : 0;
+    const temaTermed = it => isTema(it) && queryRe && (terms.length > 1 || termedBy <= 2) && queryRe.test(it.terms) ? 1 : 0;
+    const quickHits = quick.filter(it => has(it.text) || (isTema(it) && byStem(it.text)))
+      .map((it, i) => ({ it, i, score: terms.reduce((n, t, k) => n + (inLabel(it, k) ? 2 : it.own.includes(t) || it.terms.includes(t) ? 1 : 0), 0) + temaNamed(it) + temaTermed(it) }))
       .sort((a, b) => b.score - a.score || (b.score > terms.length ? a.it.label.length - b.it.label.length : 0) || a.i - b.i);
 
     const sysHits = sys.filter(it => has(it.text));
 
     // Subjects found by their name first, then those found by a sub-subject
-    const byName = [], bySub = [];
+    // (names also by the stem, as the fichas: "apartes" finds APARTE; those
+    // with the very word first: "comissões", COMISSÕES before COMISSÃO DE...).
+    // Found by its name, a subject brings all its sub-subjects (rest: those
+    // without the terms), so it doesn't look smaller than it is ("veto": none
+    // of VETO's sub-subjects says veto)
+    const byName = [], byStemName = [], bySub = [];
+    const hasName = text => has(text) || byStem(text);
     for (const it of subj) {
-      const self = has(it.text);
-      const subs = it.children.filter(c => has(self ? c.text : c.withSubject));
-      if (self) byName.push({ it, subs, byName: true });
-      else if (subs.length) bySub.push({ it, subs, byName: false });
+      const exact = has(it.text);
+      const self = exact || byStem(it.text);
+      const subs = it.children.filter(c => hasName(self ? c.text : c.withSubject));
+      if (self) (exact ? byName : byStemName).push({ it, subs, rest: it.children.filter(c => !subs.includes(c)), byName: true });
+      else if (subs.length) bySub.push({ it, subs, rest: [], byName: false });
     }
+    byName.push(...byStemName);
 
     const refHits = [];
     for (const it of refs) {
@@ -1971,7 +2022,8 @@
       { title: 'Índice remissivo', where: 'no índice remissivo', hits: byName.concat(bySub), build: buildSubjectResult },
       { title: 'Referências', where: 'nas referências', hits: refHits, build: buildRefResult },
     ].filter(s => s.hits.length);
-    return { sections, count: sections.reduce((n, s) => n + s.hits.length, 0), regex, key };
+    const named = new Set(quickHits.filter(h => temaNamed(h.it)).map(h => h.it.item));
+    return { sections, count: sections.reduce((n, s) => n + s.hits.length, 0), regex, key, named };
   }
 
   // The indexes' part of the list, in one element at its top (kept when the
@@ -1994,14 +2046,15 @@
   }
 
   // Appends build(item) of the first `shown` items to parent, the rest behind
-  // a "+ N" button (returned). noun: [singular, plural].
+  // a "+ N" button (returned). noun: [singular, plural], or the button's text
+  // from the hidden items.
   function appendWithMore(parent, items, shown, build, noun, cls) {
     for (const item of items.slice(0, shown)) parent.appendChild(build(item));
     const rest = items.length - shown;
     if (rest <= 0) return null;
     const more = document.createElement('button');
     more.className = 'res-expand' + (cls ? ' ' + cls : '');
-    more.textContent = '+ ' + rest + ' ' + noun[rest === 1 ? 0 : 1];
+    more.textContent = typeof noun === 'function' ? noun(items.slice(shown)) : '+ ' + rest + ' ' + noun[rest === 1 ? 0 : 1];
     more.addEventListener('click', () => {
       const hadFocus = document.activeElement === more;
       const added = items.slice(shown).map(build);
@@ -2093,8 +2146,9 @@
   }
 
   // A subject of the remissivo: its sub-subjects with the terms (and their
-  // "vide") and, found by its name, its articles and "vide"; each puts the
-  // subject in the search bar
+  // "vide") and, found by its name, its articles, its other sub-subjects
+  // (just the name and how many provisions: "— Tramitação (5)") and its
+  // "vide"; each puts the subject in the search bar
   function buildSubjectResult(hit) {
     const { entry } = hit.it;
     const group = indexGroup(entry.subject);
@@ -2106,9 +2160,15 @@
       items.push({ sub });
       for (const vide of sub.ch.vides || []) items.push({ vide });
     }
+    for (const sub of hit.rest) items.push({ sub, brief: true });
     if (hit.byName) for (const vide of entry.vides || []) items.push({ vide });
-    const noun = items.slice(INDEX_ENTRIES_SHOWN).every(item => item.sub) ? ['subassunto', 'subassuntos'] : ['outro', 'outros'];
-    appendWithMore(group, items, INDEX_ENTRIES_SHOWN, ({ sub, vide }) => {
+    // "+ 5 subassuntos", "+ 5 subassuntos, 1 vide", "+ 2 outros"
+    const more = hidden => {
+      const subs = hidden.filter(item => item.sub).length, vides = hidden.length - subs;
+      if (!hit.rest.length || !subs) return '+ ' + hidden.length + ' ' + (subs === hidden.length ? 'subassunto' : 'outro') + (hidden.length > 1 ? 's' : '');
+      return '+ ' + subs + ' subassunto' + (subs > 1 ? 's' : '') + (vides ? ', ' + vides + ' vide' : '');
+    };
+    appendWithMore(group, items, INDEX_ENTRIES_SHOWN, ({ sub, vide, brief }) => {
       if (vide) {
         const target = findVide(vide);
         return indexButton('res-entry res-vide', 'vide ' + escapeHtml(target.label),
@@ -2116,9 +2176,12 @@
       }
       const ch = sub.ch;
       const refs = subjectRefs(entry, ch.sub_subject);
-      return indexButton('res-entry', '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs),
+      const html = brief
+        ? '— ' + escapeHtml(ch.sub_subject) + (refs.length ? ' <span class="res-count">(' + refs.length + ')</span>' : '')
+        : '— ' + indexMarkHtml(ch.sub_subject) + refsHtml(ch.refs);
+      return indexButton('res-entry' + (brief ? ' res-brief' : ''), html,
         refs.length ? () => { openSubject({ subject: entry.subject + ' — ' + ch.sub_subject, refs }); } : null);
-    }, noun);
+    }, more);
     return group;
   }
 
@@ -2316,7 +2379,9 @@
       if (inSearch) {
         const re = indexMatches.regex;
         const found = x => { re.lastIndex = 0; return re.test(x.text); };
-        lines = lines.filter(found).concat(lines.filter(x => !found(x)));
+        // a tema searched by its name keeps the ficha's order (general to particular)
+        if (!(sec.key === 'temas' && indexMatches.named && indexMatches.named.has(item)))
+          lines = lines.filter(found).concat(lines.filter(x => !found(x)));
       }
       lists.push(['q-list', lines, x => {
         const line = document.createElement('div');
@@ -2329,7 +2394,10 @@
     for (const [cls, items, build, noun] of lists) {
       const list = document.createElement('div');
       list.className = cls;
-      if (inSearch) appendWithMore(list, items, QUICK_LIST_SHOWN, build, noun);
+      // a tema's ficha shows more lines in the search, where it sums up the
+      // subject; in the Referências tab, the first ones, so the fichas don't fill the tab
+      if (inSearch) appendWithMore(list, items, sec.key === 'temas' ? QUICK_TEMA_SHOWN : QUICK_LIST_SHOWN, build, noun);
+      else if (sec.key === 'temas') appendWithMore(list, items, QUICK_LIST_SHOWN, build, noun);
       else items.forEach(x => list.appendChild(build(x)));
       body.appendChild(list);
     }
@@ -2357,7 +2425,20 @@
       link.textContent = sec.title + ' · ' + items.length;
       link.addEventListener('click', () => head.scrollIntoView({ block: 'start', behavior: 'smooth' }));
       toc.appendChild(link);
-      for (const item of items) $indexContent.appendChild(quickItemEl(sec, item, escapeHtml, false));
+      // the fichas by group ("Fases da sessão", "Listas de hipóteses"), each with its subtitle
+      let group = null;
+      for (const item of items) {
+        // a ficha without group after grouped ones goes under "Outros", not under the group above
+        const g = item.group || (group ? 'Outros' : null);
+        if (g && g !== group) {
+          group = g;
+          const sub = document.createElement('div');
+          sub.className = 'q-subhead';
+          sub.textContent = group;
+          $indexContent.appendChild(sub);
+        }
+        $indexContent.appendChild(quickItemEl(sec, item, escapeHtml, false));
+      }
     }
     if (!toc.childNodes.length) {
       toc.className = 'q-empty';

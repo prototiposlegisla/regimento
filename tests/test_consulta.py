@@ -121,3 +121,45 @@ class TestMontarEConferir:
         md = MarkdownRenderer().render_consulta(para_o_site(montar(self.DADOS)))
         assert "- **2 dias** — Pedido de vista (improrrogável) — art. 63, § 4º" in md
         assert "1. Prefeito veta" in md
+
+
+class TestTemas:
+    """A seção "temas": uma ficha por assunto, cada fato com o artigo entre parênteses no fim."""
+    DADOS = {
+        "temas": [{"titulo": "Vista", "termos": "pedido de vista",
+                   "itens": ["2 dias, improrrogável (63 §4º)",
+                             "3 dias (63 §4º)",
+                             "1/3 (19) presente, na 1ª sessão (63 §4º)",
+                             "2 dias ⚠ o 63 diz 15 (63 §4º)"]}],
+        "prazos": [{"prazo": "15 d", "evento": "Parecer", "art": "63"}],
+    }
+
+    def test_vem_primeiro_com_o_artigo_de_cada_fato(self):
+        secoes = para_o_site(montar(self.DADOS))
+        assert [s["key"] for s in secoes] == ["temas", "prazos"]
+        ficha = secoes[0]["items"][0]
+        assert (ficha["label"], ficha["terms"]) == ("Vista", "pedido de vista")
+        assert ficha["list"][0]["text"] == "2 dias, improrrogável" and ficha["list"][0]["art"] == "63 §4º"
+        assert ficha["list"][0]["refs"] == [{"law": "RI", "art": "63", "label": "art. 63, § 4º", "path": "§ 4º"}]
+
+    def test_conferencia_de_cada_fato(self):
+        avisos: list = []
+        conferir(montar(self.DADOS), _doc(), avisos)
+        temas = [(msg, ctx) for _, msg, ctx in avisos if "Vista ›" in ctx]
+        # o número que não está no artigo citado na linha
+        assert [m for m, c in temas if c.endswith("3 dias")] == ["«3» não aparece no texto (63 §4º)"]
+        # a conta sobre 55 ("(19)"), o ordinal ("1ª") e o que vem depois do ⚠ não se conferem; a fração sim
+        assert [m for m, c in temas if "1/3" in c] == ["«1/3» não aparece no texto (63 §4º)"]
+        assert not any("⚠" in c or c.endswith("improrrogável") for _, c in temas)
+
+
+class TestTemasAvisos:
+    def test_fato_sem_artigo_e_grupo_fora_de_sequencia(self):
+        dados = {"temas": [{"titulo": "A", "grupo": "G1", "itens": ["sem artigo"]},
+                           {"titulo": "B", "grupo": "G2", "itens": ["2 dias (63 §4º)"]},
+                           {"titulo": "C", "grupo": "G1", "itens": ["2 dias (63 §4º)"]}]}
+        avisos: list = []
+        conferir(montar(dados), _doc(), avisos)
+        msgs = [m for _, m, _ in avisos]
+        assert "fato sem o artigo entre parênteses no fim" in msgs
+        assert "grupo «G1» fora de sequência" in msgs

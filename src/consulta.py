@@ -211,9 +211,25 @@ def montar(dados: dict) -> list[dict]:
     """As seções do yaml no formato do site: [{key, title, kind, terms, items}].
 
     kind "valor": cada item {v, u, label, obs?, art, refs, cf?, terms?}; kind "ficha": {label, text?,
-    obs?, list?, steps?, art, refs, cf?}. O que não está no yaml fica fora.
+    obs?, list?, steps?, art, refs, cf?}. A seção "temas" vem primeiro. O que não está no yaml fica fora.
     """
     secoes: list[dict] = []
+    # temas: tudo de um assunto numa ficha só (o Grande Expediente: duração, tempo por orador, aparte...),
+    # cada fato com o artigo entre parênteses, como nas listas de apartes
+    temas = []
+    for e in dados.get("temas") or []:
+        lista = []
+        for frase in e.get("itens") or []:
+            texto, art = _artigo_ao_fim(str(frase))
+            lista.append({"text": texto, "art": art, "refs": _refs_json(art)})
+        item = {"label": e.get("titulo", ""), "list": lista, "art": "", "refs": []}
+        if e.get("termos"):
+            item["terms"] = str(e["termos"])
+        if e.get("grupo"):
+            item["group"] = str(e["grupo"])   # subtítulo na aba Referências ("Fases da sessão", "Listas de hipóteses")
+        temas.append(item)
+    if temas:
+        secoes.append({"key": "temas", "title": "Por tema", "kind": "ficha", "terms": "tema resumo regras", "items": temas})
     for key, title, campo_v, campo_l, campo_o, termos in SECOES_VALOR:
         items = []
         for e in dados.get(key) or []:
@@ -293,6 +309,15 @@ def conferir(secoes: list[dict], doc, avisos: list) -> None:
     Em avisos, (severidade, mensagem, contexto)."""
     corpus = _Corpus(doc)
     for sec in secoes:
+        if sec["key"] == "temas":
+            # os grupos da aba Referências têm de vir juntos: um grupo que volta mais adiante repetiria o subtítulo
+            vistos, antes = set(), None
+            for item in sec["items"]:
+                g = item.get("group")
+                if g and g != antes and g in vistos:
+                    avisos.append(("aviso", f"grupo «{g}» fora de sequência", f"{sec['title']}: {item['label']}"))
+                vistos.add(g)
+                antes = g
         for item in sec["items"]:
             ctx = f"{sec['title']}: " + (f"{item['v']} — " if "v" in item else "") + item["label"]
             for parte, art_txt, refs in _todas_refs(item):
@@ -308,6 +333,29 @@ def conferir(secoes: list[dict], doc, avisos: list) -> None:
                     elif alvo.status in (REVOGADO, TACHADO) and "revog" not in art_txt:
                         avisos.append(("aviso", f"{r['label']} — revogado (marque \"(revog.)\" se é de propósito)",
                                        sub_ctx))
+            if sec["key"] == "temas":
+                # cada fato do tema: os números e as frações têm de estar no texto do artigo citado na linha
+                for sub in item.get("list") or []:
+                    if not sub["art"]:
+                        avisos.append(("aviso", "fato sem o artigo entre parênteses no fim", f"{ctx} › {sub['text']}"))
+                        continue
+                    texto = " ".join(_norm(u.full_text) for r in sub["refs"]
+                                     for u, _ in corpus.units.get((r["law"], r["art"]), []))
+                    if not texto:
+                        continue
+                    frase = re.sub(r"⚠.*", "", sub["text"])   # o aviso cita outro dispositivo
+                    # a conta sobre 55 ("1/3 (19)", "(≥ 23)") e os ordinais ("1ª sessão") não estão escritos no texto
+                    frase = re.sub(r"\(\s*[≥≤]?\s*\d+\s*\)|\b\d+\s*[ºª°]", " ", frase)
+                    faltam = [f for f in re.findall(r"\d+/\d+", frase)
+                              if f not in texto and not any(x in texto for x in FRACOES.get(f, ()))]
+                    for x in dict.fromkeys(re.findall(r"\d{1,3}(?:\.\d{3})+|\d+", re.sub(r"\d+/\d+", " ", frase))):
+                        n = int(x.replace(".", ""))
+                        # milhar e ano só por algarismo ("1.500 eleitores", "2025"); o resto também por extenso
+                        if not (x in texto if n >= 1000 else numero_no_texto(n, texto)):
+                            faltam.append(x)
+                    for f in faltam:
+                        avisos.append(("aviso", f"«{f}» não aparece no texto ({sub['art']})", f"{ctx} › {sub['text']}"))
+                continue
             if not item["refs"] or sec["key"] not in CONFERE_NUMERO | CONFERE_QUORUM:
                 continue
             texto = " ".join(_norm(u.full_text) for r in item["refs"]

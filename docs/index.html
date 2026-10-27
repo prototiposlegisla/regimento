@@ -1655,6 +1655,20 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-backlinks::before { display: block; margin: 0 0 3px 4px; font-size: .9em; font-weight: 600; color: #8a7a52; }
 .idx-back { background: #fff; color: #5f4f26; border-color: #ddd2b6; }
 .idx-more { color: #5f4f26; border-color: #ddd2b6; }
+/* the entry whose box is open, and its box: the dispositivos with their dicas */
+.idx-back.rem-open {
+  background: #8a7a52; border-color: #8a7a52; color: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #8a7a52 25%, transparent);
+}
+.rem-head .rem-law.IDX { background: #efe7d2; color: #5f4f26; }
+.idx-backlinks > .rem-box, .idx-list { color: #2b2b2b; }
+.idx-list .idx-line { padding: 1px 6px; margin: 0 -6px; border-radius: 3px; cursor: pointer; }
+.idx-list .idx-line:hover, .idx-list .idx-line:focus-visible { background: #f6f2e8; outline: none; }
+.idx-list .idx-here { background: #f3ecd9; box-shadow: inset 3px 0 0 #8a7a52; }
+.idx-list .ref-hint { color: #7b7b7b; }
+.idx-list .idx-sub { margin: 7px 0 1px; font-weight: 600; font-size: .92em; color: #6e5a2b; }
+.idx-list .idx-vides { font-size: .9em; font-style: italic; color: #888; }
+.rem-foot .idx-count { color: #7f8c8d; }
 /* implicit: a badge at the end of the provision, on both sides; label via CSS */
 .rem-imp {
   display: inline-block;
@@ -1685,6 +1699,7 @@ button.q-label:hover { color: #2c6fa6; }
 .t-div:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #c0392b; }
 .t-sim:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #2471a3; }
 .t-exc:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #ca6f1e; }
+.t-idx:is(.rem-box, #rem-pop) { --c: #8a7a52; }   /* an entry of the índice remissivo */
 /* the chip whose box is open */
 .rem-imp.rem-open {
   background: var(--c); border-color: var(--c); color: #fff;
@@ -20689,7 +20704,15 @@ button.q-label:hover { color: #2c6fa6; }
   };
   // A box belongs to one trigger: a citation and a badge may point to the same place
   function remKey(trigger) {
+    if (trigger.classList.contains('idx-back')) return 'idx:' + trigger.dataset.label;
     return (trigger.classList.contains('rem-imp') ? 'imp:' : '') + trigger.dataset.ref;
+  }
+  // The color of the preview and of the box: the correlate's kind, or the index's
+  function remKind(trigger) {
+    return trigger.classList.contains('idx-back') ? 'idx' : trigger.dataset.tipo;
+  }
+  function remPanel(trigger) {
+    return trigger.classList.contains('idx-back') ? buildIdxPanel(trigger) : buildRemPanel(trigger);
   }
 
   function parseRemRef(s) {
@@ -20895,10 +20918,10 @@ button.q-label:hover { color: #2c6fa6; }
 
   function showRemPop(trigger) {
     remPopTrigger = trigger;
-    $remPop.replaceChildren(buildRemPanel(trigger));
+    $remPop.replaceChildren(remPanel(trigger));
     // the kind's color (style.css), as in the pinned box
     for (const c of [...$remPop.classList]) if (c.startsWith('t-')) $remPop.classList.remove(c);
-    if (trigger.dataset.tipo) $remPop.classList.add('t-' + trigger.dataset.tipo);
+    if (remKind(trigger)) $remPop.classList.add('t-' + remKind(trigger));
     $remPop.style.maxHeight = 'none';
     $remPop.classList.add('visible');
     // The side with more room, never over the trigger, the header or the breadcrumb
@@ -20920,9 +20943,13 @@ button.q-label:hover { color: #2c6fa6; }
     $remPop.style.left = left + 'px';
     $remPop.style.top = (useBelow ? rr.bottom + 6 : rr.top - 6 - h) + 'px';
   }
+  // An entry of the index opens its box inside the band at the card's foot;
+  // anything else, right under its provision
   function remBoxOpen(trigger) {
-    const p = trigger.closest('p');
     const key = remKey(trigger);
+    const band = trigger.closest('.idx-backlinks');
+    if (band) return [...band.querySelectorAll(':scope > .rem-box')].find(b => b.dataset.for === key) || null;
+    const p = trigger.closest('p');
     for (let box = p && p.nextElementSibling; box && box.classList.contains('rem-box'); box = box.nextElementSibling) {
       if (box.dataset.for === key) return box;
     }
@@ -20943,23 +20970,27 @@ button.q-label:hover { color: #2c6fa6; }
 
   // Click/tap: pins the preview in a box under the provision (the only mode on touch)
   function toggleRemBox(trigger) {
-    const p = trigger.closest('p') || trigger.closest('.rem-backlinks');
-    const key = remKey(trigger);
-    let after = p;
-    for (let box = p.nextElementSibling; box && box.classList.contains('rem-box'); box = box.nextElementSibling) {
-      if (box.dataset.for === key) { closeRemBox(box); return; }
-      after = box;
-    }
+    const open = remBoxOpen(trigger);
+    if (open) { closeRemBox(open); return; }
     const b = document.createElement('div');
-    b.className = 'rem-box' + (trigger.dataset.tipo ? ' t-' + trigger.dataset.tipo : '');
-    b.dataset.for = key;
+    b.className = 'rem-box' + (remKind(trigger) ? ' t-' + remKind(trigger) : '');
+    b.dataset.for = remKey(trigger);
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'rem-close';
     close.setAttribute('aria-label', 'Fechar');
     close.textContent = '×';
-    b.append(close, buildRemPanel(trigger));
-    after.after(b);   // after the boxes already open there, in reading order
+    b.append(close, remPanel(trigger));
+    const band = trigger.closest('.idx-backlinks');
+    if (band) band.appendChild(b);
+    else {
+      // after the boxes already open there, in reading order
+      let after = trigger.closest('p') || trigger.closest('.rem-backlinks');
+      while (after.nextElementSibling && after.nextElementSibling.classList.contains('rem-box')) {
+        after = after.nextElementSibling;
+      }
+      after.after(b);
+    }
     remBoxTrigger.set(b, trigger);
     trigger.classList.add('rem-open');
     trigger.setAttribute('aria-expanded', 'true');
@@ -21046,19 +21077,16 @@ button.q-label:hover { color: #2c6fa6; }
     if (e.key !== 'Escape') return;
     const active = document.activeElement;
     let box = null;
-    if (active && active.classList && (active.classList.contains('rem-exp') || active.classList.contains('rem-imp'))) {
+    if (active && active.classList && (active.classList.contains('rem-exp') || active.classList.contains('rem-imp')
+        || active.classList.contains('idx-back'))) {
       box = remBoxOpen(active);
     }
     if (!box && active && active.closest) box = active.closest('.rem-box');
     if ($remPop.classList.contains('visible')) hideRemPop();
     else if (box) {
-      let p = box.previousElementSibling;
-      while (p && p.classList.contains('rem-box')) p = p.previousElementSibling;
-      const imp = box.dataset.for.startsWith('imp:');
-      const ref = imp ? box.dataset.for.slice(4) : box.dataset.for;
-      const t = p && p.querySelector(`${imp ? '.rem-imp' : '.rem-exp'}[data-ref="${CSS.escape(ref)}"]`);
+      const t = remBoxTrigger.get(box);
       closeRemBox(box);
-      if (t) t.focus({ preventScroll: true });
+      if (t && t.isConnected) t.focus({ preventScroll: true });
     } else return;
     e.preventDefault();
     e.stopPropagation();
@@ -21066,7 +21094,7 @@ button.q-label:hover { color: #2c6fa6; }
 
   if (HOVER) {
     $cards.addEventListener('mouseover', e => {
-      const t = e.target.closest('.rem-exp, .rem-imp, .rem-back');
+      const t = e.target.closest('.rem-exp, .rem-imp, .rem-back, .idx-back');
       if (!t || t.closest('.rem-box')) return;
       if (e.relatedTarget && t.contains(e.relatedTarget)) return;   // moving inside the trigger
       clearTimeout(remHideTimer); clearTimeout(remShowTimer);
@@ -21847,17 +21875,19 @@ button.q-label:hover { color: #2c6fa6; }
   // ===== NO ÍNDICE REMISSIVO =====
   // At the end of each article, the subjects of the remissivo that cite it (or
   // one of its provisions), as the "Citado em:" line: labels via CSS, out of
-  // the searchable text. The ones citing the whole article first; a click
+  // the searchable text. The ones citing the whole article first. Each one is
+  // a trigger as the correlates' (.rem): hover previews the entry's
+  // dispositivos, click opens them in a box in the band, and the box's foot
   // puts the subject in the search bar, starting at this article.
   const IDX_BACK_SHOWN = 6;
 
   function renderIndexBacklinks() {
-    const byArt = new Map();   // "LOM:42" → [{label, refs, whole}]
-    const add = (label, own, refs) => {
+    const byArt = new Map();   // "LOM:42" → [{label, refs, whole, entry, child}]
+    const add = (label, own, refs, entry, child = null) => {
       const items = new Map();
       for (const r of own) {
         const key = (r.law_prefix || '') + ':' + r.art;
-        if (!items.has(key)) items.set(key, { label, refs, whole: false });
+        if (!items.has(key)) items.set(key, { label, refs, whole: false, entry, child });
         if (!r.detail || r.detail === 'caput') items.get(key).whole = true;
       }
       for (const [key, it] of items) {
@@ -21866,9 +21896,9 @@ button.q-label:hover { color: #2c6fa6; }
       }
     };
     for (const entry of SUBJECT_INDEX) {
-      if (entry.refs) add(entry.subject, entry.refs, collectAllRefs(entry));
+      if (entry.refs) add(entry.subject, entry.refs, collectAllRefs(entry), entry);
       for (const ch of entry.children || []) {
-        add(entry.subject + ' — ' + ch.sub_subject, ch.refs, subjectRefs(entry, ch.sub_subject));
+        add(entry.subject + ' — ' + ch.sub_subject, ch.refs, subjectRefs(entry, ch.sub_subject), entry, ch);
       }
     }
     for (const card of ARTICLE_CARDS) {
@@ -21880,9 +21910,10 @@ button.q-label:hover { color: #2c6fa6; }
       line.dataset.label = 'No índice remissivo:';
       items.forEach((it, i) => {
         const chip = document.createElement('span');
-        chip.className = 'idx-back' + (i >= IDX_BACK_SHOWN ? ' idx-extra' : '');
+        chip.className = 'rem idx-back' + (i >= IDX_BACK_SHOWN ? ' idx-extra' : '');
         chip.tabIndex = 0;
         chip.setAttribute('role', 'button');
+        chip.setAttribute('aria-expanded', 'false');
         chip.dataset.label = it.label;
         chip.idxEntry = it;
         line.appendChild(chip);
@@ -21899,28 +21930,117 @@ button.q-label:hover { color: #2c6fa6; }
     }
   }
 
-  function onIndexBack(t) {
-    if (t.classList.contains('idx-more')) {
-      t.parentNode.classList.add('open');
-      t.remove();
-      return;
-    }
-    const it = t.idxEntry;
-    openSubject({ subject: it.label, refs: it.refs }, t.closest('.card'));
+  // The entry's box: its dispositivos with their dicas, as the index lists
+  // them (a subject with its sub-subjects under it), the ones of this article
+  // marked. A click on one goes to it (and "voltar" comes back); the foot
+  // puts the entry in the search bar.
+  function idxRemRef(r) {
+    return { law: r.law_prefix || 'RI', art: r.art, path: r.detail && r.detail !== 'caput' ? r.detail : '' };
   }
 
+  function buildIdxPanel(trigger) {
+    const it = trigger.idxEntry;
+    const card = trigger.closest('.card');
+    const group = document.createElement('section');
+    group.className = 'rem-group';
+    const head = document.createElement('div');
+    head.className = 'rem-head';
+    const tag = document.createElement('span');
+    tag.className = 'rem-law IDX';
+    tag.textContent = 'ÍNDICE';
+    const label = document.createElement('span');
+    label.textContent = it.label;
+    head.append(tag, label);
+    group.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'rem-body idx-list';
+    const addRefs = refs => {
+      formatRefsList(refs).forEach((item, i) => {
+        const r = refs[i];
+        const line = document.createElement('div');
+        const here = card && r.art === card.dataset.art && (r.law_prefix || '') === (card.dataset.law || '');
+        line.className = 'idx-line' + (here ? ' idx-here' : '');
+        line.tabIndex = 0;
+        line.setAttribute('role', 'button');
+        line.title = 'Ir para o dispositivo';
+        line.appendChild(document.createTextNode(item.label));
+        if (item.hint) {
+          const h = document.createElement('span');
+          h.className = 'ref-hint';
+          h.textContent = ' — ' + item.hint;
+          line.appendChild(h);
+        }
+        const go = ev => { ev.stopPropagation(); remGoTo(idxRemRef(r), trigger); };
+        line.addEventListener('click', go);
+        line.addEventListener('keydown', ev => {
+          if (ev.key !== 'Enter' && ev.key !== ' ') return;
+          ev.preventDefault();
+          go(ev);
+        });
+        body.appendChild(line);
+      });
+    };
+    const addVides = vides => {
+      if (!vides || !vides.length) return;
+      const v = document.createElement('div');
+      v.className = 'idx-vides';
+      v.textContent = 'Vide: ' + vides.map(x => x.split('|').map(s => s.trim()).join(' — ')).join('; ');
+      body.appendChild(v);
+    };
+    if (it.child) {
+      addRefs(it.child.refs);
+      addVides(it.child.vides);
+    } else {
+      addRefs(it.entry.refs || []);
+      addVides(it.entry.vides);
+      for (const ch of it.entry.children || []) {
+        const sub = document.createElement('div');
+        sub.className = 'idx-sub';
+        sub.textContent = '— ' + ch.sub_subject;
+        body.appendChild(sub);
+        addRefs(ch.refs || []);
+        addVides(ch.vides);
+      }
+    }
+    group.appendChild(body);
+
+    const foot = document.createElement('div');
+    foot.className = 'rem-foot';
+    const filter = document.createElement('button');
+    filter.type = 'button';
+    filter.textContent = 'Filtrar por esta entrada do índice';
+    filter.addEventListener('click', ev => {
+      ev.stopPropagation();
+      hideRemPop();
+      const box = remBoxOpen(trigger);
+      if (box) closeRemBox(box);
+      openSubject({ subject: it.label, refs: it.refs }, card);
+    });
+    const n = document.createElement('span');
+    n.className = 'idx-count';
+    n.textContent = it.refs.length + (it.refs.length === 1 ? ' dispositivo' : ' dispositivos');
+    foot.append(filter, n);
+    group.appendChild(foot);
+    return group;
+  }
+
+  // "+ N": the rest of the line's chips
+  function showIndexExtra(t) {
+    t.parentNode.classList.add('open');
+    t.remove();
+  }
   $cards.addEventListener('click', e => {
-    const t = e.target.closest('.idx-back, .idx-more');
+    const t = e.target.closest('.idx-more');
     if (!t) return;
     e.stopPropagation();
-    onIndexBack(t);
+    showIndexExtra(t);
   });
   $cards.addEventListener('keydown', e => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    const t = e.target.classList && (e.target.classList.contains('idx-back') || e.target.classList.contains('idx-more'));
-    if (!t) return;
+    if (!(e.target.classList && e.target.classList.contains('idx-more'))) return;
     e.preventDefault();
-    onIndexBack(e.target);
+    showIndexExtra(e.target);
   });
 
   // ===== PINCH-TO-ZOOM =====

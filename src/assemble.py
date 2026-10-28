@@ -34,11 +34,22 @@ def assemble(
         return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
 
     js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", dumps(systematic_index))
-    js = js.replace("/*__SUBJECT_INDEX__*/[]", dumps(subject_index))
-    js = js.replace("/*__REFERENCIAS_INDEX__*/[]", dumps(referencias_index))
-    js = js.replace("/*__CONSULTA_INDEX__*/[]", dumps(consulta_index))
     js = js.replace("/*__SUMMARIES_MAP__*/{}", dumps(summaries_map))
-    js = js.replace("/*__CORRELATO_NOTAS__*/[]", dumps(list(correlato_notas)))
+
+    # The big data as JSON blocks the script reads when needed (pageData in
+    # app.js): parsing JSON is much faster than parsing it as script literals.
+    # "</" and "<!--" escaped, so nothing in the data ends its block early.
+    blocks = {
+        "data-subject-index": subject_index,
+        "data-referencias-index": referencias_index,
+        "data-consulta-index": consulta_index,
+        "data-correlato-notas": list(correlato_notas),
+    }
+    def json_block(block_id: str, data) -> str:
+        text = dumps(data).replace("</", "<\\/").replace("<!--", "\\u003C!--")
+        return f'<script type="application/json" id="{block_id}">{text}</script>'
+
+    data_html = "\n".join(json_block(block_id, data) for block_id, data in blocks.items())
 
     info_json = json.dumps(info_html, ensure_ascii=False)
     js = js.replace("/*__INFO_HTML__*/\"\"", info_json)
@@ -46,6 +57,7 @@ def assemble(
     # Assemble final HTML
     final = template.replace("{{CSS}}", css)
     final = final.replace("{{CARDS}}", cards_html)
+    final = final.replace("{{DATA}}", data_html)
     final = final.replace("{{JS}}", js)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

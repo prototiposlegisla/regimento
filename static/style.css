@@ -313,11 +313,15 @@ body {
    off-screen card takes the height app.js estimates (--card-h); after that the
    browser remembers its real height (auto). */
 @property --card-h { syntax: '<length>'; inherits: false; initial-value: 300px; }
+@property --card-hc { syntax: '<length>'; inherits: false; initial-value: 21px; }
 .card { content-visibility: auto; contain-intrinsic-size: auto var(--card-h); }
 /* Without auto the remembered heights are dropped (after zoom or a new width) */
-#cards-container.cv-reset .card { contain-intrinsic-size: var(--card-h); }
-/* Compact mode is short: draw it all, and remember none of its heights */
-#cards-container.compact .card { content-visibility: visible; contain-intrinsic-size: none; }
+#cards-container.cv-reset .card, .card.cv-reset { contain-intrinsic-size: var(--card-h); }
+/* Compact mode: an article is a line or two, estimated apart (--card-hc).
+   Still laid out only near the screen (drawing all of it made the switch
+   take seconds), and without auto: none of its heights is remembered, so
+   leaving it goes back to the estimates of the full cards */
+#cards-container.compact .card-artigo { contain-intrinsic-size: var(--card-hc); }
 @media print { .card { content-visibility: visible; } }
 
 .card-titulo {
@@ -947,6 +951,11 @@ mark {
 
 /* Subject index */
 .subj-entry { margin-bottom: 10px; border-radius: 6px; }
+/* Thousands of entries: only those near the view are laid out (app.js sets
+   each subject's estimated height; these are the averages) */
+#index-content > .subj-entry { content-visibility: auto; contain-intrinsic-size: auto 87px; }
+#index-content > .ref-entry { content-visibility: auto; contain-intrinsic-size: auto 94px; }
+#index-content > .q-item { content-visibility: auto; contain-intrinsic-size: auto 146px; }
 .subj-entry.vide-highlight {
   background: #fff8d6;
   outline: 2px solid #e0c040;

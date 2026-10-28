@@ -4,16 +4,25 @@
   // ===== DATA (injected by build.py) =====
   const SYSTEMATIC_INDEX = /*__SYSTEMATIC_INDEX__*/[];
 
-  const SUBJECT_INDEX = /*__SUBJECT_INDEX__*/[];
+  // The big ones come as JSON blocks before this script (<script
+  // type="application/json">), read when first needed: JSON parses much
+  // faster than a script's literals, and most of it is not needed to show
+  // the page
+  function pageData(id) {
+    let value;
+    return () => value || (value = JSON.parse(document.getElementById(id).textContent));
+  }
 
-  const REFERENCIAS_INDEX = /*__REFERENCIAS_INDEX__*/[];
+  const SUBJECT_INDEX = pageData('data-subject-index')();   // the cards' index chips need it
 
-  const CONSULTA_INDEX = /*__CONSULTA_INDEX__*/[];
+  const referenciasIndex = pageData('data-referencias-index');
+
+  const consultaIndex = pageData('data-consulta-index');
 
   const SUMMARIES_MAP = /*__SUMMARIES_MAP__*/{};
 
   // Notes of the correlates, each once; a badge carries its index (data-n)
-  const CORRELATO_NOTAS = /*__CORRELATO_NOTAS__*/[];
+  const correlatoNotas = pageData('data-correlato-notas');
 
   const INFO_HTML = /*__INFO_HTML__*/"";
 
@@ -137,8 +146,26 @@
   // Per card, [fixed px, px per line, characters] of each block: read once
   // (the text does not change), so a pinch zoom only redoes the arithmetic
   let cardEstBlocks = null;
+  // In compact mode an article is its label, badge and rubrica on lines of
+  // 1.3em (--card-hc): their characters, per article card (titles keep theirs)
+  let cardEstCompact = null;
+  const COMPACT_LINE_EM = 1.3;
+  // A heading is its lines (number, then name, split by <br>) of uppercase
+  // bold, between 6px paddings: the characters of each, fitted like the rest
+  // (they came out a line short, 19px each, before)
+  let cardEstTitle = null;
+  const TITLE_CHAR_PX = 8.5, TITLE_LINE_PX = 24.8;
   function estimateCardHeights() {
     if (!cardEstBlocks) {
+      cardEstTitle = ALL_CARDS.map(card => {
+        if (!card.classList.contains('card-titulo')) return null;
+        const segs = [0];
+        for (const n of card.childNodes) {
+          if (n.nodeName === 'BR') segs.push(0);
+          else segs[segs.length - 1] += n.textContent.trim().length;
+        }
+        return segs;
+      });
       cardEstBlocks = ALL_CARDS.map(card => {
         const blocks = [];
         for (const el of card.children) {
@@ -147,28 +174,77 @@
         }
         return blocks;
       });
+      cardEstCompact = ALL_CARDS.map(card => {
+        if (!card.classList.contains('card-artigo')) return -1;
+        let n = 0;
+        for (const el of card.querySelectorAll(':scope > .art-compact-label, :scope > .art-summary, :scope > .law-badge')) {
+          n += el.textContent.length + 2;
+        }
+        return n;
+      });
     }
     const z = zoomScale;
     const textWidth = $cards.clientWidth - 24 - 32 * z - 3;
     const charsPerLine = Math.max(10, textWidth / (CARD_EST_CHAR_PX * z));
+    const compactPerLine = Math.max(10, (textWidth + 8 * z) / (CARD_EST_CHAR_PX * z));
+    // Each card restyled costs: only the estimate the mode uses, and only if it changed
+    const setEst = (i, prop, set, v) => {
+      if (set[i] !== v) ALL_CARDS[i].style.setProperty(prop, (set[i] = v) + 'px');
+    };
+    const titlePerLine = Math.max(10, ($cards.clientWidth - 24 - 24 * z - 2) / (TITLE_CHAR_PX * z));
     ALL_CARDS.forEach((card, i) => {
+      const segs = cardEstTitle[i];
+      if (segs) {
+        let lines = 0;
+        for (const n of segs) lines += Math.max(1, Math.ceil(n / titlePerLine));
+        setEst(i, '--card-h', cardEstSet, Math.round(lines * TITLE_LINE_PX * z));
+        return;
+      }
+      const nc = cardEstCompact[i];
+      if (compactMode && nc >= 0) {
+        const lines = Math.max(1, Math.ceil(nc / compactPerLine));
+        setEst(i, '--card-hc', cardEstSetC, Math.round(lines * COMPACT_LINE_EM * 16 * z));
+        return;
+      }
       let h = CARD_EST_BASE;
       for (const [fixed, perLine, n] of cardEstBlocks[i]) h += fixed + perLine * Math.ceil(n / charsPerLine);
       // contain-intrinsic-size is the content height: padding and border come on top
-      card.style.setProperty('--card-h', Math.round(Math.max(4, (h - 32) * z - 3)) + 'px');
+      setEst(i, '--card-h', cardEstSet, Math.round(Math.max(4, (h - 32) * z - 3)));
     });
   }
+  const cardEstSet = [], cardEstSetC = [];   // the values given to each card
   // Heights remembered at the old zoom or width would stay wrong until each
   // card is drawn again: once the zoom or width settles, make the browser
   // forget them (callers re-estimate first)
+  // Only cards drawn since the last time remember one: just those are reset
+  // (restyling all ~1,000 cards costs as much as the zoom itself). Without
+  // the event that tells them apart, all of them.
+  // A zoom (reestimate) re-estimates only then: a pinch or a wheel burst
+  // would restyle every card at each step, for heights no one sees meanwhile
   let cardSizeResetTimer;
-  function forgetCardHeights() {
+  let reestimatePending = false;
+  const CV_STATE_EVENTS = 'ContentVisibilityAutoStateChangeEvent' in window;
+  const cardsDrawn = new Set();   // drawn since the last reset
+  const cardsShown = new Set();   // drawn now
+  function forgetCardHeights(reestimate) {
+    if (reestimate) reestimatePending = true;
     clearTimeout(cardSizeResetTimer);
     cardSizeResetTimer = setTimeout(() => {
-      preserveScroll(() => $cards.classList.add('cv-reset'));
+      const reset = CV_STATE_EVENTS ? [...cardsDrawn] : null;
+      const mark = on => preserveScroll(() => {
+        if (on && reestimatePending) {
+          reestimatePending = false;
+          estimateCardHeights();
+        }
+        if (reset) for (const card of reset) card.classList.toggle('cv-reset', on);
+        else $cards.classList.toggle('cv-reset', on);
+      });
+      mark(true);
+      cardsDrawn.clear();
+      for (const card of cardsShown) cardsDrawn.add(card);
       // The remembered sizes are dropped at the next rendering update
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        preserveScroll(() => $cards.classList.remove('cv-reset'));
+        mark(false);
         scheduleMinimap();
       }));
     }, 400);
@@ -517,7 +593,9 @@
         const before = lastHeight.get(card);
         lastHeight.set(card, h);
         if (before === undefined) continue;
-        const estimate = parseFloat(card.style.getPropertyValue('--card-h')) + 32 * zoomScale;
+        const compactArt = compactMode && card.classList.contains('card-artigo');
+        const estimate = parseFloat(card.style.getPropertyValue(compactArt ? '--card-hc' : '--card-h'))
+          + (compactArt ? 16 : 32) * zoomScale;
         if (Math.abs(before - estimate) > 1) { onlyFirstDraws = false; continue; }
         if (card.getBoundingClientRect().top < 0) shift += h - before;
       }
@@ -1892,8 +1970,7 @@
       }
     })(SYSTEMATIC_INDEX, []);
 
-    const subj = SUBJECT_INDEX.slice()
-      .sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'))
+    const subj = sortedSubjects()
       .map(entry => {
         const text = normIndexText(entry.subject);
         return {
@@ -1907,7 +1984,7 @@
       });
 
     const refs = [];
-    for (const cat of REFERENCIAS_INDEX) {
+    for (const cat of referenciasIndex()) {
       const leg = cat.category === LEGISLACAO;
       for (const group of cat.groups) {
         const title = normIndexText(group.title);
@@ -1926,7 +2003,7 @@
     // The consulta rápida: each entry by its visible text (own) and with its
     // section's words, which aren't written ("prazo", "quórum")
     const quick = [];
-    for (const sec of CONSULTA_INDEX) {
+    for (const sec of consultaIndex()) {
       for (const item of sec.items) {
         const own = normIndexText(quickTexts(item).join(FIELD_SEP));
         const terms = normIndexText(item.terms || '');
@@ -2419,7 +2496,7 @@
     const toc = document.createElement('div');
     toc.className = 'q-toc';
     $indexContent.appendChild(toc);
-    for (const sec of CONSULTA_INDEX) {
+    for (const sec of consultaIndex()) {
       const items = sec.items.filter(item => !filter
         || textMatchesFilter(quickTexts(item).join(' ') + ' ' + sec.terms + ' ' + (item.terms || ''), filter));
       if (!items.length) continue;
@@ -3055,7 +3132,7 @@
   // struck ones. A correlate in another norm (implicit remissão) is a badge
   // (span.rem-imp) at the end of the provision, on both sides, with data-tipo
   // (eq / det / fund / div), data-side (src / tgt) and data-n (its note in
-  // CORRELATO_NOTAS: the badge is on both sides, the note only once). The preview is
+  // the page's correlatoNotas: the badge is on both sides, the note only once). The preview is
   // built from the target's card in this same page, so it always shows the
   // wording in force. Hover (desktop) shows a floating preview; click/tap or
   // Enter pins a box under the provision.
@@ -3243,7 +3320,7 @@
         pr.textContent = 'proposta, ainda não revisada';
         n.appendChild(pr);
       }
-      if (trigger.dataset.n) n.appendChild(document.createTextNode(CORRELATO_NOTAS[+trigger.dataset.n]));
+      if (trigger.dataset.n) n.appendChild(document.createTextNode(correlatoNotas()[+trigger.dataset.n]));
       wrap.appendChild(n);
     }
     for (const g of groups) {
@@ -3649,25 +3726,60 @@
 
   const $btnClearIndexSearch = document.getElementById('btn-clear-index-search');
 
+  // Filtering the remissivo redoes thousands of entries: wait for a pause in
+  // the typing, as the search bar does (a short filter matches almost all)
+  let indexFilterTimer = null;
   $indexSearch.addEventListener('input', () => {
     $btnClearIndexSearch.style.display = $indexSearch.value.trim() ? 'flex' : 'none';
-    renderIndex();
+    clearTimeout(indexFilterTimer);
+    const delay = $indexSearch.value.trim().length <= 3 ? SHORT_TERM_SEARCH_DELAY_MS : SEARCH_DELAY_MS;
+    indexFilterTimer = setTimeout(renderIndex, delay);
   });
 
-  $btnClearIndexSearch.addEventListener('click', () => {
-    $indexSearch.value = '';
-    $btnClearIndexSearch.style.display = 'none';
+  // Right away (a vide needs its target in the list)
+  function setIndexFilter(value) {
+    $indexSearch.value = value;
+    $btnClearIndexSearch.style.display = value.trim() ? 'flex' : 'none';
     renderIndex();
+  }
+
+  $btnClearIndexSearch.addEventListener('click', () => {
+    setIndexFilter('');
     $indexSearch.focus();
   });
 
+  // The entries' text lowercased and without accents, once per text
+  const filterTextCache = new Map();
+  let filterTermsOf = null, filterTerms = [];
   function textMatchesFilter(text, filter) {
-    const lower = stripAccents(text.toLowerCase());
-    return stripAccents(filter).split(/\s+/).every(term => lower.includes(term));
+    let lower = filterTextCache.get(text);
+    if (lower === undefined) filterTextCache.set(text, lower = stripAccents(text.toLowerCase()));
+    if (filter !== filterTermsOf) {
+      filterTermsOf = filter;
+      filterTerms = stripAccents(filter).split(/\s+/);
+    }
+    return filterTerms.every(term => lower.includes(term));
   }
 
+  // The remissivo and the referências unfiltered are thousands of entries:
+  // built once (per category) and put back on each opening, not rebuilt
+  const indexDomCache = new Map();
+
   function renderIndex() {
-    const filter = $indexSearch.value.trim().toLowerCase();
+    clearTimeout(indexFilterTimer);
+    indexFill = null;
+    // one letter would match nearly every entry: not a filter (as in the search bar)
+    let filter = $indexSearch.value.trim().toLowerCase();
+    if (filter.length < MIN_TERM_LENGTH) filter = '';
+    const cacheKey = filter ? null
+      : currentIndexTab === 'subject' ? 'subject'
+      : currentIndexTab === 'references' ? 'references:' + currentRefCategory : null;
+    const cached = cacheKey && indexDomCache.get(cacheKey);
+    if (cached) {
+      $indexContent.replaceChildren(...cached);
+      $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
+      return;
+    }
     $indexContent.innerHTML = '';
 
     if (currentIndexTab === 'info') {
@@ -3685,20 +3797,33 @@
     if (filter) {
       highlightIndexContent(filter);
     }
+    // (the whole remissivo is kept once its last slice is in)
+    if (cacheKey && cacheKey !== 'subject') indexDomCache.set(cacheKey, [...$indexContent.childNodes]);
   }
 
   function highlightIndexContent(filter) {
     const terms = filter.split(/\s+/).filter(Boolean);
-    const regex = new RegExp('(' + terms.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('|') + ')', 'gi');
+    const regex = new RegExp(terms.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('|'), 'gi');
     const walker = document.createTreeWalker($indexContent, NodeFilter.SHOW_TEXT, null);
-    const textNodes = [];
-    while (walker.nextNode()) textNodes.push(walker.currentNode);
-    for (const tn of textNodes) {
-      if (!regex.test(tn.textContent)) continue;
+    const hits = [];
+    while (walker.nextNode()) {
       regex.lastIndex = 0;
-      const span = document.createElement('span');
-      span.innerHTML = tn.textContent.replace(regex, '<mark>$1</mark>');
-      tn.parentNode.replaceChild(span, tn);
+      if (regex.test(walker.currentNode.data)) hits.push(walker.currentNode);
+    }
+    // Each match split off its text node into a <mark> (no HTML to parse)
+    for (let tn of hits) {
+      const spans = [];
+      regex.lastIndex = 0;
+      for (let m; (m = regex.exec(tn.data)); ) spans.push([m.index, m[0].length]);
+      let offset = 0;
+      for (const [at, len] of spans) {
+        const hit = tn.splitText(at - offset);
+        tn = hit.splitText(len);
+        offset = at + len;
+        const mark = document.createElement('mark');
+        hit.replaceWith(mark);
+        mark.appendChild(hit);
+      }
     }
   }
 
@@ -3892,161 +4017,194 @@
     return all;
   }
 
-  function renderVides(vides) {
-    const container = document.createElement('div');
-    container.className = 'subj-vides';
-    const label = document.createElement('span');
-    label.className = 'vide-label';
-    label.textContent = 'Vide: ';
-    container.appendChild(label);
-    vides.forEach((v, i) => {
-      const link = document.createElement('a');
-      link.className = 'vide-link';
+  // "Vide:" of an entry: each link carries its target ("ASSUNTO" or
+  // "ASSUNTO|SUBASSUNTO"); the clicks are handled on the panel
+  function videsHtml(vides) {
+    const links = vides.map(v => {
       // Support "ASSUNTO|SUBASSUNTO" format
       const pipeIdx = v.indexOf('|');
       const subjectPart = pipeIdx !== -1 ? v.slice(0, pipeIdx).trim() : v;
       const subSubjectPart = pipeIdx !== -1 ? v.slice(pipeIdx + 1).trim() : '';
-      link.textContent = subSubjectPart ? subjectPart + ' — ' + subSubjectPart : v;
-      link.href = '#';
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Build the key to find the target element in the DOM
-        const targetKey = subSubjectPart
-          ? stripAccents(subjectPart.toLowerCase()) + '|' + stripAccents(subSubjectPart.toLowerCase())
-          : stripAccents(subjectPart.toLowerCase());
-        // Clear search filter so the target is visible
-        if ($indexSearch.value.trim()) {
-          $indexSearch.value = '';
-          $indexSearch.dispatchEvent(new Event('input'));
-        }
-        // Find the DOM element with matching data-subject-key
-        const targetEl = $indexContent.querySelector('[data-subject-key="' + CSS.escape(targetKey) + '"]');
-        if (targetEl) {
-          // Remove any previous highlights
-          $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
-          // Highlight and scroll to the target
-          targetEl.classList.add('vide-highlight');
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          // Target not found — put in search bar
-          $indexSearch.value = subjectPart;
-          $indexSearch.dispatchEvent(new Event('input'));
-        }
-      });
-      container.appendChild(link);
-      if (i < vides.length - 1) {
-        container.appendChild(document.createTextNode(', '));
-      }
+      const text = subSubjectPart ? subjectPart + ' — ' + subSubjectPart : v;
+      return '<a class="vide-link" href="#" data-vide="' + escapeAttr(v) + '">' + escapeHtml(text) + '</a>';
     });
-    return container;
+    return '<div class="subj-vides"><span class="vide-label">Vide: </span>' + links.join(', ') + '</div>';
   }
 
+  function goToVide(v) {
+    const pipeIdx = v.indexOf('|');
+    const subjectPart = pipeIdx !== -1 ? v.slice(0, pipeIdx).trim() : v;
+    const subSubjectPart = pipeIdx !== -1 ? v.slice(pipeIdx + 1).trim() : '';
+    // Build the key to find the target element in the DOM
+    const targetKey = subSubjectPart
+      ? stripAccents(subjectPart.toLowerCase()) + '|' + stripAccents(subSubjectPart.toLowerCase())
+      : stripAccents(subjectPart.toLowerCase());
+    // Clear search filter so the target is visible
+    if ($indexSearch.value.trim()) setIndexFilter('');
+    flushIndexFill();
+    // Find the DOM element with matching data-subject-key
+    const targetEl = $indexContent.querySelector('[data-subject-key="' + CSS.escape(targetKey) + '"]');
+    if (targetEl) {
+      // Remove any previous highlights
+      $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
+      // Highlight and scroll to the target
+      targetEl.classList.add('vide-highlight');
+      // Entries not yet drawn have an estimated height (style.css): far away,
+      // jump; near, glide and then settle on it (those drawn on the way change)
+      const far = Math.abs(targetEl.getBoundingClientRect().top - $indexContent.getBoundingClientRect().top)
+        > FAR_SCROLL_SCREENS * $indexContent.clientHeight;
+      targetEl.scrollIntoView({ behavior: far ? 'instant' : 'smooth', block: 'center' });
+      if (!far && 'onscrollend' in window) {
+        $indexContent.addEventListener('scrollend',
+          () => targetEl.scrollIntoView({ behavior: 'instant', block: 'center' }), { once: true });
+      }
+    } else {
+      // Target not found — put in search bar
+      setIndexFilter(subjectPart);
+    }
+  }
+
+  function escapeAttr(s) {
+    return escapeHtml(s).replace(/"/g, '&quot;');
+  }
+
+  // An entry's lines of references, and the height they add (px, fitted
+  // against the panel's layout: per line and per character)
+  function subjRefsHtml(refs) {
+    let html = '<div class="subj-refs">', h = 0;
+    for (const item of formatRefsList(refs)) {
+      html += '<div class="subj-ref-line">' + escapeHtml(item.label);
+      let n = item.label.length;
+      if (item.hint) {
+        html += '<span class="ref-hint"> — ' + escapeHtml(item.hint) + '</span>';
+        n += item.hint.length + 3;
+      }
+      html += '</div>';
+      h += 12.7 + 0.375 * n;
+    }
+    return [html + '</div>', h];
+  }
+
+  // The remissivo is ~700 subjects and 2,000 sub-subjects: written as one
+  // HTML string (much faster than node by node), the clicks handled on the
+  // panel by the entry's position (data-i, and data-c for a sub-subject)
+  let subjectsSorted = null;
+  function sortedSubjects() {
+    if (!subjectsSorted) {
+      const collator = new Intl.Collator('pt-BR');
+      subjectsSorted = SUBJECT_INDEX.slice().sort((a, b) => collator.compare(a.subject, b.subject));
+    }
+    return subjectsSorted;
+  }
   function renderSubjectIndex(filter) {
-    const sorted = SUBJECT_INDEX.slice().sort((a, b) => a.subject.localeCompare(b.subject, 'pt-BR'));
-    for (const entry of sorted) {
+    sortedSubjects();
+    const parts = [];
+    subjectsSorted.forEach((entry, i) => {
       const matchSelf = !filter || textMatchesFilter(entry.subject, filter);
       const matchChild = !matchSelf && entry.children && entry.children.some(
         ch => textMatchesFilter(ch.sub_subject, filter)
       );
-      if (!matchSelf && !matchChild) continue;
+      if (!matchSelf && !matchChild) return;
 
-      const div = document.createElement('div');
-      div.className = 'subj-entry';
-      div.dataset.subjectKey = stripAccents(entry.subject.toLowerCase());
-      const title = document.createElement('div');
-      title.className = 'subj-title';
-      title.textContent = entry.subject;
-      const allRefs = collectAllRefs(entry);
-      if (allRefs.length > 0) {
-        title.addEventListener('click', () => {
-          closeIndex();
-          openSubject({ subject: entry.subject, refs: allRefs });
-        });
-      } else {
-        title.classList.add('no-refs');
-      }
-      div.appendChild(title);
+      const key = stripAccents(entry.subject.toLowerCase());
+      // Off-screen entries are not laid out (style.css): their estimated height
+      let est = 12.6 + 0.41 * entry.subject.length;
+      let html = '<div class="subj-title' + (collectAllRefs(entry).length ? '' : ' no-refs') + '">'
+        + escapeHtml(entry.subject) + '</div>';
 
       // Direct refs
       if (entry.refs && entry.refs.length > 0) {
-        const refsContainer = document.createElement('div');
-        refsContainer.className = 'subj-refs';
-        for (const item of formatRefsList(entry.refs)) {
-          const line = document.createElement('div');
-          line.className = 'subj-ref-line';
-          const labelSpan = document.createTextNode(item.label);
-          line.appendChild(labelSpan);
-          if (item.hint) {
-            const hintSpan = document.createElement('span');
-            hintSpan.className = 'ref-hint';
-            hintSpan.textContent = ' — ' + item.hint;
-            line.appendChild(hintSpan);
-          }
-          refsContainer.appendChild(line);
-        }
-        div.appendChild(refsContainer);
+        const [refs, h] = subjRefsHtml(entry.refs);
+        html += refs;
+        est += h;
       }
 
       // Vides (cross-references)
       if (entry.vides && entry.vides.length > 0) {
-        div.appendChild(renderVides(entry.vides));
+        html += videsHtml(entry.vides);
+        est += 9.9 + 0.44 * (6 + entry.vides.join(', ').length);
       }
 
       // Sub-subjects
       if (entry.children) {
-        for (const ch of entry.children) {
-          if (filter && !matchSelf && !textMatchesFilter(ch.sub_subject, filter)) continue;
-          const subDiv = document.createElement('div');
-          subDiv.className = 'subj-entry';
-          subDiv.dataset.subjectKey = stripAccents(entry.subject.toLowerCase()) + '|' + stripAccents(ch.sub_subject.toLowerCase());
-          subDiv.style.paddingLeft = '16px';
-          const subTitle = document.createElement('div');
-          subTitle.className = 'subj-title';
-          subTitle.style.fontSize = '13px';
-          subTitle.textContent = '— ' + ch.sub_subject;
-          if (ch.refs && ch.refs.length > 0) {
-            subTitle.addEventListener('click', ((child) => () => {
-              closeIndex();
-              openSubject({ subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs });
-            })(ch));
-          } else {
-            subTitle.classList.add('no-refs');
-          }
-          subDiv.appendChild(subTitle);
-
-          const subRefs = document.createElement('div');
-          subRefs.className = 'subj-refs';
-          for (const item of formatRefsList(ch.refs)) {
-            const line = document.createElement('div');
-            line.className = 'subj-ref-line';
-            const labelSpan = document.createTextNode(item.label);
-            line.appendChild(labelSpan);
-            if (item.hint) {
-              const hintSpan = document.createElement('span');
-              hintSpan.className = 'ref-hint';
-              hintSpan.textContent = ' — ' + item.hint;
-              line.appendChild(hintSpan);
-            }
-            subRefs.appendChild(line);
-          }
-          subDiv.appendChild(subRefs);
+        entry.children.forEach((ch, c) => {
+          if (filter && !matchSelf && !textMatchesFilter(ch.sub_subject, filter)) return;
+          const subKey = key + '|' + stripAccents(ch.sub_subject.toLowerCase());
+          html += '<div class="subj-entry" style="padding-left:16px" data-subject-key="' + escapeAttr(subKey)
+            + '" data-c="' + c + '"><div class="subj-title' + (ch.refs && ch.refs.length ? '' : ' no-refs')
+            + '" style="font-size:13px">— ' + escapeHtml(ch.sub_subject) + '</div>';
+          const [refs, h] = subjRefsHtml(ch.refs);
+          html += refs;
+          est += 23.2 + 0.49 * (2 + ch.sub_subject.length) + h;
 
           // Vides on sub-subject
           if (ch.vides && ch.vides.length > 0) {
-            subDiv.appendChild(renderVides(ch.vides));
+            html += videsHtml(ch.vides);
+            est += 9.9 + 0.44 * (6 + ch.vides.join(', ').length);
           }
-
-          div.appendChild(subDiv);
-        }
+          html += '</div>';
+        });
       }
 
-      $indexContent.appendChild(div);
+      parts.push('<div class="subj-entry" data-subject-key="' + escapeAttr(key) + '" data-i="' + i
+        + '" style="contain-intrinsic-size:auto ' + Math.round(est) + 'px">' + html + '</div>');
+    });
+    if (filter) {
+      $indexContent.insertAdjacentHTML('beforeend', parts.join(''));
+      return;
     }
+    // Whole: the first screen right away, the rest in slices after it is
+    // painted (and kept for the next openings once complete)
+    let next = SUBJECTS_FIRST;
+    $indexContent.insertAdjacentHTML('beforeend', parts.slice(0, next).join(''));
+    const fill = indexFill = () => {
+      if (indexFill !== fill) return;
+      const end = flushingIndexFill ? parts.length : next + SUBJECTS_SLICE;
+      $indexContent.insertAdjacentHTML('beforeend', parts.slice(next, end).join(''));
+      next = end;
+      if (next < parts.length) setTimeout(fill, 0);
+      else {
+        indexFill = null;
+        indexDomCache.set('subject', [...$indexContent.childNodes]);
+      }
+    };
+    requestAnimationFrame(() => setTimeout(fill, 0));
   }
+  const SUBJECTS_FIRST = 40;    // entries
+  const SUBJECTS_SLICE = 120;
+  let indexFill = null;         // the slices still to append (a new rendering cancels them)
+  let flushingIndexFill = false;
+  function flushIndexFill() {
+    if (!indexFill) return;
+    flushingIndexFill = true;
+    indexFill();
+    flushingIndexFill = false;
+  }
+
+  $indexContent.addEventListener('click', e => {
+    const vide = e.target.closest('.vide-link[data-vide]');
+    if (vide) {
+      e.preventDefault();
+      goToVide(vide.dataset.vide);
+      return;
+    }
+    const title = e.target.closest('.subj-title:not(.no-refs)');
+    const top = title && title.closest('.subj-entry[data-i]');
+    if (!top) return;
+    const entry = subjectsSorted[+top.dataset.i];
+    const sub = title.parentElement.dataset.c;
+    closeIndex();
+    if (sub === undefined) {
+      openSubject({ subject: entry.subject, refs: collectAllRefs(entry) });
+    } else {
+      const child = entry.children[+sub];
+      openSubject({ subject: entry.subject + ' — ' + child.sub_subject, refs: child.refs });
+    }
+  });
 
   function renderReferencesIndex(filter) {
     // The consulta rápida first, then the categories of the referências
-    const cats = (CONSULTA_INDEX.length ? [{ category: 'Consulta rápida', consulta: true }] : []).concat(REFERENCIAS_INDEX);
+    const cats = (consultaIndex().length ? [{ category: 'Consulta rápida', consulta: true }] : []).concat(referenciasIndex());
     if (!cats.length) {
       $indexContent.textContent = 'Nenhuma referência disponível.';
       return;
@@ -4284,10 +4442,11 @@
         add(entry.subject + ' — ' + ch.sub_subject, ch.refs, subjectRefs(entry, ch.sub_subject), entry, ch);
       }
     }
+    const collator = new Intl.Collator('pt-BR');   // (localeCompare builds one per call)
     for (const card of ARTICLE_CARDS) {
       const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
       if (!items) continue;
-      items.sort((a, b) => (b.whole - a.whole) || a.label.localeCompare(b.label, 'pt-BR'));
+      items.sort((a, b) => (b.whole - a.whole) || collator.compare(a.label, b.label));
       const line = document.createElement('div');
       line.className = 'rem-backlinks idx-backlinks';
       line.dataset.label = 'No índice remissivo:';
@@ -4430,13 +4589,14 @@
   let initialPinchDist = null;
   let initialZoom = 1;
 
-  function setZoom(scale) {
+  function setZoom(scale, now) {
     preserveScroll(() => {
       zoomScale = Math.max(0.4, Math.min(2.5, scale));
       document.documentElement.style.setProperty('--zoom-scale', zoomScale);
-      estimateCardHeights();
+      if (now) estimateCardHeights();
     });
-    forgetCardHeights();
+    // the estimates once the zoom settles (now: at load, before the first layout)
+    forgetCardHeights(!now);
 
     $zoomIndicator.textContent = Math.round(zoomScale * 100) + '%';
     $zoomIndicator.classList.add('show');
@@ -4502,8 +4662,17 @@
     cancelScrollCorrection();
     const card = selectedCard;
     compactMode = on;
+    estimateCardHeights();   // the mode's own estimates (style.css)
+    // The dozens of short articles drawn around the screen would all be laid
+    // out whole at once: let the browser decide afresh which ones to draw
+    const drawn = on ? [] : [...cardsShown];
+    for (const c of drawn) c.style.contentVisibility = 'hidden';
     $cards.classList.toggle('compact', compactMode);
     $btnCompact.classList.toggle('active', compactMode);
+    if (drawn.length) {
+      void $cards.offsetHeight;
+      for (const c of drawn) c.style.contentVisibility = '';
+    }
     if (on) {
       $cards.querySelectorAll('.diff-open').forEach(el => {
         el.classList.remove('diff-open');
@@ -4976,7 +5145,11 @@
   // height: redraw the minimap once they stop changing (not per scroll stop,
   // as programmatic scrolls end every frame)
   let minimapStaleTimer;
-  $cards.addEventListener('contentvisibilityautostatechange', () => {
+  $cards.addEventListener('contentvisibilityautostatechange', e => {
+    if (e.target.classList.contains('card')) {
+      if (e.skipped) cardsShown.delete(e.target);
+      else cardsShown.add(e.target), cardsDrawn.add(e.target);
+    }
     clearTimeout(minimapStaleTimer);
     minimapStaleTimer = setTimeout(scheduleMinimap, 500);
   }, true);
@@ -4984,7 +5157,7 @@
   // ===== INIT =====
   try {
     const savedZoom = localStorage.getItem('regimento-zoom');
-    if (savedZoom) setZoom(parseFloat(savedZoom));
+    if (savedZoom) setZoom(parseFloat(savedZoom), true);
   } catch (e) {}
   try {
     if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);

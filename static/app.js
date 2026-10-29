@@ -123,6 +123,9 @@
   // page's total height within 1%).
   // Refit whenever fonts, sizes or the card's bands change.
   const CARD_EST_BASE = 18;
+  // the index band at the foot: its lines of groups and, in a group too long
+  // for one, its own further lines (counted by indexBandHeight; refit 29/10/2026)
+  const IDX_BAND_PX = 14, IDX_LINE_PX = 30, IDX_WRAP_PX = 25;
   const CARD_EST_CHAR_PX = 7.75;
   function cardBlockCoef(el) {
     const cl = el.classList;
@@ -130,7 +133,7 @@
     if (cl.contains('law-badge')) return null;   // takes no height of its own
     if (el.tagName === 'BR') return [48, 0];
     if (cl.contains('old-version')) return [-6, 30];
-    if (cl.contains('idx-backlinks')) return [48, 29];   // the band at the foot
+    if (cl.contains('idx-backlinks')) return null;   // indexBandHeight
     if (cl.contains('rem-backlinks')) return [18, 0];
     if (cl.contains('art-summary')) return [17, 0];      // the band at the top
     return [0, 30];
@@ -138,7 +141,6 @@
   function blockTextLength(el) {
     let n = el.textContent.length;
     for (const r of el.querySelectorAll('[data-label]')) {   // chips drawn by ::before
-      if (r.classList.contains('idx-extra')) continue;   // behind the "+ N" until opened
       n += r.dataset.label.length + 3;
     }
     return n;
@@ -146,6 +148,7 @@
   // Per card, [fixed px, px per line, characters] of each block: read once
   // (the text does not change), so a pinch zoom only redoes the arithmetic
   let cardEstBlocks = null;
+  let cardEstBand = null;   // the index band at the foot (indexBandHeight)
   // In compact mode an article is its label, badge and rubrica on lines of
   // 1.3em (--card-hc): their characters, per article card (titles keep theirs)
   let cardEstCompact = null;
@@ -155,6 +158,93 @@
   // (they came out a line short, 19px each, before)
   let cardEstTitle = null;
   const TITLE_CHAR_PX = 8.5, TITLE_LINE_PX = 24.8;
+
+  // The index band's height: its groups (a subject and its sub-subjects) laid
+  // in lines, in their alphabetical order, as the browser will. Widths measured
+  // on a canvas with the band's fonts, no layout; redone with the width or the
+  // zoom.
+  let idxMetrics = null, idxFontWait = false;   // read again at each estimate (the zoom changes them)
+  let idxMetricsLast = null;   // the same, kept (with the groups' widths) while they don't change
+  const idxWidths = new Map();
+  const idxCanvas = document.createElement('canvas').getContext('2d');
+  function idxMeasure() {
+    const row = $cards.querySelector('.idx-row'), sub = $cards.querySelector('.idx-row > .idx-sub');
+    if (!row || !sub) return null;
+    const px = v => parseFloat(v) || 0;
+    const box = el => {
+      const c = getComputedStyle(el);
+      return {
+        font: c.fontStyle + ' ' + c.fontWeight + ' ' + c.fontSize + ' ' + c.fontFamily,
+        extra: px(c.marginLeft) + px(c.marginRight) + px(c.paddingLeft) + px(c.paddingRight)
+          + px(c.borderLeftWidth) + px(c.borderRightWidth),
+      };
+    };
+    const rc = getComputedStyle(row);
+    const m = { head: box(row.querySelector('.idx-head')), sub: box(sub), row: px(rc.marginLeft) + px(rc.marginRight) + px(rc.paddingLeft) };
+    m.key = [m.head.font, m.head.extra, m.sub.font, m.sub.extra, m.row].join('|');
+    if (idxMetricsLast && idxMetricsLast.key === m.key) return idxMetricsLast;
+    idxMetricsLast = m;
+    // measured before the fonts came, the widths are the fallback's: once more when they come
+    if (!idxFontWait && !(document.fonts.check(m.head.font) && document.fonts.check(m.sub.font))) {
+      idxFontWait = true;
+      Promise.all([document.fonts.load(m.head.font), document.fonts.load(m.sub.font)]).then(() => {
+        idxWidths.clear();
+        idxMetricsLast = null;
+        preserveScroll(estimateCardHeights);
+        forgetCardHeights();
+      });
+    }
+    return m;
+  }
+  function idxTextWidth(m, b, text) {
+    const key = b.font + '|' + text;
+    let w = idxWidths.get(key);
+    if (w === undefined) {
+      idxCanvas.font = b.font;
+      idxWidths.set(key, w = idxCanvas.measureText(text).width);
+    }
+    return w + b.extra;
+  }
+  // A group's items (the subject, its chips) and its width, margins included
+  function idxRowItems(m, row) {
+    if (row.idxM === m) return row.idxItems;
+    const items = [];
+    for (const el of row.children) {
+      const sub = el.classList.contains('idx-sub');
+      items.push(idxTextWidth(m, sub ? m.sub : m.head, sub ? el.dataset.show : el.dataset.label));
+    }
+    row.idxM = m;
+    row.idxItems = items;
+    row.idxW = items.reduce((a, b) => a + b, 0) + m.row;
+    return items;
+  }
+  function indexBandHeight(band, width) {
+    if (!idxMetrics) idxMetrics = idxMeasure();
+    const m = idxMetrics, rows = band.children;
+    if (!m) return IDX_BAND_PX + IDX_LINE_PX * rows.length;
+    let lines = 0, wraps = 0, used = width;   // (the first group opens a line)
+    for (const row of rows) {
+      const items = idxRowItems(m, row);
+      if (row.idxW > width) {
+        // too long for a line: it wraps by itself, on lines of its own
+        const room = width - m.row;   // (its margin takes from the line)
+        let at = 0;
+        lines++;
+        items.forEach((w, i) => {
+          if (at && at + w > room) { wraps++; at = 0; }
+          // a chip wider than the line wraps its text (the subject doesn't)
+          if (i && w > room) { wraps += Math.ceil(w / room) - 1; at = room; }
+          else at += w;
+        });
+        used = width;
+        continue;
+      }
+      if (used + row.idxW > width) { lines++; used = 0; }
+      used += row.idxW;
+    }
+    return IDX_BAND_PX + IDX_LINE_PX * lines + IDX_WRAP_PX * wraps;
+  }
+
   function estimateCardHeights() {
     if (!cardEstBlocks) {
       cardEstTitle = ALL_CARDS.map(card => {
@@ -174,6 +264,7 @@
         }
         return blocks;
       });
+      cardEstBand = ALL_CARDS.map(card => card.querySelector(':scope > .idx-backlinks'));
       cardEstCompact = ALL_CARDS.map(card => {
         if (!card.classList.contains('card-artigo')) return -1;
         let n = 0;
@@ -185,6 +276,14 @@
     }
     const z = zoomScale;
     const textWidth = $cards.clientWidth - 24 - 32 * z - 3;
+    // the band's lines, packed to the real width (the card's, less its padding)
+    idxMetrics = null;
+    const bandCard = cardEstBand.find(Boolean);
+    let bandWidth = 0;
+    if (bandCard && !compactMode) {
+      const c = getComputedStyle(bandCard.parentNode);
+      bandWidth = bandCard.parentNode.clientWidth - parseFloat(c.paddingLeft) - parseFloat(c.paddingRight);
+    }
     const charsPerLine = Math.max(10, textWidth / (CARD_EST_CHAR_PX * z));
     const compactPerLine = Math.max(10, (textWidth + 8 * z) / (CARD_EST_CHAR_PX * z));
     // Each card restyled costs: only the estimate the mode uses, and only if it changed
@@ -208,6 +307,7 @@
       }
       let h = CARD_EST_BASE;
       for (const [fixed, perLine, n] of cardEstBlocks[i]) h += fixed + perLine * Math.ceil(n / charsPerLine);
+      if (cardEstBand[i]) h += indexBandHeight(cardEstBand[i], bandWidth);
       // contain-intrinsic-size is the content height: padding and border come on top
       setEst(i, '--card-h', cardEstSet, Math.round(Math.max(4, (h - 32) * z - 3)));
     });
@@ -491,7 +591,7 @@
 
   function applyBreadcrumb(bc) {
     if (!bc) {
-      $breadcrumb.classList.remove('visible');
+      $breadcrumb.classList.remove('visible', 'open');
       return;
     }
     const { card, headings } = bc;
@@ -505,6 +605,13 @@
 
     // Build breadcrumb DOM
     $breadcrumb.innerHTML = '';
+    $breadcrumb.classList.toggle('bc-phone', PHONE.matches);
+    if (PHONE.matches) {
+      buildPhoneBreadcrumb(bc);
+      $breadcrumb.classList.add('visible');
+      breadcrumbCard = card;
+      return;
+    }
 
     function addSep() {
       const sep = document.createElement('span');
@@ -554,7 +661,88 @@
 
   let breadcrumbCard = null;
 
+  // On a phone, one line: the levels by their numbers ("RI", "II", "IV"),
+  // the deepest with its name, each on its level's color, and the article;
+  // a tap opens the whole path under it, each heading on its color, and a
+  // heading there goes to it. The line never wraps over the text.
+  const PHONE = window.matchMedia('(max-width: 600px)');
+  function bcHeadingParts(h) {
+    const name = getHeadingShortTitle(h.el);
+    if (h.level === 'norma') return [SYS_NORM_SHORT[name] || name, name];
+    const m = name.match(/^([IVXLC]+[-A-Z]*|ÚNIC[OA])(?:-(.*))?$/i);
+    if (!m) return ['', sysCase(name)];
+    const num = /^ÚNIC/i.test(m[1]) ? 'Único' : m[1];
+    return [num, m[2] ? sysCase(m[2]) : ''];
+  }
+  const BC_LEVEL_WORD = { tit: 'Título', cap: 'Capítulo', sec: 'Seção', subsec: 'Subseção' };
+  function buildPhoneBreadcrumb(bc) {
+    const { card, headings } = bc;
+    const line = document.createElement('div');
+    line.className = 'bc-line';
+    line.setAttribute('role', 'button');
+    line.setAttribute('aria-expanded', 'false');
+    line.title = 'Ver onde você está';
+    headings.forEach((h, i) => {
+      const [num, name] = bcHeadingParts(h);
+      const span = document.createElement('span');
+      span.className = 'bc-item bc-' + h.level + (i === headings.length - 1 ? ' bc-last' : '');
+      span.textContent = i === headings.length - 1 && h.level !== 'norma' && name
+        ? (num ? num + ' · ' : '') + name : num || name;
+      line.appendChild(span);
+    });
+    const art = document.createElement('span');
+    art.className = 'bc-item bc-article';
+    art.textContent = isPrecCard(card) ? precLabel(card.dataset.art)
+      : (card.dataset.law ? card.dataset.law + '\u00a0' : '') + 'Art.\u00a0' + card.dataset.art;
+    const more = document.createElement('span');
+    more.className = 'bc-more';
+    more.setAttribute('aria-hidden', 'true');
+    line.append(art, more);
+
+    const list = document.createElement('div');
+    list.className = 'bc-list';
+    const go = el => {
+      $breadcrumb.classList.remove('open');
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      scrollToY(top - getReadingLineY(), 'smooth');
+    };
+    headings.forEach((h, i) => {
+      const [num, name] = bcHeadingParts(h);
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'bc-row bc-' + h.level;
+      row.style.setProperty('--d', i);
+      row.textContent = h.level === 'norma' ? name
+        : [BC_LEVEL_WORD[h.level] && num ? BC_LEVEL_WORD[h.level] + ' ' + num : num, name].filter(Boolean).join(' — ');
+      row.addEventListener('click', e => { e.stopPropagation(); go(h.el); });
+      list.appendChild(row);
+    });
+    const artRow = document.createElement('button');
+    artRow.type = 'button';
+    artRow.className = 'bc-row bc-article';
+    artRow.style.setProperty('--d', headings.length);
+    const summary = card.querySelector(':scope > .art-summary');
+    artRow.textContent = art.textContent.replace(/\u00a0/g, ' ')
+      + (bc.path ? ', ' + bc.path.split(',').join(', ') : '')
+      + (summary ? ' — ' + summary.textContent.trim() : '');
+    artRow.addEventListener('click', e => { e.stopPropagation(); go(card); });
+    list.appendChild(artRow);
+    $breadcrumb.append(line, list);
+  }
+  PHONE.addEventListener('change', () => {
+    breadcrumbShown = null;
+    $breadcrumb.classList.remove('open');
+    document.body.classList.remove('hide-top');
+    updateBreadcrumb();
+  });
+
   $breadcrumb.addEventListener('click', (e) => {
+    if ($breadcrumb.classList.contains('bc-phone')) {
+      if (!e.target.closest('.bc-line')) return;
+      const open = $breadcrumb.classList.toggle('open');
+      e.target.closest('.bc-line').setAttribute('aria-expanded', String(open));
+      return;
+    }
     if (e.target.closest('.bc-item')) return;
     if (breadcrumbCard) {
       const top = breadcrumbCard.getBoundingClientRect().top + window.scrollY;
@@ -606,6 +794,33 @@
     ALL_CARDS.forEach(card => firstDraws.observe(card));
   }
 
+  // On a phone, the header goes away while reading down and comes back on
+  // the way up (or at the top); it stays while the search, its results or
+  // the index are in use, and through jumps (a search, a remissão). A thin
+  // bar at the top shows how far into the document the reading is.
+  const $readProgress = document.createElement('div');
+  $readProgress.id = 'read-progress';
+  document.body.appendChild($readProgress);
+  let lastScrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    if (!PHONE.matches) return;
+    const y = window.scrollY;
+    const dy = y - lastScrollY;
+    lastScrollY = y;
+    const root = document.documentElement;
+    $readProgress.style.transform = 'scaleX(' + Math.min(1, y / Math.max(1, root.scrollHeight - root.clientHeight)) + ')';
+    const busy = resultsDrawerOpen || document.activeElement === $searchInput
+      || $indexPanel.classList.contains('open') || $breadcrumb.classList.contains('open') || smoothScrolling;
+    if (y <= 80 || busy || dy < -6) document.body.classList.remove('hide-top');
+    else if (dy > 6 && dy < window.innerHeight) document.body.classList.add('hide-top');
+  }, { passive: true });
+  $searchInput.addEventListener('focus', () => document.body.classList.remove('hide-top'));
+  // the long hint doesn't fit a phone's search field
+  const SEARCH_HINT = $searchInput.placeholder;
+  const setSearchHint = () => { $searchInput.placeholder = PHONE.matches ? 'Buscar ou a43…' : SEARCH_HINT; };
+  setSearchHint();
+  PHONE.addEventListener('change', setSearchHint);
+
   let scrollTick = false;
   window.addEventListener('scroll', () => {
     if (scrollTick) return;
@@ -652,7 +867,15 @@
   // only in compact mode); keep in sync
   const UNSELECTABLE_TEXT = '.art-summary, .art-compact-label, .diff-toggle, .footnote-ref';
   const searchHighlight = HIGHLIGHT_API ? new Highlight() : null;
-  if (HIGHLIGHT_API) CSS.highlights.set('search', searchHighlight);
+  // The short words of a query with other words ("prazo de votação"): a
+  // fainter mark (see SHORT_WORDS)
+  const weakHighlight = HIGHLIGHT_API ? new Highlight() : null;
+  if (HIGHLIGHT_API) {
+    CSS.highlights.set('search', searchHighlight);
+    CSS.highlights.set('search-weak', weakHighlight);
+  }
+  let weakRanges = new Set();
+  const highlightOf = range => weakRanges.has(range) ? weakHighlight : searchHighlight;
 
   let cardHits = new Map();       // card → hits in document order (StaticRange or <mark>)
   let textNodeHits = new Map();   // text node → [[start, end], ...] of its StaticRange hits
@@ -674,8 +897,8 @@
   function applyHighlightEntries(entries) {
     for (const entry of entries) {
       for (const range of rangeTargets.get(entry.target) || []) {
-        if (entry.isIntersecting) searchHighlight.add(range);
-        else searchHighlight.delete(range);
+        if (entry.isIntersecting) highlightOf(range).add(range);
+        else highlightOf(range).delete(range);
       }
     }
   }
@@ -718,7 +941,8 @@
         const r = target.getBoundingClientRect();
         if (!r.height || r.bottom < bandTop || r.top > bandBottom) continue;
         for (const range of rangeTargets.get(target)) {
-          if (!searchHighlight.has(range)) searchHighlight.add(range);
+          const hl = highlightOf(range);
+          if (!hl.has(range)) hl.add(range);
         }
       }
     }
@@ -731,7 +955,7 @@
     window.addEventListener('beforeprint', () => {
       highlightObserver.disconnect();
       for (const ranges of rangeTargets.values()) {
-        for (const range of ranges) searchHighlight.add(range);
+        for (const range of ranges) highlightOf(range).add(range);
       }
     });
     window.addEventListener('afterprint', () => {
@@ -773,7 +997,9 @@
       highlightObserver.takeRecords();
       highlightObserver.disconnect();
       searchHighlight.clear();
+      weakHighlight.clear();
     }
+    weakRanges = new Set();
     // Put back the exact text nodes that <mark>s replaced
     for (const [textNode, first, last] of markedTextNodes) {
       const parent = first.parentNode;
@@ -867,17 +1093,41 @@
     return { kind: 'text', includeFootnotes, phrases, words, longest };
   }
 
+  // Short words (de, da, em, a...) count only as whole words: "de" alone
+  // was in Presidente, ordem, idade... Among other words ("prazo de votação")
+  // they get a fainter mark, and neither the jumps, the results list nor the
+  // snippets go to them.
+  const SHORT_WORDS = new Set(['a', 'o', 'e', 'as', 'os', 'ao', 'aos', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
+    'para', 'por', 'pelo', 'pela', 'com', 'um', 'uma', 'que', 'se']);
+  const WHOLE_WORD = p => '(?<![\\p{L}\\p{N}])' + p + '(?![\\p{L}\\p{N}])';
+  const wholeWordRes = new Map();
+  function hasWord(text, w) {
+    if (!SHORT_WORDS.has(w)) return text.includes(w);
+    let re = wholeWordRes.get(w);
+    if (!re) wholeWordRes.set(w, re = new RegExp(WHOLE_WORD(w), 'u'));
+    return re.test(text);
+  }
+
   function buildHighlightRegex(phrases, words) {
+    const esc = t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     // Phrases first (longer matches take priority in alternation)
     const allPatterns = [
-      ...phrases.map(p => accentInsensitivePattern(p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).replace(/ +/g, '[\\s\\xa0]+')),
-      ...words.map(t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+      ...phrases.map(p => esc(p).replace(/ +/g, '[\\s\\xa0]+')),
+      ...words.map(t => SHORT_WORDS.has(t) ? WHOLE_WORD(esc(t)) : esc(t))
     ];
-    return new RegExp('(' + allPatterns.join('|') + ')', 'gi');
+    const regex = new RegExp('(' + allPatterns.join('|') + ')', 'giu');
+    // the short words that get the fainter mark (none if the query has only them)
+    regex.weak = new Set(words.some(w => !SHORT_WORDS.has(w))
+      ? words.filter(w => SHORT_WORDS.has(w) && !phrases.includes(w)) : []);
+    return regex;
+  }
+
+  function isWeakMatch(regex, match) {
+    return regex.weak.size > 0 && regex.weak.has(stripAccents(match.toLowerCase()));
   }
 
   function highlightText(card, regex, includeFootnotes) {
-    const found = []; // [text node, [[start, end], ...]]
+    const found = []; // [text node, [[start, end, weak], ...]]
     const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       const tn = walker.currentNode;
@@ -886,7 +1136,7 @@
       regex.lastIndex = 0;
       while ((m = regex.exec(tn.data)) !== null) {
         if (!m[0].length) { regex.lastIndex++; continue; }
-        (spans || (spans = [])).push([m.index, m.index + m[0].length]);
+        (spans || (spans = [])).push([m.index, m.index + m[0].length, isWeakMatch(regex, m[0])]);
       }
       if (!spans) continue;
       if (!includeFootnotes && tn.parentElement.closest('.footnote-box')) continue;
@@ -898,11 +1148,14 @@
     const hits = [];
     const ranges = [];
     for (const [tn, spans] of found) {
+      // (the weak ones are painted, but aren't hits: see SHORT_WORDS)
       if (HIGHLIGHT_API && !tn.parentElement.closest(UNSELECTABLE_TEXT)) {
-        textNodeHits.set(tn, spans);
-        for (const [start, end] of spans) {
+        const strong = spans.filter(sp => !sp[2]);
+        if (strong.length) textNodeHits.set(tn, strong);
+        for (const [start, end, weak] of spans) {
           const range = new StaticRange({ startContainer: tn, startOffset: start, endContainer: tn, endOffset: end });
-          hits.push(range);
+          if (weak) weakRanges.add(range);
+          else hits.push(range);
           ranges.push(range);
         }
         continue;
@@ -910,12 +1163,13 @@
       const data = tn.data;
       const frag = document.createDocumentFragment();
       let last = 0;
-      for (const [start, end] of spans) {
+      for (const [start, end, weak] of spans) {
         if (start > last) frag.appendChild(document.createTextNode(data.slice(last, start)));
         const mark = document.createElement('mark');
         mark.textContent = data.slice(start, end);
         frag.appendChild(mark);
-        hits.push(mark);
+        if (weak) mark.className = 'weak';
+        else hits.push(mark);
         last = end;
       }
       if (last < data.length) frag.appendChild(document.createTextNode(data.slice(last)));
@@ -1015,7 +1269,7 @@
       matched = [];
       for (const card of articleCards) {
         const cardText = getCardText(card, includeFootnotes);
-        if (phrases.every(p => cardText.includes(p)) && words.every(t => cardText.includes(t))) {
+        if (phrases.every(p => cardText.includes(p)) && words.every(t => hasWord(cardText, t))) {
           matched.push(card);
           highlightText(card, regex, includeFootnotes);
           // Open footnote boxes that contain highlights
@@ -1726,7 +1980,7 @@
         continue;
       }
       const base = text.length;
-      if (n.parentElement.tagName === 'MARK') {
+      if (n.parentElement.tagName === 'MARK' && !n.parentElement.classList.contains('weak')) {
         spans.push([base, base + n.data.length]);
       } else {
         for (const [s, e] of textNodeHits.get(n) || []) spans.push([base + s, base + e]);
@@ -2178,7 +2432,7 @@
     re.lastIndex = 0;
     while ((m = re.exec(text)) !== null) {
       if (!m[0].length) { re.lastIndex++; continue; }
-      spans.push([m.index, m.index + m[0].length]);
+      if (!isWeakMatch(re, m[0])) spans.push([m.index, m.index + m[0].length]);
     }
     return snippet ? snippetHtml(text, spans) : markSpans(text, 0, text.length, spans);
   }
@@ -2269,15 +2523,14 @@
     return group;
   }
 
-  // The articles, one per line with the rubrica, as the index's tab shows
-  // them: "art. 46 — Comissões Permanentes", "LOM art. 13, I — …"
+  // The articles, one per line in two columns, as the index's tab shows
+  // them: the dispositivo with its norma's badge ("RI art. 46"), its dica
   function refsHtml(refs) {
     if (!refs || !refs.length) return '';
     let html = '';
     for (const r of formatRefsList(refs)) {
-      const label = r.label.replace(/,(?=\S)/g, ', ');   // "§1,I" → "§1, I"
-      html += '<span class="res-ref">' + escapeHtml(label)
-        + (r.hint ? '<span class="res-ref-hint"> — ' + indexMarkHtml(r.hint) + '</span>' : '') + '</span>';
+      html += '<span class="res-ref">' + refCellHtml(r)[0]
+        + '<span class="res-ref-hint">' + (r.hint ? indexMarkHtml(r.hint) : '') + '</span></span>';
     }
     return '<span class="res-refs">' + html + '</span>';
   }
@@ -2491,43 +2744,65 @@
   }
 
   // The consulta rápida in the Referências tab: its sections, with links to
-  // each one at the top; with a filter, the entries with its terms
+  // each one at the top (fixed, the section being read marked), the entries
+  // as cards in a grid; with a filter, the entries with its terms
   function renderConsulta(filter) {
     const toc = document.createElement('div');
     toc.className = 'q-toc';
     $indexContent.appendChild(toc);
+    const heads = [];
     for (const sec of consultaIndex()) {
       const items = sec.items.filter(item => !filter
         || textMatchesFilter(quickTexts(item).join(' ') + ' ' + sec.terms + ' ' + (item.terms || ''), filter));
       if (!items.length) continue;
+      const noun = items.length === 1 ? ' item' : ' itens';
       const head = document.createElement('div');
       head.className = 'ref-group-title q-head';
-      head.textContent = sec.title;
+      head.innerHTML = escapeHtml(sec.title) + '<small>' + items.length + noun + '</small>';
       $indexContent.appendChild(head);
       const link = document.createElement('button');
       link.className = 'q-toc-link';
-      link.textContent = sec.title + ' · ' + items.length;
+      link.innerHTML = escapeHtml(sec.title) + '<small>' + items.length + '</small>';
       link.addEventListener('click', () => head.scrollIntoView({ block: 'start', behavior: 'smooth' }));
       toc.appendChild(link);
+      heads.push([head, link]);
       // the fichas by group ("Fases da sessão", "Listas de hipóteses"), each with its subtitle
       let group = null;
+      let grid = null;
       for (const item of items) {
         // a ficha without group after grouped ones goes under "Outros", not under the group above
         const g = item.group || (group ? 'Outros' : null);
         if (g && g !== group) {
           group = g;
+          grid = null;
           const sub = document.createElement('div');
           sub.className = 'q-subhead';
           sub.textContent = group;
           $indexContent.appendChild(sub);
         }
-        $indexContent.appendChild(quickItemEl(sec, item, escapeHtml, false));
+        if (!grid) {
+          grid = document.createElement('div');
+          grid.className = 'q-grid';
+          $indexContent.appendChild(grid);
+        }
+        grid.appendChild(quickItemEl(sec, item, escapeHtml, false));
       }
     }
     if (!toc.childNodes.length) {
       toc.className = 'q-empty';
       toc.textContent = 'Nada na consulta rápida com esses termos.';
+      return;
     }
+    // the section being read, marked in the links
+    const mark = () => {
+      if (!toc.isConnected) { $indexContent.removeEventListener('scroll', mark); return; }
+      const top = toc.getBoundingClientRect().bottom + 8;
+      let cur = heads[0];
+      for (const h of heads) if (h[0].getBoundingClientRect().top <= top) cur = h;
+      for (const [, link] of heads) link.classList.toggle('on', link === cur[1]);
+    };
+    $indexContent.addEventListener('scroll', mark, { passive: true });
+    requestAnimationFrame(mark);
   }
 
   // "Art. 105, XII", "Art. 4-C ADT, I"
@@ -2854,7 +3129,7 @@
       if (child.nodeType === Node.TEXT_NODE) {
         html += textWithMarks(child);
       } else if (child.nodeType === Node.ELEMENT_NODE) {
-        if (child.tagName === 'MARK') {
+        if (child.tagName === 'MARK' && !child.classList.contains('weak')) {
           html += '<mark>' + escapeHtml(child.textContent) + '</mark>';
         } else if (child.classList.contains('indent-path') || child.classList.contains('unit-id')) {
           continue;
@@ -3686,6 +3961,8 @@
     }
     $indexOverlay.classList.add('open');
     $indexPanel.classList.add('open');
+    sysNorm = -1;
+    sysTitle = null;
     renderIndex();
     if (window.innerWidth > 768) $indexSearch.focus();
   }
@@ -3693,6 +3970,7 @@
   function closeIndex() {
     $indexOverlay.classList.remove('open');
     $indexPanel.classList.remove('open');
+    $sysTip.classList.remove('visible');
     $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
   }
 
@@ -3713,6 +3991,8 @@
       currentIndexTab = tab.dataset.tab;
       $indexSearchWrapper.style.display = '';
       renderIndex();
+      $indexContent.scrollTop = 0;   // (not where the last tab was)
+      if (currentIndexTab === 'systematic') syncSystematicToScroll();
     });
   });
 
@@ -3774,9 +4054,12 @@
     const cacheKey = filter ? null
       : currentIndexTab === 'subject' ? 'subject'
       : currentIndexTab === 'references' ? 'references:' + currentRefCategory : null;
+    $indexPanel.dataset.tab = currentIndexTab;
+    $indexContent.classList.remove('sys-two');
     const cached = cacheKey && indexDomCache.get(cacheKey);
     if (cached) {
       $indexContent.replaceChildren(...cached);
+      if (cacheKey === 'subject') buildSubjectRail(subjAllLetters);
       $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
       return;
     }
@@ -3827,121 +4110,382 @@
     }
   }
 
-  function sysLevelClass(sectionId) {
-    if (!sectionId) return '';
-    if (sectionId.startsWith('norma')) return 'sys-nivel-norma';
-    if (sectionId === 'adt' || sectionId === 'dgt') return 'sys-nivel-titulo';
-    if (sectionId.startsWith('tit'))   return 'sys-nivel-titulo';
-    if (sectionId.startsWith('cap'))   return 'sys-nivel-capitulo';
-    if (sectionId.startsWith('subsec')) return 'sys-nivel-subsecao';
-    if (sectionId.startsWith('sec'))   return 'sys-nivel-secao';
+  // The systematic index: one norma at a time (its tabs at the top). Each
+  // título is a bar as long as its number of articles, split in its
+  // capítulos: where the bulk of the norma is, and where the reader is. On a
+  // wide panel, two columns: the títulos on the left, the hovered (or
+  // clicked) one's capítulos and seções on the right; narrow, a título opens
+  // them under it. Names in capitals are shown in sentence case.
+  const SYS_LEVELS = ['norma', 'tit', 'cap', 'sec', 'subsec'];
+  const SYS_LEVEL_NAME = { norma: 'norma', tit: 'titulo', cap: 'capitulo', sec: 'secao', subsec: 'subsecao' };
+  const SYS_ABBR = { 'TÍTULO': 'Tít.', 'CAPÍTULO': 'Cap.', 'SEÇÃO': 'Seç.', 'SUBSEÇÃO': 'Subs.' };
+  const SYS_NORM_SHORT = { 'Regimento Interno': 'RI', 'Lei Orgânica': 'LOM', 'Constituição Estadual': 'CE',
+    'Constituição Federal': 'CF', 'Precedentes Regimentais': 'Precedentes' };
+  // kept capitalized when a name in capitals is lowercased (the longer first)
+  const SYS_PROPER = ['Câmara Municipal', 'Câmara dos Deputados', 'Câmara', 'Mesa', 'Plenário', 'Vereadores', 'Vereador',
+    'Vice-Presidentes', 'Presidentes', 'Presidente', 'Secretários Municipais', 'Secretários', 'Comissões Permanentes',
+    'Comissões Temporárias', 'Comissões', 'Comissão', 'Município', 'Prefeito', 'Lei Orgânica', 'Regimento Interno',
+    'Estado', 'União', 'Distrito Federal', 'República', 'Tribunal de Contas', 'Poder Legislativo', 'Poder Executivo',
+    'Poder Judiciário', 'Ministério Público', 'Defensoria Pública', 'Congresso Nacional', 'Senado Federal',
+    'Constituição', 'Ordem do Dia', 'Expediente', 'Subprefeituras', 'Orçamento', 'Líderes', 'Vice-Líderes'];
+  const SYS_PROPER_RE = SYS_PROPER.map(p => [new RegExp('(^|[^\\p{L}])' + p.toLowerCase() + '(?![\\p{L}])', 'gu'), p]);
+  const sysWide = window.matchMedia('(min-width: 720px)');
+  let sysTree = null;    // [norma node]; node: {title, id, level, tag, name, kids, parent, arts, first, last, art?, law?}
+  let sysNorm = -1;      // the norma shown (-1: the reader's)
+  let sysTitle = null;   // the título shown on the right (wide panel)
+
+  function sysCase(name) {
+    const letters = name.replace(/[^\p{L}]/gu, '');
+    if (!letters || letters !== letters.toUpperCase()) return name;
+    let s = name.toLowerCase();
+    for (const [re, p] of SYS_PROPER_RE) s = s.replace(re, (m, a) => a + p);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  function sysLevelOf(id) {
+    if (!id) return '';
+    if (id.startsWith('norma')) return 'norma';
+    if (id === 'adt' || id === 'dgt' || id.startsWith('tit')) return 'tit';
+    if (id.startsWith('cap')) return 'cap';
+    if (id.startsWith('subsec')) return 'subsec';
+    if (id.startsWith('sec')) return 'sec';
     return '';
   }
 
-  function renderSystematicIndex(filter) {
-    for (const group of SYSTEMATIC_INDEX) {
-      const isLaw = group.section_id && group.section_id.startsWith('norma');
-
-      if (filter && !textMatchesFilter(group.title, filter)) {
-        const hasChild = group.children && group.children.some(ch => sysNodeMatches(ch, filter));
-        if (!hasChild) continue;
-      }
-
-      const div = document.createElement('div');
-      div.className = 'sys-group';
-      const title = document.createElement('div');
-      const lvl = sysLevelClass(group.section_id);
-      title.className = (isLaw ? 'sys-title sys-law' : 'sys-title') + (lvl ? ' ' + lvl : '');
-      title.textContent = group.title;
-      if (group.art_range && (!group.children || !group.children.length)) {
-        const rangeSpan = document.createElement('span');
-        rangeSpan.className = 'sys-art-range';
-        rangeSpan.textContent = ' ' + group.art_range;
-        title.appendChild(rangeSpan);
-      }
-      if (group.section_id) {
-        title.dataset.section = group.section_id;
-        title.style.cursor = 'pointer';
-        title.addEventListener('click', () => {
-          closeIndex();
-          navigateToSection(group.section_id);
-        });
-      }
-      div.appendChild(title);
-
-      if (group.children) {
-        for (const ch of group.children) {
-          renderSysNode(ch, div, 12, filter);
+  // The tree, with each section's number of articles and first and last
+  // article, counted on the cards (once)
+  function sysTreeBuild() {
+    if (sysTree) return sysTree;
+    const byId = new Map();
+    const node = (src, parent) => {
+      const title = (src.title || src.label || '').replace(/\xa0/g, ' ');
+      const n = { title, id: src.section_id || '', kids: [], parent, arts: 0, first: '', last: '' };
+      n.level = sysLevelOf(n.id);
+      if (src.art) { n.art = src.art; n.law = src.law || ''; }
+      const m = title.match(/^(TÍTULO|CAPÍTULO|SEÇÃO|SUBSEÇÃO)\s+([IVXLC]+[-A-Z]*|ÚNIC[OA])\s*[—–-]\s*(.*)$/i);
+      n.tag = m ? (SYS_ABBR[m[1].toUpperCase()] || m[1]) + ' ' + (/^ÚNIC/i.test(m[2]) ? 'Único' : m[2]) : '';
+      n.name = sysCase(m ? m[3] : title);
+      if (n.id) byId.set(n.id, n);
+      for (const ch of src.children || []) if (ch.title || ch.art) n.kids.push(node(ch, n));
+      return n;
+    };
+    sysTree = [];
+    for (const g of SYSTEMATIC_INDEX) {
+      if (sysLevelOf(g.section_id) === 'norma') { sysTree.push(node(g, null)); continue; }
+      // the Regimento's títulos come first, without a norma of their own
+      if (!sysTree.length) sysTree.push({ title: 'Regimento Interno', name: 'Regimento Interno', id: 'norma1',
+        level: 'norma', tag: '', kids: [], parent: null, arts: 0, first: '', last: '' });
+      sysTree[sysTree.length - 1].kids.push(node(g, sysTree[sysTree.length - 1]));
+    }
+    if (sysTree.length && !byId.has('norma1')) byId.set('norma1', sysTree[0]);
+    const current = SYS_LEVELS.map(() => null);
+    for (const card of ALL_CARDS) {
+      if (card.classList.contains('card-titulo')) {
+        const i = SYS_LEVELS.indexOf(headingLevel(card));
+        if (i < 0) continue;
+        current[i] = byId.get(card.dataset.section) || null;
+        current.fill(null, i + 1);
+      } else if (card.classList.contains('card-artigo')) {
+        const art = card.dataset.art.replace(/^ADT/, '');
+        for (const n of current) {
+          if (!n) continue;
+          n.arts++;
+          if (!n.first) n.first = art;
+          n.last = art;
         }
       }
-
-      $indexContent.appendChild(div);
     }
+    return sysTree;
   }
 
-  function sysNodeMatches(node, filter) {
-    if (node.art) return textMatchesFilter(node.label, filter);   // a precedent
-    if (!node.title) return false;
-    if (textMatchesFilter(node.title, filter)) return true;
-    if (node.children) {
-      for (const ch of node.children) {
-        if (sysNodeMatches(ch, filter)) return true;
-      }
-    }
-    return false;
+  function sysRange(n) {
+    if (!n.first || n.art) return '';
+    return 'art. ' + (n.first === n.last ? n.first : n.first + '–' + n.last);
   }
 
-  // A leaf of the index: one precedent ("nº 2/2004 — síntese"), which goes to its card
-  function renderSysLeaf(leaf, parent, indent, filter) {
-    if (filter && !textMatchesFilter(leaf.label, filter)) return;
+  // The nodes that contain the reader's position (a precedent: its leaf)
+  function sysHerePath() {
+    const here = new Set();
+    const card = selectedCard;
+    if (!card) return here;
+    let n = null;
+    if (isPrecCard(card)) {
+      const norm = sysTree.find(x => x.kids.some(k => k.art));
+      n = norm && norm.kids.find(k => k.art === card.dataset.art) || null;
+    } else {
+      const id = getCurrentSectionId();
+      const find = list => {
+        for (const x of list) {
+          if (x.id === id) return x;
+          const y = find(x.kids);
+          if (y) return y;
+        }
+        return null;
+      };
+      n = id ? find(sysTree) : null;
+    }
+    for (; n; n = n.parent) here.add(n);
+    return here;
+  }
+
+  function sysFlat(n, out = [], depth = 0) {
+    for (const k of n.kids) {
+      out.push([k, depth]);
+      sysFlat(k, out, depth + 1);
+    }
+    return out;
+  }
+
+  function sysGo(n) {
+    closeIndex();
+    if (!n.art) { navigateToSection(n.id); return; }
+    const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(n.art)}"][data-law="${n.law}"]`);
+    if (!card) return;
+    revealCard(card);   // hidden by a filter: shown (and its norma), as a remissão does
+    scrollToReadingLine(card);
+    selectCard(card, true);
+  }
+
+  function sysTagHtml(n) {
+    return n.tag ? '<span class="sys-tag">' + escapeHtml(n.tag) + '</span>' : '';
+  }
+
+  // A row: a capítulo, seção... or a precedent; goes to it
+  function sysRowEl(n, depth, here) {
     const el = document.createElement('div');
-    el.className = 'sys-item sys-leaf';
-    el.style.marginLeft = indent + 'px';
-    el.textContent = leaf.label;
-    el.dataset.art = leaf.art;
-    el.addEventListener('click', () => {
-      closeIndex();
-      const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(leaf.art)}"][data-law="${leaf.law || ''}"]`);
-      if (!card) return;
-      revealCard(card);   // hidden by a filter: shown (and its norma), as a remissão does
-      scrollToReadingLine(card);
-      selectCard(card, true);
-    });
-    parent.appendChild(el);
+    el.className = 'sys-row lv-' + (SYS_LEVEL_NAME[n.level] || 'leaf') + (here.has(n) ? ' sys-here' : '');
+    el.style.setProperty('--d', depth);
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.innerHTML = sysTagHtml(n) + '<span class="sys-nm">' + escapeHtml(n.art ? n.title : n.name) + '</span>'
+      + '<span class="sys-rg">' + escapeHtml(sysRange(n).replace(/^art\. /, '')) + '</span>';
+    el.sysNode = n;
+    return el;
   }
 
-  function renderSysNode(node, parent, indent, filter) {
-    if (node.art) { renderSysLeaf(node, parent, indent, filter); return; }
-    if (!node.title) return;
-    if (filter && !sysNodeMatches(node, filter)) return;
-
+  // A título: its name and range, and the bar of its capítulos
+  function sysTitleEl(t, max, here) {
     const el = document.createElement('div');
-    const lvl = sysLevelClass(node.section_id);
-    el.className = 'sys-item' + (lvl ? ' ' + lvl : '');
-    el.style.marginLeft = indent + 'px';
-    el.textContent = node.title;
-    if (node.art_range && (!node.children || !node.children.length)) {
-      const rangeSpan = document.createElement('span');
-      rangeSpan.className = 'sys-art-range';
-      rangeSpan.textContent = ' ' + node.art_range;
-      el.appendChild(rangeSpan);
+    el.className = 'sys-tit lv-titulo' + (here.has(t) ? ' sys-here' : '');
+    const top = document.createElement('div');
+    top.className = 'sys-top';
+    top.tabIndex = 0;
+    top.setAttribute('role', 'button');
+    top.innerHTML = sysTagHtml(t) + '<span class="sys-nm">' + escapeHtml(t.name) + '</span>'
+      + '<span class="sys-rg">' + escapeHtml(sysRange(t)) + '</span>';
+    const bar = document.createElement('div');
+    bar.className = 'sys-bar' + (t.kids.length ? '' : ' solo');
+    bar.style.width = Math.max(t.arts / max * 100, 3) + '%';
+    for (const s of t.kids.length ? t.kids : [t]) {
+      const seg = document.createElement('i');
+      seg.style.flex = Math.max(s.arts, 1);
+      if (here.has(s)) seg.className = 'sys-here';
+      seg.sysNode = s;
+      bar.appendChild(seg);
     }
+    el.append(top, bar);
+    el.sysNode = t;
+    return el;
+  }
 
-    if (node.section_id) {
-      el.dataset.section = node.section_id;
-      el.addEventListener('click', () => {
-        closeIndex();
-        navigateToSection(node.section_id);
+  function sysNormTabs(here) {
+    const tabs = document.createElement('div');
+    tabs.className = 'sys-norms';
+    sysTree.forEach((n, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = i === sysNorm ? 'on' : '';
+      b.title = n.title + ': ' + n.arts + (n.arts === 1 ? ' artigo' : ' artigos');
+      b.innerHTML = escapeHtml(SYS_NORM_SHORT[n.title] || n.title) + (here.has(n) ? ' <span class="sys-dot" aria-label="você está aqui">●</span>' : '');
+      b.addEventListener('click', () => {
+        sysNorm = i;
+        sysTitle = null;
+        renderIndex();
       });
-    }
-    parent.appendChild(el);
+      tabs.appendChild(b);
+    });
+    return tabs;
+  }
 
-    if (node.children) {
-      for (const child of node.children) {
-        renderSysNode(child, parent, indent + 12, filter);
+  function renderSystematicIndex(filter) {
+    sysTreeBuild();
+    const here = sysHerePath();
+    if (filter) { renderSysFiltered(filter, here); return; }
+    if (sysNorm < 0) sysNorm = Math.max(0, sysTree.findIndex(n => here.has(n)));
+    const norm = sysTree[sysNorm];
+    $indexContent.appendChild(sysNormTabs(here));
+    // the precedents: just their list
+    if (!norm.kids.some(k => k.kids.length || k.id)) {
+      const list = document.createElement('div');
+      list.className = 'sys-list';
+      for (const k of norm.kids) list.appendChild(sysRowEl(k, 0, here));
+      $indexContent.appendChild(list);
+      return;
+    }
+    const max = Math.max(1, ...norm.kids.map(t => t.arts));
+    const intro = document.createElement('div');
+    intro.className = 'sys-intro';
+    intro.textContent = 'Cada barra mede o título em artigos; cada pedaço é um capítulo.';
+    $indexContent.appendChild(intro);
+    if (sysWide.matches) {
+      $indexContent.classList.add('sys-two');
+      if (!sysTitle || !norm.kids.includes(sysTitle)) sysTitle = norm.kids.find(t => here.has(t)) || norm.kids[0];
+      const cols = document.createElement('div');
+      cols.className = 'sys-cols';
+      const left = document.createElement('div');
+      left.className = 'sys-left';
+      const right = document.createElement('div');
+      right.className = 'sys-right';
+      for (const t of norm.kids) {
+        const el = sysTitleEl(t, max, here);
+        if (t === sysTitle) el.classList.add('on');
+        left.appendChild(el);
       }
+      cols.append(left, right);
+      $indexContent.appendChild(cols);
+      sysFillRight(right, sysTitle, here);
+      return;
+    }
+    for (const t of norm.kids) {
+      const el = sysTitleEl(t, max, here);
+      if (t.kids.length) {
+        const kids = document.createElement('div');
+        kids.className = 'sys-kids';
+        kids.hidden = !here.has(t);
+        const start = sysRowEl(t, 0, new Set());
+        start.classList.add('sys-start');
+        start.querySelector('.sys-nm').textContent = 'Início do título';
+        kids.appendChild(start);
+        for (const [n, d] of sysFlat(t)) kids.appendChild(sysRowEl(n, d, here));
+        el.appendChild(kids);
+        el.setAttribute('aria-expanded', String(!kids.hidden));
+      }
+      $indexContent.appendChild(el);
     }
   }
+
+  // The right column: the título, a way to its start, its capítulos and seções
+  function sysFillRight(right, t, here) {
+    right.replaceChildren();
+    right.sysNode = t;
+    const head = document.createElement('div');
+    head.className = 'sys-head';
+    head.tabIndex = 0;
+    head.setAttribute('role', 'button');
+    head.title = 'Ir ao início do título';
+    head.innerHTML = '<div class="sys-k">' + escapeHtml(t.tag || 'Título') + '</div>'
+      + '<div class="sys-h">' + escapeHtml(t.name) + '</div>'
+      + '<div class="sys-rg">' + escapeHtml(sysRange(t)) + ' · ' + t.arts + (t.arts === 1 ? ' artigo' : ' artigos')
+      + '<span class="sys-go">ir ao início ›</span></div>';
+    head.sysNode = t;
+    right.appendChild(head);
+    if (!t.kids.length) {
+      const empty = document.createElement('div');
+      empty.className = 'sys-empty';
+      empty.textContent = 'Sem capítulos: o título vai direto aos artigos.';
+      right.appendChild(empty);
+    }
+    for (const [n, d] of sysFlat(t)) right.appendChild(sysRowEl(n, d, here));
+    right.scrollTop = 0;
+  }
+
+  // With a filter: the sections that match, under the títulos (and normas) they belong to
+  function renderSysFiltered(filter, here) {
+    const shown = new Set();
+    const visit = n => {
+      for (const k of n.kids) {
+        if (textMatchesFilter(k.title, filter) || textMatchesFilter(k.name, filter)) {
+          for (let x = k; x; x = x.parent) shown.add(x);
+        }
+        visit(k);
+      }
+    };
+    sysTree.forEach(visit);
+    if (!shown.size) {
+      $indexContent.innerHTML = '<div class="sys-empty">Nada no índice sistemático com esses termos.</div>';
+      return;
+    }
+    for (const norm of sysTree) {
+      if (!shown.has(norm)) continue;
+      const h = document.createElement('div');
+      h.className = 'sys-norm-h';
+      h.textContent = norm.title;
+      $indexContent.appendChild(h);
+      for (const [n, d] of sysFlat(norm)) if (shown.has(n)) $indexContent.appendChild(sysRowEl(n, d, here));
+    }
+  }
+
+  // Wide: the título on the right (and marked on the left)
+  function sysShowTitle(tit) {
+    const right = $indexContent.querySelector('.sys-right');
+    if (!right) return false;
+    sysTitle = tit.sysNode;
+    $indexContent.querySelectorAll('.sys-tit.on').forEach(x => x.classList.remove('on'));
+    tit.classList.add('on');
+    if (right.sysNode !== tit.sysNode) sysFillRight(right, tit.sysNode, sysHerePath());
+    return true;
+  }
+
+  // Clicks and keys in the systematic index
+  function sysActivate(e) {
+    const seg = e.target.closest('.sys-bar > i');
+    if (seg) { e.stopPropagation(); sysGo(seg.sysNode); return true; }
+    const row = e.target.closest('.sys-row, .sys-head');
+    if (row) { sysGo(row.sysNode); return true; }
+    const top = e.target.closest('.sys-top');
+    if (!top) return false;
+    const tit = top.parentNode;
+    const t = tit.sysNode;
+    if (sysShowTitle(tit)) return true;
+    const kids = tit.querySelector(':scope > .sys-kids');
+    if (!kids) { sysGo(t); return true; }
+    kids.hidden = !kids.hidden;
+    tit.setAttribute('aria-expanded', String(!kids.hidden));
+    return true;
+  }
+  $indexContent.addEventListener('click', e => {
+    if (currentIndexTab === 'systematic') sysActivate(e);
+  });
+  $indexContent.addEventListener('keydown', e => {
+    if (currentIndexTab !== 'systematic' || (e.key !== 'Enter' && e.key !== ' ')) return;
+    if (!e.target.matches('.sys-row, .sys-head, .sys-top')) return;
+    e.preventDefault();
+    sysActivate(e);
+  });
+  // Wide: hovering a título shows it on the right, and it stays there for the
+  // mouse to go to it (after a pause on it: crossing other títulos on the way
+  // doesn't change it); a piece of a bar names its capítulo
+  let sysHoverTimer = 0;
+  const $sysTip = document.createElement('div');
+  $sysTip.id = 'sys-tip';
+  document.body.appendChild($sysTip);
+  $indexContent.addEventListener('mouseover', e => {
+    if (currentIndexTab !== 'systematic') return;
+    const seg = e.target.closest('.sys-bar > i');
+    if (seg) {
+      const s = seg.sysNode;
+      $sysTip.innerHTML = (s.tag ? '<b>' + escapeHtml(s.tag) + '</b> ' : '') + escapeHtml(s.name)
+        + '<br><span>' + escapeHtml(sysRange(s)) + ' · ' + s.arts + (s.arts === 1 ? ' artigo' : ' artigos') + '</span>';
+      $sysTip.classList.add('visible');
+    }
+    if (!HOVER) return;
+    clearTimeout(sysHoverTimer);
+    const tit = e.target.closest('.sys-left .sys-tit');
+    if (tit && !tit.classList.contains('on')) sysHoverTimer = setTimeout(() => sysShowTitle(tit), 120);
+  });
+  $indexContent.addEventListener('mousemove', e => {
+    if (!$sysTip.classList.contains('visible')) return;
+    const w = $sysTip.offsetWidth;
+    $sysTip.style.left = Math.min(e.clientX + 12, window.innerWidth - w - 8) + 'px';
+    $sysTip.style.top = (e.clientY + 16) + 'px';
+  });
+  $indexContent.addEventListener('mouseout', e => {
+    if (e.target.closest('.sys-bar > i')) $sysTip.classList.remove('visible');
+    if (!e.relatedTarget || !$indexContent.contains(e.relatedTarget)) clearTimeout(sysHoverTimer);
+  });
+  sysWide.addEventListener('change', () => {
+    if ($indexPanel.classList.contains('open') && currentIndexTab === 'systematic') renderIndex();
+  });
 
   function getCurrentSectionId() {
     const card = selectedCard;
@@ -3957,20 +4501,14 @@
     return '';
   }
 
+  // The reader's place, in view: the título on the left (wide) and the
+  // deepest section or precedent
   function syncSystematicToScroll() {
-    // a precedent has its own entry; anything else, its section
-    const card = selectedCard;
-    const leaf = card && card.classList.contains('card-prec')
-      ? $indexContent.querySelector(`.sys-leaf[data-art="${CSS.escape(card.dataset.art)}"]`) : null;
-    const sectionId = leaf ? '' : getCurrentSectionId();
-    if (!leaf && !sectionId) return;
-    // Remove previous highlight
-    $indexContent.querySelectorAll('.sys-active').forEach(el => el.classList.remove('sys-active'));
-    // Find matching element in the index panel
-    const target = leaf || $indexContent.querySelector('[data-section="' + sectionId + '"]');
-    if (!target) return;
-    target.classList.add('sys-active');
-    target.scrollIntoView({ behavior: 'instant', block: 'center' });
+    const tit = $indexContent.querySelector('.sys-left .sys-tit.sys-here');
+    if (tit) tit.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+    const rows = $indexContent.querySelectorAll('.sys-row.sys-here');
+    const target = rows[rows.length - 1] || $indexContent.querySelector('.sys-tit.sys-here');
+    if (target) target.scrollIntoView({ behavior: 'instant', block: 'center' });
   }
 
   function navigateToSection(sectionId) {
@@ -4068,21 +4606,28 @@
     return escapeHtml(s).replace(/"/g, '&quot;');
   }
 
-  // An entry's lines of references, and the height they add (px, fitted
-  // against the panel's layout: per line and per character)
+  // An entry's lines of references, in two columns: the dispositivo (with
+  // its norma's badge, as the remissões') and its dica. A line goes to its
+  // dispositivo (data-r: its position in refs). And the height they add (px,
+  // fitted against the panel's layout: per line of the longer column)
+  const SUBJ_HINT_CHARS = 50, SUBJ_REF_CHARS = 20;
   function subjRefsHtml(refs) {
     let html = '<div class="subj-refs">', h = 0;
-    for (const item of formatRefsList(refs)) {
-      html += '<div class="subj-ref-line">' + escapeHtml(item.label);
-      let n = item.label.length;
-      if (item.hint) {
-        html += '<span class="ref-hint"> — ' + escapeHtml(item.hint) + '</span>';
-        n += item.hint.length + 3;
-      }
-      html += '</div>';
-      h += 12.7 + 0.375 * n;
-    }
+    formatRefsList(refs).forEach((item, i) => {
+      const [cell, n] = refCellHtml(item);
+      html += '<div class="subj-ref-line" data-r="' + i + '" role="button" tabindex="0" title="Ir para o dispositivo">'
+        + cell + '<span class="ref-hint">' + escapeHtml(item.hint) + '</span></div>';
+      h += 21 + 15.5 * (Math.max(1, Math.ceil(item.hint.length / SUBJ_HINT_CHARS), Math.ceil(n / SUBJ_REF_CHARS)) - 1);
+    });
     return [html + '</div>', h];
+  }
+  // The dispositivo's column: its norma's badge and the rest ("art. 46, I"),
+  // and how many characters it takes
+  function refCellHtml(item) {
+    const law = item.lawPrefix || 'RI';
+    const ref = law === 'PREC' ? item.label.replace(/^Precedente /, '')
+      : item.label.replace(/^[A-Z]+ (?=art\.)/, '').replace(/,(?=\S)/g, ', ');   // "§1,I" → "§1, I"
+    return ['<span class="rf"><i class="' + law + '">' + law + '</i>' + escapeHtml(ref) + '</span>', law.length + ref.length + 1];
   }
 
   // The remissivo is ~700 subjects and 2,000 sub-subjects: written as one
@@ -4096,19 +4641,36 @@
     }
     return subjectsSorted;
   }
+  // The subjects' initial ("Á" under A; a digit under #)
+  function subjLetter(entry) {
+    const c = stripAccents(entry.subject.charAt(0)).toUpperCase();
+    return /[A-Z]/.test(c) ? c : '#';
+  }
+
   function renderSubjectIndex(filter) {
     sortedSubjects();
     const parts = [];
+    // the subjects shown, by letter (each letter's band says how many)
+    const shown = subjectsSorted.map(entry => !filter || textMatchesFilter(entry.subject, filter)
+      || !!(entry.children && entry.children.some(ch => textMatchesFilter(ch.sub_subject, filter))));
+    const perLetter = new Map();
     subjectsSorted.forEach((entry, i) => {
+      if (shown[i]) perLetter.set(subjLetter(entry), (perLetter.get(subjLetter(entry)) || 0) + 1);
+    });
+    let letter = null;
+    subjectsSorted.forEach((entry, i) => {
+      if (!shown[i]) return;
       const matchSelf = !filter || textMatchesFilter(entry.subject, filter);
-      const matchChild = !matchSelf && entry.children && entry.children.some(
-        ch => textMatchesFilter(ch.sub_subject, filter)
-      );
-      if (!matchSelf && !matchChild) return;
+      if (subjLetter(entry) !== letter) {
+        letter = subjLetter(entry);
+        const n = perLetter.get(letter);
+        parts.push('<div class="subj-letter" data-letter="' + letter + '">' + letter
+          + '<small>' + n + (n === 1 ? ' assunto' : ' assuntos') + '</small></div>');
+      }
 
       const key = stripAccents(entry.subject.toLowerCase());
       // Off-screen entries are not laid out (style.css): their estimated height
-      let est = 12.6 + 0.41 * entry.subject.length;
+      let est = 26 + 18 * (Math.ceil(entry.subject.length / 54) - 1);
       let html = '<div class="subj-title' + (collectAllRefs(entry).length ? '' : ' no-refs') + '">'
         + escapeHtml(entry.subject) + '</div>';
 
@@ -4122,7 +4684,7 @@
       // Vides (cross-references)
       if (entry.vides && entry.vides.length > 0) {
         html += videsHtml(entry.vides);
-        est += 9.9 + 0.44 * (6 + entry.vides.join(', ').length);
+        est += 17 * Math.ceil((6 + entry.vides.join(', ').length) / 52);
       }
 
       // Sub-subjects
@@ -4130,17 +4692,17 @@
         entry.children.forEach((ch, c) => {
           if (filter && !matchSelf && !textMatchesFilter(ch.sub_subject, filter)) return;
           const subKey = key + '|' + stripAccents(ch.sub_subject.toLowerCase());
-          html += '<div class="subj-entry" style="padding-left:16px" data-subject-key="' + escapeAttr(subKey)
+          html += '<div class="subj-entry subj-sub" data-subject-key="' + escapeAttr(subKey)
             + '" data-c="' + c + '"><div class="subj-title' + (ch.refs && ch.refs.length ? '' : ' no-refs')
-            + '" style="font-size:13px">— ' + escapeHtml(ch.sub_subject) + '</div>';
+            + '">— ' + escapeHtml(ch.sub_subject) + '</div>';
           const [refs, h] = subjRefsHtml(ch.refs);
           html += refs;
-          est += 23.2 + 0.49 * (2 + ch.sub_subject.length) + h;
+          est += 27 + 16 * (Math.ceil((2 + ch.sub_subject.length) / 60) - 1) + h;
 
           // Vides on sub-subject
           if (ch.vides && ch.vides.length > 0) {
             html += videsHtml(ch.vides);
-            est += 9.9 + 0.44 * (6 + ch.vides.join(', ').length);
+            est += 17 * Math.ceil((6 + ch.vides.join(', ').length) / 52);
           }
           html += '</div>';
         });
@@ -4149,6 +4711,8 @@
       parts.push('<div class="subj-entry" data-subject-key="' + escapeAttr(key) + '" data-i="' + i
         + '" style="contain-intrinsic-size:auto ' + Math.round(est) + 'px">' + html + '</div>');
     });
+    if (!filter) subjAllLetters = perLetter;
+    buildSubjectRail(perLetter);
     if (filter) {
       $indexContent.insertAdjacentHTML('beforeend', parts.join(''));
       return;
@@ -4170,6 +4734,63 @@
     };
     requestAnimationFrame(() => setTimeout(fill, 0));
   }
+  // The letters A–Z beside the remissivo: a click goes to the letter (those
+  // without subjects, greyed); the letter being read is marked
+  const $subjRail = document.createElement('nav');
+  $subjRail.id = 'subj-rail';
+  $subjRail.setAttribute('aria-label', 'Letras do índice remissivo');
+  $indexPanel.appendChild($subjRail);
+  let subjAllLetters = new Map();   // of the whole remissivo (its DOM is kept: see renderIndex)
+  function buildSubjectRail(perLetter) {
+    $subjRail.replaceChildren();
+    for (const l of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = l;
+      b.dataset.letter = l;
+      b.disabled = !perLetter.has(l);
+      $subjRail.appendChild(b);
+    }
+    $subjRail.style.top = ($indexContent.offsetTop + 6) + 'px';
+    syncSubjectRail();
+  }
+  $subjRail.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    flushIndexFill();
+    const band = $indexContent.querySelector('.subj-letter[data-letter="' + b.dataset.letter + '"]');
+    if (!band) return;
+    // its first subject right under the band (a band may be stuck to the top:
+    // not where it is). Entries drawn on the way change from their estimated
+    // height, some frames later: held there for a few frames
+    const first = band.nextElementSibling || band;
+    const jump = () => {
+      $indexContent.scrollTop += first.getBoundingClientRect().top - $indexContent.getBoundingClientRect().top
+        - band.offsetHeight - 2;
+    };
+    let frames = 0;
+    (function hold() {
+      jump();
+      if (++frames < 12) requestAnimationFrame(hold);
+    })();
+  });
+  function syncSubjectRail() {
+    if (currentIndexTab !== 'subject') return;
+    const top = $indexContent.scrollTop + $indexContent.offsetTop + 8;
+    let cur = null;
+    for (const band of $indexContent.querySelectorAll('.subj-letter')) {
+      if (band.offsetTop <= top) cur = band.dataset.letter;
+      else break;
+    }
+    for (const b of $subjRail.children) b.classList.toggle('on', b.dataset.letter === (cur || 'A'));
+  }
+  $indexContent.addEventListener('scroll', syncSubjectRail, { passive: true });
+  $indexContent.addEventListener('keydown', e => {
+    if ((e.key !== 'Enter' && e.key !== ' ') || !e.target.matches('.subj-ref-line')) return;
+    e.preventDefault();
+    e.target.click();
+  });
+
   const SUBJECTS_FIRST = 40;    // entries
   const SUBJECTS_SLICE = 120;
   let indexFill = null;         // the slices still to append (a new rendering cancels them)
@@ -4186,6 +4807,16 @@
     if (vide) {
       e.preventDefault();
       goToVide(vide.dataset.vide);
+      return;
+    }
+    const line = e.target.closest('.subj-ref-line[data-r]');
+    if (line) {
+      const at = line.closest('.subj-entry[data-i]');
+      const entry = subjectsSorted[+at.dataset.i];
+      const sub = line.closest('.subj-entry[data-c]');
+      const refs = sub ? entry.children[+sub.dataset.c].refs : entry.refs;
+      closeIndex();
+      goToQuickRef(idxRemRef(refs[+line.dataset.r]));
       return;
     }
     const title = e.target.closest('.subj-title:not(.no-refs)');
@@ -4415,21 +5046,21 @@
 
   // ===== NO ÍNDICE REMISSIVO =====
   // At the end of each article, the subjects of the remissivo that cite it (or
-  // one of its provisions), as the "Citado em:" line: labels via CSS, out of
-  // the searchable text. The ones citing the whole article first. Each one is
+  // one of its provisions), grouped: each subject (bold) with its sub-subjects
+  // beside it, the groups running one after the other (38% of the entries
+  // repeated the subject of another in the same card). Labels via CSS, out of
+  // the searchable text. All in alphabetical order. Each entry is
   // a trigger as the correlates' (.rem): hover previews the entry's
   // dispositivos, click opens them in a box in the band, and the box's foot
   // puts the subject in the search bar, starting at this article.
-  const IDX_BACK_SHOWN = 6;
 
   function renderIndexBacklinks() {
-    const byArt = new Map();   // "LOM:42" → [{label, refs, whole, entry, child}]
+    const byArt = new Map();   // "LOM:42" → [{label, refs, entry, child}]
     const add = (label, own, refs, entry, child = null) => {
       const items = new Map();
       for (const r of own) {
         const key = (r.law_prefix || '') + ':' + r.art;
-        if (!items.has(key)) items.set(key, { label, refs, whole: false, entry, child });
-        if (!r.detail || r.detail === 'caput') items.get(key).whole = true;
+        if (!items.has(key)) items.set(key, { label, refs, entry, child });
       }
       for (const [key, it] of items) {
         if (!byArt.has(key)) byArt.set(key, []);
@@ -4446,29 +5077,43 @@
     for (const card of ARTICLE_CARDS) {
       const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
       if (!items) continue;
-      items.sort((a, b) => (b.whole - a.whole) || collator.compare(a.label, b.label));
-      const line = document.createElement('div');
-      line.className = 'rem-backlinks idx-backlinks';
-      line.dataset.label = 'No índice remissivo:';
-      items.forEach((it, i) => {
-        const chip = document.createElement('span');
-        chip.className = 'rem idx-back' + (i >= IDX_BACK_SHOWN ? ' idx-extra' : '');
-        chip.tabIndex = 0;
-        chip.setAttribute('role', 'button');
-        chip.setAttribute('aria-expanded', 'false');
-        chip.dataset.label = it.label;
-        chip.idxEntry = it;
-        line.appendChild(chip);
-      });
-      if (items.length > IDX_BACK_SHOWN) {
-        const more = document.createElement('span');
-        more.className = 'idx-more';
-        more.tabIndex = 0;
-        more.setAttribute('role', 'button');
-        more.dataset.label = '+ ' + (items.length - IDX_BACK_SHOWN);
-        line.appendChild(more);
+      items.sort((a, b) => collator.compare(a.label, b.label));
+      // by subject, in alphabetical order (easier to find one)
+      const groups = new Map();
+      for (const it of items) {
+        const head = it.child ? it.entry.subject : it.label;
+        if (!groups.has(head)) groups.set(head, { self: null, subs: [] });
+        if (it.child) groups.get(head).subs.push(it);
+        else groups.get(head).self = it;
       }
-      card.appendChild(line);
+      const band = document.createElement('div');
+      band.className = 'rem-backlinks idx-backlinks';
+      band.setAttribute('aria-label', 'No índice remissivo');
+      const chip = (it, cls, show) => {
+        const c = document.createElement('span');
+        c.className = 'rem idx-back ' + cls;
+        c.tabIndex = 0;
+        c.setAttribute('role', 'button');
+        c.setAttribute('aria-expanded', 'false');
+        c.dataset.label = it.label;
+        if (show) c.dataset.show = show;
+        c.idxEntry = it;
+        return c;
+      };
+      for (const [head, g] of [...groups].sort((a, b) => collator.compare(a[0], b[0]))) {
+        const row = document.createElement('div');
+        row.className = 'idx-row';
+        if (g.self) row.appendChild(chip(g.self, 'idx-head'));
+        else {
+          const h = document.createElement('span');
+          h.className = 'idx-head';
+          h.dataset.label = head;
+          row.appendChild(h);
+        }
+        for (const it of g.subs) row.appendChild(chip(it, 'idx-sub', it.child.sub_subject));
+        band.appendChild(row);
+      }
+      card.appendChild(band);
     }
   }
 
@@ -4566,24 +5211,6 @@
     group.appendChild(foot);
     return group;
   }
-
-  // "+ N": the rest of the line's chips
-  function showIndexExtra(t) {
-    t.parentNode.classList.add('open');
-    t.remove();
-  }
-  $cards.addEventListener('click', e => {
-    const t = e.target.closest('.idx-more');
-    if (!t) return;
-    e.stopPropagation();
-    showIndexExtra(t);
-  });
-  $cards.addEventListener('keydown', e => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    if (!(e.target.classList && e.target.classList.contains('idx-more'))) return;
-    e.preventDefault();
-    showIndexExtra(e.target);
-  });
 
   // ===== PINCH-TO-ZOOM =====
   let initialPinchDist = null;

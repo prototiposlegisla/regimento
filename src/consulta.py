@@ -183,6 +183,167 @@ def numero_no_texto(n: int, texto: str) -> bool:
     return any(re.search(rf"\b{f}\b", texto) for f in extenso(n))
 
 
+# ── ordem das entradas ──────────────────────────────────────────────────
+# Prazos e tempos do mais curto ao mais longo; quóruns e subscrição do menor ao maior; datas pelo
+# calendário; números e composição pelo artigo. No empate, o artigo (RI, LOM, CE, CF, precedentes).
+# Vale no site, na busca (empate de relevância) e na folha impressa, que lê o yaml na ordem do arquivo:
+# por isso o yaml é gravado em ordem (ordenar_yaml) e o build avisa quando não está.
+
+_ORDEM_NORMA = {"RI": 0, "LOM": 1, "CE": 2, "CF": 3, "PREC": 4}
+_MINUTOS = [(r"min", 1), (r"h", 60), (r"d", 1440), (r"mes(?:es)?", 43_200), (r"anos?", 525_600)]
+_MESES = {m: i for i, m in enumerate(("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out",
+                                      "nov", "dez"), 1)}
+
+
+def _romano(s: str) -> int:
+    v = {"I": 1, "V": 5, "X": 10, "L": 50}
+    n = [v[c] for c in s if c in v]
+    return sum(-x if i + 1 < len(n) and x < n[i + 1] else x for i, x in enumerate(n))
+
+
+def _chave_artigo(art: str) -> tuple:
+    """'103 I o · 368' → a posição do primeiro dispositivo citado: norma, artigo, parágrafo, inciso, alínea."""
+    refs = parse_arts(art or "")
+    if not refs:
+        return (9,)
+    lei, num, path = refs[0]
+    if lei == "PREC":
+        n, ano = num.split("/")
+        return (_ORDEM_NORMA[lei], int(ano), int(n))
+    m = re.fullmatch(r"(ADT)?(\d+)(?:-([A-Z]))?", num)
+    artigo = (bool(m[1]), int(m[2]), m[3] or "") if m else (True, 9999, num)
+    par = inc = ali = 0
+    for p in path.split(","):
+        if p == "§ú":
+            par = 1
+        elif p.startswith("§"):
+            par = int(re.sub(r"\D", "", p))
+        elif _ROMANO.match(p):
+            inc = _romano(p)
+        elif p:
+            ali = ord(p)
+    return (_ORDEM_NORMA.get(lei, 5), *artigo, par, inc, ali)
+
+
+def _chave_duracao(valor: str) -> tuple:
+    """'48 h' antes de '3 d'; no mesmo tempo, a unidade menor primeiro ('48 h' antes de '2 d', '90 d' antes de
+    '3 meses'), '15 d' antes de '15 d úteis', e esse antes de '> 15 d'; pelo primeiro número ('10 / 15 d',
+    '2 d úteis / 30 d'). O que não é duração vai no fim: o que se conta em sessões ou do 1º dia útil, pelo
+    número; depois o que se repete ('1x/semana', 'quinzenal'), pelo período."""
+    s = _norm(valor)
+    periodo = next((p for w, p in (("semana", 7), ("quinzenal", 15), ("mensal", 30), ("anual", 365)) if w in s), 0)
+    if periodo:
+        return (2, periodo, 0, 0)
+    m = re.match(r"\s*([<>≥≤])?\s*(\d+)\s*(?:h\s*(\d+))?", s)
+    if not m or "sess" in s or re.match(r"\s*\d+\s*[ºª°]", s):
+        n = re.search(r"\d+", s)
+        return (1, int(n[0]) if n else 0, 0, 0)
+    if m[3]:   # '1h45'
+        return (0, int(m[2]) * 60 + int(m[3]), 60, 0)
+    resto = s[m.end():]
+    for unid, fator in _MINUTOS:
+        u = re.search(rf"\b{unid}\b(\s+ute?is|\s+util)?", resto)
+        if u and not re.search(r"\b(min|h|d|mes(?:es)?|anos?)\b", resto[:u.start()]):
+            return (0, int(m[2]) * fator, fator, 2 if m[1] else 1 if u[1] else 0)
+    return (1, int(m[2]), 0, 0)
+
+
+def _chave_quorum(valor: str) -> tuple:
+    """Do menor ao maior pela conta sobre 55 ('absoluta (28)', '1/3 (19)'); a maioria simples e a dos votantes
+    antes de todos; os de colegiado ('maioria dos membros' da Mesa ou da Comissão) e os do eleitorado no fim."""
+    s = _norm(valor)
+    if "eleitorado" in s:
+        p = re.search(r"\d+(?:,\d+)?", s)
+        return (2, float(p[0].replace(",", ".")) if p else 0)
+    n = re.search(r"\((\d+)\)", s)
+    if n:
+        return (0, int(n[1]))
+    if re.search(r"simples|presentes|votantes", s):
+        return (0, 0)
+    if re.search(r"membros|mesa", s):
+        return (1, 0)
+    if re.fullmatch(r"\d+", s.strip()):
+        return (0, int(s))
+    if "absoluta" in s:
+        return (0, 28)
+    f = re.search(r"(\d+)/(\d+)", s)
+    return (0, 55 * int(f[1]) / int(f[2])) if f else (3, 0)
+
+
+def _chave_data(valor: str) -> tuple:
+    """Pelo calendário, do 1º de janeiro a 31 de dezembro; depois o que se repete: na semana ('ter · qua · qui'),
+    no mês ('dia 20', '1ª ter do mês'), no bimestre."""
+    s = _norm(valor)
+    meses = "|".join(_MESES)
+    m = re.search(rf"(\d+)\s*[ºª°]?\s*({meses})\b", s)
+    if m:
+        return (0, _MESES[m[2]], int(m[1]))
+    if re.search(r"\bdia \d+|do mes", s):
+        d = re.search(r"\d+", s)
+        dia = int(d[0]) if "dia" in s else (int(d[0]) - 1) * 7 + 1
+        return (1, 1, dia)
+    if "bimestre" in s:
+        return (1, 2, 0)
+    m = re.search(rf"\b({meses})\b", s)
+    if m:
+        return (0, _MESES[m[1]], 0)
+    return (1, 0, 0)
+
+
+# seção do yaml → (campo do valor, chave do valor); None: só o artigo
+ORDEM = {
+    "prazos": ("prazo", _chave_duracao),
+    "tempos": ("t", _chave_duracao),
+    "quoruns": ("n", _chave_quorum),
+    "quorum_materia": ("quorum", _chave_quorum),
+    "subscricao": ("frac", _chave_quorum),
+    "datas": ("d", _chave_data),
+    "numeros": ("valor", None),
+}
+
+
+def ordenar(dados: dict) -> dict:
+    """As seções de ORDEM em ordem (cópia rasa de dados; as outras seções como estão)."""
+    novo = dict(dados)
+    for key, (campo, chave) in ORDEM.items():
+        if isinstance(dados.get(key), list):
+            novo[key] = sorted(dados[key], key=lambda e: ((chave(str(e.get(campo, ""))) if chave else ()),
+                                                          _chave_artigo(str(e.get("art", "")))))
+    return novo
+
+
+def ordenar_yaml(texto: str) -> str:
+    """O texto do consulta-rapida.yaml com as entradas de cada seção de ORDEM em ordem, linha a linha (cada entrada
+    leva as suas linhas; o resto do arquivo fica como está). Recusa seção com comentário no meio, que não saberia
+    a que entrada pertence."""
+    import yaml
+    linhas = texto.split("\n")
+    for key in ORDEM:
+        ini = next((i for i, l in enumerate(linhas) if re.match(rf"^{key}:\s*$", l)), None)
+        if ini is None:
+            continue
+        fim = ini + 1
+        while fim < len(linhas) and not re.match(r"^[A-Za-z_]\w*:", linhas[fim]):
+            fim += 1
+        while fim > ini + 1 and (not linhas[fim - 1].strip() or linhas[fim - 1].lstrip().startswith("#")):
+            fim -= 1
+        corpo = linhas[ini + 1:fim]
+        if any(l.lstrip().startswith("#") for l in corpo):
+            raise ValueError(f"{key}: comentário entre as entradas; ordene à mão")
+        inicios = [i for i, l in enumerate(corpo) if re.match(r"^ *- ", l)]
+        if not inicios or inicios[0] != 0:
+            continue
+        blocos = [corpo[a:b] for a, b in zip(inicios, inicios[1:] + [len(corpo)])]
+        itens = [yaml.safe_load("\n".join(b))[0] for b in blocos]
+        pos = {id(e): n for n, e in enumerate(ordenar({key: itens})[key])}
+        ordem = sorted(range(len(itens)), key=lambda i: pos[id(itens[i])])
+        linhas[ini + 1:fim] = [l for i in ordem for l in blocos[i]]
+    novo = "\n".join(linhas)
+    if yaml.safe_load(novo) != ordenar(yaml.safe_load(texto)):
+        raise ValueError("o yaml reordenado não bate com a ordem esperada: nada mudou")
+    return novo
+
+
 # ── montagem ────────────────────────────────────────────────────────────
 
 def carregar(path: str | Path) -> dict:
@@ -212,7 +373,9 @@ def montar(dados: dict) -> list[dict]:
 
     kind "valor": cada item {v, u, label, obs?, art, refs, cf?, terms?}; kind "ficha": {label, text?,
     obs?, list?, steps?, art, refs, cf?}. A seção "temas" vem primeiro. O que não está no yaml fica fora.
+    As entradas de valor saem em ordem (ORDEM), esteja o yaml em ordem ou não.
     """
+    dados = ordenar(dados)
     secoes: list[dict] = []
     # temas: tudo de um assunto numa ficha só (o Grande Expediente: duração, tempo por orador, aparte...),
     # cada fato com o artigo entre parênteses, como nas listas de apartes
@@ -386,3 +549,42 @@ def para_o_site(secoes: list[dict]) -> list[dict]:
         for item in sec["items"]:
             item.pop("_bruto", None)
     return secoes
+
+
+def main(argv: list[str] | None = None) -> int:
+    """python -m src.consulta --ordenar [consulta-rapida.yaml]: grava o yaml com as entradas em ordem (backup
+    .antes-ordem.yaml em varredura/backups, se houver, ou ao lado). Sem arquivo, o da config.local.toml (o do build)."""
+    import argparse
+    p = argparse.ArgumentParser(prog="python -m src.consulta")
+    p.add_argument("--ordenar", action="store_true", help="grava o yaml com as entradas em ordem")
+    p.add_argument("arquivo", nargs="?")
+    args = p.parse_args(argv)
+    if not args.ordenar:
+        p.print_help()
+        return 1
+    if args.arquivo:
+        path = Path(args.arquivo)
+    else:
+        import build
+        fontes = build._load_config().get("sources", {})
+        path = Path(fontes.get("consulta") or Path(fontes.get("docx", "")).parent / "consulta-rapida.yaml")
+    bruto = path.read_bytes()
+    nl = "\r\n" if b"\r\n" in bruto else "\n"
+    texto = bruto.decode("utf-8").replace("\r\n", "\n")
+    novo = ordenar_yaml(texto)
+    if novo == texto:
+        print(f"{path}: já em ordem")
+        return 0
+    pasta = path.parent / "varredura" / "backups"
+    backup = (pasta if pasta.is_dir() else path.parent) / f"{path.stem}.antes-ordem{path.suffix}"
+    backup.write_bytes(bruto)
+    with open(path, "w", encoding="utf-8", newline=nl) as f:
+        f.write(novo)
+    print(f"{path}: entradas em ordem (backup: {backup})")
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.exit(main())

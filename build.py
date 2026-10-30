@@ -280,11 +280,17 @@ def _carregar_consulta(args: argparse.Namespace, doc, report: ValidationReport) 
         print("      → consulta-rapida.yaml não encontrado, consulta rápida vazia")
         return []
     try:
-        secoes = consulta.montar(consulta.carregar(path))
+        dados = consulta.carregar(path)
+        secoes = consulta.montar(dados)
     except Exception as e:  # yaml malformado: o build segue, com o erro no relatório
         report.add("consulta", "erro", f"não foi possível ler o arquivo: {e}", str(path))
         return []
     avisos: list = []
+    # o site sai sempre em ordem; a folha impressa, na ordem do arquivo
+    fora = [k for k in consulta.ORDEM if dados.get(k) != consulta.ordenar(dados).get(k)]
+    if fora:
+        avisos.append(("aviso", f"entradas fora de ordem em {', '.join(fora)} (a folha impressa sai na ordem do "
+                                f"arquivo): python -m src.consulta --ordenar", str(path)))
     consulta.conferir(secoes, doc, avisos)
     for severity, message, context in avisos:
         report.add("consulta", severity, message, context)

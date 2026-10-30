@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.consulta import conferir, destaque, extenso, montar, para_o_site, parse_arts
+from src.consulta import conferir, destaque, extenso, montar, ordenar, ordenar_yaml, para_o_site, parse_arts
 from src.models import ArticleBlock, DocumentUnit, ParsedDocument, TextRun, UnitType
 from src.render_markdown import MarkdownRenderer
 
@@ -96,7 +96,7 @@ class TestMontarEConferir:
         assert (vista["v"], vista["u"], vista["label"], vista["obs"]) == ("2", "dias", "Pedido de vista", "improrrogável")
         assert vista["refs"] == [{"law": "RI", "art": "63", "label": "art. 63, § 4º", "path": "§ 4º"}]
         assert "_bruto" not in vista
-        assert secoes[0]["items"][2]["terms"] == "afastamento"
+        assert secoes[0]["items"][1]["terms"] == "afastamento"   # em ordem: 2 d, 15 d, 30 d
         aparte = secoes[2]["items"][0]
         assert aparte["list"][0]["text"] == "Grande Expediente" and aparte["list"][0]["art"] == "160"
         assert secoes[3]["items"][0]["steps"] == ["Prefeito veta", "Câmara aprecia"]
@@ -163,3 +163,57 @@ class TestTemasAvisos:
         msgs = [m for _, m, _ in avisos]
         assert "fato sem o artigo entre parênteses no fim" in msgs
         assert "grupo «G1» fora de sequência" in msgs
+
+
+class TestOrdem:
+    def _valores(self, key, campo, valores, arts=None):
+        dados = {key: [{campo: v, "art": (arts or {}).get(v, "1")} for v in valores]}
+        return [e[campo] for e in ordenar(dados)[key]]
+
+    def test_prazos_do_mais_curto_ao_mais_longo(self):
+        assert self._valores("prazos", "prazo", [
+            "quinzenal", "5 sessões", "3 meses", "90 d", "> 30 d", "30 d úteis", "30 d", "2 d", "48 h", "15 min",
+            "1º d útil", "1x/semana", "10 / 15 d", "2 d úteis / 30 d"]) == [
+            "15 min", "48 h", "2 d", "2 d úteis / 30 d", "10 / 15 d", "30 d", "30 d úteis", "> 30 d", "90 d",
+            "3 meses", "1º d útil", "5 sessões", "1x/semana", "quinzenal"]
+
+    def test_tempos(self):
+        assert self._valores("tempos", "t", ["4 h", "1h45", "1–4 h", "60 min", "5 / 10 min", "2 min"]) == [
+            "2 min", "5 / 10 min", "60 min", "1–4 h", "1h45", "4 h"]
+
+    def test_quoruns_e_subscricao(self):
+        assert self._valores("quorum_materia", "quorum", [
+            "maioria dos membros da Comissão", "qualificada 2/3 (37)", "absoluta (28)", "simples",
+            "requerimento 1/3 (19)", "especial 3/5 (33)"]) == [
+            "simples", "requerimento 1/3 (19)", "absoluta (28)", "especial 3/5 (33)", "qualificada 2/3 (37)",
+            "maioria dos membros da Comissão"]
+        assert self._valores("subscricao", "frac", [
+            "5% eleitorado", "maioria membros", "2/3 (37)", "1% eleitorado", "1/10 (6)"]) == [
+            "1/10 (6)", "2/3 (37)", "maioria membros", "1% eleitorado", "5% eleitorado"]
+
+    def test_datas_pelo_calendario(self):
+        assert self._valores("datas", "d", [
+            "dia 20", "31 dez", "ter · qua · qui, 15h", "15 abr", "1º jan, 15h", "jan · jul", "30 d/bimestre",
+            "1ª ter do mês", "1º fev–30 jun · 1º ago–15 dez"]) == [
+            "jan · jul", "1º jan, 15h", "1º fev–30 jun · 1º ago–15 dez", "15 abr", "31 dez",
+            "ter · qua · qui, 15h", "1ª ter do mês", "dia 20", "30 d/bimestre"]
+
+    def test_empate_e_numeros_pelo_artigo(self):
+        arts = {"a": "LOM 12", "b": "103 I o", "c": "103 I a-f", "d": "PREC 2/2001", "e": "63 §4º", "f": "63"}
+        assert self._valores("numeros", "valor", list("abcdef"), arts) == list("fecbad")
+        assert self._valores("prazos", "prazo", ["15 d", "15 d "], {"15 d": "LOM 1", "15 d ": "RI 2"}) == ["15 d ", "15 d"]
+
+    def test_yaml_reordenado_linha_a_linha(self):
+        texto = ("# cabeçalho\ntitulo: x\nprazos:\n  - {prazo: \"30 d\", evento: \"B\", art: \"2\"}\n"
+                 "  - {prazo: \"2 d\", evento: \"A\",\n     art: \"1\"}\n\ntempos:\n  - {t: \"5 min\", art: \"1\"}\n")
+        novo = ordenar_yaml(texto)
+        assert novo == ("# cabeçalho\ntitulo: x\nprazos:\n  - {prazo: \"2 d\", evento: \"A\",\n     art: \"1\"}\n"
+                        "  - {prazo: \"30 d\", evento: \"B\", art: \"2\"}\n\ntempos:\n  - {t: \"5 min\", art: \"1\"}\n")
+        assert ordenar_yaml(novo) == novo
+        with pytest.raises(ValueError):
+            ordenar_yaml("prazos:\n  - {prazo: \"3 d\"}\n  # nota\n  - {prazo: \"2 d\"}\n")
+
+    def test_site_sai_em_ordem(self):
+        secoes = montar({"prazos": [{"prazo": "15 d", "evento": "X", "art": "63"},
+                                    {"prazo": "2 d", "evento": "Y", "art": "63 §4º"}]})
+        assert [i["label"] for i in secoes[0]["items"]] == ["Y", "X"]

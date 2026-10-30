@@ -869,7 +869,7 @@ mark.weak {
 }
 .marker-btn:hover { transform: scale(1.05); }
 
-#marker-filter-btn {
+#marker-filter-btn, #marker-copy-btn {
   min-width: 28px; height: 28px;
   border-radius: 6px;
   border: none;
@@ -886,6 +886,9 @@ mark.weak {
 #marker-filter-btn:hover { transform: scale(1.1); }
 #marker-filter-btn.visible { display: flex; }
 #marker-filter-btn.active { background: var(--selected-border); }
+#marker-copy-btn:hover { transform: scale(1.1); }
+#marker-copy-btn.visible { display: flex; }
+#marker-copy-btn.copied { background: #2f9e44; }
 
 #marker-clear-all {
   min-width: 28px; height: 28px;

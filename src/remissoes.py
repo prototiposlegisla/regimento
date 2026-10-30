@@ -110,18 +110,35 @@ class Implicita:
     u_destino: DocumentUnit
 
 
+# Ordem dos correlatos de um dispositivo: por norma, do Regimento para a Constituição
+ORDEM_NORMAS = ("RI", "LOM", "CE", "CF", PREC)
+
+
 @dataclass
 class Resultado:
     remissoes: list[Remissao] = field(default_factory=list)
     avisos: list[tuple[str, str]] = field(default_factory=list)
     implicitas: list[Implicita] = field(default_factory=list)
+    posicao: dict[int, int] = field(default_factory=dict)   # id(unit) -> posição no documento
 
     def implicitas_por_unidade(self) -> dict[int, list[tuple[Implicita, str]]]:
-        """Correlatos por dispositivo, nos dois lados: id(unit) -> [(implícita, "src" | "tgt")]."""
+        """Correlatos por dispositivo, nos dois lados: id(unit) -> [(implícita, "src" | "tgt")].
+
+        Em cada dispositivo, pela norma do outro lado (ORDEM_NORMAS: RI, LOM, CE, CF) e, nela, pela
+        posição do dispositivo no documento; o mesmo dispositivo, na ordem da planilha.
+        """
         out: dict[int, list[tuple[Implicita, str]]] = defaultdict(list)
         for im in self.implicitas:
             out[id(im.u_origem)].append((im, "src"))
             out[id(im.u_destino)].append((im, "tgt"))
+
+        def chave(item):
+            im, side = item
+            alvo, u = (im.destino, im.u_destino) if side == "src" else (im.origem, im.u_origem)
+            norma = ORDEM_NORMAS.index(alvo.law) if alvo.law in ORDEM_NORMAS else len(ORDEM_NORMAS)
+            return norma, self.posicao.get(id(u), 0)
+        for lst in out.values():
+            lst.sort(key=chave)
         return out
 
     def por_unidade(self) -> dict[int, list[Remissao]]:
@@ -981,6 +998,7 @@ def detectar(doc: ParsedDocument, excecoes: Optional[dict] = None, implicitas: O
     """
     corpus = _Corpus(doc)
     res = Resultado()
+    res.posicao = {id(u): i for i, (u, _) in enumerate(x for us in corpus.units.values() for x in us)}
     for (law, art_number), units in corpus.units.items():
         art = corpus.arts[(law, art_number)]
         if art.is_revoked:

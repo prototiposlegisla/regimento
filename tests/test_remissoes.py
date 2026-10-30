@@ -263,6 +263,20 @@ class TestImplicitas:
         assert "*(correlatos: é exceção à regra geral de art. 369 — O 368 abre exceção.)*" in md
         assert "*(correlatos: tem como exceção art. 368 — O 368 abre exceção.)*" in md
 
+    def test_ordem_dos_selos_por_norma_e_posicao(self):
+        doc = _doc()
+        res = detectar(doc, implicitas=[
+            _linha(1, "369", "LOM:18,IV"),
+            _linha(2, "369", "LOM:18,III"),
+            _linha(3, "369", "368", tipo="exceção", nota="Nota."),
+            _linha(4, "LOM:18", "369", tipo="detalha"),
+        ])
+        u369 = doc.elements[3].caput
+        refs = [(im.destino if side == "src" else im.origem).ref
+                for im, side in res.implicitas_por_unidade()[id(u369)]]
+        # RI antes da LOM; na LOM, o artigo antes dos incisos, e III antes de IV
+        assert refs == ["368", "LOM:18", "LOM:18,III", "LOM:18,IV"]
+
     def test_planilha(self, tmp_path):
         import openpyxl
         from src.remissoes import carregar_implicitas

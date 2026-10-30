@@ -1909,18 +1909,18 @@ button.q-label:hover { color: #2c6fa6; }
 /* ===== REMISSÕES ===== */
 /* explicit: the cited text itself opens a preview of the cited provision */
 .rem-exp {
-  text-decoration: underline dotted #2e86c1;
+  text-decoration: underline dotted var(--c);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
   cursor: pointer;
 }
 .rem-exp a { color: inherit; text-decoration: inherit; }   /* the citation's original link */
-.rem-exp:focus-visible { outline: 2px solid #2e86c1; outline-offset: 1px; border-radius: 2px; }
+.rem-exp:focus-visible { outline: 2px solid var(--c); outline-offset: 1px; border-radius: 2px; }
 .rem-exp::after {
   content: "\2197";            /* ↗, out of the text (not searchable) */
   content: "\2197" / "";       /* and not read as part of the name */
   font-size: .7em;
-  color: #2e86c1;
+  color: var(--c);
   margin-left: 1px;
   vertical-align: super;
 }
@@ -1940,7 +1940,8 @@ button.q-label:hover { color: #2c6fa6; }
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  background: #eef5fb; color: #1f618d; border: 1px solid #d4e6f1;
+  background: color-mix(in srgb, var(--c) 9%, #fff); color: color-mix(in srgb, var(--c) 88%, #000);
+  border: 1px solid color-mix(in srgb, var(--c) 28%, #fff);
 }
 .rem-back::before { content: attr(data-label); }
 #cards-container.compact .rem-backlinks { display: none; }
@@ -2036,31 +2037,29 @@ button.q-label:hover { color: #2c6fa6; }
   user-select: none;
   -webkit-user-select: none;
   vertical-align: 1px;
-  background: #efe6fb; color: #6c3483; border: 1px solid #d7bde2;
+  background: color-mix(in srgb, var(--c) 9%, #fff); color: color-mix(in srgb, var(--c) 88%, #000);
+  border: 1px solid color-mix(in srgb, var(--c) 28%, #fff);
 }
 .rem-imp::before { content: attr(data-label); }
-.rem-imp:focus-visible { outline: 2px solid #8e44ad; outline-offset: 1px; }
-.rem-imp.t-det  { background: #e8f6f3; color: #0e6655; border-color: #a2d9ce; }
-.rem-imp.t-fund { background: #e9f7ef; color: #196f3d; border-color: #abebc6; }
-.rem-imp.t-div  { background: #fdedec; color: #a93226; border-color: #f5b7b1; font-weight: 600; }
-.rem-imp.t-sim  { background: #ebf5fb; color: #1b4f72; border-color: #aed6f1; }
-.rem-imp.t-exc  { background: #fef5e7; color: #9c640c; border-color: #f8c471; }
+.rem-imp:focus-visible { outline: 2px solid var(--c); outline-offset: 1px; }
+.rem-imp.t-div  { font-weight: 600; }   /* the kind is in the label (≈ ↑ ≠ ⇄); a divergence, in bold too */
 .rem-imp[data-status="proposta"] { border-style: dashed; opacity: .85; }
-/* the color of each kind (--c), for the open chip, its box and its note */
-.rem-imp, .rem-note, .rem-box, #rem-pop { --c: #7d3c98; }   /* equivalent: the default kind */
-.rem-box:not([class*="t-"]), #rem-pop:not([class*="t-"]) { --c: #2471a3; }   /* explicit citation */
-.t-det:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #117a65; }
-.t-fund:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #1e8449; }
-.t-div:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #c0392b; }
-.t-sim:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #2471a3; }
-.t-exc:is(.rem-imp, .rem-note, .rem-box, #rem-pop) { --c: #ca6f1e; }
+/* The color of a remissão (--c): the norma it points to, as in the prefix of
+   its data-ref ("LOM:42"; none, the Regimento), for the chip, the citation and
+   "Citado em"; the box and the preview take their trigger's (app.js: data-nrm),
+   and the correlate's note inside them, from them */
+:is(.rem-imp, .rem-exp, .rem-back), :is(.rem-box, #rem-pop) { --c: var(--n-ri); }
+:is(.rem-imp, .rem-exp, .rem-back)[data-ref^="LOM:"], :is(.rem-box, #rem-pop)[data-nrm="LOM"] { --c: var(--n-lom); }
+:is(.rem-imp, .rem-exp, .rem-back)[data-ref^="CE:"], :is(.rem-box, #rem-pop)[data-nrm="CE"] { --c: var(--n-ce); }
+:is(.rem-imp, .rem-exp, .rem-back)[data-ref^="CF:"], :is(.rem-box, #rem-pop)[data-nrm="CF"] { --c: var(--n-cf); }
+:is(.rem-imp, .rem-exp, .rem-back)[data-ref^="PREC:"], :is(.rem-box, #rem-pop)[data-nrm="PREC"] { --c: var(--n-prec); }
 .t-idx:is(.rem-box, #rem-pop) { --c: #8a7a52; }   /* an entry of the índice remissivo */
 /* the chip whose box is open */
 .rem-imp.rem-open {
   background: var(--c); border-color: var(--c); color: #fff;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 25%, transparent);
 }
-.rem-exp.rem-open { background: color-mix(in srgb, #2471a3 14%, transparent); border-radius: 3px; }
+.rem-exp.rem-open { background: color-mix(in srgb, var(--c) 14%, transparent); border-radius: 3px; }
 #cards-container.compact .rem-imp { display: none; }
 
 /* preview: hover on desktop (interactive, unlike #footnote-tooltip) */
@@ -2081,7 +2080,7 @@ button.q-label:hover { color: #2c6fa6; }
   line-height: 1.5;
 }
 #rem-pop.visible { display: block; }
-/* correlate: the note on top, colored by kind */
+/* correlate: the note on top, in the box's color */
 .rem-note {
   padding: 5px 10px; color: #2b2b2b;
   background: color-mix(in srgb, var(--c) 7%, #fff); border-bottom: 1.5px solid var(--c);

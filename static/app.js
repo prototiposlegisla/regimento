@@ -3531,9 +3531,13 @@
     if (trigger.classList.contains('idx-back')) return 'idx:' + trigger.dataset.label;
     return (trigger.classList.contains('rem-imp') ? 'imp:' : '') + trigger.dataset.ref;
   }
-  // The color of the preview and of the box: the correlate's kind, or the index's
+  // The color of the preview and of the box: the norma it points to (its first
+  // target's), or the index's
   function remKind(trigger) {
-    return trigger.classList.contains('idx-back') ? 'idx' : trigger.dataset.tipo;
+    return trigger.classList.contains('idx-back') ? 'idx' : '';
+  }
+  function remNorm(trigger) {
+    return trigger.classList.contains('idx-back') ? '' : parseRemRef(trigger.dataset.ref.split(';')[0]).law;
   }
   function remPanel(trigger) {
     return trigger.classList.contains('idx-back') ? buildIdxPanel(trigger) : buildRemPanel(trigger);
@@ -3743,9 +3747,11 @@
   function showRemPop(trigger) {
     remPopTrigger = trigger;
     $remPop.replaceChildren(remPanel(trigger));
-    // the kind's color (style.css), as in the pinned box
+    // its color (style.css), as in the pinned box
     for (const c of [...$remPop.classList]) if (c.startsWith('t-')) $remPop.classList.remove(c);
     if (remKind(trigger)) $remPop.classList.add('t-' + remKind(trigger));
+    if (remNorm(trigger)) $remPop.dataset.nrm = remNorm(trigger);
+    else delete $remPop.dataset.nrm;
     $remPop.style.maxHeight = 'none';
     $remPop.classList.add('visible');
     // The side with more room, never over the trigger, the header or the breadcrumb
@@ -3798,6 +3804,7 @@
     if (open) { closeRemBox(open); return; }
     const b = document.createElement('div');
     b.className = 'rem-box' + (remKind(trigger) ? ' t-' + remKind(trigger) : '');
+    if (remNorm(trigger)) b.dataset.nrm = remNorm(trigger);
     b.dataset.for = remKey(trigger);
     const close = document.createElement('button');
     close.type = 'button';

@@ -21655,6 +21655,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       : $cards.querySelector(`.card-artigo[data-art="${r.art}"][data-law="${r.law}"]`);
   }
   function remUnitP(card, path) {
+    if (path === 'caput') return remCaputP(card);   // the index's
     for (const u of card.querySelectorAll(':scope > p .unit-id[data-path]')) {
       if (u.dataset.path === path) return u.closest('p');
     }
@@ -21860,6 +21861,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       topLimit = Math.max(topLimit, $breadcrumb.getBoundingClientRect().bottom);
     }
     topLimit += 6;
+    if (trigger.classList.contains('idx-line') && placeRemPopBeside(trigger, topLimit)) return;
     const below = window.innerHeight - rr.bottom - 14;
     const above = rr.top - topLimit - 8;
     const natural = $remPop.getBoundingClientRect().height;
@@ -21871,6 +21873,21 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     const left = Math.min(Math.max(8, rr.left), viewW - $remPop.offsetWidth - 8);
     $remPop.style.left = left + 'px';
     $remPop.style.top = (useBelow ? rr.bottom + 6 : rr.top - 6 - h) + 'px';
+  }
+  // A line of an index box: beside its text, if there is room, so that the
+  // lines under it stay free to hover
+  function placeRemPopBeside(line, topLimit) {
+    const range = document.createRange();
+    range.selectNodeContents(line);
+    const tr = range.getBoundingClientRect();
+    const left = tr.right + 14;
+    if (left + $remPop.offsetWidth > document.documentElement.clientWidth - 8) return false;
+    const natural = $remPop.getBoundingClientRect().height;
+    const h = Math.max(80, Math.min(natural, window.innerHeight * 0.6, window.innerHeight - 8 - topLimit));
+    $remPop.style.maxHeight = h + 'px';
+    $remPop.style.left = left + 'px';
+    $remPop.style.top = Math.max(topLimit, Math.min(tr.top - 8, window.innerHeight - 8 - h)) + 'px';
+    return true;
   }
   // An entry of the index opens its box inside the band at the card's foot;
   // anything else, right under its provision
@@ -22030,15 +22047,16 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
 
   if (HOVER) {
     $cards.addEventListener('mouseover', e => {
-      const t = e.target.closest('.rem-exp, .rem-imp, .rem-back, .idx-back');
-      if (!t || t.closest('.rem-box')) return;
+      // (in a box, only the lines of an index entry's: they preview their dispositivo)
+      const t = e.target.closest('.rem-exp, .rem-imp, .rem-back, .idx-back, .rem-box .idx-line');
+      if (!t || (t.closest('.rem-box') && !t.classList.contains('idx-line'))) return;
       if (e.relatedTarget && t.contains(e.relatedTarget)) return;   // moving inside the trigger
       clearTimeout(remHideTimer); clearTimeout(remShowTimer);
       if (!t.classList.contains('rem-back') && remBoxOpen(t)) return;  // its box is already open
       remShowTimer = setTimeout(() => showRemPop(t), 250);
     });
     $cards.addEventListener('mouseout', e => {
-      const t = e.target.closest('.rem');
+      const t = e.target.closest('.rem, .idx-line');
       if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
       clearTimeout(remShowTimer);
       remHideTimer = setTimeout(hideRemPop, 250);
@@ -23485,7 +23503,8 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
 
   // The entry's box: its dispositivos with their dicas, as the index lists
   // them (a subject with its sub-subjects under it), the ones of this article
-  // marked. A click on one goes to it (and "voltar" comes back); the foot
+  // marked. Hover previews one (desktop), a click goes to it (and "voltar"
+  // comes back); the foot
   // puts the entry in the search bar.
   function idxRemRef(r) {
     return { law: r.law_prefix || 'RI', art: r.art, path: r.detail && r.detail !== 'caput' ? r.detail : '' };
@@ -23516,7 +23535,9 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
         line.className = 'idx-line' + (here ? ' idx-here' : '');
         line.tabIndex = 0;
         line.setAttribute('role', 'button');
-        line.title = 'Ir para o dispositivo';
+        // in the box, hover previews it (as a citation: data-ref); a click goes to it
+        line.dataset.ref = (r.law_prefix ? r.law_prefix + ':' : '') + r.art + (r.detail ? ',' + r.detail : '');
+        if (!HOVER) line.title = 'Ir para o dispositivo';
         line.appendChild(document.createTextNode(item.label));
         if (item.hint) {
           const h = document.createElement('span');

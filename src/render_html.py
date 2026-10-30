@@ -17,6 +17,24 @@ from .models import (
 )
 
 
+# Capa de cada norma (pelo prefixo dos seus artigos): o monograma ao fundo e
+# a linha de identificação sob o nome
+CAPA_NORMA = {
+    "": ("RI", "Câmara Municipal de São Paulo · Resolução nº 2, de 26 de abril de 1991"),
+    "LOM": ("LOM", "Município de São Paulo · promulgada em 4 de abril de 1990"),
+    "CE": ("CE", "Estado de São Paulo · promulgada em 5 de outubro de 1989 · dispositivos selecionados"),
+    "CF": ("CF", "República Federativa do Brasil · promulgada em 5 de outubro de 1988 · dispositivos selecionados"),
+    PREC: ("PR", "Câmara Municipal de São Paulo · decisões e interpretações da Presidência (RI, art. 313)"),
+}
+
+# O tipo de cada dispositivo, que dá a cor do seu número (o artigo sem classe)
+UNIT_ID_KIND = {
+    UnitType.PARAGRAFO_UNICO: "u-par", UnitType.PARAGRAFO_NUM: "u-par",
+    UnitType.INCISO: "u-inc", UnitType.ALINEA: "u-ali",
+    UnitType.SUB_ALINEA: "u-item", UnitType.ITEM_NUM: "u-item",
+}
+
+
 class HTMLRenderer:
     """Gera HTML dos cards com a mesma estrutura do index.html original."""
 
@@ -39,22 +57,36 @@ class HTMLRenderer:
 
     def render(self, doc: ParsedDocument) -> str:
         """Renderiza todos os elementos do documento."""
+        # A norma de cada título: a dos artigos que vêm depois dele
+        norma_de: dict[int, str] = {}
+        norma = ""
+        for el in reversed(doc.elements):
+            if isinstance(el, ArticleBlock):
+                norma = el.law_prefix
+            elif isinstance(el, SectionHeading):
+                norma_de[id(el)] = norma
         parts: list[str] = []
         for el in doc.elements:
             if isinstance(el, SectionHeading):
-                parts.append(self._render_heading(el))
+                parts.append(self._render_heading(el, norma_de.get(id(el), "")))
             elif isinstance(el, ArticleBlock):
                 parts.append(self._render_article(el))
         return "\n\n".join(parts)
 
-    def _render_heading(self, h: SectionHeading) -> str:
+    def _render_heading(self, h: SectionHeading, norma: str = "") -> str:
         text = html.escape(h.text)
         if h.subtitle:
             text += "<br>" + html.escape(h.subtitle)
         section = html.escape(h.data_section)
         nivel = self._heading_nivel(h)
+        # a norma (como o data-law dos artigos; o Regimento sem) e, na capa,
+        # o monograma e a linha de identificação
+        attrs = f' data-nrm="{html.escape(norma)}"' if norma else ""
+        if nivel == "nivel-norma" and norma in CAPA_NORMA:
+            mono, sub = CAPA_NORMA[norma]
+            attrs += f' data-mono="{html.escape(mono)}" data-sub="{html.escape(sub)}"'
         return (
-            f'  <div class="card card-titulo {nivel}" data-section="{section}">'
+            f'  <div class="card card-titulo {nivel}" data-section="{section}"{attrs}>'
             f"{text}</div>"
         )
 
@@ -284,7 +316,9 @@ class HTMLRenderer:
         uid = html.escape(unit.uid)
         label = html.escape(unit.identifier)
         path_attr = f' data-path="{html.escape(path)}"' if path else ""
-        return f'<span class="unit-id" data-uid="{uid}"{path_attr}>{label}</span>'
+        kind = UNIT_ID_KIND.get(unit.unit_type)
+        cls = f"unit-id {kind}" if kind else "unit-id"
+        return f'<span class="{cls}" data-uid="{uid}"{path_attr}>{label}</span>'
 
     def _render_runs_after_identifier(self, unit: DocumentUnit, marks: "tuple | list" = ()) -> str:
         """Renderiza os runs removendo o identificador do início.
@@ -321,18 +355,24 @@ class HTMLRenderer:
             # Fallback: skip identifier length
             skip_chars = len(ident)
 
+        # The wording notes at the end ("(Redação dada…) (Vide…)") in one span, as in
+        # the old versions: the site shows them as a tag, out of the norma's text
+        notes = note_tail_spans(full_text)
+        nota = max(notes[0][0], skip_chars) if notes else None
+
         # Now render runs, skipping the first skip_chars characters
         if marks:
-            return self._render_runs_with_marks(unit.runs, skip_chars, marks)
-        return self._render_runs_from(unit.runs, skip_chars)
+            return self._render_runs_with_marks(unit.runs, skip_chars, marks, nota)
+        return self._render_runs_from(unit.runs, skip_chars, nota)
 
     def _render_runs_with_marks(
-        self, runs: list[TextRun], skip_chars: int, marks: "list[Remissao]",
+        self, runs: list[TextRun], skip_chars: int, marks: "list[Remissao]", nota: Optional[int] = None,
     ) -> str:
         """Como _render_runs_from, envolvendo cada trecho citado num gatilho de remissão.
 
         O link oficial que já estava no trecho fica no href do gatilho (sem link
         dentro de link); o JS mostra a prévia e o oferece como "fonte oficial".
+        nota: onde começam as notas de redação do fim (ver _render_runs_from).
         """
         spans = []
         last_end = skip_chars
@@ -341,13 +381,16 @@ class HTMLRenderer:
                 spans.append(m)
                 last_end = m.end
         if not spans:
-            return self._render_runs_from(runs, skip_chars)
+            return self._render_runs_from(runs, skip_chars, nota)
 
-        cuts = sorted({skip_chars, *(m.start for m in spans), *(m.end for m in spans)})
+        cuts = sorted({skip_chars, *(m.start for m in spans), *(m.end for m in spans),
+                       *((nota,) if nota is not None else ())})
         parts: list[str] = []
         pos = 0
         mi = 0
         open_mark = None
+        in_nota = False
+        longa = nota is not None and self._nota_longa("".join(r.text for r in runs)[nota:])
         for run in runs:
             r_start, r_end = pos, pos + len(run.text)
             pos = r_end
@@ -355,6 +398,9 @@ class HTMLRenderer:
                 continue
             bounds = [max(r_start, skip_chars)] + [c for c in cuts if max(r_start, skip_chars) < c < r_end] + [r_end]
             for a, b in zip(bounds, bounds[1:]):
+                if a == nota and open_mark is None:
+                    parts.append(self._nota_open(longa))
+                    in_nota = True
                 if open_mark is None and mi < len(spans) and spans[mi].start == a:
                     open_mark = spans[mi]
                     parts.append(self._open_mark(open_mark))
@@ -362,7 +408,10 @@ class HTMLRenderer:
                 # a link cut by a citation: its leftover " ", ";", "(Vide " or "(Redação dada pelo "
                 # outside stays plain text
                 split = (a > r_start or b < r_end) and open_mark is None
-                parts.append(self._wrap_run(html.escape(text), run,
+                esc = html.escape(text)
+                if in_nota and longa:
+                    esc = esc.replace(" ", self.ESPACO_NOTA).replace("\xa0", "\u202f")
+                parts.append(self._wrap_run(esc, run,
                                             link=not (split and re.fullmatch(
                                                 r"[\s\xa0.,;:()–—-]*(?:(?:no|na|nos|nas|do|da|dos|das|ao|aos|e|[Vv]ide"
                                                 r"|Reda[çc][ãa]o\s+dada\s+pel[oa])"
@@ -373,6 +422,8 @@ class HTMLRenderer:
                     open_mark = None
                     mi += 1
         if open_mark is not None:
+            parts.append("</span>")
+        if in_nota:
             parts.append("</span>")
         return "".join(parts)
 
@@ -453,8 +504,24 @@ class HTMLRenderer:
             attrs += f' data-tach="{html.escape(";".join(tachados))}"'
         return f'<span class="rem rem-exp" tabindex="0" role="button"{attrs}>'
 
-    @staticmethod
-    def _wrap_run(escaped: str, run: TextRun, link: bool = True, in_mark: bool = False) -> str:
+    # A long note flows with the text (a tag that doesn't fit would leave the
+    # justified line before it spread over the whole width), its words apart
+    # by four-per-em spaces (and the no-break ones narrow), which justification
+    # doesn't stretch (and a search takes as spaces, \s); a short one is a
+    # block in the line
+    NOTA_LONGA = 45
+    ESPACO_NOTA = "\u2005"
+
+    @classmethod
+    def _nota_longa(cls, text: str) -> bool:
+        return len(text.strip()) > cls.NOTA_LONGA
+
+    @classmethod
+    def _nota_open(cls, longa: bool) -> str:
+        return f'<span class="amendment-note{" longa" if longa else ""}">'
+
+    @classmethod
+    def _wrap_run(cls, escaped: str, run: TextRun, link: bool = True, in_mark: bool = False) -> str:
         """Link, tachado, negrito e itálico de um trecho de run (já escapado).
 
         in_mark: dentro de um gatilho de remissão; o link sai da ordem do Tab (o
@@ -462,6 +529,13 @@ class HTMLRenderer:
         """
         if link and run.hyperlink_url:
             tab = ' tabindex="-1"' if in_mark else ""
+            # a link that is a note by itself, "(Dispositivos renumerados…)", even where
+            # the note isn't one of the known kinds (note_tail_spans): shown as one
+            if not in_mark and escaped.lstrip().startswith("("):
+                longa = cls._nota_longa(html.unescape(escaped))
+                if longa:
+                    escaped = escaped.replace(" ", cls.ESPACO_NOTA).replace("\xa0", "\u202f")
+                tab += f' class="amendment-note{" longa" if longa else ""}"'
             escaped = f'<a href="{html.escape(run.link_url)}" target="_blank" rel="noopener"{tab}>{escaped}</a>'
         elif link and run.hyperlink_anchor:
             # Internal link — generate navigation
@@ -476,21 +550,33 @@ class HTMLRenderer:
         return escaped
 
     def _render_runs_from(
-        self, runs: list[TextRun], skip_chars: int
+        self, runs: list[TextRun], skip_chars: int, nota: Optional[int] = None
     ) -> str:
-        """Renderiza runs pulando os primeiros skip_chars caracteres."""
+        """Renderiza runs pulando os primeiros skip_chars caracteres.
+
+        nota: a posição (no texto inteiro) onde começam as notas de redação do
+        fim; dali ao fim, num <span class="amendment-note">.
+        """
         parts: list[str] = []
-        remaining_skip = skip_chars
-
+        pos = 0
+        longa = nota is not None and self._nota_longa("".join(r.text for r in runs)[nota:])
         for run in runs:
-            if remaining_skip >= len(run.text):
-                remaining_skip -= len(run.text)
+            r_start, r_end = pos, pos + len(run.text)
+            pos = r_end
+            if r_end <= skip_chars:
                 continue
-
-            text = run.text[remaining_skip:]
-            remaining_skip = 0
-            parts.append(self._wrap_run(html.escape(text), run))
-
+            a = max(r_start, skip_chars)
+            if nota is not None and a < nota < r_end:
+                parts.append(self._wrap_run(html.escape(run.text[a - r_start:nota - r_start]), run))
+                a = nota
+            if a == nota:
+                parts.append(self._nota_open(longa))
+            text = html.escape(run.text[a - r_start:])
+            if longa and nota <= a:
+                text = text.replace(" ", self.ESPACO_NOTA).replace("\xa0", "\u202f")
+            parts.append(self._wrap_run(text, run))
+        if nota is not None and nota < pos:
+            parts.append("</span>")
         return "".join(parts)
 
     def _render_footnote(self, fn: Footnote) -> str:

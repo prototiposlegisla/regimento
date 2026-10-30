@@ -123,9 +123,11 @@
   // page's total height within 1%).
   // Refit whenever fonts, sizes or the card's bands change.
   const CARD_EST_BASE = 18;
-  // the index band at the foot: its lines of groups and, in a group too long
-  // for one, its own further lines (counted by indexBandHeight; refit 29/10/2026)
-  const IDX_BAND_PX = 14, IDX_LINE_PX = 30, IDX_WRAP_PX = 25;
+  // the index band at the foot (indexBandHeight): its line, and open, the
+  // rows of its table — each as tall as its subject's lines (in the left
+  // column) or its sub-subjects' (packed in the right one)
+  const IDX_BAND_PX = 12, IDX_SUM_PX = 18, IDX_OPEN_PX = 2;
+  const IDX_ROW_PX = 7, IDX_HEAD_TOP_PX = 3, IDX_HEAD_LINE_PX = 16, IDX_SUB_LINE_PX = 26.4;
   const CARD_EST_CHAR_PX = 7.75;
   function cardBlockCoef(el) {
     const cl = el.classList;
@@ -149,20 +151,26 @@
   // (the text does not change), so a pinch zoom only redoes the arithmetic
   let cardEstBlocks = null;
   let cardEstBand = null;   // the index band at the foot (indexBandHeight)
+  let idxOpen = false;      // the index bands open (setIndexOpen), or folded to their line
   // In compact mode an article is its label, badge and rubrica on lines of
   // 1.3em (--card-hc): their characters, per article card (titles keep theirs)
   let cardEstCompact = null;
   const COMPACT_LINE_EM = 1.3;
-  // A heading is its lines (number, then name, split by <br>) of uppercase
-  // bold, between 6px paddings: the characters of each, fitted like the rest
-  // (they came out a line short, 19px each, before)
+  // A heading is a ribbon, further in at each level (both margins, and its
+  // 28px paddings): "TÍTULO I" on a line, then the name (after the <br>) on
+  // lines of roman capitals (Cinzel), the small first line ("TÍTULO I")
+  // a little taller than the others. A norma's cover: its name in large
+  // letters, then the line naming it (data-sub) at 78% of the width. Fitted
+  // 30/10/2026 (14 of 574 headings a line off).
   let cardEstTitle = null;
-  const TITLE_CHAR_PX = 8.5, TITLE_LINE_PX = 24.8;
+  const TITLE_CHAR_PX = 11.8, TITLE_LINE_PX = 21.4, TITLE_FIRST_PX = 23.6;
+  const TITLE_INSET = { 'nivel-capitulo': 28, 'nivel-secao': 56, 'nivel-subsecao': 84 };
+  const COVER_CHAR_PX = 13.5, COVER_LINE_PX = 35.6, COVER_SUB_CHAR_PX = 7, COVER_SUB_LINE_PX = 16.7;
 
-  // The index band's height: its groups (a subject and its sub-subjects) laid
-  // in lines, in their alphabetical order, as the browser will. Widths measured
-  // on a canvas with the band's fonts, no layout; redone with the width or the
-  // zoom.
+  // The index band's height, open: its table's rows, the subject wrapped in
+  // its column and the sub-subjects packed in lines beside it, as the browser
+  // will. Widths measured on a canvas with the band's fonts, no layout; redone
+  // with the width or the zoom.
   let idxMetrics = null, idxFontWait = false;   // read again at each estimate (the zoom changes them)
   let idxMetricsLast = null;   // the same, kept (with the groups' widths) while they don't change
   const idxWidths = new Map();
@@ -171,17 +179,21 @@
     const row = $cards.querySelector('.idx-row'), sub = $cards.querySelector('.idx-row > .idx-sub');
     if (!row || !sub) return null;
     const px = v => parseFloat(v) || 0;
-    const box = el => {
+    // the font and what the box adds to the text's width (the subject's
+    // negative margin puts it in the left column: not counted)
+    const box = (el, margins) => {
       const c = getComputedStyle(el);
       return {
         font: c.fontStyle + ' ' + c.fontWeight + ' ' + c.fontSize + ' ' + c.fontFamily,
-        extra: px(c.marginLeft) + px(c.marginRight) + px(c.paddingLeft) + px(c.paddingRight)
+        extra: (margins ? px(c.marginLeft) + px(c.marginRight) : 0) + px(c.paddingLeft) + px(c.paddingRight)
           + px(c.borderLeftWidth) + px(c.borderRightWidth),
+        spacing: px(c.letterSpacing),
       };
     };
+    const head = row.querySelector('.idx-head');
     const rc = getComputedStyle(row);
-    const m = { head: box(row.querySelector('.idx-head')), sub: box(sub), row: px(rc.marginLeft) + px(rc.marginRight) + px(rc.paddingLeft) };
-    m.key = [m.head.font, m.head.extra, m.sub.font, m.sub.extra, m.row].join('|');
+    const m = { head: box(head, false), sub: box(sub, true), col: px(rc.paddingLeft), headW: px(getComputedStyle(head).width) };
+    m.key = [m.head.font, m.head.spacing, m.sub.font, m.sub.extra, m.col, m.headW].join('|');
     if (idxMetricsLast && idxMetricsLast.key === m.key) return idxMetricsLast;
     idxMetricsLast = m;
     // measured before the fonts came, the widths are the fallback's: once more when they come
@@ -203,9 +215,9 @@
       idxCanvas.font = b.font;
       idxWidths.set(key, w = idxCanvas.measureText(text).width);
     }
-    return w + b.extra;
+    return w + b.extra + b.spacing * text.length;
   }
-  // A group's items (the subject, its chips) and its width, margins included
+  // A subject's row: its width (the subject's text) and its sub-subjects'
   function idxRowItems(m, row) {
     if (row.idxM === m) return row.idxItems;
     const items = [];
@@ -215,34 +227,28 @@
     }
     row.idxM = m;
     row.idxItems = items;
-    row.idxW = items.reduce((a, b) => a + b, 0) + m.row;
     return items;
   }
   function indexBandHeight(band, width) {
+    if (!idxOpen) return IDX_BAND_PX + IDX_SUM_PX;
     if (!idxMetrics) idxMetrics = idxMeasure();
-    const m = idxMetrics, rows = band.children;
-    if (!m) return IDX_BAND_PX + IDX_LINE_PX * rows.length;
-    let lines = 0, wraps = 0, used = width;   // (the first group opens a line)
+    const m = idxMetrics, rows = band.querySelectorAll(':scope > .idx-row');
+    let h = IDX_BAND_PX + IDX_SUM_PX + IDX_OPEN_PX;
+    if (!m) return h + (IDX_ROW_PX + IDX_SUB_LINE_PX) * rows.length;
+    const room = width - m.col;
     for (const row of rows) {
       const items = idxRowItems(m, row);
-      if (row.idxW > width) {
-        // too long for a line: it wraps by itself, on lines of its own
-        const room = width - m.row;   // (its margin takes from the line)
-        let at = 0;
-        lines++;
-        items.forEach((w, i) => {
-          if (at && at + w > room) { wraps++; at = 0; }
-          // a chip wider than the line wraps its text (the subject doesn't)
-          if (i && w > room) { wraps += Math.ceil(w / room) - 1; at = room; }
-          else at += w;
-        });
-        used = width;
-        continue;
+      const heads = Math.max(1, Math.ceil(items[0] / m.headW));
+      let subs = 0, at = 0;
+      for (let k = 1; k < items.length; k++) {
+        const w = items[k];
+        if (!subs || at + w > room) { subs++; at = 0; }
+        if (w > room) { subs += Math.ceil(w / room) - 1; at = room; }   // its text wraps
+        else at += w;
       }
-      if (used + row.idxW > width) { lines++; used = 0; }
-      used += row.idxW;
+      h += IDX_ROW_PX + Math.max(IDX_HEAD_TOP_PX + heads * IDX_HEAD_LINE_PX, subs * IDX_SUB_LINE_PX);
     }
-    return IDX_BAND_PX + IDX_LINE_PX * lines + IDX_WRAP_PX * wraps;
+    return h;
   }
 
   function estimateCardHeights() {
@@ -254,7 +260,9 @@
           if (n.nodeName === 'BR') segs.push(0);
           else segs[segs.length - 1] += n.textContent.trim().length;
         }
-        return segs;
+        if (card.classList.contains('nivel-norma')) return { cover: segs[0], sub: (card.dataset.sub || '').length };
+        const level = [...card.classList].find(c => c in TITLE_INSET);
+        return { segs, inset: TITLE_INSET[level] || 0 };
       });
       cardEstBlocks = ALL_CARDS.map(card => {
         const blocks = [];
@@ -290,13 +298,24 @@
     const setEst = (i, prop, set, v) => {
       if (set[i] !== v) ALL_CARDS[i].style.setProperty(prop, (set[i] = v) + 'px');
     };
-    const titlePerLine = Math.max(10, ($cards.clientWidth - 24 - 24 * z - 2) / (TITLE_CHAR_PX * z));
+    const titleWidth = $cards.clientWidth - 24;
+    const coverWidth = titleWidth - 44 * z;
+    const perLine = (width, charPx) => Math.max(10, width / (charPx * z));
     ALL_CARDS.forEach((card, i) => {
-      const segs = cardEstTitle[i];
-      if (segs) {
+      const t = cardEstTitle[i];
+      if (t && t.segs) {
+        const per = perLine(titleWidth - t.inset - 56 * z, TITLE_CHAR_PX);
+        // (the four without a number are their name alone)
+        const numbered = t.segs.length > 1;
         let lines = 0;
-        for (const n of segs) lines += Math.max(1, Math.ceil(n / titlePerLine));
-        setEst(i, '--card-h', cardEstSet, Math.round(lines * TITLE_LINE_PX * z));
+        for (const n of t.segs.slice(numbered ? 1 : 0)) lines += Math.max(1, Math.ceil(n / per));
+        setEst(i, '--card-h', cardEstSet, Math.round(((numbered ? TITLE_FIRST_PX : 0) + lines * TITLE_LINE_PX) * z));
+        return;
+      }
+      if (t) {
+        const name = Math.max(1, Math.ceil(t.cover / perLine(coverWidth, COVER_CHAR_PX)));
+        const sub = t.sub ? 8 + COVER_SUB_LINE_PX * z * Math.ceil(t.sub / perLine(coverWidth * .78, COVER_SUB_CHAR_PX)) : 0;
+        setEst(i, '--card-h', cardEstSet, Math.round(name * COVER_LINE_PX * z + sub));
         return;
       }
       const nc = cardEstCompact[i];
@@ -401,9 +420,45 @@
     const root = document.documentElement;
     const dest = Math.max(0, Math.min(top, root.scrollHeight - root.clientHeight));
     smoothScrolling = behavior === 'smooth' && Math.abs(dest - window.scrollY) >= 1;
+    const from = window.scrollY;
     window.scrollTo({ top, behavior });
-    if (behavior === 'instant') holdLanding(call);
+    if (behavior === 'instant') {
+      holdLanding(call);
+      if (Math.abs(window.scrollY - from) >= FAR_SCROLL_SCREENS * window.innerHeight) farJump(from, window.scrollY);
+    }
     else if (smoothScrolling) window.addEventListener('scrollend', () => holdLanding(call), { once: true });
+  }
+
+  // A far jump lands at once (above): the text comes out of a blur, and on
+  // the minimap a trail runs from where the reading was to where it landed,
+  // with a ring opening there, so the jump's way is seen
+  const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function farJump(from, to) {
+    if (REDUCED_MOTION.matches) return;
+    $cards.animate([{ opacity: .12, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0)' }],
+      { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    const map = document.getElementById('minimap');
+    if (!map || !map.offsetHeight) return;
+    const docH = document.documentElement.scrollHeight, mapH = map.clientHeight;
+    const y0 = (from + window.innerHeight / 2) / docH * mapH;
+    const y1 = (to + window.innerHeight / 2) / docH * mapH;
+    const down = to > from;
+    const trail = document.createElement('div');
+    trail.className = 'mm-trail' + (down ? '' : ' up');
+    trail.style.top = Math.min(y0, y1) + 'px';
+    trail.style.height = Math.max(4, Math.abs(y1 - y0)) + 'px';
+    map.appendChild(trail);
+    // it grows from the start and shrinks into the end
+    const start = down ? 'inset(0 0 100% 0)' : 'inset(100% 0 0 0)';
+    const end = down ? 'inset(100% 0 0 0)' : 'inset(0 0 100% 0)';
+    trail.animate([{ clipPath: start }, { clipPath: 'inset(0 0 0 0)', offset: .5 }, { clipPath: end }],
+      { duration: 950, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = () => trail.remove();
+    const ring = document.createElement('div');
+    ring.className = 'mm-landing';
+    ring.style.top = y1 + 'px';
+    map.appendChild(ring);
+    ring.animate([{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(.2)', opacity: 1, offset: .4 },
+      { transform: 'scale(2.6)', opacity: 0 }], { duration: 1300, easing: 'ease-out' }).onfinish = () => ring.remove();
   }
 
   // Cards drawn for the first time around the landing spot change height
@@ -624,6 +679,7 @@
       if (i > 0) addSep();
       const span = document.createElement('span');
       span.className = 'bc-item bc-' + h.level;
+      if (h.level === 'norma') span.dataset.nrm = h.el.dataset.nrm || 'RI';   // its color (CSS)
       span.textContent = getHeadingShortTitle(h.el);
       span.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -686,6 +742,7 @@
       const [num, name] = bcHeadingParts(h);
       const span = document.createElement('span');
       span.className = 'bc-item bc-' + h.level + (i === headings.length - 1 ? ' bc-last' : '');
+      if (h.level === 'norma') span.dataset.nrm = h.el.dataset.nrm || 'RI';
       span.textContent = i === headings.length - 1 && h.level !== 'norma' && name
         ? (num ? num + ' · ' : '') + name : num || name;
       line.appendChild(span);
@@ -762,6 +819,15 @@
     if (best && best !== selectedCard) selectCard(best, false);
     applyBreadcrumb(bc);
     applyMinimapViewport(viewport);
+    if (best) showNorma(best);
+  }
+
+  // The norma being read gives its color to the window (style.css, --bg)
+  function showNorma(card) {
+    const law = card.dataset.law || card.dataset.nrm;
+    const root = document.documentElement;
+    if (law) { if (root.dataset.nrm !== law) root.dataset.nrm = law; }
+    else if (root.dataset.nrm) delete root.dataset.nrm;
   }
 
   // A card drawn for the first time above the screen changes height
@@ -1801,6 +1867,7 @@
         if (lawTitle) {
           const sep = document.createElement('div');
           sep.className = 'res-law';
+          sep.dataset.nrm = card.dataset.law || 'RI';
           sep.setAttribute('role', 'heading');
           sep.setAttribute('aria-level', '3');
           sep.textContent = lawTitle;
@@ -1840,7 +1907,7 @@
     const lawPrefix = card.dataset.law;
     if (lawPrefix) {
       const tag = document.createElement('span');
-      tag.className = 'res-law-tag';
+      tag.className = 'res-law-tag ' + lawPrefix;
       const matched = getCardHits(card).some(hit => hitElement(hit).closest('.law-badge'));
       tag.innerHTML = matched ? '<mark>' + escapeHtml(lawPrefix) + '</mark>' : escapeHtml(lawPrefix);
       head.appendChild(tag);
@@ -4121,6 +4188,9 @@
   const SYS_ABBR = { 'TÍTULO': 'Tít.', 'CAPÍTULO': 'Cap.', 'SEÇÃO': 'Seç.', 'SUBSEÇÃO': 'Subs.' };
   const SYS_NORM_SHORT = { 'Regimento Interno': 'RI', 'Lei Orgânica': 'LOM', 'Constituição Estadual': 'CE',
     'Constituição Federal': 'CF', 'Precedentes Regimentais': 'Precedentes' };
+  // ...and its prefix, for its color (CSS: [data-nrm])
+  const SYS_NORM_PREFIX = { 'Regimento Interno': 'RI', 'Lei Orgânica': 'LOM', 'Constituição Estadual': 'CE',
+    'Constituição Federal': 'CF', 'Precedentes Regimentais': 'PREC' };
   // kept capitalized when a name in capitals is lowercased (the longer first)
   const SYS_PROPER = ['Câmara Municipal', 'Câmara dos Deputados', 'Câmara', 'Mesa', 'Plenário', 'Vereadores', 'Vereador',
     'Vice-Presidentes', 'Presidentes', 'Presidente', 'Secretários Municipais', 'Secretários', 'Comissões Permanentes',
@@ -4295,6 +4365,7 @@
       const b = document.createElement('button');
       b.type = 'button';
       b.className = i === sysNorm ? 'on' : '';
+      b.dataset.nrm = SYS_NORM_PREFIX[n.title] || 'RI';
       b.title = n.title + ': ' + n.arts + (n.arts === 1 ? ' artigo' : ' artigos');
       b.innerHTML = escapeHtml(SYS_NORM_SHORT[n.title] || n.title) + (here.has(n) ? ' <span class="sys-dot" aria-label="você está aqui">●</span>' : '');
       b.addEventListener('click', () => {
@@ -4409,6 +4480,7 @@
       if (!shown.has(norm)) continue;
       const h = document.createElement('div');
       h.className = 'sys-norm-h';
+      h.dataset.nrm = SYS_NORM_PREFIX[norm.title] || 'RI';
       h.textContent = norm.title;
       $indexContent.appendChild(h);
       for (const [n, d] of sysFlat(norm)) if (shown.has(n)) $indexContent.appendChild(sysRowEl(n, d, here));
@@ -5089,6 +5161,15 @@
       const band = document.createElement('div');
       band.className = 'rem-backlinks idx-backlinks';
       band.setAttribute('aria-label', 'No índice remissivo');
+      const nEntries = items.length;
+      const sum = document.createElement('button');
+      sum.type = 'button';
+      sum.className = 'idx-sum';
+      sum.setAttribute('aria-expanded', String(idxOpen));
+      sum.dataset.label = 'Índice remissivo · ' + groups.size + (groups.size === 1 ? ' assunto · ' : ' assuntos · ')
+        + nEntries + (nEntries === 1 ? ' entrada' : ' entradas');
+      sum.setAttribute('aria-label', sum.dataset.label);
+      band.appendChild(sum);
       const chip = (it, cls, show) => {
         const c = document.createElement('span');
         c.className = 'rem idx-back ' + cls;
@@ -5320,6 +5401,29 @@
   }
 
   $btnCompact.addEventListener('click', () => setCompactMode(!compactMode));
+
+  // The index bands at the cards' feet: folded to their line, or all open.
+  // The card clicked stays where it was on the screen.
+  function setIndexOpen(on, anchor) {
+    cancelScrollCorrection();
+    const topBefore = anchor ? anchor.getBoundingClientRect().top : null;
+    idxOpen = on;
+    estimateCardHeights();
+    $cards.classList.toggle('idx-open', on);
+    for (const b of $cards.querySelectorAll('.idx-sum')) b.setAttribute('aria-expanded', String(on));
+    if (anchor) window.scrollBy(0, anchor.getBoundingClientRect().top - topBefore);
+    forgetCardHeights();
+    updateBreadcrumb();
+    if (searchMatches.length) updateSearchTicks();
+    scheduleMinimap();
+    try { localStorage.setItem('regimento-indice-aberto', on ? '1' : '0'); } catch (e) {}
+  }
+  $cards.addEventListener('click', e => {
+    const b = e.target.closest('.idx-sum');
+    if (!b) return;
+    e.stopPropagation();
+    setIndexOpen(!idxOpen, b.closest('.card'));
+  });
 
   // ===== VERSION DIFF =====
   function wordDiff(oldText, newText) {
@@ -5788,6 +5892,10 @@
   } catch (e) {}
   try {
     if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);
+  } catch (e) {}
+  try {
+    idxOpen = localStorage.getItem('regimento-indice-aberto') === '1';
+    $cards.classList.toggle('idx-open', idxOpen);
   } catch (e) {}
   renderIndexBacklinks();
   // After everything that adds blocks to the cards (the saved zoom above

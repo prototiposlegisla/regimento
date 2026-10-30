@@ -235,6 +235,36 @@ class TestVersaoAntiga:
         assert md.count("Revogado pela") == 1
 
 
+# ── Notas de redação no texto vigente ───────────────────────────────────
+
+class TestNotaNoTextoVigente:
+    URL = "https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=RESCMSP&NUMERO=1&ANO=2019"
+
+    def test_nota_curta_num_span(self):
+        unit = DocumentUnit(UnitType.INCISO, "II", "x", runs=[TextRun("II - solenes; (Vide Ato nº 383/1992)")])
+        html = HTMLRenderer()._render_runs_after_identifier(unit)
+        assert html == 'solenes; <span class="amendment-note">(Vide Ato nº 383/1992)</span>'
+
+    def test_nota_longa_flui_com_espacos_que_nao_esticam(self):
+        nota = "(Redação dada pela Resolução nº 01 de 03 de abril de 2019)"
+        unit = DocumentUnit(UnitType.INCISO, "V", "x", runs=[
+            TextRun("V - permanentes "), TextRun(nota, hyperlink_url=self.URL)])
+        html = HTMLRenderer()._render_runs_after_identifier(unit)
+        assert html.startswith('permanentes <span class="amendment-note longa"><a href=')
+        assert nota.replace(" ", " ") in html and html.endswith("</a></span>")
+
+    def test_link_que_e_uma_nota_inteira(self):
+        """Uma nota de tipo desconhecido, mas toda num link: vira etiqueta também."""
+        unit = DocumentUnit(UnitType.INCISO, "V", "x", runs=[
+            TextRun("V - permanentes "), TextRun("(Dispositivos renumerados)", hyperlink_url=self.URL)])
+        html = HTMLRenderer()._render_runs_after_identifier(unit)
+        assert 'class="amendment-note">(Dispositivos renumerados)</a>' in html
+
+    def test_texto_sem_nota_nao_muda(self):
+        unit = DocumentUnit(UnitType.INCISO, "I", "x", runs=[TextRun("I - pela morte;")])
+        assert HTMLRenderer()._render_runs_after_identifier(unit) == "pela morte;"
+
+
 # ── Casos apontados na verificação ──────────────────────────────────────
 
 class TestTachadoCasosDeBorda:

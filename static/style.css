@@ -9,7 +9,6 @@
   --mark-green-solid: #2ecc71;
   --mark-yellow-solid: #f1c40f;
   --selected-border: #3498db;
-  --bg: #e3e5e9;
   --card-bg: #fff;
   --card-border: #c9ced6;
   --header-h: 56px;
@@ -23,7 +22,35 @@
   --rubrica: #252839;
   --font-text: "Merriweather", Georgia, serif;
   --font-ui: "Merriweather Sans", system-ui, -apple-system, sans-serif;
+  --font-fita: "Cinzel", "Merriweather", Georgia, serif;
+  --font-capa: "EB Garamond", "Merriweather", Georgia, serif;
+  /* One color per norma, for signs only (window, cover, rubrica's end,
+     selection): --nc is a card's, --amb the one being read (app.js sets
+     data-nrm on <html>) */
+  --n-ri: #4a5f86;   --n-ri-bg: #dfe4ec;
+  --n-lom: #5f7a3e;  --n-lom-bg: #e3e8da;
+  --n-ce: #9a6b2c;   --n-ce-bg: #ece5d8;
+  --n-cf: #2b6f74;   --n-cf-bg: #dbe8e8;
+  --n-prec: #96512a; --n-prec-bg: #ede2da;
+  --amb: var(--n-ri);
+  --bg: var(--n-ri-bg);
 }
+html[data-nrm="LOM"]  { --amb: var(--n-lom);  --bg: var(--n-lom-bg); }
+html[data-nrm="CE"]   { --amb: var(--n-ce);   --bg: var(--n-ce-bg); }
+html[data-nrm="CF"]   { --amb: var(--n-cf);   --bg: var(--n-cf-bg); }
+html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
+.card { --nc: var(--n-ri); }
+.card:is([data-law="LOM"], [data-nrm="LOM"])   { --nc: var(--n-lom); }
+.card:is([data-law="CE"], [data-nrm="CE"])     { --nc: var(--n-ce); }
+.card:is([data-law="CF"], [data-nrm="CF"])     { --nc: var(--n-cf); }
+.card:is([data-law="PREC"], [data-nrm="PREC"]) { --nc: var(--n-prec); }
+/* ...and on every tag or band that names a norma, wherever it is (card's
+   corner, preview's head, index and results lines, the index's tabs) */
+:is(.rem-law, .rf i, .res-law-tag, .res-law, .sys-norms button, .sys-norm-h, .bc-norma) { --nc: var(--n-ri); }
+:is(.rem-law, .rf i, .res-law-tag).LOM, :is(.res-law, .sys-norms button, .sys-norm-h, .bc-norma)[data-nrm="LOM"] { --nc: var(--n-lom); }
+:is(.rem-law, .rf i, .res-law-tag).CE, :is(.res-law, .sys-norms button, .sys-norm-h, .bc-norma)[data-nrm="CE"] { --nc: var(--n-ce); }
+:is(.rem-law, .rf i, .res-law-tag).CF, :is(.res-law, .sys-norms button, .sys-norm-h, .bc-norma)[data-nrm="CF"] { --nc: var(--n-cf); }
+:is(.rem-law, .rf i, .res-law-tag).PREC, :is(.res-law, .sys-norms button, .sys-norm-h, .bc-norma)[data-nrm="PREC"] { --nc: var(--n-prec); }
 
 /* Fonts next to the page (copied to fonts/ by the build), latin subset;
    SIL Open Font License, in fonts/OFL-*.txt */
@@ -39,6 +66,16 @@
   font-family: "Merriweather Sans"; font-style: normal; font-weight: 400 700; font-display: swap;
   src: url(fonts/merriweather-sans-latin.woff2) format("woff2");
 }
+/* Only on the headings: Cinzel (roman capitals) on the ribbons, EB Garamond
+   on the norma's cover */
+@font-face {
+  font-family: "Cinzel"; font-style: normal; font-weight: 400 900; font-display: swap;
+  src: url(fonts/cinzel-latin.woff2) format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond"; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url(fonts/eb-garamond-latin.woff2) format("woff2");
+}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 button, input { font-family: inherit; }   /* form controls don't inherit it by default */
@@ -48,6 +85,7 @@ html { font-size: 15.5px; }
 body {
   font-family: var(--font-ui);
   background: var(--bg);
+  transition: background-color .8s ease;
   color: #222;
   overflow-x: hidden;
   -webkit-text-size-adjust: none;
@@ -67,7 +105,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  height: var(--header-h);
+  height: var(--header-h);  transition: background-color .8s ease;   /* with the window's (the norma's) */
 }
 
 #btn-index {
@@ -187,9 +225,16 @@ body {
   position: relative;
 }
 .unit-id:hover {
-  outline: 2px solid rgba(52,152,219,.4);
-  outline-offset: 1px;
+  background: color-mix(in srgb, var(--selected-border) 12%, transparent);
+  text-decoration: underline 2px color-mix(in srgb, var(--selected-border) 55%, transparent);
+  text-underline-offset: 4px;
 }
+/* Each level of the hierarchy in its ink; the paragraph in small caps */
+:is(.card, #rem-pop) :is(.unit-id, .rem-uid)        { color: #1d2233; }
+:is(.card, #rem-pop) :is(.unit-id, .rem-uid).u-par  { color: #3b5b8c; font-variant: small-caps; letter-spacing: .02em; }
+:is(.card, #rem-pop) :is(.unit-id, .rem-uid).u-inc  { color: #2d6f60; }
+:is(.card, #rem-pop) :is(.unit-id, .rem-uid).u-ali  { color: #9a5a22; font-style: italic; }
+:is(.card, #rem-pop) :is(.unit-id, .rem-uid).u-item { color: #6d4f86; }
 
 /* ===== BREADCRUMB (scroll context) ===== */
 /* A full-width bar, so every % below is of the viewport. The breadcrumb may
@@ -261,7 +306,7 @@ body {
   white-space: nowrap;
 }
 .bc-item:hover { opacity: .8; }
-.bc-norma   { background: var(--nivel-norma); }
+.bc-norma   { background: var(--nc); }
 .bc-tit     { background: var(--nivel-titulo); }
 .bc-cap     { background: var(--nivel-capitulo); }
 .bc-sec     { background: var(--nivel-secao); color: var(--nivel-secao-texto); }
@@ -269,6 +314,23 @@ body {
 .bc-article { background: var(--rubrica); }
 .bc-path    { background: #fff; color: #2b2f36; padding: 3px 11px; }
 .bc-sep     { display: none; }   /* the segments touch: no separator */
+/* Each level an arrow that fits into the next (the phone's line apart) */
+#breadcrumb:not(.bc-phone) {
+  gap: 0; border: 0; background: none; box-shadow: none; overflow: visible; border-radius: 0;
+  filter: drop-shadow(0 2px 3px rgba(20,30,45,.35));
+}
+#breadcrumb:not(.bc-phone) .bc-item {
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%, 9px 50%);
+  padding: 3px 16px 3px 19px; margin-left: -6px;
+}
+#breadcrumb:not(.bc-phone) .bc-item:first-child {
+  margin-left: 0; padding-left: 12px; border-radius: 6px 0 0 6px;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%);
+}
+#breadcrumb:not(.bc-phone) .bc-item:last-child {
+  border-radius: 0 6px 6px 0; padding-right: 12px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 9px 50%);
+}
 
 /* Phone: one line that never wraps (the deepest heading shrinks), and a tap
    opens the whole path under it, each heading on its level's color */
@@ -292,7 +354,7 @@ body {
 #read-progress { display: none; }
 @media (max-width: 600px) {
   #breadcrumb-bar { --bc-l: 8px; --bc-r: 8px; }
-  #header, #breadcrumb-bar { transition: transform .22s ease; }
+  #header, #breadcrumb-bar { transition: transform .22s ease, background-color .8s ease; }
   body.hide-top #header { transform: translateY(-100%); }
   body.hide-top #breadcrumb-bar { transform: translateY(calc(-1 * var(--header-h))); }
   #read-progress {
@@ -319,22 +381,31 @@ body {
   padding: calc(16px * var(--zoom-scale));
   margin-bottom: calc(10px * var(--zoom-scale));
   box-shadow: var(--card-shadow);
-  transition: border-color .2s, box-shadow .2s, background-color .3s;
+  /* (not the shadow: the selected card's halo changes all along a scroll,
+     and animating it made scrolling with the mouse over the text ~10% slower) */
+  transition: border-color .2s, background-color .3s, opacity .3s ease;
   font-size: calc(1rem * var(--zoom-scale));
   line-height: 1.6;
   cursor: pointer;
   position: relative;
 }
-/* the article: a clearly bounded container */
+/* the article: a sheet floating over the window, bounded by its shadow (the
+   border stays, transparent, so the height doesn't change) */
 .card-artigo {
-  --card-radius: 8px;
-  border: 1.5px solid #9aa3af;
+  --card-radius: 12px;
+  --card-shadow: 0 1px 2px rgba(20,30,45,.07), 0 8px 22px -14px rgba(20,30,45,.45);
+  border: 1.5px solid transparent;
   line-height: 1.75;
 }
 
 .card.selected {
   border-color: var(--selected-border);
   box-shadow: inset 4px 0 0 var(--selected-border), var(--card-shadow);
+}
+/* the selected article: a halo */
+.card-artigo.selected {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--selected-border), 0 12px 26px -14px color-mix(in srgb, var(--selected-border) 70%, #000);
 }
 
 .card.filtered-out { display: none; }
@@ -364,11 +435,54 @@ body {
   padding: calc(6px * var(--zoom-scale)) calc(12px * var(--zoom-scale));
 }
 .card-titulo { border-color: rgba(0,0,0,.12); }
-.card-titulo.nivel-norma    { background: var(--nivel-norma); color: #fff; }
-.card-titulo.nivel-titulo   { background: var(--nivel-titulo); color: #fff; }
-.card-titulo.nivel-capitulo { background: var(--nivel-capitulo); color: #fff; }
-.card-titulo.nivel-secao    { background: var(--nivel-secao); color: var(--nivel-secao-texto); }
-.card-titulo.nivel-subsecao { background: var(--nivel-subsecao); color: #fff; }
+.card-titulo.nivel-titulo   { --lv: var(--nivel-titulo);   --lv-t: #fff; }
+.card-titulo.nivel-capitulo { --lv: var(--nivel-capitulo); --lv-t: #fff; }
+.card-titulo.nivel-secao    { --lv: var(--nivel-secao);    --lv-t: var(--nivel-secao-texto); }
+.card-titulo.nivel-subsecao { --lv: var(--nivel-subsecao); --lv-t: #fff; }
+
+/* A ladder of ribbons: each level further in, its ends cut like a pennant,
+   so the hierarchy reads in the margin. Two voices in roman capitals
+   (Cinzel): "TÍTULO I" small and spaced, the name larger. */
+.card-titulo:not(.nivel-norma) {
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%), var(--lv);
+  color: var(--lv-t);
+  border: 0; border-radius: 0; box-shadow: none;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 50%, 100% 100%, 0 100%, 12px 50%);
+  padding: calc(9px * var(--zoom-scale)) calc(28px * var(--zoom-scale)) calc(11px * var(--zoom-scale));
+  font: 600 calc(1.06rem * var(--zoom-scale))/1.3 var(--font-fita);
+  letter-spacing: .08em;
+}
+.card-titulo.nivel-capitulo { margin-inline: 14px; }
+.card-titulo.nivel-secao    { margin-inline: 28px; }
+.card-titulo.nivel-subsecao { margin-inline: 42px; }
+.card-titulo:not(.nivel-norma):has(br)::first-line {
+  font: 600 calc(.76rem * var(--zoom-scale))/2 var(--font-fita); letter-spacing: .26em;
+  color: color-mix(in srgb, var(--lv-t) 72%, transparent);
+}
+
+/* The norma's cover: a gem in its color, a shine at the top, its monogram
+   large and faint behind, and a line naming it (data-mono, data-sub) */
+.card-titulo.nivel-norma {
+  overflow: hidden; border: 0; color: #fff; text-align: left;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
+    linear-gradient(120deg, color-mix(in srgb, var(--nc) 70%, #000) 0%, var(--nc) 60%, color-mix(in srgb, var(--nc) 75%, #fff) 100%);
+  box-shadow: 0 16px 30px -18px color-mix(in srgb, var(--nc) 80%, #000), inset 0 1px 0 rgba(255,255,255,.3);
+  padding: calc(24px * var(--zoom-scale)) calc(22px * var(--zoom-scale));
+  margin: calc(24px * var(--zoom-scale)) 0 calc(16px * var(--zoom-scale));
+  font: 500 calc(2rem * var(--zoom-scale))/1.15 var(--font-capa); text-transform: none; letter-spacing: .01em;
+  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+.card-titulo.nivel-norma::before {
+  content: attr(data-mono); position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  font: 700 calc(4.6rem * var(--zoom-scale))/1 var(--font-capa); letter-spacing: -.04em;
+  color: rgba(255,255,255,.13); text-shadow: none; pointer-events: none;
+}
+.card-titulo.nivel-norma::after {
+  content: attr(data-sub); display: block; margin-top: 8px; max-width: 78%;
+  font: 500 calc(.72rem * var(--zoom-scale))/1.5 var(--font-ui); letter-spacing: .08em; text-transform: uppercase;
+  color: rgba(255,255,255,.78); text-shadow: none;
+}
 
 /* The norm's text with serifs; what is interface in it (chips, labels) without */
 .card p, .card .art-para, .rem-body, .rem-note, .footnote-box { font-family: var(--font-text); }
@@ -434,65 +548,55 @@ body {
   padding-top: calc(4px * var(--zoom-scale));
 }
 
-.old-version .amendment-note {
-  font-style: italic;
-  color: #888;
-  font-size: calc(.85rem * var(--zoom-scale));
-  text-decoration: none;
-  display: inline-block;  /* stops the paragraph's line-through */
-}
 
-/* Diff toggle icon (inline, always visible after text) */
+/* Diff toggle: a grey chip "⇄ comparar", as the other chips (the word via
+   CSS, out of the searchable text); in the norma's color while open */
 .diff-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(20px * var(--zoom-scale));
-  height: calc(20px * var(--zoom-scale));
-  border-radius: 4px;
-  background: #cce0ff;
-  color: #2a7fff;
-  font-size: calc(12px * var(--zoom-scale));
-  line-height: 1;
+  display: inline-block;
+  margin-left: calc(6px * var(--zoom-scale));
+  padding: 0 7px;
+  border-radius: 10px;
+  border: 1px solid #e1e4e8;
+  background: #f3f4f6;
+  color: #7a818c;
+  font: 500 calc(.72rem * var(--zoom-scale))/1.6 var(--font-ui);
   text-decoration: none;
+  vertical-align: 1px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  margin-left: calc(6px * var(--zoom-scale));
-  vertical-align: middle;
-  flex-shrink: 0;
 }
-.diff-toggle:hover { background: #a8cfff; }
-.old-version.diff-open .diff-toggle { background: var(--selected-border); color: #fff; }
+.diff-toggle::after { content: "\00a0 comparar"; }
+.diff-toggle:hover { background: #e9edf3; color: #1f4f8a; border-color: #cfd8e4; }
+.old-version.diff-open .diff-toggle { background: var(--nc); border-color: var(--nc); color: #fff; }
 
-/* Diff panel */
+/* Diff panel: what changed for the next wording, in the text's letter; what
+   left in pink, struck, what came in mint */
 .diff-panel {
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: calc(10px * var(--zoom-scale));
-  margin-top: calc(4px * var(--zoom-scale));
-  margin-bottom: calc(6px * var(--zoom-scale));
-  font-size: calc(.9rem * var(--zoom-scale));
-  line-height: 1.6;
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px -12px rgba(20,30,45,.35);
+  padding: calc(8px * var(--zoom-scale)) calc(12px * var(--zoom-scale)) calc(10px * var(--zoom-scale));
+  margin: calc(4px * var(--zoom-scale)) 0 calc(6px * var(--zoom-scale)) calc(16px * var(--zoom-scale));
+  font: calc(.95rem * var(--zoom-scale))/1.75 var(--font-text);
+  color: #2b2f36;
   text-decoration: none;
   opacity: 1;
 }
+.diff-panel::before {
+  content: "O QUE MUDOU NESTA REDAÇÃO"; display: block; margin-bottom: 4px;
+  font: 700 calc(.62rem * var(--zoom-scale))/1.5 var(--font-ui); letter-spacing: .14em; color: #8a919b;
+}
 .diff-del {
-  background: #fdd;
-  text-decoration: line-through;
-  color: #a00;
-  padding: 1px 2px;
-  border-radius: 2px;
+  background: #fbe3e1; color: #9b2f25;
+  text-decoration: line-through; text-decoration-color: rgba(155,47,37,.5);
+  padding: 1px 3px; border-radius: 3px;
 }
-.diff-ins {
-  background: #dfd;
-  color: #060;
-  padding: 1px 2px;
-  border-radius: 2px;
-}
+.diff-ins { background: #d9f2ea; color: #0f5e48; padding: 1px 3px; border-radius: 3px; }
 
-/* Article summary (rubrica) — a dark band across the top of the card */
+/* Article summary (rubrica) — a dark band across the top of the card,
+   toward the norma's color at its end */
 .art-summary {
   display: block;
   font-size: calc(.9rem * var(--zoom-scale));
@@ -502,15 +606,33 @@ body {
   letter-spacing: .1px;
   margin: calc(-16px * var(--zoom-scale)) calc(-16px * var(--zoom-scale)) calc(12px * var(--zoom-scale));
   line-height: 1.4;
-  background: var(--rubrica);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0)),
+    linear-gradient(100deg, var(--rubrica) 0%, var(--rubrica) 35%, color-mix(in srgb, var(--nc) 80%, var(--rubrica)) 100%);
   padding: calc(7px * var(--zoom-scale)) calc(16px * var(--zoom-scale));
   border-radius: calc(var(--card-radius) - 1.5px) calc(var(--card-radius) - 1.5px) 0 0;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
 }
-.card-artigo.selected > .art-summary { box-shadow: inset 4px 0 0 var(--selected-border); }
 .card-artigo[data-law] > .art-summary { padding-right: calc(56px * var(--zoom-scale)); }
+/* The article's number at the start of the band, so each card shows from
+   afar which article it is: a float, so the rubrica's first line starts
+   after it, however long the number */
+.card-artigo::before {
+  content: attr(data-art);
+  float: left; position: relative; z-index: 1;
+  height: calc((14px + .9rem * 1.4) * var(--zoom-scale));
+  margin: calc(-16px * var(--zoom-scale)) calc(9px * var(--zoom-scale)) 0 calc(-16px * var(--zoom-scale));
+  padding: 0 calc(8px * var(--zoom-scale));
+  display: flex; align-items: center;
+  border-radius: calc(var(--card-radius) - 1.5px) 0 0 0;
+  background: rgba(255,255,255,.1); border-right: 1px solid rgba(255,255,255,.18);
+  font: 800 calc(.82rem * var(--zoom-scale))/1 var(--font-ui); color: #fff;
+  font-variant-numeric: tabular-nums; pointer-events: none;
+  user-select: none; -webkit-user-select: none;
+}
+#cards-container.compact .card-artigo::before { content: none; }
 
 /* Law badge, on the rubrica's band */
 .law-badge {
@@ -521,7 +643,7 @@ body {
   box-shadow: 0 0 0 1px rgba(255,255,255,.35);
   font-size: calc(.7rem * var(--zoom-scale));
   font-weight: 700;
-  background: #6c5ce7;
+  background: var(--nc);
   color: #fff;
   padding: 2px 6px;
   border-radius: 4px;
@@ -533,7 +655,6 @@ body {
   padding-right: calc(40px * var(--zoom-scale));
 }
 /* Precedentes Regimentais: the title, then the text as written (no provisions) */
-.card-prec .law-badge { background: #8e5a2b; }
 .card-prec .prec-para { margin-top: calc(6px * var(--zoom-scale)); }
 
 /* Compact-mode label (hidden by default) */
@@ -613,10 +734,10 @@ body {
 
 /* Search highlight (::highlight = CSS Custom Highlight API; mark = fallback and unselectable text) */
 ::highlight(search) {
-  background-color: #ffe066;
+  background-color: #e6ff5a;
 }
 mark {
-  background: #ffe066;
+  background: #e6ff5a;
   color: inherit;
   border-radius: 2px;
 }
@@ -625,13 +746,13 @@ mark {
 }
 /* the short words among other words ("prazo de votação"): fainter */
 ::highlight(search-weak) {
-  background-color: #fff6d6;
-  text-decoration: underline 2px #f2c94c;
+  background-color: #f6ffd0;
+  text-decoration: underline 2px #c2dc3c;
   text-underline-offset: 2px;
 }
 mark.weak {
-  background: #fff6d6;
-  text-decoration: underline 2px #f2c94c;
+  background: #f6ffd0;
+  text-decoration: underline 2px #c2dc3c;
   text-underline-offset: 2px;
 }
 @media print {
@@ -682,7 +803,7 @@ mark.weak {
   background: #fef5e7; color: #935116; border: 1px solid #f5cba7;
 }
 .footnote-ref.leg-ref::before { content: attr(data-label); }
-.leg-box { --c: #935116; background: #fdf6ec; }   /* the color of its badge */
+.leg-box { --c: #935116; background: #fff; }   /* the color of its badge */
 .leg-list { margin: 4px 0 0; padding-left: 1.2em; }
 .leg-list li + li { margin-top: 4px; }
 #cards-container.compact .leg-ref { display: none; }
@@ -702,13 +823,14 @@ mark.weak {
   position: fixed;
   z-index: 200;
   max-width: min(420px, 85vw);
-  background: #fff8dc;
-  border-left: 3px solid #f1c40f;
-  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #d6dbdf;
+  border-top: 3px solid #935116;
+  border-radius: 6px;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
-  box-shadow: 0 2px 12px rgba(0,0,0,.18);
+  box-shadow: 0 6px 24px rgba(0,0,0,.18);
   pointer-events: none;
   overflow: hidden;
   max-height: 60vh;
@@ -828,22 +950,27 @@ mark.weak {
 }
 
 /* ===== INDEX PANEL ===== */
+/* the text behind darkens a little, not blurred: still readable */
 #index-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.4);
+  background: rgba(22,28,40,.3);
   z-index: 400;
 }
 #index-overlay.open { display: block; }
 
+/* A sheet floating off the edge, round corners and a deep shadow */
 #index-panel {
   position: fixed;
-  top: 0; left: 0; bottom: 0;
+  top: 10px; left: 10px; bottom: 10px;
   width: min(320px, 85vw);
+  max-width: calc(100vw - 20px);
   background: #fff;
   z-index: 500;
-  transform: translateX(-100%);
+  border-radius: 16px;
+  box-shadow: 0 30px 70px -24px rgba(10,16,28,.6), 0 0 0 1px rgba(20,30,45,.08);
+  transform: translateX(calc(-100% - 24px));
   transition: transform .25s ease;
   display: flex;
   flex-direction: column;
@@ -866,24 +993,30 @@ mark.weak {
   margin-bottom: 8px;
 }
 
+/* the tabs as a segmented switch */
 #index-tabs {
   display: flex;
   flex: 1;
-  gap: 0;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #eceef2;
 }
 
 .index-tab {
   flex: 1;
   padding: 8px;
   border: none;
-  background: #eee;
+  border-radius: 8px;
+  background: transparent;
+  color: #4b5563;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
+  transition: background .2s, color .2s, box-shadow .2s;
 }
-.index-tab:first-child { border-radius: 6px 0 0 6px; }
-.index-tab:last-child { border-radius: 0 6px 6px 0; }
-.index-tab.active { background: var(--selected-border); color: #fff; }
+.index-tab.active { background: #fff; color: #1d232b; box-shadow: 0 1px 3px rgba(20,30,45,.18), 0 0 0 1px rgba(20,30,45,.04); }
+.index-tab:not(.active):hover { background: rgba(255,255,255,.55); }
 
 #btn-info-tab {
   flex: 0 0 auto;
@@ -925,8 +1058,9 @@ mark.weak {
 #index-search {
   width: 100%;
   padding: 8px 30px 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1px solid #e1e4e9;
+  border-radius: 10px;
+  background: #f6f7f9;
   font-size: 14px;
   outline: none;
 }
@@ -961,8 +1095,8 @@ mark.weak {
   padding: 4px 11px; cursor: pointer;
   font: 600 12px/1.2 var(--font-ui); color: #4a5361;
 }
-.sys-norms button:hover { border-color: var(--nivel-norma); }
-.sys-norms button.on { background: var(--nivel-norma); border-color: var(--nivel-norma); color: #fff; }
+.sys-norms button:hover { border-color: var(--nc); }
+.sys-norms button.on { background: var(--nc); border-color: var(--nc); color: #fff; }
 .sys-dot { font-size: 8px; vertical-align: 2px; color: var(--selected-border); }
 .sys-norms button.on .sys-dot { color: #fff; }
 .sys-intro { padding: 8px 2px 4px; font: 12px/1.4 var(--font-ui); color: #6b7480; }
@@ -993,13 +1127,15 @@ mark.weak {
 .sys-top:focus-visible { outline: none; }
 .sys-bar { display: flex; gap: 2px; height: 11px; margin-top: 6px; }
 .sys-bar > i {
-  display: block; min-width: 3px; height: 100%; border-radius: 2px; cursor: pointer;
-  background: var(--nivel-capitulo); opacity: .5;
+  display: block; min-width: 3px; height: 100%; border-radius: 3px; cursor: pointer;
+  background-color: var(--nivel-capitulo);
+  background-image: linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,0) 60%);   /* a shine */
+  opacity: .5;
 }
 .sys-bar > i:nth-child(even) { opacity: .75; }
-.sys-bar.solo > i { background: var(--nivel-titulo); }
-.sys-bar > i:hover { opacity: 1; background: var(--nivel-titulo); }
-.sys-bar > i.sys-here { background: var(--selected-border); opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--selected-border); }
+.sys-bar.solo > i { background-color: var(--nivel-titulo); }
+.sys-bar > i:hover { opacity: 1; background-color: var(--nivel-titulo); }
+.sys-bar > i.sys-here { background-color: var(--selected-border); opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--selected-border); }
 #sys-tip {
   position: fixed; z-index: 900; display: none; max-width: 280px; pointer-events: none;
   padding: 5px 8px; border-radius: 5px; background: #2b2f36; color: #fff;
@@ -1056,7 +1192,7 @@ mark.weak {
 /* with a filter: the matching sections under their normas */
 .sys-norm-h {
   margin: 14px 0 4px; padding: 5px 8px; border-radius: 4px;
-  background: var(--nivel-norma); color: #fff; font: 700 12px/1.3 var(--font-ui);
+  background: var(--nc); color: #fff; font: 700 12px/1.3 var(--font-ui);
 }
 .sys-norm-h:first-child { margin-top: 2px; }
 
@@ -1116,12 +1252,10 @@ mark.weak {
 .rf i {
   margin-right: 4px; padding: 1px 4px; border-radius: 3px;
   font-style: normal; font-size: 10px; font-weight: 700;
-  background: #eceef2; color: #4a5361;
 }
-.rf i.LOM { background: #fdebd0; color: #7e5109; }
-.rf i.CE { background: #d6eaf8; color: #1b4f72; }
-.rf i.CF { background: #d5f5e3; color: #145a32; }
-.rf i.PREC { background: #f6ddcc; color: #6e2c00; }
+.rf i, .rem-head .rem-law, .res-head .res-law-tag:is(.RI, .LOM, .CE, .CF, .PREC) {
+  background: color-mix(in srgb, var(--nc) 16%, #fff); color: color-mix(in srgb, var(--nc) 82%, #000);
+}
 .subj-ref-line .ref-hint { margin: 0; color: #4a5361; font-size: 12.5px; }
 .subj-sub { padding-left: 12px; margin-bottom: 4px; }
 .subj-sub > .subj-title { margin-top: 4px; font-size: 12.5px; color: #6e5a2b; }
@@ -1412,13 +1546,14 @@ button.q-label:hover { color: #2c6fa6; }
   text-decoration: line-through;
 }
 #search-tick-tooltip .mtt-chip mark {
-  background: #ffe066;
+  background: #e6ff5a;
   color: inherit;
   border-radius: 2px;
   padding: 0 1px;
 }
 
 /* ===== MINIMAP ===== */
+/* where one is reading: a clear glass lens */
 #minimap {
   display: none;
   position: fixed;
@@ -1427,7 +1562,7 @@ button.q-label:hover { color: #2c6fa6; }
   bottom: 0;
   width: 48px;
   z-index: 170;
-  background: rgba(200,200,200,0.6);
+  background: rgba(255,255,255,.3);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-left: 1px solid #ccc;
@@ -1444,10 +1579,13 @@ button.q-label:hover { color: #2c6fa6; }
 
 #minimap-viewport {
   position: absolute;
-  left: 2px;
-  right: 2px;
-  background: rgba(52,152,219,0.18);
-  border: 1.5px solid rgba(52,152,219,0.5);
+  left: 0;
+  right: 0;
+  background: rgba(255,255,255,.28);
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(25,35,55,.55), 0 4px 10px -2px rgba(0,0,0,.35);
+  backdrop-filter: brightness(1.12) saturate(1.4);
+  -webkit-backdrop-filter: brightness(1.12) saturate(1.4);
   border-radius: 3px;
   pointer-events: none;
   min-height: 12px;
@@ -1566,7 +1704,7 @@ button.q-label:hover { color: #2c6fa6; }
 .res-law {
   margin: 10px 4px 6px;
   padding: 3px 8px;
-  background: var(--nivel-norma);
+  background: var(--nc);
   color: #fff;
   border-radius: 4px;
   font-size: 11px;
@@ -1677,7 +1815,7 @@ button.q-label:hover { color: #2c6fa6; }
 .res-idx-part + .res-law { margin-top: 14px; }
 #search-nav.index-only .search-arrow { display: none; }
 #results-list mark {
-  background: #ffe066;
+  background: #e6ff5a;
   color: inherit;
   border-radius: 2px;
 }
@@ -1709,8 +1847,8 @@ button.q-label:hover { color: #2c6fa6; }
     bottom: 12px;
     left: 12px;
     width: var(--results-w);
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border-radius: 14px;
+    box-shadow: 0 18px 40px -22px rgba(10,16,28,.55), 0 0 0 1px rgba(20,30,45,.06);
   }
   body.results-open #cards-container {
     margin-left: var(--cards-left);
@@ -1831,31 +1969,56 @@ button.q-label:hover { color: #2c6fa6; }
   border-top: 1px solid #e3dccb;
   border-radius: 0 0 calc(var(--card-radius) - 1.5px) calc(var(--card-radius) - 1.5px);
 }
-.card.selected > .idx-backlinks { box-shadow: inset 4px 0 0 var(--selected-border); }
 .idx-backlinks::before { content: none; }
-/* a group per subject: the subject (an entry itself, or just its name) and
-   its sub-subjects; the groups run one after the other (in the order
-   app.js packs them), a long one wrapping under its first chip's line,
-   indented. The subject close to its chips, the groups apart. */
+/* Folded to a line, "▸ Índice remissivo · 7 assuntos · 12 entradas" (the
+   label via CSS, out of the searchable text); a click opens the bands of
+   every card at once, and the choice is remembered (app.js, setIndexOpen) */
+.idx-sum {
+  display: block; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
+  font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #8a7a52;
+}
+.idx-sum::before { content: "\25B8\00a0 " attr(data-label); }
+.idx-sum:hover { color: #5f4f26; text-decoration: underline dotted; text-underline-offset: 3px; }
+#cards-container.idx-open .idx-sum { margin-bottom: 4px; }
+#cards-container.idx-open .idx-sum::before { content: "\25BE\00a0 " attr(data-label); }
+#cards-container:not(.idx-open) .idx-backlinks > :not(.idx-sum) { display: none; }
+/* Open, a table as a book's index: each subject (an entry itself, or just
+   its name) in a column on the left, small and spaced, aligned to the
+   right; its sub-subjects beside it; a dotted rule between the subjects */
 .idx-row {
-  display: inline-flex; flex-wrap: wrap; align-items: baseline; max-width: 100%;
-  margin: 2px 26px 2px 0; padding-left: 14px; vertical-align: baseline;
+  display: flow-root; margin: 0; padding: 3px 0 3px 214px; border-top: 1px dotted #ddd2b6;
 }
+.idx-sum + .idx-row { border-top: 0; }
 .idx-head::before { content: attr(data-label); }
-.idx-head { font-weight: 700; color: #5f4f26; margin: 2px 0 2px -10px; white-space: nowrap; }
-.idx-back.idx-head {
-  background: none; border: 0; border-bottom: 1px dotted #b8a77a; border-radius: 0;
-  padding: 0; line-height: 1.5;
+.idx-row > .idx-head {
+  float: left; width: 200px; margin: 3px 0 0 -214px; text-align: right; line-height: 1.4;
+  font-size: .78em; font-weight: 700; letter-spacing: .09em; color: #8a7a52;
 }
-.idx-back.idx-head.rem-open { border-radius: 4px; padding: 0 4px; }
+.idx-row > .idx-back.idx-head {
+  background: none; border: 0; border-radius: 3px; padding: 0;
+  text-decoration: underline dotted #b8a77a; text-underline-offset: 3px; line-height: 1.6;
+}
+@media (max-width: 600px) {
+  .idx-row { padding-left: 116px; }
+  .idx-row > .idx-head { width: 104px; margin-left: -116px; }
+}
 .idx-back.idx-sub::before { content: attr(data-show); }
-.idx-back { background: #fff; color: #5f4f26; border-color: #ddd2b6; }
-/* the entry whose box is open, and its box: the dispositivos with their dicas */
-.idx-back.rem-open {
+.idx-row > .idx-sub { margin: 2px 4px 2px 0; background: #efe8d6; border-color: transparent; color: #5f4f26; }
+.idx-row > .idx-sub:hover { background: #e6dcc2; }
+.idx-backlinks > .rem-box { clear: both; }
+/* the entry whose box is open (white on its brown, the subject too), and
+   its box: the dispositivos with their dicas */
+.idx-row > .idx-sub.rem-open, .idx-row > .idx-sub.rem-open:hover,
+.idx-row > .idx-head.rem-open::before {
   background: #8a7a52; border-color: #8a7a52; color: #fff;
   box-shadow: 0 0 0 3px color-mix(in srgb, #8a7a52 25%, transparent);
 }
-.rem-head .rem-law.IDX { background: #efe7d2; color: #5f4f26; }
+/* (the subject: only its words, not the whole column) */
+.idx-row > .idx-head.rem-open { text-decoration: none; }
+.idx-row > .idx-head.rem-open::before {
+  padding: 1px 5px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
+.rem-head .rem-law.IDX.IDX { background: #efe7d2; color: #5f4f26; }
 .idx-backlinks > .rem-box, .idx-list { color: #2b2b2b; }
 .idx-list .idx-line { padding: 1px 6px; margin: 0 -6px; border-radius: 3px; cursor: pointer; }
 .idx-list .idx-line:hover, .idx-list .idx-line:focus-visible { background: #f6f2e8; outline: none; }
@@ -1943,12 +2106,8 @@ button.q-label:hover { color: #2c6fa6; }
 }
 .rem-head .rem-law {
   font-size: 10px; font-weight: 700; letter-spacing: .5px;
-  padding: 1px 5px; border-radius: 3px; background: #d6eaf8; color: #1b4f72;
+  padding: 1px 5px; border-radius: 3px;
 }
-.rem-head .rem-law.LOM { background: #fdebd0; color: #7e5109; }
-.rem-head .rem-law.CE { background: #d6eaf8; color: #1b4f72; }
-.rem-head .rem-law.CF { background: #d5f5e3; color: #145a32; }
-.rem-head .rem-law.PREC { background: #f6ddcc; color: #6e2c00; }
 .rem-head .rem-sint { font-weight: 400; color: #566573; }
 .rem-head .rem-revoked {
   font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px;
@@ -2006,3 +2165,123 @@ button.q-label:hover { color: #2c6fa6; }
   padding: 7px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.25); cursor: pointer;
 }
 #rem-return.visible { display: block; }
+
+/* ===== FINISHING (chosen in the visual fitting room, 29/10/2026) ===== */
+/* Sleeping chips: grey while reading; the paragraph under the mouse gives
+   them their kind's color (on touch, the one tapped) */
+.card :is(p, .art-para):not(:hover) > .rem-imp:not(.rem-open),
+.card :is(p, .art-para):not(:hover) > .footnote-ref.leg-ref,
+.card .rem-backlinks:not(:hover) > .rem-back:not(.rem-open) {
+  background: #f3f4f6; border-color: #e1e4e8; color: #8a919b;
+}
+.card .rem-imp, .card .footnote-ref.leg-ref, .card .rem-back {
+  transition: transform .14s ease, box-shadow .14s ease, background-color .25s, border-color .25s, color .25s;
+}
+
+/* Movement: what opens unfolds, the index panel slides in with a spring,
+   chips rise under the mouse */
+@keyframes unfold { from { opacity: 0; transform: translateY(-8px) scaleY(.96); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes pop-in { from { opacity: 0; transform: translateY(4px) scale(.98); } }
+@media (prefers-reduced-motion: no-preference) {
+  .rem-box, .footnote-box.open { animation: unfold .26s cubic-bezier(.2,.8,.2,1); transform-origin: top center; }
+  #rem-pop.visible { animation: pop-in .16s ease-out; }
+  #index-panel { transition: transform .42s cubic-bezier(.3,1.18,.4,1), width .3s ease; }
+  #index-overlay.open { animation: fade-in .3s ease; }
+  .card .idx-back { transition: transform .14s ease, box-shadow .14s ease, background-color .2s, color .2s; }
+  .card .rem-imp:hover, .card .idx-back:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
+  }
+  .q-grid > * { animation: pop-in .25s ease-out backwards; }
+  .sys-bar > i { transition: transform .15s, opacity .15s; }
+  .sys-bar > i:hover { transform: scaleY(1.45); }
+}
+
+/* Reading aid, with a mouse: the paragraph under it on a faint wash of the
+   norma's color, and the other articles fade */
+@media (hover: hover) {
+  .card-artigo > :is(p, .art-para) { border-radius: 4px; transition: background-color .15s; }
+  .card-artigo > :is(p, .art-para):hover { background-color: color-mix(in srgb, var(--nc) 7%, transparent); }
+  #cards-container:hover > .card-artigo:not(:hover, .revoked) { opacity: .55; }
+}
+
+/* The wording notes at the end of a provision ("(Redação dada…)",
+   "(Vide…)", "(Revogado…)") as small grey tags: metadata, not the norma's
+   text; the same in the current text, the old versions and the previews.
+   A block of their own in the line, or the justified text would spread
+   their words apart (and the old version's line-through stops at them). */
+.amendment-note {
+  display: inline-block; max-width: 100%; text-align: left;
+  padding: 0 6px; border-radius: 4px; margin-left: 2px;
+  background: #f0f2f5; color: #5b6573; text-decoration: none; font-style: normal;
+  font: 500 .74em/1.9 var(--font-ui); letter-spacing: .01em; vertical-align: 1px;
+}
+.amendment-note { hyphens: manual; -webkit-hyphens: manual; }
+.amendment-note.longa { display: inline; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.amendment-note a[href] { color: inherit; text-decoration: none; }
+.amendment-note .amendment-note { display: inline; padding: 0; margin: 0; background: none; font: inherit; vertical-align: baseline; }
+a.amendment-note:hover { color: #1f4f8a; background: #e3e8ef; }
+.amendment-note a[href]:hover { color: #1f4f8a; text-decoration: underline; }
+/* Links to the official texts, wherever the site shows a text (cards,
+   previews, notes): the text's own ink, a thin underline and ↗; blue only
+   under the mouse. A citation (.rem-exp) keeps its dotted underline. */
+:where(.card, #rem-pop, #footnote-tooltip) a[target="_blank"]:not(:where(.rem-exp a, .rem-foot a, .amendment-note a, a.amendment-note)) {
+  color: inherit; text-decoration: underline 1px color-mix(in srgb, currentColor 35%, transparent);
+  text-underline-offset: 2px;
+}
+:where(.card, #rem-pop, #footnote-tooltip) a[target="_blank"]:not(:where(.rem-exp a, .rem-foot a))::after {
+  content: "\2197"; content: "\2197" / ""; font-size: .7em; vertical-align: super; margin-left: 1px; opacity: .55;
+}
+:where(.card, #rem-pop) a[target="_blank"]:not(:where(.rem-exp a, .rem-foot a, .amendment-note a, a.amendment-note)):hover {
+  color: #1f4f8a; text-decoration-color: currentColor;
+}
+
+/* Type: justified with hyphens, as a printed code; no word alone on the
+   last line; rubricas and headings balanced */
+:is(.card, #rem-pop) :is(p, .art-para) {
+  text-align: justify; hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 7 3 3;
+  text-wrap: pretty;
+}
+.art-summary, .card-titulo { text-wrap: balance; }
+
+/* Fine touches: selection in the norma's color, a thin scrollbar, a soft
+   focus ring, the top buttons answer the mouse */
+::selection { background: color-mix(in srgb, var(--amb) 26%, #fff); color: inherit; }
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--amb) 55%, #aab) transparent; }
+:focus-visible { outline: 2px solid color-mix(in srgb, var(--selected-border) 70%, transparent); outline-offset: 2px; }
+:is(#btn-index, #btn-compact) { transition: transform .12s, box-shadow .12s, background-color .12s; }
+:is(#btn-index, #btn-compact):hover { transform: translateY(-1px); box-shadow: 0 6px 14px -6px rgba(20,30,45,.45); }
+:is(#btn-index, #btn-compact):active { transform: translateY(0); box-shadow: 0 1px 4px -2px rgba(20,30,45,.4); }
+#search-input::placeholder { color: #8c94a0; font-style: italic; }
+
+/* The window: the norma's initials huge and faint in the bottom corner,
+   still (they change on crossing a cover), and its edges a shade deeper */
+body::before, body::after { position: fixed; z-index: -1; pointer-events: none; }
+body::before {
+  content: ""; inset: 0;
+  background: radial-gradient(ellipse 75% 85% at 50% 42%, transparent 50%, color-mix(in srgb, var(--amb) 16%, transparent) 100%);
+}
+body::after {
+  content: "RI"; left: 1vw; bottom: -.12em;
+  font: 900 34vh/1 var(--font-text); letter-spacing: -.05em;
+  color: color-mix(in srgb, var(--amb) 13%, transparent);
+}
+html[data-nrm="LOM"] body::after { content: "LOM"; }
+html[data-nrm="CE"] body::after { content: "CE"; }
+html[data-nrm="CF"] body::after { content: "CF"; }
+html[data-nrm="PREC"] body::after { content: "PR"; }
+@media print { body::before, body::after { content: none; } }
+
+/* A far jump (app.js, farJump): a trail runs down the minimap from where
+   the reading left to where it landed, and a ring opens there */
+.mm-trail {
+  position: absolute; left: 3px; right: 3px; z-index: 3; pointer-events: none; border-radius: 4px;
+  background: linear-gradient(180deg, rgba(52,152,219,0), rgba(52,152,219,.9));
+  box-shadow: 0 0 10px 1px rgba(52,152,219,.45);
+}
+.mm-trail.up { background: linear-gradient(0deg, rgba(52,152,219,0), rgba(52,152,219,.9)); }
+.mm-landing {
+  position: absolute; left: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; z-index: 4; pointer-events: none;
+  border-radius: 50%; border: 2px solid #3498db; box-shadow: 0 0 8px rgba(52,152,219,.6);
+}

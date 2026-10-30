@@ -893,7 +893,7 @@
   $searchInput.addEventListener('focus', () => document.body.classList.remove('hide-top'));
   // the long hint doesn't fit a phone's search field
   const SEARCH_HINT = $searchInput.placeholder;
-  const setSearchHint = () => { $searchInput.placeholder = PHONE.matches ? 'Buscar ou a43…' : SEARCH_HINT; };
+  const setSearchHint = () => { $searchInput.placeholder = PHONE.matches ? 'Buscar ou r43…' : SEARCH_HINT; };
   setSearchHint();
   PHONE.addEventListener('change', setSearchHint);
 
@@ -1145,23 +1145,30 @@
   }
 
   // Terms of a single character match nearly every article, so they don't
-  // trigger a text search (typing "a222" goes through "a" first)
+  // trigger a text search (typing "r222" goes through "r" first)
   const MIN_TERM_LENGTH = 2;
 
+  // The prefix of an article asked for in the search bar: its law (data-law)
+  const NAV_LAWS = { r: '', l: 'LOM' };
+
   // What doSearch will do with a term:
-  //  'empty' → clear; 'nav' → go to an article (a43, a44, aADT1, aLO23...);
+  //  'empty' → clear; 'nav' → go to an article: r43, r183a, rADT1 in the
+  //  Regimento, l43, l229-B, lADT15A in the Lei Orgânica;
   //  'short' → no term reaches MIN_TERM_LENGTH; 'text' → text search.
-  // A "r " prefix includes footnotes in the search.
+  // A "n " prefix (notas) includes footnotes in the search.
   function classifyQuery(term) {
     if (!term) return { kind: 'empty' };
     let includeFootnotes = false;
-    const footnoteMatch = term.match(/^r\s+(.+)$/i);
+    const footnoteMatch = term.match(/^n\s+(.+)$/i);
     if (footnoteMatch) {
       includeFootnotes = true;
       term = footnoteMatch[1];
     }
-    const artMatch = term.match(/^a([A-Z]{2,})?(\d+[-A-Za-z]*)$/i);
-    if (artMatch) return { kind: 'nav', artMatch };
+    const m = term.match(/^([rl])(adt)?(\d+)(?:-?([a-z]))?$/i);
+    if (m) {
+      const art = (m[2] ? 'ADT' : '') + m[3] + (m[4] ? '-' + m[4].toUpperCase() : '');
+      return { kind: 'nav', law: NAV_LAWS[m[1].toLowerCase()], art };
+    }
     const { phrases, words } = parseSearchTerms(term);
     let longest = 0;
     for (const t of phrases.concat(words)) longest = Math.max(longest, t.length);
@@ -1287,7 +1294,7 @@
     return cards.filter(c => marked.has(c));
   }
 
-  // An article asked for in the search bar (a43, aLO23...)
+  // An article asked for in the search bar (r43, l23...)
   function goToArticle(target) {
     revealCard(target);   // hidden by a filter: shown anyway
     const targetY = target.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25;
@@ -1320,15 +1327,9 @@
 
     let navTarget = null;
     if (query.kind === 'nav') {
-      const lawPrefix = query.artMatch[1] ? query.artMatch[1].toUpperCase() : '';
-      const artNum = query.artMatch[2];
-      if (lawPrefix) {
-        navTarget = $cards.querySelector(`.card-artigo[data-art="${artNum}"][data-law="${lawPrefix}"]`);
-      } else {
-        // Search default (no data-law) first, then any
-        navTarget = $cards.querySelector(`.card-artigo[data-art="${artNum}"]:not([data-law])`)
-              || $cards.querySelector(`.card-artigo[data-art="${artNum}"]`);
-      }
+      // (the Regimento's cards have no data-law)
+      navTarget = $cards.querySelector(`.card-artigo[data-art="${query.art}"]`
+        + (query.law ? `[data-law="${query.law}"]` : ':not([data-law])'));
     }
 
     const text = query.kind === 'text';
@@ -1363,8 +1364,8 @@
       // object, so the list keeps its indexes' part. The indexes are searched
       // whole, a chip or not: they lead to other subjects.
       const indexKey = JSON.stringify([phrases, words]);
-      // the query as typed (without quotes nor the "r " prefix), for the fichas' search terms
-      const typed = normIndexText((includeFootnotes ? term.replace(/^\s*r\s+/i, '') : term).replace(/"/g, ' ')).trim();
+      // the query as typed (without quotes nor the "n " prefix), for the fichas' search terms
+      const typed = normIndexText((includeFootnotes ? term.replace(/^\s*n\s+/i, '') : term).replace(/"/g, ' ')).trim();
       if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey, typed);
     } else {
       indexMatches = null;

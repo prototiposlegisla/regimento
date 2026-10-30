@@ -73,6 +73,16 @@
   let markerTooltipTimer = null;
   let footnoteTooltipTimer = null;
   let scrollRafId = null;
+  // The history's steps (see BACK AND FORWARD)
+  const STEP_LOAD = Date.now().toString(36);
+  let stepCount = 0;
+  let stepId = STEP_LOAD + ':0';
+  const steps = new Map();       // step id → the state kept when it was left
+  const stepKinds = new Map();   // step id → what it opened ('drawer', 'panel'), or 'rem'
+  let stepTaken = false;         // in this action
+  let restoring = false;
+  let silentPops = 0;            // backs that only take a step out
+  let indexRenders = 0;          // the index panel drawn so many times
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
@@ -1293,6 +1303,8 @@
     // pending so the newer term still applies
     if (term === $searchInput.value.trim()) cancelPendingSearch();
     if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
+    // (the state before it, if it opens the drawer)
+    const before = !restoring && !resultsWide.matches && !resultsDrawerOpen ? stepState() : null;
     currentSearch = term;
     clearHighlights();
     const cards = getAllCards();
@@ -1379,7 +1391,10 @@
     if (shownFor !== resultsShownFor) {
       resultsShownFor = shownFor;
       resultsHidden = false;
-      if (!resultsWide.matches) resultsDrawerOpen = text;
+      if (!resultsWide.matches) {
+        if (text && !resultsDrawerOpen) takeStep('drawer', before);
+        resultsDrawerOpen = text;
+      }
     }
     showResults();
 
@@ -1717,6 +1732,7 @@
   }
 
   function updateResultsVisibility() {
+    if (!resultsDrawerOpen) dropStep('drawer');
     document.body.classList.toggle('results-open', resultsActive && resultsWide.matches && !resultsHidden);
     document.body.classList.toggle('results-drawer-open', resultsDrawerOpen);
     $indexOverlay.classList.toggle('open', resultsDrawerOpen || $indexPanel.classList.contains('open'));
@@ -1770,6 +1786,7 @@
     if (resultsWide.matches) {
       setResultsHidden(false);
     } else {
+      if (stepKinds.get(stepId) !== 'drawer') takeStep('drawer');
       resultsDrawerOpen = true;
       updateResultsVisibility();
       $resultsClose.focus({ preventScroll: true });
@@ -2107,6 +2124,7 @@
   }
 
   function goToResult(card, unit, event) {
+    takeStep();
     const fromDrawer = resultsDrawerOpen;
     const i = searchMatches.indexOf(card);
     if (i >= 0) {
@@ -2239,6 +2257,8 @@
   });
   $resultsClose.addEventListener('click', e => closeResults(e.detail === 0));
   $indexResultsLink.addEventListener('click', () => {
+    // the panel's step is the drawer's now: back closes it
+    if (!resultsWide.matches && stepKinds.get(stepId) === 'panel') stepKinds.set(stepId, 'drawer');
     closeIndex();
     openResults();
   });
@@ -2527,6 +2547,7 @@
   }
 
   function goToIndexResult(event, go) {
+    takeStep();
     const fromDrawer = resultsDrawerOpen;
     if (resultsDrawerOpen) {
       resultsDrawerOpen = false;
@@ -2712,6 +2733,7 @@
   function quickGo(go, inSearch) {
     return e => {
       if (inSearch) { goToIndexResult(e, go); return; }
+      takeStep();
       closeIndex();
       go();
     };
@@ -3824,6 +3846,7 @@
     const card = remCard(r);
     if (!card) return;
     const target = (r.path && remUnitP(card, r.path)) || card;
+    takeStep('rem');
     card.classList.remove('filtered-out');   // the target may be hidden by a filter
     remReturnTo = trigger;
     const src = trigger.closest('.card-artigo');
@@ -3841,6 +3864,11 @@
     remFlash(target, smooth);
   }
   $remReturn.addEventListener('click', () => {
+    // as back: the jump's step out of the history (forward goes to it again)
+    if (stepKinds.get(stepId) === 'rem') {
+      steps.set(stepId, stepState());
+      dropStep('rem');
+    }
     if (remReturnTo && remReturnTo.isConnected) {
       const smooth = remScrollTo(remReturnTo);
       if (remReturnTo.tabIndex >= 0) remReturnTo.focus({ preventScroll: true });
@@ -4020,6 +4048,7 @@
   let currentIndexTab = 'systematic';
 
   function openIndex() {
+    takeStep('panel');
     // The results drawer (opened by a search, below the header) gives way;
     // the panel links back to it
     if (resultsDrawerOpen) {
@@ -4035,6 +4064,7 @@
   }
 
   function closeIndex() {
+    dropStep('panel');
     $indexOverlay.classList.remove('open');
     $indexPanel.classList.remove('open');
     $sysTip.classList.remove('visible');
@@ -4050,13 +4080,16 @@
   const $btnInfoTab = document.getElementById('btn-info-tab');
   const $indexSearchWrapper = document.getElementById('index-search-wrapper');
 
+  function setIndexTab(name) {
+    document.querySelectorAll('.index-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    $btnInfoTab.classList.toggle('active', name === 'info');
+    currentIndexTab = name;
+    $indexSearchWrapper.style.display = name === 'info' ? 'none' : '';
+  }
+
   document.querySelectorAll('.index-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
-      $btnInfoTab.classList.remove('active');
-      tab.classList.add('active');
-      currentIndexTab = tab.dataset.tab;
-      $indexSearchWrapper.style.display = '';
+      setIndexTab(tab.dataset.tab);
       renderIndex();
       $indexContent.scrollTop = 0;   // (not where the last tab was)
       if (currentIndexTab === 'systematic') syncSystematicToScroll();
@@ -4064,10 +4097,7 @@
   });
 
   $btnInfoTab.addEventListener('click', () => {
-    document.querySelectorAll('.index-tab').forEach(t => t.classList.remove('active'));
-    $btnInfoTab.classList.add('active');
-    currentIndexTab = 'info';
-    $indexSearchWrapper.style.display = 'none';
+    setIndexTab('info');
     renderIndex();
   });
 
@@ -4113,6 +4143,7 @@
   const indexDomCache = new Map();
 
   function renderIndex() {
+    indexRenders++;
     clearTimeout(indexFilterTimer);
     indexFill = null;
     // one letter would match nearly every entry: not a filter (as in the search bar)
@@ -4307,6 +4338,7 @@
   }
 
   function sysGo(n) {
+    takeStep();
     closeIndex();
     if (!n.art) { navigateToSection(n.id); return; }
     const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(n.art)}"][data-law="${n.law}"]`);
@@ -4887,6 +4919,7 @@
       const entry = subjectsSorted[+at.dataset.i];
       const sub = line.closest('.subj-entry[data-c]');
       const refs = sub ? entry.children[+sub.dataset.c].refs : entry.refs;
+      takeStep();
       closeIndex();
       goToQuickRef(idxRemRef(refs[+line.dataset.r]));
       return;
@@ -4896,6 +4929,7 @@
     if (!top) return;
     const entry = subjectsSorted[+top.dataset.i];
     const sub = title.parentElement.dataset.c;
+    takeStep();
     closeIndex();
     if (sub === undefined) {
       openSubject({ subject: entry.subject, refs: collectAllRefs(entry) });
@@ -4969,6 +5003,7 @@
           linkEl.textContent = ' — ' + refEntryLabel(entry);
           linkEl.addEventListener('click', (e) => {
             e.preventDefault();
+            takeStep();
             closeIndex();
             goToRefEntry(entry, cat.category === LEGISLACAO);
           });
@@ -5062,9 +5097,17 @@
   // within them. The bar's filter and arrows serve both; clearing the bar
   // takes the chip out too.
   function openScope(chip, startCard = null) {
-    scope = chip;
+    takeStep();
+    showChip(chip);
     scopeOpening = true;
     scopeStartCard = startCard;
+    $searchInput.value = '';
+    doSearch('');
+  }
+
+  // The chip in the bar (the caller searches again)
+  function showChip(chip) {
+    scope = chip;
     const subject = chip.kind === 'subject';
     $searchChip.dataset.kind = chip.kind;
     $chipLabel.textContent = subject ? chip.label : '\u2605 ' + chip.label;
@@ -5072,10 +5115,8 @@
     $searchChip.hidden = false;
     $resultsTitle.textContent = subject ? 'Remissivo: ' + chip.label : 'Artigos marcados';
     updateChipSpace();
-    $searchInput.value = '';
     markScopeUnits();
     renderMarkerNav();
-    doSearch('');
   }
 
   function openSubject(entry, startCard = null) {
@@ -5115,6 +5156,144 @@
   });
   // Its width is a share of the bar's
   window.addEventListener('resize', () => { if (scope) updateChipSpace(); });
+
+  // ===== BACK AND FORWARD =====
+  // The browser's back button undoes a jump, so the search's results and the
+  // index panel can be explored: a result of the list (of the indexes or of
+  // the articles), a subject or the marked articles put in the bar, a section
+  // or provision from the index panel, a remissão. Each jump first keeps the
+  // state it leaves in a step of the history: the bar's terms and chip, the
+  // list (open or not, its scroll, its indexes' part as it was, with the
+  // "+ N" opened), the index panel, the article being read and where it was
+  // on the screen. Back puts that back; forward, the state back left.
+  // Opening the results drawer (small screens) or the index panel is a step
+  // too, so back closes them; closed by hand, their step goes out. Typing is
+  // not a step. The states live in the page: after a reload, the steps of
+  // before restore nothing.
+  history.replaceState({ step: stepId }, '');
+
+  // kind: what the step opens ('drawer', 'panel'), or 'rem' (a remissão's
+  // jump, which its "voltar" undoes). state: the one left, if taken before.
+  function takeStep(kind, state) {
+    if (restoring || stepTaken) return;
+    // one per action (a result of the list may open a chip)
+    stepTaken = true;
+    queueMicrotask(() => { stepTaken = false; });
+    steps.set(stepId, state || stepState());
+    stepId = STEP_LOAD + ':' + ++stepCount;
+    if (kind) stepKinds.set(stepId, kind);
+    history.pushState({ step: stepId }, '');
+  }
+
+  // The step of the drawer or the panel just closed (or of the remissão gone
+  // back from) out of the history
+  function dropStep(kind) {
+    if (restoring || stepKinds.get(stepId) !== kind) return;
+    stepKinds.delete(stepId);
+    silentPops++;
+    history.back();
+  }
+
+  window.addEventListener('popstate', e => {
+    const id = e.state && e.state.step;
+    if (silentPops) {
+      silentPops--;
+      if (id) stepId = id;
+      return;
+    }
+    const state = id && steps.get(id);
+    if (state) steps.set(stepId, stepState());
+    if (id) stepId = id;
+    if (state) restoreStep(state);
+  });
+
+  function stepState() {
+    let card = selectedCard;
+    if (!card || card.classList.contains('filtered-out')) card = findSelectionCard();
+    // the indexes' part of the list, if it is the one of the bar's terms
+    const applied = !searchTimer && currentSearch === $searchInput.value.trim();
+    return {
+      term: $searchInput.value, scope, filter: searchFilter,
+      card, top: card ? card.getBoundingClientRect().top : 0,
+      drawer: resultsDrawerOpen, hidden: resultsHidden, listTop: $resultsList.scrollTop,
+      indexMatches: applied ? indexMatches : null,
+      indexPart: applied && indexPart && indexPart.isConnected && indexPartFor === indexMatches ? indexPart : null,
+      panel: !$indexPanel.classList.contains('open') ? null : {
+        tab: currentIndexTab, refCategory: currentRefCategory, filter: $indexSearch.value,
+        sysNorm, sysTitle, top: $indexContent.scrollTop, renders: indexRenders,
+      },
+      remBack: $remReturn.classList.contains('visible') ? { label: $remReturn.textContent, to: remReturnTo } : null,
+    };
+  }
+
+  function restoreStep(s) {
+    restoring = true;
+    try {
+      cancelPendingSearch();
+      hideRemPop();
+      if (s.term !== $searchInput.value || s.scope !== scope || s.filter !== searchFilter) {
+        searchFilter = s.filter;
+        $btnFilter.classList.toggle('active', searchFilter);
+        if (s.scope !== scope) {
+          if (s.scope) showChip(s.scope);
+          else closeScope();
+        }
+        $searchInput.value = s.term;
+        // the indexes' part of the list as it was left (the search keeps it)
+        if (s.indexMatches) indexMatches = s.indexMatches;
+        if (s.indexPart && s.indexPart !== indexPart) {
+          clearResultsList();
+          $resultsList.replaceChildren(s.indexPart);
+          indexPart = s.indexPart;
+          indexPartFor = s.indexMatches;
+        }
+        doSearch(s.term.trim());
+      }
+      // the list and the panel, open or closed as they were
+      resultsHidden = s.hidden;
+      resultsDrawerOpen = s.drawer && resultsActive && !resultsWide.matches;
+      if (s.panel) restorePanel(s.panel);
+      else if ($indexPanel.classList.contains('open')) closeIndex();
+      updateResultsVisibility();
+      if (resultsShown() && resultsBuiltFor !== searchMatches) buildResultsList();
+      // the article being read, where it was on the screen (not where the
+      // search goes)
+      if (scrollRafId) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
+      if (s.card) {
+        revealCard(s.card);
+        selectCard(s.card, true);
+        scrollToY(window.scrollY + s.card.getBoundingClientRect().top - s.top, 'instant');
+      }
+      // the list where it was (not on the selected article's group)
+      revealGroup = null;
+      revealPending = false;
+      if (resultsShown()) $resultsList.scrollTop = s.listTop;
+      if (s.remBack) {
+        $remReturn.textContent = s.remBack.label;
+        remReturnTo = s.remBack.to;
+      }
+      $remReturn.classList.toggle('visible', !!s.remBack);
+    } finally {
+      restoring = false;
+    }
+  }
+
+  // Drawn again since it was left: drawn as it was
+  function restorePanel(p) {
+    if (p.renders !== indexRenders) {
+      setIndexTab(p.tab);
+      currentRefCategory = p.refCategory;
+      $indexSearch.value = p.filter;
+      $btnClearIndexSearch.style.display = p.filter.trim() ? 'flex' : 'none';
+      sysNorm = p.sysNorm;
+      sysTitle = p.sysTitle;
+      renderIndex();
+      flushIndexFill();
+    }
+    $indexOverlay.classList.add('open');
+    $indexPanel.classList.add('open');
+    $indexContent.scrollTop = p.top;
+  }
 
   // ===== NO ÍNDICE REMISSIVO =====
   // At the end of each article, the subjects of the remissivo that cite it (or

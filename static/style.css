@@ -1461,6 +1461,11 @@ button.q-label:hover { color: #2c6fa6; }
 .detail-highlight {
   animation: detail-flash .4s ease-out;
   background-color: #fff3bf;
+}
+/* A paragraph's yellow reaches a little to the left of the text; the whole
+   article's card keeps its own padding and corners (or the number and the
+   rubrica, which reach out to the card's edge, are cut off) */
+.detail-highlight:not(.card) {
   border-radius: 4px;
   margin-left: calc(-4px * var(--zoom-scale));
   padding-left: calc(4px * var(--zoom-scale));

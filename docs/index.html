@@ -92,7 +92,7 @@ html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
   src: url(fonts/merriweather-sans-latin.woff2) format("woff2");
 }
 /* Only on the headings: Cinzel (roman capitals) on the ribbons, EB Garamond
-   on the norma's cover */
+   on the norma's cover (its italic on the cover's act and date) */
 @font-face {
   font-family: "Cinzel"; font-style: normal; font-weight: 400 900; font-display: swap;
   src: url(fonts/cinzel-latin.woff2) format("woff2");
@@ -100,6 +100,10 @@ html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
 @font-face {
   font-family: "EB Garamond"; font-style: normal; font-weight: 400 800; font-display: swap;
   src: url(fonts/eb-garamond-latin.woff2) format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond"; font-style: italic; font-weight: 400 800; font-display: swap;
+  src: url(fonts/eb-garamond-italic-latin.woff2) format("woff2");
 }
 /* Until those come (swap), the text is in a system font sized to take the
    same room — size-adjust measured on the site's own text, 31/10/2026 —, so
@@ -574,28 +578,50 @@ body {
   color: color-mix(in srgb, var(--lv-t) 90%, transparent);
 }
 
-/* The norma's cover: a gem in its color, a shine at the top, its monogram
-   large and faint behind, and a line naming it (data-mono, data-sub) */
+/* The norma's cover: a divider in a binder. A sheet of paper with a tab
+   on top holding its letters (data-mono), each norma's tab further along
+   the edge (RI first, LOM second…), as in a vade-mécum; under the name the
+   act and its date in italics (data-ato) and a small note, with the count
+   of articles (data-nota, on an empty <i> that gives a third pseudo-
+   element). Chosen 31/10/2026 in dist/prototipo-capa. */
 .card-titulo.nivel-norma {
-  overflow: hidden; border: 0; color: #fff; text-align: left;
+  --aba: calc(30px * var(--zoom-scale)); --aba-i: 0; --papel: #fffdf8;
+  display: grid; justify-items: start; align-content: start; text-align: left;
+  border: 0; border-radius: 0; overflow: hidden; box-shadow: none;
   background:
-    radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
-    linear-gradient(120deg, color-mix(in srgb, var(--nc) 70%, #000) 0%, var(--nc) 60%, color-mix(in srgb, var(--nc) 75%, #fff) 100%);
-  box-shadow: 0 16px 30px -18px color-mix(in srgb, var(--nc) 80%, #000), inset 0 1px 0 rgba(255,255,255,.3);
-  padding: calc(24px * var(--zoom-scale)) calc(22px * var(--zoom-scale));
-  margin: calc(24px * var(--zoom-scale)) 0 calc(16px * var(--zoom-scale));
-  font: 500 calc(2rem * var(--zoom-scale))/1.15 var(--font-capa); text-transform: none; letter-spacing: .01em;
-  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+    linear-gradient(var(--nc) 0 0) 0 var(--aba) / 100% calc(3px * var(--zoom-scale)) no-repeat,
+    linear-gradient(color-mix(in srgb, var(--nc) 14%, var(--papel)) 0 0) 0 var(--aba) / calc(7px * var(--zoom-scale)) 100% no-repeat,
+    linear-gradient(var(--papel) 0 0) 0 var(--aba) / 100% 100% no-repeat;
+  filter: drop-shadow(0 1px 1px rgba(20,30,45,.1)) drop-shadow(0 8px 10px rgba(20,30,45,.14));
+  padding: 0 0 calc(24px * var(--zoom-scale)) calc(28px * var(--zoom-scale));
+  margin: calc(26px * var(--zoom-scale)) 0 calc(16px * var(--zoom-scale));
+  font: 500 calc(2.3rem * var(--zoom-scale))/1.08 var(--font-capa); text-transform: none; letter-spacing: .005em;
+  color: color-mix(in srgb, var(--nc) 28%, #191a1f);
 }
+.card-titulo.nivel-norma[data-nrm="LOM"]  { --aba-i: 1; }
+.card-titulo.nivel-norma[data-nrm="CE"]   { --aba-i: 2; }
+.card-titulo.nivel-norma[data-nrm="CF"]   { --aba-i: 3; }
+.card-titulo.nivel-norma[data-nrm="PREC"] { --aba-i: 4; }
 .card-titulo.nivel-norma::before {
-  content: attr(data-mono); position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  font: 700 calc(4.6rem * var(--zoom-scale))/1 var(--font-capa); letter-spacing: -.04em;
-  color: rgba(255,255,255,.13); text-shadow: none; pointer-events: none;
+  content: attr(data-mono); box-sizing: border-box; height: var(--aba); min-width: 19%;
+  margin: 0 0 calc(18px * var(--zoom-scale)) calc(var(--aba-i) * 19% + 6px - 28px * var(--zoom-scale));
+  padding: 0 calc(16px * var(--zoom-scale));
+  border-radius: calc(8px * var(--zoom-scale)) calc(8px * var(--zoom-scale)) 0 0; text-align: center;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 70%), var(--nc);
+  font: 700 calc(.82rem * var(--zoom-scale))/var(--aba) var(--font-fita); letter-spacing: .16em; color: #fff;
 }
 .card-titulo.nivel-norma::after {
-  content: attr(data-sub); display: block; margin-top: 8px; max-width: 78%;
-  font: 500 calc(.72rem * var(--zoom-scale))/1.5 var(--font-ui); letter-spacing: .08em; text-transform: uppercase;
-  color: rgba(255,255,255,.78); text-shadow: none;
+  content: attr(data-ato); order: 1; margin-top: calc(8px * var(--zoom-scale)); padding-right: calc(20px * var(--zoom-scale));
+  font: italic 400 calc(1.04rem * var(--zoom-scale))/1.4 var(--font-capa); color: #4c4f57;
+}
+.capa-nota {
+  order: 2; margin-top: calc(10px * var(--zoom-scale));
+  font: 600 calc(.6rem * var(--zoom-scale))/1.4 var(--font-ui); letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(35,37,44,.55);
+}
+.capa-nota::before { content: attr(data-nota); }
+@media (max-width: 600px) {
+  .card-titulo.nivel-norma { font-size: calc(1.95rem * var(--zoom-scale)); }
 }
 
 /* The norm's text with serifs; what is interface in it (chips, labels) without */
@@ -2617,7 +2643,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
 
 <!-- CARDS -->
 <div id="cards-container">
-  <div class="card card-titulo nivel-norma" data-section="norma1" data-mono="RI" data-sub="Câmara Municipal de São Paulo · Resolução nº 2, de 26 de abril de 1991">Regimento Interno</div>
+  <div class="card card-titulo nivel-norma" data-section="norma1" data-mono="RI" data-ato="Resolução nº 2, de 26 de abril de 1991">Regimento Interno<i class="capa-nota" aria-hidden="true" data-nota="411 artigos"></i></div>
 
   <div class="card card-titulo nivel-titulo" data-section="tit1">TÍTULO I<br>DA CÂMARA MUNICIPAL</div>
 
@@ -8209,7 +8235,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     </div>
   </div>
 
-  <div class="card card-titulo nivel-norma" data-section="norma2" data-nrm="LOM" data-mono="LOM" data-sub="Município de São Paulo · promulgada em 4 de abril de 1990">Lei Orgânica</div>
+  <div class="card card-titulo nivel-norma" data-section="norma2" data-nrm="LOM" data-mono="LOM" data-ato="Promulgada em 4 de abril de 1990">Lei Orgânica<i class="capa-nota" aria-hidden="true" data-nota="283 artigos"></i></div>
 
   <div class="card card-titulo nivel-titulo" data-section="tit17" data-nrm="LOM">TÍTULO I<br>DISPOSIÇÕES PRELIMINARES</div>
 
@@ -12948,7 +12974,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     <p class="art-para"><span class="unit-id u-par" data-uid="artLOMADT38p4" data-path="§ 4º">§ 4º</span> — A adesão ao regime de previdência complementar de que trata este artigo deverá ter início até 90 (noventa) dias após a promulgação desta Emenda à Lei Orgânica, ficando disponível aos servidores pelo prazo de 2 (dois) anos. <span class="amendment-note longa"><a href="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=ELO&amp;NUMERO=41&amp;ANO=2021&amp;DOCUMENTO=Atualizado" target="_blank" rel="noopener" class="amendment-note longa">(Incluído pela Emenda à Lei Orgânica nº 41, de 18 de novembro de 2021, que entra em vigor 120 dias após sua promulgação)</a></span></p>
   </div>
 
-  <div class="card card-titulo nivel-norma" data-section="norma3" data-nrm="CE" data-mono="CE" data-sub="Estado de São Paulo · promulgada em 5 de outubro de 1989 · dispositivos selecionados">Constituição Estadual</div>
+  <div class="card card-titulo nivel-norma" data-section="norma3" data-nrm="CE" data-mono="CE" data-ato="Promulgada em 5 de outubro de 1989">Constituição Estadual<i class="capa-nota" aria-hidden="true" data-nota="Dispositivos selecionados · 165 artigos"></i></div>
 
   <div class="card card-titulo nivel-titulo" data-section="tit23" data-nrm="CE">TÍTULO I<br>Dos Fundamentos do Estado</div>
 
@@ -15272,7 +15298,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     <p><span class="unit-id" data-uid="artCE296">Art. 296</span> — É vedada a concessão de incentivos e isenções fiscais às empresas que comprovadamente não atendam às normas de preservação ambiental e às relativas à saúde e à segurança do trabalho.<span class="rem rem-imp t-sim" tabindex="0" role="button" data-ref="LOM:183,§ 2º" data-tipo="sim" data-side="tgt" data-n="4196" data-label="⇄ LOM 183, § 2º" data-esfera="estadual"></span></p>
   </div>
 
-  <div class="card card-titulo nivel-norma" data-section="norma4" data-nrm="CF" data-mono="CF" data-sub="República Federativa do Brasil · promulgada em 5 de outubro de 1988 · dispositivos selecionados">Constituição Federal</div>
+  <div class="card card-titulo nivel-norma" data-section="norma4" data-nrm="CF" data-mono="CF" data-ato="Promulgada em 5 de outubro de 1988">Constituição Federal<i class="capa-nota" aria-hidden="true" data-nota="Dispositivos selecionados · 141 artigos"></i></div>
 
   <div class="card card-titulo nivel-titulo" data-section="tit31" data-nrm="CF">TÍTULO I<br>Dos Princípios Fundamentais</div>
 
@@ -18665,7 +18691,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     <div class="rem-backlinks" data-label="Citado em:"><span class="rem rem-back" tabindex="0" role="button" data-ref="CF:40,§ 22º,V" data-label="CF art. 40, § 22º, V"></span><span class="rem rem-back" tabindex="0" role="button" data-ref="CF:167,XII" data-label="CF art. 167, XII"></span></div>
   </div>
 
-  <div class="card card-titulo nivel-norma" data-section="norma5" data-nrm="PREC" data-mono="PR" data-sub="Câmara Municipal de São Paulo · decisões e interpretações da Presidência (RI, art. 313)">Precedentes Regimentais</div>
+  <div class="card card-titulo nivel-norma" data-section="norma5" data-nrm="PREC" data-mono="PR" data-ato="Decisões e interpretações da Presidência">Precedentes Regimentais<i class="capa-nota" aria-hidden="true" data-nota="RI, art. 313 · 20 precedentes"></i></div>
 
   <div class="card card-artigo card-prec" data-art="2/1993" data-law="PREC" data-src="https://app-plpconsulta-prd.azurewebsites.net/Forms/MostrarArquivo?TIPO=PRG&amp;NUMERO=2&amp;ANO=1993&amp;DOCUMENTO=Atualizado">
     <span class="art-compact-label">Precedente nº 2/1993</span>
@@ -19158,7 +19184,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 19:40 · a067150<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 20:22 · b5ff34e<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette
@@ -19308,13 +19334,15 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // A heading is a ribbon, further in at each level (both margins, and its
   // 28px paddings): "TÍTULO I" on a line, then the name (after the <br>) on
   // lines of roman capitals (Cinzel), the small first line ("TÍTULO I")
-  // a little taller than the others. A norma's cover: its name in large
-  // letters, then the line naming it (data-sub) at 78% of the width. Fitted
-  // 30/10/2026 (14 of 574 headings a line off).
+  // a little taller than the others. Fitted 30/10/2026 (14 of 574 headings
+  // a line off). A norma's cover: its tab, the name in large letters (a
+  // little smaller on a phone), the act in italics (data-ato) and the note
+  // (.capa-nota), one line.
   let cardEstTitle = null;
   const TITLE_CHAR_PX = 11.8, TITLE_LINE_PX = 21.4, TITLE_FIRST_PX = 23.6;
   const TITLE_INSET = { 'nivel-capitulo': 28, 'nivel-secao': 56, 'nivel-subsecao': 84 };
-  const COVER_CHAR_PX = 13.5, COVER_LINE_PX = 35.6, COVER_SUB_CHAR_PX = 7, COVER_SUB_LINE_PX = 16.7;
+  const COVER_TOP_PX = 48, COVER_CHAR_PX = 15.5, COVER_LINE_PX = 39.7, COVER_ATO_CHAR_PX = 7.2, COVER_ATO_LINE_PX = 23.3,
+    COVER_ATO_TOP_PX = 8, COVER_NOTA_PX = 21.4, COVER_PHONE = 1.95 / 2.3;
 
   // The index band's height, open: its table's rows, the subject wrapped in
   // its column and the sub-subjects packed in lines beside it, as the browser
@@ -19409,7 +19437,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
           if (n.nodeName === 'BR') segs.push(0);
           else segs[segs.length - 1] += n.textContent.trim().length;
         }
-        if (card.classList.contains('nivel-norma')) return { cover: segs[0], sub: (card.dataset.sub || '').length };
+        if (card.classList.contains('nivel-norma')) return { cover: segs[0], ato: (card.dataset.ato || '').length, nota: !!card.querySelector('.capa-nota') };
         const level = [...card.classList].find(c => c in TITLE_INSET);
         return { segs, inset: TITLE_INSET[level] || 0 };
       });
@@ -19448,7 +19476,8 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       if (set[i] !== v) ALL_CARDS[i].style.setProperty(prop, (set[i] = v) + 'px');
     };
     const titleWidth = $cards.clientWidth - 24;
-    const coverWidth = titleWidth - 44 * z;
+    const coverWidth = titleWidth - 28 * z;
+    const coverFont = matchMedia('(max-width: 600px)').matches ? COVER_PHONE : 1;
     const perLine = (width, charPx) => Math.max(10, width / (charPx * z));
     ALL_CARDS.forEach((card, i) => {
       const t = cardEstTitle[i];
@@ -19462,9 +19491,10 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
         return;
       }
       if (t) {
-        const name = Math.max(1, Math.ceil(t.cover / perLine(coverWidth, COVER_CHAR_PX)));
-        const sub = t.sub ? 8 + COVER_SUB_LINE_PX * z * Math.ceil(t.sub / perLine(coverWidth * .78, COVER_SUB_CHAR_PX)) : 0;
-        setEst(i, '--card-h', cardEstSet, Math.round(name * COVER_LINE_PX * z + sub));
+        const name = Math.max(1, Math.ceil(t.cover / perLine(coverWidth, COVER_CHAR_PX * coverFont)));
+        const ato = t.ato ? COVER_ATO_TOP_PX + COVER_ATO_LINE_PX * Math.ceil(t.ato / perLine(coverWidth - 20 * z, COVER_ATO_CHAR_PX)) : 0;
+        setEst(i, '--card-h', cardEstSet,
+          Math.round((COVER_TOP_PX + name * COVER_LINE_PX * coverFont + ato + (t.nota ? COVER_NOTA_PX : 0)) * z));
         return;
       }
       const nc = cardEstCompact[i];

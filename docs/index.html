@@ -197,6 +197,9 @@ body {
   flex-shrink: 0;
 }
 #btn-index:hover { background: #eef0f3; }
+/* tapped before the page's script ran (base.html): it opens once it does */
+#btn-index.pending { cursor: progress; animation: btn-pending .6s ease-in-out infinite alternate; }
+@keyframes btn-pending { to { opacity: .3; } }
 
 #search-wrapper {
   flex: 1;
@@ -1072,9 +1075,21 @@ mark.weak {
 /* closed and out of sight (setPanelOpen): its lines out of reach of Tab
    and of a screen reader, their layout kept for the next opening */
 #index-panel.shut { content-visibility: hidden; }
-/* a tab chosen, its list on the way (indexTabClick) */
+/* a tab chosen (or the panel opened), its list on the way (renderIndexSoon):
+   a bar running under the tabs. Not the list dimmed: thousands of lines
+   painted again, the very frame that answers the tap made slow */
 #index-panel.loading { cursor: progress; }
-#index-panel.loading #index-content { opacity: .45; }
+#index-header { position: relative; }   /* (the panel clips the bar) */
+#index-panel.loading #index-header::after {
+  content: ''; position: absolute; left: 0; bottom: 0; width: 35%; height: 3px;
+  background: var(--amb); border-radius: 2px;
+  animation: index-loading .9s ease-in-out infinite;
+}
+@keyframes index-loading { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+#index-panel.loading #index-content:empty::before {
+  content: 'Carregando…'; display: block; padding: 24px 8px; text-align: center;
+  font: 500 14px var(--font-ui); color: #6b7380;
+}
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
 #index-panel[data-tab="subject"] { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
@@ -2329,16 +2344,15 @@ button.q-label:hover { color: #2c6fa6; }
 @media (prefers-reduced-motion: no-preference) {
   .rem-box, .footnote-box.open { animation: unfold .26s cubic-bezier(.2,.8,.2,1); transform-origin: top center; }
   #rem-pop.visible { animation: pop-in .16s ease-out; }
-  #index-panel { transition: transform .42s cubic-bezier(.3,1.18,.4,1), width .3s ease; }
+  /* (not its width, from tab to tab: each frame would lay its whole list
+     out again, the slowness of a tab's first opening on a phone) */
+  #index-panel { transition: transform .42s cubic-bezier(.3,1.18,.4,1); }
   #index-overlay.open { animation: fade-in .3s ease; }
   .card .idx-back { transition: transform .14s ease, box-shadow .14s ease, background-color .2s, color .2s; }
   .card .rem-imp:hover, .card .idx-back:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
   }
-  /* the first cards of each grid (all of them at once, hundreds, would be
-     drawn one by one as the tab opens) */
-  .q-grid > :nth-child(-n+8) { animation: pop-in .25s ease-out backwards; }
   .sys-bar > i { transition: transform .15s, opacity .15s; }
   .sys-bar > i:hover { transform: scaleY(1.45); }
 }
@@ -2438,6 +2452,15 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
 <!-- HEADER -->
 <div id="header">
   <button id="btn-index" title="Índice" aria-label="Índice" aria-controls="index-panel" aria-expanded="false">☰</button>
+  <script>
+  // The header shows seconds before the page's script runs (it comes after
+  // the cards): a tap on ☰ meanwhile is answered at once and remembered, and
+  // the index opens as soon as the script runs (19-inicio-da-pagina.js)
+  document.getElementById('btn-index').addEventListener('click', window.earlyIndex = function () {
+    this.classList.add('pending');
+    window.earlyIndex.asked = true;
+  });
+  </script>
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: r43 vai ao Art. 43 do RI, l43 ao da LOM)" autocomplete="off" enterkeyhint="search">
     <span id="search-chip" hidden><span id="chip-label"></span><button id="chip-remove" type="button" title="Tirar o assunto da busca" aria-label="Tirar o assunto da busca">&times;</button></span>
@@ -22512,11 +22535,15 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       resultsDrawerOpen = false;
       updateResultsVisibility();
     }
+    // In at once, its list drawn right after (renderIndexSoon); meanwhile
+    // the last one dimmed, or nothing if it was another tab's (one kept from
+    // idle time: 19-inicio-da-pagina.js)
+    if ($indexContent.dataset.of !== currentIndexTab) $indexContent.replaceChildren();
     $indexOverlay.classList.add('open');
     setPanelOpen(true);
     sysNorm = -1;
     sysTitle = null;
-    renderIndex();
+    renderIndexSoon();
     if (window.innerWidth > 768) $indexSearch.focus();
   }
 
@@ -22593,20 +22620,25 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     $indexSearchWrapper.style.display = name === 'info' ? 'none' : '';
   }
 
-  // The tab marked and the list it leaves dimmed at once; its own list drawn
-  // once that is on the screen: a long one (the first time, on a phone) does
-  // not leave the tap unanswered. Another rendering meanwhile cancels it.
+  // The list being left dimmed at once, and the new one drawn once that is
+  // on the screen: a long one (on a phone) does not leave the tap unanswered.
+  // Another rendering meanwhile cancels it.
   let tabRender = 0;
-  function indexTabClick(name) {
-    setIndexTab(name);
+  function renderIndexSoon(then) {
     $indexPanel.classList.add('loading');
     const mine = ++tabRender;
     requestAnimationFrame(() => setTimeout(() => {
       if (mine !== tabRender) return;
       renderIndex();
+      if (then) then();
+    }, 0));
+  }
+  function indexTabClick(name) {
+    setIndexTab(name);
+    renderIndexSoon(() => {
       $indexContent.scrollTop = 0;   // (not where the last tab was)
       if (currentIndexTab === 'systematic') syncSystematicToScroll();
-    }, 0));
+    });
   }
   document.querySelectorAll('.index-tab').forEach(tab => {
     tab.addEventListener('click', () => indexTabClick(tab.dataset.tab));
@@ -22685,6 +22717,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       : currentIndexTab === 'subject' ? 'subject'
       : currentIndexTab === 'references' ? 'references:' + currentRefCategory : null;
     if ($indexPanel.dataset.tab !== currentIndexTab) $indexPanel.dataset.tab = currentIndexTab;
+    $indexContent.dataset.of = currentIndexTab;
     $indexContent.classList.remove('sys-two');
     const cached = cacheKey && indexDomCache.get(cacheKey);
     if (cached) {
@@ -24657,6 +24690,13 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // On a slow network the bar shows seconds before the script runs: what
   // was typed meanwhile is searched now
   if ($searchInput.value.trim()) $searchInput.dispatchEvent(new Event('input'));
+  // ...and ☰ tapped meanwhile (base.html) opens the index now
+  if (window.earlyIndex) {
+    $btnIndex.removeEventListener('click', window.earlyIndex);
+    $btnIndex.classList.remove('pending');
+    if (window.earlyIndex.asked) openIndex();
+    delete window.earlyIndex;
+  }
 
   // Warm what the first results list needs (law titles, fonts and styles of
   // its entries), so its first build is not a long task

@@ -2529,6 +2529,18 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     this.classList.add('pending');
     window.earlyIndex.asked = e.timeStamp || performance.now();   // (when: ?medir, 12-painel-do-indice.js)
   });
+  // A finger's tap on a button doesn't put the focus on it (as on an iPhone):
+  // on an Android phone the page's first focus on a button froze it for 2.5 s
+  // (the browser's own work, measured with ?medir&sem=foco), the ☰'s first
+  // opening above all. A field being typed in loses it, as before (the
+  // keyboard closes); Tab still goes to the buttons
+  document.addEventListener('mousedown', function (e) {
+    if (!(e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents)
+        || !e.target.closest || !e.target.closest('button, [role="button"]')) return;
+    e.preventDefault();
+    var typing = document.activeElement;
+    if (typing && typing.matches('input, textarea')) typing.blur();
+  }, true);
   </script>
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: r43 vai ao Art. 43 do RI, l43 ao da LOM)" autocomplete="off" enterkeyhint="search">
@@ -19093,7 +19105,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 18:38 · 35f1a01<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 18:57 · e8bb815<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette

@@ -128,6 +128,30 @@ def test_aba_de_informacoes_mostra_a_versao(abrir):
     assert re.match(r"Versão de \d\d/\d\d/\d{4}, \d\d:\d\d", pg.locator(".info-versao").inner_text())
 
 
+def test_outras_abas_so_se_preparam_depois_de_fechar_o_painel(abrir):
+    """Não logo depois da carga, quando o primeiro toque no ☰ esperaria por elas."""
+    pg = abrir()
+    pg.wait_for_timeout(1500)
+    assert pg.evaluate("document.getElementById('index-content').dataset.of") is None
+    pg.click("#btn-index")
+    pg.wait_for_selector("#index-content .sys-tit")
+    pg.click("#index-close")
+    pg.wait_for_function("document.getElementById('index-content').dataset.of === 'subject'")
+    assert pg.evaluate("document.getElementById('index-panel').classList.contains('shut')")
+
+
+def test_medir_mostra_a_primeira_abertura_na_aba_de_informacoes(abrir, site):
+    pg = abrir()
+    pg.goto(site + "?medir", wait_until="load")
+    pg.wait_for_selector(".idx-sum", state="attached")
+    pg.click("#btn-index")
+    pg.wait_for_selector("#index-content .sys-tit")
+    pg.wait_for_timeout(100)
+    pg.click("#btn-info-tab")
+    texto = pg.locator(".info-medida").inner_text()
+    assert re.match(r"Primeira abertura do índice: toque aos [\d,]+ s .*painel na tela [\d,]+ s depois; lista [\d,]+ s depois", texto), texto
+
+
 def test_deslizar_para_a_esquerda_fecha_o_painel(abrir):
     pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
     pg.click("#btn-index")

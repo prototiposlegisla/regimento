@@ -32,9 +32,9 @@
   // The header shows seconds before the page's script runs (it comes after
   // the cards): a tap on ☰ meanwhile is answered at once and remembered, and
   // the index opens as soon as the script runs (19-inicio-da-pagina.js)
-  document.getElementById('btn-index').addEventListener('click', window.earlyIndex = function () {
+  document.getElementById('btn-index').addEventListener('click', window.earlyIndex = function (e) {
     this.classList.add('pending');
-    window.earlyIndex.asked = true;
+    window.earlyIndex.asked = e.timeStamp || performance.now();   // (when: ?medir, 12-painel-do-indice.js)
   });
   </script>
   <div id="search-wrapper">

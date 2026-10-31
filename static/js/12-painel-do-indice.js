@@ -1,7 +1,36 @@
   // ===== INDEX PANEL =====
   let currentIndexTab = 'systematic';
 
+  // ?medir in the address: the index's first opening timed on this device,
+  // shown in the info tab (a phone's numbers, to set against those of an
+  // emulated one). When ☰ was touched, when the panel was on the screen,
+  // when its list was, and the long tasks meanwhile
+  const firstOpen = /[?&]medir\b/.test(location.search) ? { long: [] } : null;
+  if (firstOpen) {
+    $btnIndex.addEventListener('pointerdown', e => { if (!firstOpen.tap) firstOpen.tap = e.timeStamp; });
+    try {
+      new PerformanceObserver(l => { for (const e of l.getEntries()) firstOpen.long.push([e.startTime, e.duration]); })
+        .observe({ type: 'longtask', buffered: true });
+    } catch (e) {}
+  }
+  function firstOpenHtml() {
+    const f = firstOpen;
+    if (!f || !f.list) return '';
+    const s = ms => (ms / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' s';
+    const nav = performance.getEntriesByType('navigation')[0];
+    const long = f.long.filter(([t, d]) => t + d > f.tap - 1000 && t < f.list)
+      .map(([t, d]) => (t < f.tap ? '−' : '+') + s(Math.abs(t - f.tap)) + ' (' + Math.round(d) + ' ms)');
+    return '<p class="info-medida">Primeira abertura do índice: toque aos ' + s(f.tap)
+      + (nav && nav.loadEventEnd ? ' (página carregada aos ' + s(nav.loadEventEnd) + ')' : '')
+      + '; painel na tela ' + s(f.frame - f.tap) + ' depois; lista ' + s(f.list - f.tap) + ' depois. '
+      + 'Tarefas longas de 1 s antes do toque até a lista: ' + (long.join(', ') || 'nenhuma') + '.</p>';
+  }
+
   function openIndex() {
+    if (firstOpen && !firstOpen.frame) {
+      firstOpen.tap = firstOpen.tap || performance.now();
+      requestAnimationFrame(() => { firstOpen.frame = performance.now(); });
+    }
     takeStep('panel');
     // The results drawer (opened by a search, below the header) gives way;
     // the panel links back to it
@@ -32,7 +61,13 @@
     $indexPanel.classList.toggle('open', open);
     clearTimeout(panelShutTimer);
     if (open || now) $indexPanel.classList.toggle('shut', !open);
-    else panelShutTimer = setTimeout(() => $indexPanel.classList.add('shut'), PANEL_SLIDE_MS);
+    else panelShutTimer = setTimeout(() => {
+      $indexPanel.classList.add('shut');
+      // out of sight, the lists of the tabs not yet seen built for their
+      // first opening (warmIndexTab), in idle time
+      whenIdle(() => warmIndexTab('references'));
+      whenIdle(() => warmIndexTab('subject'));
+    }, PANEL_SLIDE_MS);
     $btnIndex.setAttribute('aria-expanded', open);
   }
 
@@ -105,6 +140,7 @@
       if (mine !== tabRender) return;
       renderIndex();
       if (then) then();
+      if (firstOpen && !firstOpen.list) requestAnimationFrame(() => { firstOpen.list = performance.now(); });
     }, 0));
   }
   function indexTabClick(name) {
@@ -164,12 +200,12 @@
   // built once (per category) and put back on each opening, not rebuilt
   const indexDomCache = new Map();
 
-  // In idle time after the load (19-inicio-da-pagina.js): a tab's list built
-  // in the closed panel and kept, so its first opening only lays it out. Not
-  // with the panel open or a filter in it, nor once kept
+  // In idle time once the panel is closed (setPanelOpen): a tab's list built
+  // in it, out of sight, and kept, so its first opening only lays it out. Not
+  // with the panel on the screen or a filter in it, nor once kept
   function warmIndexTab(name) {
     const key = name === 'subject' ? 'subject' : 'references:' + currentRefCategory;
-    if ($indexPanel.classList.contains('open') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
+    if (!$indexPanel.classList.contains('shut') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
     const was = currentIndexTab, wasWidth = $indexPanel.dataset.tab;
     currentIndexTab = name;
     renderIndex();
@@ -206,7 +242,7 @@
     $indexContent.innerHTML = '';
 
     if (currentIndexTab === 'info') {
-      $indexContent.innerHTML = '<div class="info-content">' + INFO_HTML + '</div>';
+      $indexContent.innerHTML = '<div class="info-content">' + INFO_HTML.replace('</p>', '</p>' + firstOpenHtml()) + '</div>';
       return;
     } else if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);

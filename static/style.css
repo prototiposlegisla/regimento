@@ -1273,8 +1273,9 @@ mark.weak {
   padding: 8px 12px;
 }
 
-/* Systematic index: the norma's tabs; each título a bar of its capítulos
-   (as long as its articles); wide, two columns (títulos | the one shown) */
+/* Systematic index: the norma's tabs; each título a band, with a thread of
+   its capítulos (as long as its articles); wide, two columns (títulos | the
+   one shown) */
 .sys-norms {
   display: flex; flex-wrap: wrap; gap: 4px;
   margin: -8px -12px 0; padding: 10px 12px 8px;
@@ -1296,37 +1297,61 @@ mark.weak {
 .lv-secao    { --lc: var(--nivel-secao); }
 .lv-subsecao { --lc: var(--nivel-subsecao); }
 .lv-leaf     { --lc: var(--nivel-norma); }
-/* the level's color behind the label ("Tít. II", "Cap. IV") */
+/* the level and number ("Título II", "Seção IV"), small, over the name */
 .sys-tag {
-  flex: none; min-width: 48px; padding: 3px 6px 2px; border-radius: 4px;
-  background: var(--lc); color: #fff; text-align: center;
-  font: 700 10.5px/1.2 var(--font-ui); letter-spacing: .03em; white-space: nowrap;
+  flex: 0 0 100%; order: -1; white-space: nowrap;
+  font: 700 9.5px/1.2 var(--font-ui); letter-spacing: .09em; text-transform: uppercase; color: var(--lc);
 }
-.lv-secao .sys-tag { color: var(--nivel-secao-texto); }
+.lv-secao .sys-tag { color: #9a7424; }
 .sys-nm { flex: 1; min-width: 0; }
 .sys-rg {
   flex: none; margin-left: auto; padding-left: 8px; white-space: nowrap;
   font: 500 11.5px/1.4 var(--font-ui); color: #8d96a3; font-variant-numeric: tabular-nums;
 }
-/* a título and its bar */
-.sys-tit { padding: 7px 4px 9px; border-bottom: 1px solid #f0f2f4; }
+/* a título: narrow, a band that stays under the norma's tabs while its
+   capítulos go by (the name goes to it, the arrow opens them), its thread
+   under it, its capítulos hanging from its color */
+.sys-tit { padding: 8px 0 4px; }
+.sys-band {
+  position: sticky; top: var(--sys-nh, 36px); z-index: 1;
+  display: flex; align-items: center; margin: 0 -4px; padding-right: 6px; border-radius: 6px;
+  background: color-mix(in srgb, var(--nivel-titulo) 10%, #fff); box-shadow: inset 4px 0 0 var(--nivel-titulo);
+}
+.sys-tit.open > .sys-band { border-radius: 6px 6px 0 0; }
+.sys-tit.sys-here:not(.open) > .sys-band { background: color-mix(in srgb, var(--nivel-titulo) 17%, #fff); }
 .sys-top {
-  display: flex; align-items: baseline; gap: 8px; cursor: pointer;
+  display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 1px; cursor: pointer;
   font: 600 13px/1.3 var(--font-ui); color: #2b2f36;
 }
+.sys-band > .sys-top { flex: 1; min-width: 0; padding: 9px 4px 9px 12px; }
+.sys-band > .sys-top:only-child { padding-right: 38px; }   /* (the ranges in line with the arrows') */
 .sys-top:hover .sys-nm, .sys-top:focus-visible .sys-nm { color: var(--selected-border); }
 .sys-top:focus-visible { outline: none; }
-.sys-bar { display: flex; gap: 2px; height: 11px; margin-top: 6px; }
-.sys-bar > i {
-  display: block; min-width: 3px; height: 100%; border-radius: 3px; cursor: pointer;
-  background-color: var(--nivel-capitulo);
-  background-image: linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,0) 60%);   /* a shine */
-  opacity: .5;
+.sys-open {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px; padding: 0;
+  border: 0; border-radius: 50%; cursor: pointer;
+  background: color-mix(in srgb, var(--nivel-titulo) 16%, #fff); color: var(--nivel-titulo);
 }
+.sys-open::before { content: "›"; margin-left: 2px; font: 700 22px/1 var(--font-ui); transform: rotate(90deg); }
+.sys-open[aria-expanded="true"] { background: var(--nivel-titulo); color: #fff; }
+.sys-open[aria-expanded="true"]::before { margin: 0 0 0 -2px; transform: rotate(-90deg); }
+.sys-open:focus-visible { outline: 2px solid var(--selected-border); outline-offset: 2px; }
+.sys-bar { display: flex; gap: 1px; height: 3px; margin-left: -4px; }
+.sys-bar > i {
+  display: block; min-width: 2px; height: 100%; cursor: pointer;
+  background-color: var(--nivel-capitulo); opacity: .5;
+}
+.sys-bar > i:first-child { border-radius: 2px 0 0 2px; }
+.sys-bar > i:last-child { border-radius: 0 2px 2px 0; }
 .sys-bar > i:nth-child(even) { opacity: .75; }
 .sys-bar.solo > i { background-color: var(--nivel-titulo); }
 .sys-bar > i:hover { opacity: 1; background-color: var(--nivel-titulo); }
-.sys-bar > i.sys-here { background-color: var(--selected-border); opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--selected-border); }
+.sys-bar > i.sys-here { background-color: var(--selected-border); opacity: 1; }
+.sys-kids {
+  margin: 0 -4px; padding: 2px 0 8px 8px;
+  border-left: 4px solid color-mix(in srgb, var(--nivel-titulo) 22%, #fff);
+}
+.sys-kids[hidden] { display: none; }
 #sys-tip {
   position: fixed; z-index: 900; display: none; max-width: 280px; pointer-events: none;
   padding: 5px 8px; border-radius: 5px; background: #2b2f36; color: #fff;
@@ -1336,49 +1361,54 @@ mark.weak {
 #sys-tip span { opacity: .7; }
 /* the rows: capítulos, seções, subseções, precedents */
 .sys-row {
-  display: flex; align-items: baseline; gap: 8px; cursor: pointer;
+  display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 1px; cursor: pointer;
   padding: 6px 8px 6px calc(8px + var(--d, 0) * 16px);
   font: 13px/1.4 var(--font-ui); color: #2b2f36; border-bottom: 1px solid #f4f5f7;
 }
 .sys-row:hover, .sys-row:focus-visible { background: #f1f4f8; outline: none; }
-.sys-kids { padding: 4px 0 2px 6px; }
-.sys-kids[hidden] { display: none; }
-.sys-start .sys-nm { font-style: italic; color: #4a5361; }
-.sys-start .sys-tag { min-width: 0; }
-/* where the reader is */
-.sys-here.sys-row, .sys-here > .sys-top { background: color-mix(in srgb, var(--selected-border) 9%, #fff); box-shadow: inset 3px 0 0 var(--selected-border); }
-.sys-here > .sys-top { margin: -3px -4px; padding: 3px 4px; border-radius: 3px; }
-.sys-here.sys-row .sys-nm::after, .sys-here:not(:has(.sys-here)) > .sys-top .sys-nm::after {
+/* where the reader is: the deepest step marked, the ones above it with the name in the accent */
+.sys-tit.sys-here .sys-top .sys-nm, .sys-row.sys-here:has(~ .sys-row.sys-here) .sys-nm { color: var(--selected-border); }
+.sys-row.sys-here:not(:has(~ .sys-row.sys-here)) {
+  background: color-mix(in srgb, var(--selected-border) 9%, #fff); box-shadow: inset 3px 0 0 var(--selected-border);
+}
+.sys-row.sys-here:not(:has(~ .sys-row.sys-here)) .sys-nm::after, .sys-tit.solo.sys-here .sys-top .sys-nm::after {
   content: "você está aqui"; margin-left: 6px; white-space: nowrap;
   font: 700 9.5px/1 var(--font-ui); color: var(--selected-border); text-transform: uppercase; letter-spacing: .05em;
 }
-.sys-row.sys-here:has(~ .sys-row.sys-here) .sys-nm::after { content: none; }
-/* wide: two columns */
+/* wide: two columns; the títulos as bands on the left, the one shown stronger */
 #index-content.sys-two { display: flex; flex-direction: column; overflow: hidden; }
 #index-content.sys-two .sys-norms { position: static; }
 .sys-cols {
   flex: 1; min-height: 0; display: grid; grid-template-columns: 270px 1fr;
   margin: 0 -12px -8px; border-top: 1px solid #e3e6ea;
 }
-.sys-left { overflow-y: auto; background: #fafbfc; border-right: 1px solid #e3e6ea; }
-.sys-left .sys-tit { padding: 8px 10px 9px 9px; border-left: 3px solid transparent; cursor: pointer; }
-.sys-left .sys-tit:hover { background: #eef2f6; }
-.sys-left .sys-tit.on { background: #fff; border-left-color: var(--nivel-titulo); }
+.sys-left { overflow-y: auto; padding: 6px 8px; background: #fafbfc; border-right: 1px solid #e3e6ea; }
+.sys-left .sys-tit {
+  margin-bottom: 6px; padding: 8px 10px 9px 8px; border-radius: 6px; cursor: pointer;
+  background: color-mix(in srgb, var(--nivel-titulo) 6%, #fff);
+  border-left: 4px solid color-mix(in srgb, var(--nivel-titulo) 40%, #fff);
+}
+.sys-left .sys-tit:hover { background: color-mix(in srgb, var(--nivel-titulo) 10%, #fff); }
+.sys-left .sys-tit.on {
+  background: color-mix(in srgb, var(--nivel-titulo) 16%, #fff); border-left-color: var(--nivel-titulo);
+  box-shadow: 0 2px 8px -4px rgba(60,25,35,.35);
+}
 .sys-left .sys-top { font-size: 12.5px; }
 .sys-left .sys-rg { display: none; }
+.sys-left .sys-bar { margin: 8px 0 0; }
 .sys-right { overflow-y: auto; padding-bottom: 24px; }
 .sys-head {
   position: sticky; top: 0; z-index: 1; cursor: pointer;
-  padding: 14px 16px 10px; background: #fff; border-bottom: 1px solid #eef0f2;
+  padding: 14px 16px 10px; border-bottom: 1px solid #eef0f2;
+  background: color-mix(in srgb, var(--nivel-titulo) 10%, #fff); box-shadow: inset 4px 0 0 var(--nivel-titulo);
 }
-.sys-k { font: 700 11px/1 var(--font-ui); color: var(--nivel-titulo); letter-spacing: .06em; text-transform: uppercase; }
+.sys-k { font: 700 10.5px/1 var(--font-ui); color: var(--nivel-titulo); letter-spacing: .09em; text-transform: uppercase; }
 .sys-h { margin-top: 4px; font: 700 17px/1.3 var(--font-text); color: #2b2f36; }
 .sys-head .sys-rg { display: flex; margin: 4px 0 0; padding: 0; }
 .sys-go { margin-left: auto; color: var(--selected-border); font-weight: 600; }
 .sys-head:hover .sys-h, .sys-head:focus-visible .sys-h { color: var(--selected-border); }
 .sys-head:focus-visible { outline: none; }
 .sys-right .sys-row { padding-left: calc(16px + var(--d, 0) * 16px); padding-right: 16px; font-size: 13.5px; }
-.sys-right .sys-tag, .sys-kids .sys-tag { min-width: 60px; }
 .sys-empty { padding: 20px 16px; color: #8d96a3; font: 13px var(--font-ui); }
 /* with a filter: the matching sections under their normas */
 .sys-norm-h {
@@ -2401,7 +2431,7 @@ button.q-label:hover { color: #2c6fa6; }
     box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
   }
   .sys-bar > i { transition: transform .15s, opacity .15s; }
-  .sys-bar > i:hover { transform: scaleY(1.45); }
+  .sys-bar > i:hover { transform: scaleY(2.2); }
 }
 
 /* Reading aid, with a mouse: the paragraph under it on a faint wash of the

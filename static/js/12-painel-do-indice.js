@@ -346,14 +346,15 @@
   }
 
   // The systematic index: one norma at a time (its tabs at the top). Each
-  // título is a bar as long as its number of articles, split in its
-  // capítulos: where the bulk of the norma is, and where the reader is. On a
-  // wide panel, two columns: the títulos on the left, the hovered (or
-  // clicked) one's capítulos and seções on the right; narrow, a título opens
-  // them under it. Names in capitals are shown in sentence case.
+  // título is a band, with a thread as long as its number of articles, split
+  // in its capítulos: where the bulk of the norma is, and where the reader
+  // is. On a wide panel, two columns: the títulos on the left, the hovered
+  // (or clicked) one's capítulos and seções on the right; narrow, the name
+  // goes to the título and the arrow at the band's end opens them under it.
+  // Names in capitals are shown in sentence case.
   const SYS_LEVELS = ['norma', 'tit', 'cap', 'sec', 'subsec'];
   const SYS_LEVEL_NAME = { norma: 'norma', tit: 'titulo', cap: 'capitulo', sec: 'secao', subsec: 'subsecao' };
-  const SYS_ABBR = { 'TÍTULO': 'Tít.', 'CAPÍTULO': 'Cap.', 'SEÇÃO': 'Seç.', 'SUBSEÇÃO': 'Subs.' };
+  const SYS_LABEL = { 'TÍTULO': 'Título', 'CAPÍTULO': 'Capítulo', 'SEÇÃO': 'Seção', 'SUBSEÇÃO': 'Subseção' };
   const SYS_NORM_SHORT = { 'Regimento Interno': 'RI', 'Lei Orgânica': 'LOM', 'Constituição Estadual': 'CE',
     'Constituição Federal': 'CF', 'Precedentes Regimentais': 'Precedentes' };
   // ...and its prefix, for its color (CSS: [data-nrm])
@@ -371,6 +372,11 @@
   let sysTree = null;    // [norma node]; node: {title, id, level, tag, name, kids, parent, arts, first, last, art?, law?}
   let sysNorm = -1;      // the norma shown (-1: the reader's)
   let sysTitle = null;   // the título shown on the right (wide panel)
+  // narrow: the títulos' bands stick under the norma's tabs, as tall as they are
+  const sysNormsSize = new ResizeObserver(([e]) => {
+    const h = e.target.offsetHeight;
+    if (h) $indexContent.style.setProperty('--sys-nh', (h - 8) + 'px');
+  });
 
   function sysCase(name) {
     const letters = name.replace(/[^\p{L}]/gu, '');
@@ -401,7 +407,8 @@
       n.level = sysLevelOf(n.id);
       if (src.art) { n.art = src.art; n.law = src.law || ''; }
       const m = title.match(/^(TÍTULO|CAPÍTULO|SEÇÃO|SUBSEÇÃO)\s+([IVXLC]+[-A-Z]*|ÚNIC[OA])\s*[—–-]\s*(.*)$/i);
-      n.tag = m ? (SYS_ABBR[m[1].toUpperCase()] || m[1]) + ' ' + (/^ÚNIC/i.test(m[2]) ? 'Único' : m[2]) : '';
+      n.tag = m ? (SYS_LABEL[m[1].toUpperCase()] || m[1]) + ' '
+        + (/^ÚNICA$/i.test(m[2]) ? 'Única' : /^ÚNIC/i.test(m[2]) ? 'Único' : m[2]) : '';
       n.name = sysCase(m ? m[3] : title);
       if (n.id) byId.set(n.id, n);
       for (const ch of src.children || []) if (ch.title || ch.art) n.kids.push(node(ch, n));
@@ -510,10 +517,11 @@
     return el;
   }
 
-  // A título: its name and range, and the bar of its capítulos
-  function sysTitleEl(t, max, here) {
+  // A título: its name and range, and the bar of its capítulos; narrow, in a
+  // band with the arrow that opens them
+  function sysTitleEl(t, max, here, narrow) {
     const el = document.createElement('div');
-    el.className = 'sys-tit lv-titulo' + (here.has(t) ? ' sys-here' : '');
+    el.className = 'sys-tit lv-titulo' + (here.has(t) ? ' sys-here' : '') + (t.kids.length ? '' : ' solo');
     const top = document.createElement('div');
     top.className = 'sys-top';
     top.tabIndex = 0;
@@ -530,9 +538,30 @@
       seg.sysNode = s;
       bar.appendChild(seg);
     }
-    el.append(top, bar);
+    let head = top;
+    if (narrow) {
+      head = document.createElement('div');
+      head.className = 'sys-band';
+      head.appendChild(top);
+      if (t.kids.length) {
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'sys-open';
+        open.title = ({ cap: 'Capítulos', sec: 'Seções' }[t.kids[0].level] || 'Partes') + ' de ' + (t.tag || t.name);
+        open.setAttribute('aria-label', open.title);
+        head.appendChild(open);
+      }
+    }
+    el.append(head, bar);
     el.sysNode = t;
     return el;
+  }
+
+  // Narrow: a título's capítulos shown under it, or not
+  function sysSetOpen(tit, on) {
+    tit.querySelector(':scope > .sys-kids').hidden = !on;
+    tit.classList.toggle('open', on);
+    tit.querySelector('.sys-open').setAttribute('aria-expanded', String(on));
   }
 
   function sysNormTabs(here) {
@@ -561,7 +590,10 @@
     if (filter) { renderSysFiltered(filter, here); return; }
     if (sysNorm < 0) sysNorm = Math.max(0, sysTree.findIndex(n => here.has(n)));
     const norm = sysTree[sysNorm];
-    $indexContent.appendChild(sysNormTabs(here));
+    const tabs = sysNormTabs(here);
+    $indexContent.appendChild(tabs);
+    sysNormsSize.disconnect();
+    if (!sysWide.matches) sysNormsSize.observe(tabs);
     // the precedents: just their list
     if (!norm.kids.some(k => k.kids.length || k.id)) {
       const list = document.createElement('div');
@@ -595,18 +627,13 @@
       return;
     }
     for (const t of norm.kids) {
-      const el = sysTitleEl(t, max, here);
+      const el = sysTitleEl(t, max, here, true);
       if (t.kids.length) {
         const kids = document.createElement('div');
         kids.className = 'sys-kids';
-        kids.hidden = !here.has(t);
-        const start = sysRowEl(t, 0, new Set());
-        start.classList.add('sys-start');
-        start.querySelector('.sys-nm').textContent = 'Início do título';
-        kids.appendChild(start);
         for (const [n, d] of sysFlat(t)) kids.appendChild(sysRowEl(n, d, here));
         el.appendChild(kids);
-        el.setAttribute('aria-expanded', String(!kids.hidden));
+        sysSetOpen(el, here.has(t));
       }
       $indexContent.appendChild(el);
     }
@@ -679,17 +706,19 @@
   function sysActivate(e) {
     const seg = e.target.closest('.sys-bar > i');
     if (seg) { e.stopPropagation(); sysGo(seg.sysNode); return true; }
+    const open = e.target.closest('.sys-open');
+    if (open) {
+      const tit = open.closest('.sys-tit');
+      sysSetOpen(tit, !tit.classList.contains('open'));
+      return true;
+    }
     const row = e.target.closest('.sys-row, .sys-head');
     if (row) { sysGo(row.sysNode); return true; }
     const top = e.target.closest('.sys-top');
     if (!top) return false;
-    const tit = top.parentNode;
-    const t = tit.sysNode;
+    const tit = top.closest('.sys-tit');
     if (sysShowTitle(tit)) return true;
-    const kids = tit.querySelector(':scope > .sys-kids');
-    if (!kids) { sysGo(t); return true; }
-    kids.hidden = !kids.hidden;
-    tit.setAttribute('aria-expanded', String(!kids.hidden));
+    sysGo(tit.sysNode);
     return true;
   }
   $indexContent.addEventListener('click', e => {

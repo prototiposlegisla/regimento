@@ -22,11 +22,14 @@ def assemble(
     """Monta o dist/index.html final (self-contained, exceto as fontes em fonts/ e as imagens em img/)."""
     template_path = base_dir / "templates" / "base.html"
     css_path = base_dir / "static" / "style.css"
-    js_path = base_dir / "static" / "app.js"
+    # The script in parts, one per section (static/js/NN-name.js), joined in
+    # their numbers' order into the one script of the page
+    js_parts = sorted((base_dir / "static" / "js").glob("*.js"))
 
     template = template_path.read_text(encoding="utf-8")
     css = css_path.read_text(encoding="utf-8")
-    js = js_path.read_text(encoding="utf-8")
+    assert js_parts, "static/js/ sem os arquivos do script"
+    js = "".join(p.read_text(encoding="utf-8") for p in js_parts)
 
     # Inject data into JS placeholders, without indentation (the page is not read by hand;
     # intermediate/ keeps the indented JSON for debugging)
@@ -37,14 +40,14 @@ def assemble(
     # blocks below (a "</script>" in a summary would end the script), and each
     # placeholder must be there (a renamed one would leave its data out silently)
     def inject(js: str, placeholder: str, data) -> str:
-        assert placeholder in js, f"marcador {placeholder} não está em static/app.js"
+        assert placeholder in js, f"marcador {placeholder} não está em static/js/"
         return js.replace(placeholder, dumps(data).replace("</", "<\\/").replace("<!--", "\\u003C!--"))
 
     js = inject(js, "/*__SYSTEMATIC_INDEX__*/[]", systematic_index)
     js = inject(js, "/*__SUMMARIES_MAP__*/{}", summaries_map)
 
     # The big data as JSON blocks the script reads when needed (pageData in
-    # app.js): parsing JSON is much faster than parsing it as script literals.
+    # static/js): parsing JSON is much faster than parsing it as script literals.
     # "</" and "<!--" escaped, so nothing in the data ends its block early.
     blocks = {
         "data-subject-index": subject_index,

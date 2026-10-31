@@ -1,7 +1,7 @@
 """A parte da aba de informações que o build escreve: até onde vai o texto de cada norma e como usar a busca.
 
 Fica no código, e não em informacoes.docx, para não desatualizar: a última alteração de cada norma sai das
-notas de redação do próprio DOCX, e os atalhos acompanham a busca (static/app.js, classifyQuery). O texto
+notas de redação do próprio DOCX, e os atalhos acompanham a busca (static/js/04-busca.js, classifyQuery). O texto
 livre do usuário continua em informacoes.docx, antes desta parte.
 """
 

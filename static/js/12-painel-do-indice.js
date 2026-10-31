@@ -17,11 +17,18 @@
     if (window.innerWidth > 768) $indexSearch.focus();
   }
 
-  // The closed panel stays in the page, off to the side: inert, so Tab and a
-  // screen reader don't walk through its thousands of lines
-  function setPanelOpen(open) {
+  // The closed panel stays in the page, off to the side: shut once out of
+  // sight (style.css), so Tab and a screen reader don't walk through its
+  // thousands of lines. Not inert: turned on and off, it would have them all
+  // styled again on each opening, a long pause on a phone; shut, they keep
+  // their layout and come back at once
+  const PANEL_SLIDE_MS = 450;   // its slide out (style.css: .42s at most)
+  let panelShutTimer = null;
+  function setPanelOpen(open, now) {
     $indexPanel.classList.toggle('open', open);
-    $indexPanel.inert = !open;
+    clearTimeout(panelShutTimer);
+    if (open || now) $indexPanel.classList.toggle('shut', !open);
+    else panelShutTimer = setTimeout(() => $indexPanel.classList.add('shut'), PANEL_SLIDE_MS);
     $btnIndex.setAttribute('aria-expanded', open);
   }
 
@@ -38,7 +45,7 @@
     return hadFocus;
   }
 
-  setPanelOpen(false);
+  setPanelOpen(false, true);
   $btnIndex.addEventListener('click', () => {
     if ($indexPanel.classList.contains('open')) closeIndex();
     else openIndex();
@@ -47,6 +54,21 @@
     closeIndex();
     if (resultsDrawerOpen) closeResults();
   });
+  document.getElementById('index-close').addEventListener('click', closeIndex);
+  // A finger: a swipe to the left closes it, as a drawer (not one along a
+  // strip that scrolls sideways, as the consulta rápida's)
+  let swipe = null;
+  $indexPanel.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    swipe = e.touches.length === 1 && !e.target.closest('.q-toc') ? { x: t.clientX, y: t.clientY } : null;
+  }, { passive: true });
+  $indexPanel.addEventListener('touchend', e => {
+    if (!swipe) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - swipe.x, dy = t.clientY - swipe.y;
+    swipe = null;
+    if (dx < -70 && Math.abs(dy) < -dx / 2 && !String(getSelection())) closeIndex();
+  }, { passive: true });
   // Esc closes the open layer first, the panel or the results drawer, before
   // clearing the search (as the remissões' previews and boxes do, above)
   document.addEventListener('keydown', e => {
@@ -133,11 +155,14 @@
     const cacheKey = filter ? null
       : currentIndexTab === 'subject' ? 'subject'
       : currentIndexTab === 'references' ? 'references:' + currentRefCategory : null;
-    $indexPanel.dataset.tab = currentIndexTab;
+    if ($indexPanel.dataset.tab !== currentIndexTab) $indexPanel.dataset.tab = currentIndexTab;
     $indexContent.classList.remove('sys-two');
     const cached = cacheKey && indexDomCache.get(cacheKey);
     if (cached) {
-      $indexContent.replaceChildren(...cached);
+      // still in the panel (closed and reopened): left as they are; put back,
+      // thousands of entries would be styled and laid out again as it opens
+      const kept = $indexContent.firstChild === cached[0] && $indexContent.childNodes.length === cached.length;
+      if (!kept) $indexContent.replaceChildren(...cached);
       if (cacheKey === 'subject') buildSubjectRail(subjAllLetters);
       $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
       return;

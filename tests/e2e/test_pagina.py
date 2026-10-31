@@ -60,12 +60,66 @@ def test_esc_fecha_o_painel_antes_de_limpar_a_busca(abrir):
     assert pg.input_value("#search-input") == ""
 
 
+_FOCA_A_ABA = ("() => { const b = document.querySelector('.index-tab'); b.focus();"
+               " return document.activeElement === b; }")
+
+
 def test_painel_fechado_nao_recebe_foco(abrir):
     pg = abrir()
-    assert pg.evaluate("document.getElementById('index-panel').inert") is True
+    assert pg.evaluate(_FOCA_A_ABA) is False
     pg.click("#btn-index")
-    assert pg.evaluate("document.getElementById('index-panel').inert") is False
+    assert pg.evaluate(_FOCA_A_ABA) is True
     assert pg.get_attribute("#btn-index", "aria-expanded") == "true"
+    pg.click("#index-close")
+    pg.wait_for_function("document.getElementById('index-panel').classList.contains('shut')")
+    assert pg.evaluate(_FOCA_A_ABA) is False
+
+
+def test_x_fecha_o_painel(abrir):
+    pg = abrir()
+    pg.click("#btn-index")
+    pg.click("#index-close")
+    assert "open" not in (pg.get_attribute("#index-panel", "class") or "")
+
+
+def _aberto(pg) -> bool:
+    return "open" in (pg.get_attribute("#index-panel", "class") or "")
+
+
+@pytest.mark.parametrize("largura", [320, 360, 375, 412])
+def test_no_celular_o_x_cabe_no_painel(abrir, largura):
+    pg = abrir(largura=largura, altura=667, is_mobile=True, has_touch=True)
+    pg.click("#btn-index")
+    for aba in ("systematic", "subject", "references"):
+        pg.click(f'.index-tab[data-tab="{aba}"]')
+        pg.wait_for_timeout(450)    # a largura do painel muda com a aba
+        sobra, cortadas = pg.evaluate("""() => {
+          const x = document.getElementById('index-close').getBoundingClientRect();
+          const p = document.getElementById('index-panel').getBoundingClientRect();
+          const cortadas = [...document.querySelectorAll('.index-tab')]
+            .filter(t => t.scrollWidth > t.clientWidth).map(t => t.textContent);
+          return [p.right - x.right, cortadas];
+        }""")
+        assert sobra >= 0, (aba, sobra)
+        if largura >= 360:
+            assert not cortadas, (aba, cortadas)
+    pg.tap("#index-close")
+    assert not _aberto(pg)
+
+
+def test_deslizar_para_a_esquerda_fecha_o_painel(abrir):
+    pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
+    pg.click("#btn-index")
+    gesto = """([x0, x1, y]) => {
+      const p = document.getElementById('index-content');
+      const toque = x => new Touch({ identifier: 1, target: p, clientX: x, clientY: y });
+      p.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [toque(x0)], changedTouches: [toque(x0)] }));
+      p.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [toque(x1)] }));
+    }"""
+    pg.evaluate(gesto, [300, 260, 400])     # curto: fica
+    assert _aberto(pg)
+    pg.evaluate(gesto, [300, 120, 400])
+    assert not _aberto(pg)
 
 
 def test_voltar_fecha_o_painel(abrir):

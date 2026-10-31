@@ -42,6 +42,9 @@
     warm.remove();
   });
 
+  // The systematic index's tree too, so the panel's first opening doesn't pay for it
+  whenIdle(() => sysTreeBuild());
+
   // Build the search text cache in idle time, so the first search doesn't pay for it
   let textCacheWarmed = 0;
   whenIdle(function warmCardText(deadline) {

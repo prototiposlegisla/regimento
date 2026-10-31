@@ -2229,9 +2229,10 @@ button.q-label:hover { color: #2c6fa6; }
   border-radius: 0 0 calc(var(--card-radius) - 1.5px) calc(var(--card-radius) - 1.5px);
 }
 .idx-backlinks::before { content: none; }
-/* Folded to a line, "▸ Índice remissivo · 7 assuntos · 12 entradas" (the
-   label via CSS, out of the searchable text); a click opens the bands of
-   every card at once, and the choice is remembered (app.js, setIndexOpen) */
+/* Folded to a line, "▸ 7 assuntos · 12 entradas"; open, "▾ No índice
+   remissivo · 7 assuntos · 12 entradas" (the label via CSS, out of the
+   searchable text); a click opens the bands of every card at once, and the
+   choice is remembered (app.js, setIndexOpen) */
 .idx-sum {
   display: block; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
   font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #7e6f4b;
@@ -2239,7 +2240,7 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-sum::before { content: "\25B8\00a0 " attr(data-label); }
 .idx-sum:hover { color: #5f4f26; text-decoration: underline dotted; text-underline-offset: 3px; }
 #cards-container.idx-open .idx-sum { margin-bottom: 4px; }
-#cards-container.idx-open .idx-sum::before { content: "\25BE\00a0 " attr(data-label); }
+#cards-container.idx-open .idx-sum::before { content: "\25BE\00a0 No \00edndice remissivo \00b7  " attr(data-label); }
 #cards-container:not(.idx-open) .idx-backlinks > :not(.idx-sum) { display: none; }
 /* Open, a table as a book's index: each subject (an entry itself, or just
    its name) in a column on the left, small and spaced, aligned to the

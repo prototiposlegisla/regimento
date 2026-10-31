@@ -50,9 +50,10 @@
       sum.type = 'button';
       sum.className = 'idx-sum';
       sum.setAttribute('aria-expanded', String(idxOpen));
-      sum.dataset.label = 'Índice remissivo · ' + groups.size + (groups.size === 1 ? ' assunto · ' : ' assuntos · ')
+      // only the counts; "No índice remissivo · " is put before them by CSS when open
+      sum.dataset.label = groups.size + (groups.size === 1 ? ' assunto · ' : ' assuntos · ')
         + nEntries + (nEntries === 1 ? ' entrada' : ' entradas');
-      sum.setAttribute('aria-label', sum.dataset.label);
+      sum.setAttribute('aria-label', 'Índice remissivo · ' + sum.dataset.label);
       band.appendChild(sum);
       band.idxGroups = [...groups].sort((a, b) => collator.compare(a[0], b[0]));
       indexBands.push(band);

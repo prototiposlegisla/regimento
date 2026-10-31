@@ -1069,10 +1069,12 @@ mark.weak {
   overflow: hidden;
 }
 #index-panel.open { transform: translateX(0); }
+/* closed and out of sight (setPanelOpen): its lines out of reach of Tab
+   and of a screen reader, their layout kept for the next opening */
+#index-panel.shut { content-visibility: hidden; }
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
 #index-panel[data-tab="subject"] { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
-
 #index-header {
   padding: 12px;
   border-bottom: 1px solid #eee;
@@ -1089,6 +1091,7 @@ mark.weak {
 #index-tabs {
   display: flex;
   flex: 1;
+  min-width: 0;   /* gives way to the "i" and the × on a narrow phone */
   gap: 2px;
   padding: 3px;
   border-radius: 10px;
@@ -1097,7 +1100,11 @@ mark.weak {
 
 .index-tab {
   flex: 1;
+  min-width: 0;
   padding: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: none;
   border-radius: 8px;
   background: transparent;
@@ -1109,6 +1116,12 @@ mark.weak {
 }
 .index-tab.active { background: #fff; color: #1d232b; box-shadow: 0 1px 3px rgba(20,30,45,.18), 0 0 0 1px rgba(20,30,45,.04); }
 .index-tab:not(.active):hover { background: rgba(255,255,255,.55); }
+/* A narrow phone: the tabs' names whole, and the × still in the panel */
+@media (max-width: 420px) {
+  #index-header { padding: 10px 8px; }
+  #index-tabs-row { gap: 4px; }
+  .index-tab { padding: 8px 2px; font-size: 12.5px; }
+}
 
 #btn-info-tab {
   flex: 0 0 auto;
@@ -1127,6 +1140,27 @@ mark.weak {
   justify-content: center;
 }
 #btn-info-tab.active { background: var(--selected-border); color: #fff; }
+
+/* Closes the panel (as Esc, back, a tap beside it or a swipe to the left) */
+#index-close {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  margin-right: -4px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#index-close:hover { background: #eee; color: #333; }
+@media (pointer: coarse) {
+  #index-close { width: 36px; height: 36px; font-size: 26px; }
+}
 
 .info-content { line-height: 1.6; }
 .info-content h3 {
@@ -18155,6 +18189,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
         <button class="index-tab" data-tab="references">Referências</button>
       </div>
       <button id="btn-info-tab" data-tab="info" title="Informações">i</button>
+      <button id="index-close" type="button" title="Fechar o índice" aria-label="Fechar o índice">&times;</button>
     </div>
     <div id="index-search-wrapper">
       <input id="index-search" type="text" placeholder="Pesquisar no índice...">
@@ -22453,11 +22488,18 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     if (window.innerWidth > 768) $indexSearch.focus();
   }
 
-  // The closed panel stays in the page, off to the side: inert, so Tab and a
-  // screen reader don't walk through its thousands of lines
-  function setPanelOpen(open) {
+  // The closed panel stays in the page, off to the side: shut once out of
+  // sight (style.css), so Tab and a screen reader don't walk through its
+  // thousands of lines. Not inert: turned on and off, it would have them all
+  // styled again on each opening, a long pause on a phone; shut, they keep
+  // their layout and come back at once
+  const PANEL_SLIDE_MS = 450;   // its slide out (style.css: .42s at most)
+  let panelShutTimer = null;
+  function setPanelOpen(open, now) {
     $indexPanel.classList.toggle('open', open);
-    $indexPanel.inert = !open;
+    clearTimeout(panelShutTimer);
+    if (open || now) $indexPanel.classList.toggle('shut', !open);
+    else panelShutTimer = setTimeout(() => $indexPanel.classList.add('shut'), PANEL_SLIDE_MS);
     $btnIndex.setAttribute('aria-expanded', open);
   }
 
@@ -22474,7 +22516,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     return hadFocus;
   }
 
-  setPanelOpen(false);
+  setPanelOpen(false, true);
   $btnIndex.addEventListener('click', () => {
     if ($indexPanel.classList.contains('open')) closeIndex();
     else openIndex();
@@ -22483,6 +22525,21 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     closeIndex();
     if (resultsDrawerOpen) closeResults();
   });
+  document.getElementById('index-close').addEventListener('click', closeIndex);
+  // A finger: a swipe to the left closes it, as a drawer (not one along a
+  // strip that scrolls sideways, as the consulta rápida's)
+  let swipe = null;
+  $indexPanel.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    swipe = e.touches.length === 1 && !e.target.closest('.q-toc') ? { x: t.clientX, y: t.clientY } : null;
+  }, { passive: true });
+  $indexPanel.addEventListener('touchend', e => {
+    if (!swipe) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - swipe.x, dy = t.clientY - swipe.y;
+    swipe = null;
+    if (dx < -70 && Math.abs(dy) < -dx / 2 && !String(getSelection())) closeIndex();
+  }, { passive: true });
   // Esc closes the open layer first, the panel or the results drawer, before
   // clearing the search (as the remissões' previews and boxes do, above)
   document.addEventListener('keydown', e => {
@@ -22569,11 +22626,14 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     const cacheKey = filter ? null
       : currentIndexTab === 'subject' ? 'subject'
       : currentIndexTab === 'references' ? 'references:' + currentRefCategory : null;
-    $indexPanel.dataset.tab = currentIndexTab;
+    if ($indexPanel.dataset.tab !== currentIndexTab) $indexPanel.dataset.tab = currentIndexTab;
     $indexContent.classList.remove('sys-two');
     const cached = cacheKey && indexDomCache.get(cacheKey);
     if (cached) {
-      $indexContent.replaceChildren(...cached);
+      // still in the panel (closed and reopened): left as they are; put back,
+      // thousands of entries would be styled and laid out again as it opens
+      const kept = $indexContent.firstChild === cached[0] && $indexContent.childNodes.length === cached.length;
+      if (!kept) $indexContent.replaceChildren(...cached);
       if (cacheKey === 'subject') buildSubjectRail(subjAllLetters);
       $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
       return;
@@ -24554,6 +24614,9 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     void warm.offsetHeight;
     warm.remove();
   });
+
+  // The systematic index's tree too, so the panel's first opening doesn't pay for it
+  whenIdle(() => sysTreeBuild());
 
   // Build the search text cache in idle time, so the first search doesn't pay for it
   let textCacheWarmed = 0;

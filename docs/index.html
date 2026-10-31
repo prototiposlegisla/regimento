@@ -2251,9 +2251,10 @@ button.q-label:hover { color: #2c6fa6; }
   border-radius: 0 0 calc(var(--card-radius) - 1.5px) calc(var(--card-radius) - 1.5px);
 }
 .idx-backlinks::before { content: none; }
-/* Folded to a line, "▸ Índice remissivo · 7 assuntos · 12 entradas" (the
-   label via CSS, out of the searchable text); a click opens the bands of
-   every card at once, and the choice is remembered (app.js, setIndexOpen) */
+/* Folded to a line, "▸ 7 assuntos · 12 entradas"; open, "▾ No índice
+   remissivo · 7 assuntos · 12 entradas" (the label via CSS, out of the
+   searchable text); a click opens the bands of every card at once, and the
+   choice is remembered (app.js, setIndexOpen) */
 .idx-sum {
   display: block; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
   font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #7e6f4b;
@@ -2261,7 +2262,7 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-sum::before { content: "\25B8\00a0 " attr(data-label); }
 .idx-sum:hover { color: #5f4f26; text-decoration: underline dotted; text-underline-offset: 3px; }
 #cards-container.idx-open .idx-sum { margin-bottom: 4px; }
-#cards-container.idx-open .idx-sum::before { content: "\25BE\00a0 " attr(data-label); }
+#cards-container.idx-open .idx-sum::before { content: "\25BE\00a0 No \00edndice remissivo \00b7  " attr(data-label); }
 #cards-container:not(.idx-open) .idx-backlinks > :not(.idx-sum) { display: none; }
 /* Open, a table as a book's index: each subject (an entry itself, or just
    its name) in a column on the left, small and spaced, aligned to the
@@ -19157,7 +19158,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 19:37 · 5d6de08<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 19:40 · a067150<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette
@@ -24941,9 +24942,10 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       sum.type = 'button';
       sum.className = 'idx-sum';
       sum.setAttribute('aria-expanded', String(idxOpen));
-      sum.dataset.label = 'Índice remissivo · ' + groups.size + (groups.size === 1 ? ' assunto · ' : ' assuntos · ')
+      // only the counts; "No índice remissivo · " is put before them by CSS when open
+      sum.dataset.label = groups.size + (groups.size === 1 ? ' assunto · ' : ' assuntos · ')
         + nEntries + (nEntries === 1 ? ' entrada' : ' entradas');
-      sum.setAttribute('aria-label', sum.dataset.label);
+      sum.setAttribute('aria-label', 'Índice remissivo · ' + sum.dataset.label);
       band.appendChild(sum);
       band.idxGroups = [...groups].sort((a, b) => collator.compare(a[0], b[0]));
       indexBands.push(band);

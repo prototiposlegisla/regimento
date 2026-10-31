@@ -214,7 +214,7 @@
         idxMetricsLast = null;
         preserveScroll(estimateCardHeights);
         forgetCardHeights();
-      });
+      }, () => {});   // (a font that never comes, or the page left meanwhile)
     }
     return m;
   }
@@ -1490,10 +1490,13 @@
       return;
     }
     if (e.key !== 'Enter') return;
+    // A search still waiting for its delay only runs: it already goes to the
+    // first result, and Enter would go past it
+    const pending = searchTimer !== null;
     flushPendingSearch();
     if (searchMatches.length) {
       e.preventDefault();
-      navigateSearch(e.shiftKey ? -1 : 1);
+      if (!pending) navigateSearch(e.shiftKey ? -1 : 1);
     }
   });
 
@@ -2933,15 +2936,23 @@
   }
 
   // ===== MARKERS (click-on-identifier system) =====
+  // Read back as saved, keeping only well-formed markers (a list edited or
+  // left broken would stop the load, or put a quote into a selector)
   function loadMarkers() {
     try {
-      const saved = localStorage.getItem('regimento-markers-v2');
-      if (saved) markersList = JSON.parse(saved);
+      const saved = JSON.parse(localStorage.getItem('regimento-markers-v2') || '[]');
+      if (!Array.isArray(saved)) return;
+      const seen = new Set();
+      markersList = saved.filter(m => m && typeof m.uid === 'string' && /^[\w.-]+$/.test(m.uid)
+        && Number.isInteger(m.colorIdx) && m.colorIdx >= 0 && m.colorIdx < MARKER_PALETTE.length
+        && !seen.has(m.uid) && seen.add(m.uid)).map(m => ({ uid: m.uid, colorIdx: m.colorIdx }));
     } catch (e) {}
   }
 
+  // A browser that refuses to store (full, private mode, a policy) still
+  // marks: only for this visit
   function saveMarkers() {
-    localStorage.setItem('regimento-markers-v2', JSON.stringify(markersList));
+    try { localStorage.setItem('regimento-markers-v2', JSON.stringify(markersList)); } catch (e) {}
   }
 
   function getNextColorIdx() {
@@ -3072,14 +3083,12 @@
       ((uid, pal) => {
         btn.addEventListener('mouseenter', () => showMarkerTooltip(btn, uid, pal));
         btn.addEventListener('mouseleave', () => hideMarkerTooltip());
-        btn.addEventListener('touchstart', (e) => {
-          markerTooltipTimer = setTimeout(() => {
-            e.preventDefault();
-            showMarkerTooltip(btn, uid, pal);
-          }, 500);
-        }, { passive: false });
-        btn.addEventListener('touchend', () => hideMarkerTooltip());
-        btn.addEventListener('touchmove', () => hideMarkerTooltip());
+        // passive: a touch never waits for the script to start scrolling
+        btn.addEventListener('touchstart', () => {
+          markerTooltipTimer = setTimeout(() => showMarkerTooltip(btn, uid, pal), 500);
+        }, { passive: true });
+        btn.addEventListener('touchend', () => hideMarkerTooltip(), { passive: true });
+        btn.addEventListener('touchmove', () => hideMarkerTooltip(), { passive: true });
       })(marker.uid, palette);
       $markerNav.appendChild(btn);
     }
@@ -4215,21 +4224,19 @@
     if (ref) hideFootnoteTooltip();
   }, true);
 
-  // Mobile: long-press
+  // Mobile: long-press. Passive: a touch on the text never waits for the
+  // script to start scrolling
   $cards.addEventListener('touchstart', (e) => {
     const ref = e.target.closest('.footnote-ref');
     if (!ref) return;
-    footnoteTooltipTimer = setTimeout(() => {
-      e.preventDefault();
-      showFootnoteTooltip(ref);
-    }, 500);
-  }, { passive: false });
+    footnoteTooltipTimer = setTimeout(() => showFootnoteTooltip(ref), 500);
+  }, { passive: true });
   $cards.addEventListener('touchend', (e) => {
     if (e.target.closest('.footnote-ref')) hideFootnoteTooltip();
-  });
+  }, { passive: true });
   $cards.addEventListener('touchmove', (e) => {
     if (e.target.closest('.footnote-ref')) hideFootnoteTooltip();
-  });
+  }, { passive: true });
 
   // ===== INDEX PANEL =====
   let currentIndexTab = 'systematic';
@@ -4243,26 +4250,53 @@
       updateResultsVisibility();
     }
     $indexOverlay.classList.add('open');
-    $indexPanel.classList.add('open');
+    setPanelOpen(true);
     sysNorm = -1;
     sysTitle = null;
     renderIndex();
     if (window.innerWidth > 768) $indexSearch.focus();
   }
 
-  function closeIndex() {
-    dropStep('panel');
-    $indexOverlay.classList.remove('open');
-    $indexPanel.classList.remove('open');
-    $sysTip.classList.remove('visible');
-    $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
+  // The closed panel stays in the page, off to the side: inert, so Tab and a
+  // screen reader don't walk through its thousands of lines
+  function setPanelOpen(open) {
+    $indexPanel.classList.toggle('open', open);
+    $indexPanel.inert = !open;
+    $btnIndex.setAttribute('aria-expanded', open);
   }
 
-  $btnIndex.addEventListener('click', openIndex);
+  // Returns whether the focus was in the panel: it goes back to the ☰ that
+  // opened it (the caller may then put it on the article it goes to)
+  function closeIndex() {
+    dropStep('panel');
+    const hadFocus = $indexPanel.contains(document.activeElement);
+    $indexOverlay.classList.remove('open');
+    setPanelOpen(false);
+    $sysTip.classList.remove('visible');
+    $indexContent.querySelectorAll('.vide-highlight').forEach(el => el.classList.remove('vide-highlight'));
+    if (hadFocus) $btnIndex.focus({ preventScroll: true });
+    return hadFocus;
+  }
+
+  setPanelOpen(false);
+  $btnIndex.addEventListener('click', () => {
+    if ($indexPanel.classList.contains('open')) closeIndex();
+    else openIndex();
+  });
   $indexOverlay.addEventListener('click', () => {
     closeIndex();
     if (resultsDrawerOpen) closeResults();
   });
+  // Esc closes the open layer first, the panel or the results drawer, before
+  // clearing the search (as the remissões' previews and boxes do, above)
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    if ($indexPanel.classList.contains('open')) closeIndex();
+    else if (resultsDrawerOpen) closeResults(true);
+    else return;
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
 
   const $btnInfoTab = document.getElementById('btn-info-tab');
   const $indexSearchWrapper = document.getElementById('index-search-wrapper');
@@ -4526,13 +4560,21 @@
 
   function sysGo(n) {
     takeStep();
-    closeIndex();
-    if (!n.art) { navigateToSection(n.id); return; }
-    const card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(n.art)}"][data-law="${n.law}"]`);
-    if (!card) return;
-    revealCard(card);   // hidden by a filter: shown (and its norma), as a remissão does
-    scrollToReadingLine(card);
-    selectCard(card, true);
+    const byKeyboard = closeIndex();
+    let card;
+    if (!n.art) card = navigateToSection(n.id);
+    else {
+      card = $cards.querySelector(`.card-artigo[data-art="${CSS.escape(n.art)}"][data-law="${n.law}"]`);
+      if (!card) return;
+      revealCard(card);   // hidden by a filter: shown (and its norma), as a remissão does
+      scrollToReadingLine(card);
+      selectCard(card, true);
+    }
+    // chosen from the keyboard: Tab goes on from the card gone to, not from the header
+    if (byKeyboard && card) {
+      card.tabIndex = -1;
+      card.focus({ preventScroll: true });
+    }
   }
 
   function sysTagHtml(n) {
@@ -5478,7 +5520,7 @@
       flushIndexFill();
     }
     $indexOverlay.classList.add('open');
-    $indexPanel.classList.add('open');
+    setPanelOpen(true);
     $indexContent.scrollTop = p.top;
   }
 
@@ -5491,6 +5533,8 @@
   // a trigger as the correlates' (.rem): hover previews the entry's
   // dispositivos, click opens them in a box in the band, and the box's foot
   // puts the subject in the search bar, starting at this article.
+  // Folded (the usual), a band is only its line: its table is built when the
+  // bands open (fillIndexBands), a quarter of the page's elements spared.
 
   function renderIndexBacklinks() {
     const byArt = new Map();   // "LOM:42" → [{label, refs, entry, child}]
@@ -5536,18 +5580,30 @@
         + nEntries + (nEntries === 1 ? ' entrada' : ' entradas');
       sum.setAttribute('aria-label', sum.dataset.label);
       band.appendChild(sum);
-      const chip = (it, cls, show) => {
-        const c = document.createElement('span');
-        c.className = 'rem idx-back ' + cls;
-        c.tabIndex = 0;
-        c.setAttribute('role', 'button');
-        c.setAttribute('aria-expanded', 'false');
-        c.dataset.label = it.label;
-        if (show) c.dataset.show = show;
-        c.idxEntry = it;
-        return c;
-      };
-      for (const [head, g] of [...groups].sort((a, b) => collator.compare(a[0], b[0]))) {
+      band.idxGroups = [...groups].sort((a, b) => collator.compare(a[0], b[0]));
+      indexBands.push(band);
+      card.appendChild(band);
+    }
+    if (idxOpen) fillIndexBands();
+  }
+  const indexBands = [];
+
+  // Each band's table, once: a row per subject, its sub-subjects beside it
+  function fillIndexBands() {
+    const chip = (it, cls, show) => {
+      const c = document.createElement('span');
+      c.className = 'rem idx-back ' + cls;
+      c.tabIndex = 0;
+      c.setAttribute('role', 'button');
+      c.setAttribute('aria-expanded', 'false');
+      c.dataset.label = it.label;
+      if (show) c.dataset.show = show;
+      c.idxEntry = it;
+      return c;
+    };
+    for (const band of indexBands) {
+      if (!band.idxGroups) continue;
+      for (const [head, g] of band.idxGroups) {
         const row = document.createElement('div');
         row.className = 'idx-row';
         if (g.self) row.appendChild(chip(g.self, 'idx-head'));
@@ -5560,7 +5616,7 @@
         for (const it of g.subs) row.appendChild(chip(it, 'idx-sub', it.child.sub_subject));
         band.appendChild(row);
       }
-      card.appendChild(band);
+      band.idxGroups = null;
     }
   }
 
@@ -5667,6 +5723,9 @@
   let initialZoom = 1;
 
   function setZoom(scale, now) {
+    // a saved value gone bad, or a pinch with both fingers on one point,
+    // would make every size NaN (the text 0 px, until the site's data is cleared)
+    if (!Number.isFinite(scale) || scale <= 0) return;
     preserveScroll(() => {
       zoomScale = Math.max(0.4, Math.min(2.5, scale));
       document.documentElement.style.setProperty('--zoom-scale', zoomScale);
@@ -5684,15 +5743,16 @@
     try { localStorage.setItem('regimento-zoom', zoomScale); } catch (e) {}
   }
 
+  // Only the pinch's touchmove blocks (it keeps the browser from zooming
+  // the page itself); its start does not need to
   document.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
-      e.preventDefault();
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
-      initialPinchDist = Math.hypot(dx, dy);
+      initialPinchDist = Math.hypot(dx, dy) || null;
       initialZoom = zoomScale;
     }
-  }, { passive: false });
+  }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2 && initialPinchDist !== null) {
@@ -5707,7 +5767,7 @@
 
   document.addEventListener('touchend', () => {
     initialPinchDist = null;
-  });
+  }, { passive: true });
 
   document.addEventListener('gesturestart', (e) => {
     e.preventDefault();
@@ -5777,6 +5837,7 @@
     cancelScrollCorrection();
     const topBefore = anchor ? anchor.getBoundingClientRect().top : null;
     idxOpen = on;
+    if (on) fillIndexBands();
     estimateCardHeights();
     $cards.classList.toggle('idx-open', on);
     for (const b of $cards.querySelectorAll('.idx-sum')) b.setAttribute('aria-expanded', String(on));
@@ -6279,6 +6340,9 @@
   initDiffToggles();
   scheduleMinimap();
   if (window.innerWidth > 768) $searchInput.focus();
+  // On a slow network the bar shows seconds before the script runs: what
+  // was typed meanwhile is searched now
+  if ($searchInput.value.trim()) $searchInput.dispatchEvent(new Event('input'));
 
   // Warm what the first results list needs (law titles, fonts and styles of
   // its entries), so its first build is not a long task

@@ -23,8 +23,8 @@
   --nivel-secao-texto: #2e2410;
   --nivel-subsecao: #4f8a7c;
   --rubrica: #252839;
-  --font-text: "Merriweather", Georgia, serif;
-  --font-ui: "Merriweather Sans", system-ui, -apple-system, sans-serif;
+  --font-text: "Merriweather", "Merriweather Reserva", "Merriweather Reserva Noto", Georgia, serif;
+  --font-ui: "Merriweather Sans", "Merriweather Sans Reserva", "Merriweather Sans Reserva Roboto", system-ui, -apple-system, sans-serif;
   --font-fita: "Cinzel", "Merriweather", Georgia, serif;
   --font-capa: "EB Garamond", "Merriweather", Georgia, serif;
   /* One color per norma, for signs only (window, cover, rubrica's end,
@@ -78,6 +78,61 @@ html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
 @font-face {
   font-family: "EB Garamond"; font-style: normal; font-weight: 400 800; font-display: swap;
   src: url(fonts/eb-garamond-latin.woff2) format("woff2");
+}
+/* Until those come (swap), the text is in a system font sized to take the
+   same room — size-adjust measured on the site's own text, 31/10/2026 —, so
+   the lines don't move when they arrive: Georgia (Windows, Apple) or Noto
+   Serif (Android) for Merriweather; Arial, or Roboto, for Merriweather Sans.
+   A font the device lacks just skips its family. */
+@font-face {
+  font-family: "Merriweather Reserva"; font-style: normal; font-weight: 400;
+  src: local("Georgia");
+  size-adjust: 107.9%; ascent-override: 91.2%; descent-override: 25.3%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Reserva"; font-style: normal; font-weight: 700;
+  src: local("Georgia Bold"), local("Georgia-Bold");
+  size-adjust: 95.5%; ascent-override: 103.1%; descent-override: 28.6%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Reserva"; font-style: italic; font-weight: 400;
+  src: local("Georgia Italic"), local("Georgia-Italic");
+  size-adjust: 100.2%; ascent-override: 98.2%; descent-override: 27.2%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Reserva Noto"; font-style: normal; font-weight: 400;
+  src: local("Noto Serif"), local("NotoSerif-Regular");
+  size-adjust: 100.2%; ascent-override: 98.2%; descent-override: 27.3%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Reserva Noto"; font-style: normal; font-weight: 700;
+  src: local("Noto Serif Bold"), local("NotoSerif-Bold");
+  size-adjust: 97.1%; ascent-override: 101.3%; descent-override: 28.1%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Reserva Noto"; font-style: italic; font-weight: 400;
+  src: local("Noto Serif Italic"), local("NotoSerif-Italic");
+  size-adjust: 97%; ascent-override: 101.4%; descent-override: 28.1%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Sans Reserva"; font-style: normal; font-weight: 400;
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 101.2%; ascent-override: 97.3%; descent-override: 27%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Sans Reserva"; font-style: normal; font-weight: 700;
+  src: local("Arial Bold"), local("Arial-BoldMT");
+  size-adjust: 100.7%; ascent-override: 97.7%; descent-override: 27.1%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Sans Reserva Roboto"; font-style: normal; font-weight: 400;
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 104.1%; ascent-override: 94.6%; descent-override: 26.2%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Sans Reserva Roboto"; font-style: normal; font-weight: 700;
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  size-adjust: 105.5%; ascent-override: 93.3%; descent-override: 25.9%; line-gap-override: 0%;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -217,6 +272,21 @@ body {
   color: #333;
 }
 .search-arrow:hover { background: #ddd; }
+/* A finger, not a mouse: the bar's small buttons keep their look, and their
+   touch area grows past them (::before), up and down into the bar's height;
+   the arrows a little larger and further apart. Each area stops short of its
+   neighbor's look: the × never takes a tap meant for "›". */
+@media (pointer: coarse) {
+  #search-nav { gap: 6px; right: 62px; }
+  .search-arrow { width: 28px; height: 28px; }
+  #search-input.has-nav { padding-right: 150px; }
+  .search-arrow, #chip-remove { position: relative; }
+  :is(.search-arrow, #btn-clear-search, #btn-filter, #chip-remove)::before {
+    content: ""; position: absolute; inset: -8px -3px;
+  }
+  #btn-clear-search::before { inset: -8px -1px -8px -2px; }
+  #btn-filter::before { inset: -8px -4px -8px -1px; }
+}
 
 /* ===== UNIT IDENTIFIERS (clickable markers) ===== */
 .unit-id {
@@ -454,7 +524,7 @@ body {
 .card-titulo.nivel-subsecao { margin-inline: 42px; }
 .card-titulo:not(.nivel-norma):has(br)::first-line {
   font: 600 calc(.76rem * var(--zoom-scale))/2 var(--font-fita); letter-spacing: .26em;
-  color: color-mix(in srgb, var(--lv-t) 72%, transparent);
+  color: color-mix(in srgb, var(--lv-t) 90%, transparent);
 }
 
 /* The norma's cover: a gem in its color, a shine at the top, its monogram
@@ -1218,6 +1288,11 @@ mark.weak {
 #subj-rail button:hover { background: #e8eef6; }
 #subj-rail button.on { background: #4d6c99; color: #fff; }
 #subj-rail button:disabled { color: #ccd1d8; cursor: default; background: none; }
+@media (pointer: coarse) {   /* a finger: each letter's touch area into the space around it */
+  #subj-rail { width: 30px; right: 10px; }
+  #subj-rail button { position: relative; width: 28px; }
+  #subj-rail button::before { content: ""; position: absolute; inset: -6px -1px; }
+}
 #index-content > .subj-entry { padding: 6px 0 8px; border-bottom: 1px solid #eef0f2; }
 .subj-entry { margin-bottom: 10px; border-radius: 6px; font-size: 13.5px; }
 /* Thousands of entries: only those near the view are laid out (app.js sets
@@ -1981,7 +2056,7 @@ button.q-label:hover { color: #2c6fa6; }
    every card at once, and the choice is remembered (app.js, setIndexOpen) */
 .idx-sum {
   display: block; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
-  font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #8a7a52;
+  font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #7e6f4b;
 }
 .idx-sum::before { content: "\25B8\00a0 " attr(data-label); }
 .idx-sum:hover { color: #5f4f26; text-decoration: underline dotted; text-underline-offset: 3px; }
@@ -1998,7 +2073,7 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-head::before { content: attr(data-label); }
 .idx-row > .idx-head {
   float: left; width: 200px; margin: 3px 0 0 -214px; text-align: right; line-height: 1.4;
-  font-size: .78em; font-weight: 700; letter-spacing: .09em; color: #8a7a52;
+  font-size: .78em; font-weight: 700; letter-spacing: .09em; color: #7e6f4b;
 }
 .idx-row > .idx-back.idx-head {
   background: none; border: 0; border-radius: 3px; padding: 0;

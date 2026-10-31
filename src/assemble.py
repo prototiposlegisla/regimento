@@ -19,7 +19,7 @@ def assemble(
     output_path: Path,
     correlato_notas: list[str] = (),
 ) -> None:
-    """Monta o dist/index.html final (self-contained, exceto as fontes em fonts/)."""
+    """Monta o dist/index.html final (self-contained, exceto as fontes em fonts/ e as imagens em img/)."""
     template_path = base_dir / "templates" / "base.html"
     css_path = base_dir / "static" / "style.css"
     js_path = base_dir / "static" / "app.js"
@@ -33,8 +33,15 @@ def assemble(
     def dumps(data) -> str:
         return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
 
-    js = js.replace("/*__SYSTEMATIC_INDEX__*/[]", dumps(systematic_index))
-    js = js.replace("/*__SUMMARIES_MAP__*/{}", dumps(summaries_map))
+    # Data written into the script itself: "</" and "<!--" escaped as in the JSON
+    # blocks below (a "</script>" in a summary would end the script), and each
+    # placeholder must be there (a renamed one would leave its data out silently)
+    def inject(js: str, placeholder: str, data) -> str:
+        assert placeholder in js, f"marcador {placeholder} não está em static/app.js"
+        return js.replace(placeholder, dumps(data).replace("</", "<\\/").replace("<!--", "\\u003C!--"))
+
+    js = inject(js, "/*__SYSTEMATIC_INDEX__*/[]", systematic_index)
+    js = inject(js, "/*__SUMMARIES_MAP__*/{}", summaries_map)
 
     # The big data as JSON blocks the script reads when needed (pageData in
     # app.js): parsing JSON is much faster than parsing it as script literals.
@@ -51,8 +58,7 @@ def assemble(
 
     data_html = "\n".join(json_block(block_id, data) for block_id, data in blocks.items())
 
-    info_json = json.dumps(info_html, ensure_ascii=False)
-    js = js.replace("/*__INFO_HTML__*/\"\"", info_json)
+    js = inject(js, "/*__INFO_HTML__*/\"\"", info_html)
 
     # Assemble final HTML
     final = template.replace("{{CSS}}", css)
@@ -72,3 +78,13 @@ def assemble(
         for f in fonts_src.iterdir():
             if f.is_file():
                 shutil.copyfile(f, fonts_dst / f.name)
+
+    # ...and the images of a shared link (og:image) and of the phone's home
+    # screen; the sources they come from (_*) stay behind
+    img_src = base_dir / "static" / "img"
+    if img_src.is_dir():
+        img_dst = output_path.parent / "img"
+        img_dst.mkdir(exist_ok=True)
+        for f in img_src.iterdir():
+            if f.is_file() and f.suffix in (".png", ".svg") and not f.name.startswith("_"):
+                shutil.copyfile(f, img_dst / f.name)

@@ -75,7 +75,9 @@ class ValidationReport:
             by_cat.setdefault(issue.category, []).append(issue)
 
         cat_labels = {
+            "fontes": "Fontes do build (arquivo ausente ou ilegível)",
             "docx": "Formatação do DOCX",
+            "links":"Links do DOCX com endereço inválido (corrija o hyperlink no Word)",
             "texto": "Texto dos dispositivos (caractere perdido)",
             "legislacao": "Legislação correlata (a mesma norma com nomes diferentes)",
             "formato": "Formato da planilha",
@@ -132,6 +134,31 @@ class ValidationReport:
         ]
 
 
+def _siglas() -> dict[str, str]:
+    """Sigla de cada norma do DOCX nos artigos e nos uids (o RI fica sem sigla). Vem do código, não da
+    aba "Normas" do remissivo.xlsx: sem a planilha (ausente, aberta no Excel) o site saía sem LOM, CE e
+    CF ("LOM 5" deixava de existir) e o build não acusava erro."""
+    from src.remissoes import LAW_SHORT
+    return {nome: sigla for nome, sigla in LAW_SHORT.items() if sigla != "RI"}
+
+
+def _aplicar_siglas(doc, *, uids: bool) -> None:
+    """Põe a sigla da norma nos artigos de LOM, CE e CF (e, com uids, nos uids dos dispositivos)."""
+    from src.models import ArticleBlock
+    siglas = _siglas()
+    for el in doc.elements:
+        if isinstance(el, ArticleBlock) and el.law_name in siglas and not el.law_prefix:
+            el.law_prefix = lp = siglas[el.law_name]
+            if not uids:
+                continue
+            if el.caput:
+                el.caput.uid = el.caput.uid.replace("art", f"art{lp}", 1)
+            for child in el.children:
+                child.uid = child.uid.replace("art", f"art{lp}", 1)
+            for v in el.all_versions:
+                v.uid = v.uid.replace("art", f"art{lp}", 1)
+
+
 def _load_config() -> dict:
     """Lê config.local.toml (se existir) e retorna dict com paths."""
     config_path = BASE_DIR / "config.local.toml"
@@ -161,21 +188,27 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
     xlsx_path = Path(args.xlsx)
     if not xlsx_path.exists():
         print("      → XLSX não encontrado, índice remissivo vazio")
+        report.add("fontes", "erro", "remissivo.xlsx não encontrado: o site sairia sem índice remissivo", str(xlsx_path))
         return None, {}
     try:
         law_mapping = parse_law_mapping(xlsx_path)
         if law_mapping:
             print(f"      → {len(law_mapping)} normas mapeadas")
+        # a sigla de cada norma vem do código (_siglas); a aba Normas só confere
+        siglas = _siglas()
+        for nome, sigla in law_mapping.items():
+            if siglas.get(nome, sigla) != sigla:
+                report.add("formato", "aviso", f"aba Normas: {nome} = {sigla}, mas o build usa {siglas[nome]}")
 
         from src.validate_xlsx import validate_xlsx as _validate_xlsx_fmt
-        for _e in _validate_xlsx_fmt(xlsx_path, law_mapping):
+        for _e in _validate_xlsx_fmt(xlsx_path, {**law_mapping, **siglas}):
             report.add("formato", "aviso", _e.strip())
 
         # Artigos letrados do DOCX (ex: "212-A"), por norma, para expansão correta de ranges
         known_lettered: dict[str, set[str]] = {}
         for el in doc.elements:
             if hasattr(el, "art_number") and _re.search(r"-[A-Za-z]", el.art_number):
-                prefix = el.law_prefix or law_mapping.get(getattr(el, "law_name", None) or "", "")
+                prefix = el.law_prefix or siglas.get(getattr(el, "law_name", None) or "", "")
                 known_lettered.setdefault(prefix, set()).add(el.art_number)
         subject_index = parse_xlsx(xlsx_path, known_lettered=known_lettered)
 
@@ -192,6 +225,8 @@ def _carregar_indice(args: argparse.Namespace, doc, report: ValidationReport):
         print("      ⚠ Não foi possível abrir remissivo.xlsx (arquivo em uso pelo Excel?)")
         print("        Feche a planilha e rode o build novamente.")
         print("        Continuando sem índice remissivo...")
+        report.add("fontes", "erro", "remissivo.xlsx não abriu (em uso pelo Excel?): o site sairia sem índice "
+                                     "remissivo", str(xlsx_path))
         return None, {}
 
     # Normalizar refs de ADT letrados: "4-C" → "ADT4-C"
@@ -278,6 +313,8 @@ def _carregar_consulta(args: argparse.Namespace, doc, report: ValidationReport) 
     path = Path(args.consulta)
     if not path.exists():
         print("      → consulta-rapida.yaml não encontrado, consulta rápida vazia")
+        report.add("fontes", "erro", "consulta-rapida.yaml não encontrado: o site sairia sem a consulta rápida",
+                   str(path))
         return []
     try:
         dados = consulta.carregar(path)
@@ -296,6 +333,33 @@ def _carregar_consulta(args: argparse.Namespace, doc, report: ValidationReport) 
         report.add("consulta", severity, message, context)
     print(f"      → consulta rápida: {sum(len(s['items']) for s in secoes)} entradas em {len(secoes)} seções")
     return consulta.para_o_site(secoes)
+
+
+def _conferir_links(doc, report: ValidationReport) -> None:
+    """Links do DOCX: os de ação que o parser fez abrir o processo (src/links.py) e os que nenhum
+    navegador abre (sem domínio, com espaço: "http://- Inciso VII declarado...")."""
+    from src.links import valido
+
+    if doc.links_corrigidos:
+        print(f"      → {len(doc.links_corrigidos)} links de ação passam a abrir o processo (STF, TJSP)")
+
+    def units(us):
+        for u in us:
+            yield u
+            yield from units(u.children)
+
+    vistos: set[tuple[str, str, str]] = set()
+    for el in doc.elements:
+        if not hasattr(el, "art_number"):
+            continue
+        for u in units(([el.caput] if el.caput else []) + list(el.children) + list(el.all_versions)):
+            paras = [fn_p for fn in u.footnotes for fn_p in fn.paragraphs] + list(u.legislacao)
+            for r in list(u.runs) + [r for p in paras for r in p.runs]:
+                url = r.hyperlink_url
+                if url and not valido(url) and (el.law_name, el.art_number, url) not in vistos:
+                    vistos.add((el.law_name, el.art_number, url))
+                    report.add("links", "aviso", f"«{r.text.strip()[:40]}» → {url[:70]}",
+                               f"{el.law_name or 'Regimento Interno'}, Art. {el.art_number}")
 
 
 def _build_once(
@@ -330,6 +394,7 @@ def _build_once(
     n_prec = sum(1 for e in articles if e.law_prefix == "PREC")
     print(f"      → {len(headings)} headings, {len(articles) - n_prec} artigos"
           + (f", {n_prec} precedentes regimentais" if n_prec else ""))
+    _conferir_links(doc, report)
 
     # ── 1b. Validação do DOCX ─────────────────────────────────────────
     from validate import get_paragraphs as _get_paras, run_checks as _run_checks, CODE_LABELS
@@ -388,19 +453,8 @@ def _build_once(
                         ctx += f" > {entry.sub_subject}"
                     report.add("vide", "aviso", f"\"{v}\"", f"assunto: {ctx}")
 
-    # Apply law prefixes to articles based on law_name ↔ mapping
-    if law_mapping:
-        from src.models import ArticleBlock as _AB
-        for el in doc.elements:
-            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping and not el.law_prefix:
-                el.law_prefix = law_mapping[el.law_name]
-                lp = el.law_prefix
-                if el.caput:
-                    el.caput.uid = el.caput.uid.replace("art", f"art{lp}", 1)
-                for child in el.children:
-                    child.uid = child.uid.replace("art", f"art{lp}", 1)
-                for v in el.all_versions:
-                    v.uid = v.uid.replace("art", f"art{lp}", 1)
+    # Sigla da norma nos artigos e nos uids (LOM, CE, CF)
+    _aplicar_siglas(doc, uids=True)
 
     # Forma certa dos erros do texto oficial, para a busca achar o dispositivo pela palavra certa (o81); depois dos prefixos, que separam o RI 32 da LOM 32
     from src.resolve_amendments import formas_de_busca
@@ -413,6 +467,9 @@ def _build_once(
 
     # Remissões explícitas: citações a outros artigos ("artigo 369"), com prévia no site
     from src.remissoes import detectar, carregar_excecoes, carregar_implicitas, mudancas_desde_ultimo_build
+    if not Path(args.remissoes).exists():
+        report.add("fontes", "erro", "remissoes.xlsx não encontrado: o site sairia sem os correlatos entre normas",
+                   str(args.remissoes))
     remissoes = detectar(doc, carregar_excecoes(BASE_DIR / "remissoes_excecoes.toml"),
                          carregar_implicitas(args.remissoes),
                          privadas=include_private, propostas=args.com_propostas)
@@ -450,7 +507,12 @@ def _build_once(
         print(f"      → {len(info_html)} caracteres de HTML")
     else:
         print("      → DOCX de informações não encontrado, aba vazia")
+        report.add("fontes", "aviso", "informacoes.docx não encontrado: a aba de informações sai sem o seu texto",
+                   str(info_path))
         info_html = ""
+    # e a parte escrita pelo build: até onde vai cada norma, atalhos da busca, marcadores (src/ajuda.py)
+    from src.ajuda import html_da_ajuda
+    info_html = "\n".join(p for p in (info_html, html_da_ajuda(doc)) if p)
 
     # ── 6. Build systematic index ──────────────────────────────────────
     print("[6/8] Gerando índice sistemático...")
@@ -600,13 +662,8 @@ def _build_markdown(
     subject_index, law_mapping = _carregar_indice(args, doc, ValidationReport())
     subject_list = subject_index.to_list() if subject_index else []
 
-    # Apply law prefixes
-    if law_mapping:
-        from src.models import ArticleBlock as _AB
-
-        for el in doc.elements:
-            if isinstance(el, _AB) and el.law_name and el.law_name in law_mapping and not el.law_prefix:
-                el.law_prefix = law_mapping[el.law_name]
+    # Sigla da norma nos artigos (o Markdown não usa uids)
+    _aplicar_siglas(doc, uids=False)
 
     # ── 4. Consulta rápida ────────────────────────────────────────
     print("[4/5] Montando a consulta rápida...")
@@ -649,40 +706,61 @@ def _build_canonico(args: argparse.Namespace) -> None:
         print(f"      {line}")
 
 
-def _auto_commit_and_push() -> None:
-    """Faz git add + commit + push de docs/index.html."""
+# O código que entra na página: publicar com mudança não commitada nele põe no ar um código que não
+# está no histórico (as memórias registram três contornos à mão, trocando o app.js pelo do HEAD)
+CODIGO_DA_PAGINA = ["build.py", "validate.py", "src", "static", "templates", "*.toml"]
+# O que o --push commita: a página e as fontes e imagens copiadas ao lado dela
+SAIDA_PUBLICADA = ["docs/index.html", "docs/fonts", "docs/img"]
+
+
+def _git(*args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=BASE_DIR, capture_output=True, text=True, encoding="utf-8")
+
+
+def _pode_publicar() -> str:
+    """Antes do build com --push: "" se dá para publicar; senão, o motivo. Código da página sem
+    mudança fora do histórico e testes passando."""
+    r = _git("status", "--porcelain", "--", *CODIGO_DA_PAGINA)
+    if r.returncode != 0:
+        return f"o git status falhou: {r.stderr.strip()}"
+    if r.stdout.strip():
+        return ("há mudança não commitada no código da página (ela iria ao ar sem estar no histórico):\n"
+                + r.stdout.rstrip() + "\n  Commite essas mudanças (ou guarde com git stash) e rode de novo.")
+    print("\n── Testes ──")
+    if subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"], cwd=BASE_DIR).returncode:
+        return "os testes falharam (veja acima)"
+    return ""
+
+
+def _auto_commit_and_push() -> bool:
+    """Commit + push só de docs/ (a página e as fontes). Falso se não publicou por um problema."""
     public_html = BASE_DIR / "docs" / "index.html"
     if not public_html.exists():
-        return
+        return False
+    if not _git("status", "--porcelain", "--", *SAIDA_PUBLICADA).stdout.strip():
+        print("\n⊘ docs/ sem alterações — nada a commitar")
+        return True
 
-    # Check if there are changes to commit
-    result = subprocess.run(
-        ["git", "diff", "--quiet", "docs/index.html"],
-        cwd=BASE_DIR,
-        capture_output=True,
-    )
-    if result.returncode == 0:
-        # Also check if file is untracked
-        result2 = subprocess.run(
-            ["git", "ls-files", "--error-unmatch", "docs/index.html"],
-            cwd=BASE_DIR,
-            capture_output=True,
-        )
-        if result2.returncode == 0:
-            print("\n⊘ docs/index.html sem alterações — nada a commitar")
-            return
+    # Página bem menor que a publicada: quase sempre uma fonte que faltou (sem correlatos, sem consulta)
+    r = _git("cat-file", "-s", "HEAD:docs/index.html")
+    if r.returncode == 0:
+        antes, agora = int(r.stdout), public_html.stat().st_size
+        if agora < antes * 0.9:
+            print(f"\n✗ Não publicado: a página encolheu {100 - round(100 * agora / antes)}% "
+                  f"({antes // 1024} → {agora // 1024} KB). Confira as fontes; se for isso mesmo, "
+                  f"commite docs/ à mão.")
+            return False
 
     print("\n── Git ──")
-    subprocess.run(["git", "add", "docs/index.html"], cwd=BASE_DIR, check=True)
-    print("  git add docs/index.html")
-
     timestamp = time.strftime("%Y-%m-%d %H:%M")
     msg = f"build: atualiza regimento ({timestamp})"
-    subprocess.run(["git", "commit", "-m", msg], cwd=BASE_DIR, check=True)
-    print(f"  git commit -m \"{msg}\"")
-
+    subprocess.run(["git", "add", "--", *SAIDA_PUBLICADA], cwd=BASE_DIR, check=True)
+    # com os caminhos, o commit leva só docs/, mesmo que haja outra coisa no stage
+    subprocess.run(["git", "commit", "-m", msg, "--", *SAIDA_PUBLICADA], cwd=BASE_DIR, check=True)
+    print(f"  git commit -m \"{msg}\" -- docs/")
     subprocess.run(["git", "push"], cwd=BASE_DIR, check=True)
     print("  git push ✓")
+    return True
 
 
 def main() -> int:
@@ -776,6 +854,12 @@ def main() -> int:
         print("Nada a fazer. Configure [output] em config.local.toml.")
         return 1
 
+    if args.push and build_public:
+        motivo = _pode_publicar()
+        if motivo:
+            print(f"\n✗ Não publicado: {motivo}")
+            return 1
+
     t_total = time.time()
     all_reports: list[ValidationReport] = []
 
@@ -811,13 +895,18 @@ def main() -> int:
     print(f"  Total: {elapsed_total:.1f}s")
     print(f"{'═' * 60}")
 
-    # Commit/push only when explicitly requested
-    if args.push and build_public:
-        _auto_commit_and_push()
-
     # Exit code based on validation results
     total_errors = sum(len(r.errors) for r in all_reports)
     total_warnings = sum(len(r.warnings) for r in all_reports)
+
+    # Commit/push only when explicitly requested, and only without errors
+    if args.push and build_public:
+        if total_errors:
+            print(f"\n✗ Não publicado: o build tem {total_errors} erro(s) — veja o relatório acima.")
+            return 1
+        if not _auto_commit_and_push():
+            return 1
+
     if total_errors or (args.strict and total_warnings):
         return 1
     return 0

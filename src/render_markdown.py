@@ -307,7 +307,8 @@ class MarkdownRenderer:
             # Replace non-breaking space
             text = text.replace("\xa0", " ")
 
-            if run.hyperlink_url and not self._canonico:
+            # as in the site: a piece without a letter (" " before a note, a lone ";") is not a link
+            if run.hyperlink_url and not self._canonico and re.search(r"\w", text):
                 text = f"[{text}]({run.link_url})"
             # hyperlink_anchor → plain text (no link target in markdown)
 

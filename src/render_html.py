@@ -527,6 +527,10 @@ class HTMLRenderer:
         in_mark: dentro de um gatilho de remissão; o link sai da ordem do Tab (o
         gatilho é a parada) e continua abrindo com Ctrl/Cmd+clique.
         """
+        # a piece without a letter or digit is not a link: the link of a note often starts at the
+        # space before it (" (Redação dada…)"), and the PLP links a lone ";" (LOM 32) — each would
+        # be a stray "↗" and an empty Tab stop
+        link = link and re.search(r"\w", html.unescape(escaped)) is not None
         if link and run.hyperlink_url:
             tab = ' tabindex="-1"' if in_mark else ""
             # a link that is a note by itself, "(Dispositivos renumerados…)", even where

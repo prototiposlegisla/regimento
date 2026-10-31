@@ -161,6 +161,8 @@ class ArticleBlock:
 class ParsedDocument:
     """Documento parseado completo."""
     elements: list[SectionHeading | ArticleBlock] = field(default_factory=list)
+    # links de ação que passaram a abrir o processo (src/links.py): (texto, antes, depois)
+    links_corrigidos: list[tuple[str, str, str]] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         """Serializa para JSON-friendly dict."""

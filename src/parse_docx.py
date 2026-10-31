@@ -7,6 +7,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from .links import corrigir as corrigir_link
 from .models import (
     TextRun, DocumentUnit, SectionHeading, ArticleBlock,
     ParsedDocument, UnitType, Footnote, FootnotePara, PREC, prec_label,
@@ -117,15 +118,34 @@ def parse_docx(path: str | Path, *, include_private: bool = False) -> ParsedDocu
         include_private: Se True, inclui footnotes com prefixo "b " (notas privadas).
     """
     path = Path(path)
+    corrigidos: list[tuple[str, str, str]] = []
     with zipfile.ZipFile(path, "r") as zf:
         rels = _parse_rels(zf)
         footnotes_map, summaries_map, private_fn_ids, legislacao_map = _parse_footnotes_xml(
-            zf, include_private=include_private, rels=_parse_rels(zf, "word/_rels/footnotes.xml.rels"))
-        paragraphs = _parse_document_xml(zf, rels)
+            zf, include_private=include_private, rels=_parse_rels(zf, "word/_rels/footnotes.xml.rels"),
+            corrigidos=corrigidos)
+        paragraphs = _parse_document_xml(zf, rels, corrigidos)
 
     raw_units = _classify_paragraphs(paragraphs)
     doc = _build_document(raw_units, footnotes_map, summaries_map, private_fn_ids, legislacao_map)
+    doc.links_corrigidos = corrigidos
     return doc
+
+
+def _link(hl_el: ET.Element, rels: dict[str, tuple[str, str]], runs: list[TextRun],
+          corrigidos: list[tuple[str, str, str]] | None) -> tuple[str | None, str | None]:
+    """(url, âncora) de um w:hyperlink; o link de uma ação que leva à página inicial do tribunal, ao
+    portal antigo do STF ou a um endereço quebrado passa a abrir o processo (src/links.py)."""
+    rid = hl_el.get(f"{{{NS['r']}}}id", "")
+    url = rels[rid][0] if rid in rels else ""
+    anchor = hl_el.get(f"{{{NS['w']}}}anchor", "")
+    texto = "".join(r.text for r in runs)
+    novo = corrigir_link(url, texto)
+    if novo != url:
+        if corrigidos is not None:
+            corrigidos.append((texto.strip(), url, novo))
+        url, anchor = novo, ""
+    return url or None, anchor or None
 
 
 # ── Leitura do XML ─────────────────────────────────────────────────────
@@ -158,6 +178,7 @@ def _parse_footnotes_xml(
     *,
     include_private: bool = False,
     rels: dict[str, tuple[str, str]] | None = None,
+    corrigidos: list[tuple[str, str, str]] | None = None,
 ) -> tuple[dict[int, list[FootnotePara]], dict[int, str], set[int], dict[int, list[FootnotePara]]]:
     """Parseia word/footnotes.xml → (footnotes_map, summaries_map, private_fn_ids, legislacao_map).
 
@@ -198,22 +219,19 @@ def _parse_footnotes_xml(
             for child in p_el:
                 # runs, also inside links (as in the document's paragraphs)
                 if child.tag == f"{{{w}}}hyperlink":
-                    rid = child.get(f"{{{NS['r']}}}id", "")
-                    url = rels[rid][0] if rid in rels else ""
-                    anchor = child.get(f"{{{w}}}anchor", "")
-                    r_els, link = child.findall(f"{{{w}}}r"), (url or None, anchor or None)
+                    r_els = child.findall(f"{{{w}}}r")
                 elif child.tag == f"{{{w}}}r":
-                    r_els, link = [child], (None, None)
+                    r_els = [child]
                 else:
                     continue
-                for r_el in r_els:
-                    # Skip footnoteRef marker run (just the superscript number)
-                    if r_el.find(f"{{{w}}}footnoteRef") is not None:
-                        continue
-                    tr = _parse_run(r_el, w)
-                    if tr.text:
-                        tr.hyperlink_url, tr.hyperlink_anchor = link
-                        runs.append(tr)
+                # Skip footnoteRef marker run (just the superscript number)
+                trs = [tr for tr in (_parse_run(r_el, w) for r_el in r_els
+                                     if r_el.find(f"{{{w}}}footnoteRef") is None) if tr.text]
+                link = (_link(child, rels, trs, corrigidos) if child.tag == f"{{{w}}}hyperlink"
+                        else (None, None))
+                for tr in trs:
+                    tr.hyperlink_url, tr.hyperlink_anchor = link
+                    runs.append(tr)
             # Detect paragraph indent via <w:ind w:left="...">
             indent = False
             ppr = p_el.find(f"{{{w}}}pPr")
@@ -303,7 +321,8 @@ class _RawParagraph:
 
 
 def _parse_document_xml(
-    zf: zipfile.ZipFile, rels: dict[str, tuple[str, str]]
+    zf: zipfile.ZipFile, rels: dict[str, tuple[str, str]],
+    corrigidos: list[tuple[str, str, str]] | None = None,
 ) -> list[_RawParagraph]:
     """Parseia word/document.xml e retorna lista de parágrafos raw."""
     data = zf.read("word/document.xml")
@@ -314,16 +333,16 @@ def _parse_document_xml(
 
     paragraphs: list[_RawParagraph] = []
     for p_el in body.findall(f"{{{NS['w']}}}p"):
-        para = _parse_paragraph(p_el, rels)
+        para = _parse_paragraph(p_el, rels, corrigidos)
         paragraphs.append(para)
     return paragraphs
 
 
 def _parse_paragraph(
-    p_el: ET.Element, rels: dict[str, tuple[str, str]]
+    p_el: ET.Element, rels: dict[str, tuple[str, str]],
+    corrigidos: list[tuple[str, str, str]] | None = None,
 ) -> _RawParagraph:
     w = NS["w"]
-    r_ns = NS["r"]
 
     # Paragraph properties
     ppr = p_el.find(f"{{{w}}}pPr")
@@ -370,20 +389,13 @@ def _parse_paragraph(
                 if tr.strike:
                     has_strike = True
         elif tag == f"{{{w}}}hyperlink":
-            # Get hyperlink target
-            rid = child.get(f"{{{r_ns}}}id", "")
-            anchor = child.get(f"{{{w}}}anchor", "")
-            url = ""
-            if rid and rid in rels:
-                url = rels[rid][0]
-            for r_el in child.findall(f"{{{w}}}r"):
-                tr = _parse_run(r_el, w)
-                if tr.text:
-                    tr.hyperlink_url = url or None
-                    tr.hyperlink_anchor = anchor or None
-                    runs.append(tr)
-                    if tr.strike:
-                        has_strike = True
+            trs = [tr for tr in (_parse_run(r_el, w) for r_el in child.findall(f"{{{w}}}r")) if tr.text]
+            url, anchor = _link(child, rels, trs, corrigidos)
+            for tr in trs:
+                tr.hyperlink_url, tr.hyperlink_anchor = url, anchor
+                runs.append(tr)
+                if tr.strike:
+                    has_strike = True
 
     full_text = "".join(r.text for r in runs).strip()
 

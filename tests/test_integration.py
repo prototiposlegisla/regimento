@@ -272,6 +272,10 @@ class TestRemissoes:
         perdidos = [(h, n) for p_sem, p_com in zip(pat.findall(sem), pat.findall(com))
                     for h, n in (hrefs(p_sem) - hrefs(p_com)).items()]
         assert not perdidos, perdidos[:5]
+        # no link without a letter: a lone space or ";" would be a stray "↗" and an empty Tab stop
+        for html_ in (com, sem):
+            vazios = _re.findall(r'<a\b[^>]*>(?:[^<\w]|<[^a/][^>]*>|</[^a][^>]*>)*</a>', html_)
+            assert not vazios, vazios[:3]
 
     def test_dgt_que_citam_a_ec_103_existem_como_externas(self, remissoes):
         ext = [r for r in remissoes.remissoes if r.origem.ref == "LOM:ADT26,I"]

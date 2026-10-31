@@ -4,5 +4,9 @@ markers = [
     "unit: testes de lógica pura, sem DOCX",
     "integration: requer DOCX real",
     "snapshot: comparação com golden file",
+    "e2e: navegador sobre a página gerada (tests/e2e)",
 ]
-addopts = "-m unit --tb=short -q"
+# tudo por padrão (~7 s): os de integração e o snapshot pulam sozinhos sem o DOCX real
+# (config.local.toml); só os rápidos: pytest -m unit. Os de navegador ficam de fora:
+# pytest -m e2e, depois de um build (tests/e2e/conftest.py)
+addopts = "--tb=short -q -m 'not e2e'"

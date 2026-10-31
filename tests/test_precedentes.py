@@ -253,7 +253,9 @@ class TestSite:
                  TextRun("(Redação dada pelo Precedente Regimental nº 1/2020)", hyperlink_url=link))
         doc.elements[-4].children += [old, new]
         html = HTMLRenderer(detectar(doc)).render(doc)
-        assert '<p class="old-version" data-item="6">6) Texto antigo.</p>' in html
+        assert ('<div class="old-drawer" data-old="1" role="button" tabindex="0" aria-expanded="false"'
+                ' data-label="redação anterior"></div>\n'
+                '    <p class="old-version old-first" data-item="6" data-old="1">6) Texto antigo.</p>') in html
         assert ('<p class="prec-para" data-item="6">6) Texto novo. (Redação dada pelo '
                 '<span class="rem rem-exp" tabindex="0" role="button" data-ref="PREC:1/2020">'
                 f'<a href="{link.replace("&", "&amp;")}" target="_blank" rel="noopener" tabindex="-1">'

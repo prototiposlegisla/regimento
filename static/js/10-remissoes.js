@@ -379,6 +379,7 @@
     const card = remCard(r);
     if (!card) return;
     const target = (r.path && remUnitP(card, r.path)) || card;
+    revealOld(target);   // a revoked provision or a redação anterior
     takeStep('rem');
     card.classList.remove('filtered-out');   // the target may be hidden by a filter
     remReturnTo = trigger;

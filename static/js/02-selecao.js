@@ -23,6 +23,14 @@
       for (const hit of getCardHits(card)) {
         if (hitHasBox(hit)) { rect = hitRect(hit); break; }
       }
+      // All in hidden redações anteriores or revoked text: the first one opened
+      if (!rect) {
+        const hit = getCardHits(card).find(h => hitElement(h).closest('.old-version'));
+        if (hit) {
+          revealOld(hitElement(hit));
+          if (hitHasBox(hit)) rect = hitRect(hit);
+        }
+      }
       // None (a chip without text): its first dispositivo in the card
       if (!rect) {
         const unit = card.classList.contains('scope-unit') ? null : card.querySelector('.scope-unit');

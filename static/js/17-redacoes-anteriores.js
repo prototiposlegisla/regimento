@@ -77,8 +77,8 @@
     // Walk forward through siblings to find the next version (old or current)
     let sib = oldEl.nextElementSibling;
     while (sib) {
-      // Skip diff panels
-      if (sib.classList.contains('diff-panel')) {
+      // Skip diff panels, and the drawers and lines that hide old versions
+      if (sib.matches('.diff-panel, .old-drawer, .revoked-block')) {
         sib = sib.nextElementSibling;
         continue;
       }
@@ -173,7 +173,47 @@
     });
   }
 
-  // Delegated click handler for diff
+  // ===== HIDDEN OLD VERSIONS =====
+  // The struck paragraphs of a card stay hidden (style.css): a drawer where
+  // they were opens a provision's redações anteriores, a line a run of revoked
+  // provisions; the drawer or line and its paragraphs share data-old
+  // (render_html._plan_old_versions)
+  function oldTrigger(p) {
+    return p.parentElement.querySelector(`:scope > :is(.old-drawer, .revoked-block)[data-old="${p.dataset.old}"]`);
+  }
+
+  function setOldOpen(trigger, open) {
+    trigger.classList.toggle('open', open);
+    trigger.setAttribute('aria-expanded', open);
+    for (const p of trigger.parentElement.querySelectorAll(`:scope > .old-version[data-old="${trigger.dataset.old}"]`)) {
+      p.classList.toggle('open', open);
+      if (!open && p.classList.contains('diff-open')) toggleDiff(p);
+    }
+  }
+
+  // An old paragraph shown (a search hit or a citation's target in it), if hidden
+  function revealOld(el) {
+    const p = el && el.closest('.old-version');
+    if (!p || p.classList.contains('open') || !p.parentElement.classList.contains('card')) return;
+    const t = oldTrigger(p);
+    if (t) setOldOpen(t, true);
+  }
+
+  // The search found words in hidden paragraphs: their drawer or line says so
+  let oldSearchHits = [];
+  function markHiddenOldHit(p) {
+    const t = p.parentElement.classList.contains('card') && !p.classList.contains('open') && oldTrigger(p);
+    if (t && !t.classList.contains('search-hit')) {
+      t.classList.add('search-hit');
+      oldSearchHits.push(t);
+    }
+  }
+  function clearHiddenOldHits() {
+    for (const t of oldSearchHits) t.classList.remove('search-hit');
+    oldSearchHits = [];
+  }
+
+  // Delegated click handler for diff and the drawers
   $cards.addEventListener('click', (e) => {
     const toggle = e.target.closest('.diff-toggle');
     if (toggle) {
@@ -182,5 +222,14 @@
       if (oldEl) toggleDiff(oldEl);
       return;
     }
+    const trigger = e.target.closest('.old-drawer, .revoked-block');
+    if (trigger) setOldOpen(trigger, !trigger.classList.contains('open'));
+  });
+  $cards.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const trigger = e.target.closest('.old-drawer, .revoked-block');
+    if (!trigger) return;
+    e.preventDefault();
+    setOldOpen(trigger, !trigger.classList.contains('open'));
   });
 

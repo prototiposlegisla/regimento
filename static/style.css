@@ -618,6 +618,66 @@ body {
   padding-top: calc(4px * var(--zoom-scale));
 }
 
+/* In the card, the struck paragraphs stay hidden until asked for
+   (render_html._plan_old_versions): a redação anterior behind a drawer where
+   it was ("▸ 2 redações anteriores", in a light red), a run of revoked
+   provisions behind one line ("Parágrafo único (com 10 incisos) — revogado").
+   Open, each is a box with a rule in the norma's color and a label, without
+   the line-through: it is there because it was asked for. (The previews keep
+   the line-through above.) */
+.card > .old-version:not(.open) { display: none; }
+/* each as far in as its provision's text (--ind: its depth, render_html) */
+.card > :is(.old-version, .old-drawer, .revoked-block) { margin-left: calc(16px * var(--ind, 0) * var(--zoom-scale)); }
+.card > .old-version {
+  text-decoration: none; opacity: 1; color: #6b7380; border-top: 0;
+  border-left: 3px solid color-mix(in srgb, var(--nc) 40%, #d6dae0);
+  background: color-mix(in srgb, var(--nc) 4%, #fafbfc);
+  padding: calc(3px * var(--zoom-scale)) calc(10px * var(--zoom-scale));
+  border-radius: 0 6px 6px 0;
+}
+.card > .old-version.old-first::before {
+  content: "REDAÇÃO ANTERIOR"; display: block;
+  font: 700 calc(.58rem * var(--zoom-scale))/1.7 var(--font-ui); letter-spacing: .14em; color: #9aa1ab;
+  text-align: left;
+}
+.card > .old-version.old-first.old-many::before { content: "REDAÇÕES ANTERIORES, DA MAIS ANTIGA À MAIS RECENTE"; }
+.card > .old-version.old-revoked.old-first::before { content: "TEXTO REVOGADO"; }
+
+.old-drawer, .revoked-block {
+  margin: calc(2px * var(--zoom-scale)) 0;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+  border-radius: 4px;
+}
+.old-drawer {
+  width: max-content; max-width: 100%;
+  font: 600 calc(.7rem * var(--zoom-scale))/1.7 var(--font-ui); letter-spacing: .02em;
+  color: #b9675d;
+}
+.old-drawer::before { content: "▸\2002" attr(data-label); }
+.old-drawer.open::before { content: "▾\2002" attr(data-label); }
+.old-drawer:hover { color: #93443b; }
+.revoked-block {
+  font: calc(.88rem * var(--zoom-scale))/1.7 var(--font-text); color: #b9675d; text-align: left;
+}
+.revoked-block:hover { color: #93443b; }
+.rb-id::before { content: attr(data-label); font-weight: 700; }
+.rb-word::before { content: "\2002—\2002" attr(data-label); font-style: italic; }
+.rb-note::before {
+  content: attr(data-label);
+  display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 4px; background: #f0f2f5; color: #6b7480;
+  font: 500 .76em/1.9 var(--font-ui); vertical-align: 1px;
+}
+.revoked-block::after {
+  content: "ver o texto";
+  display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 10px; border: 1px solid #e1e4e8;
+  background: #f6f7f9; color: #7a818c; font: 600 .72em/1.6 var(--font-ui); vertical-align: 1px;
+}
+.revoked-block:hover::after { background: #e9edf3; color: #1f4f8a; border-color: #cfd8e4; }
+.revoked-block.open::after { content: "ocultar"; background: var(--nc); border-color: var(--nc); color: #fff; }
+:is(.old-drawer, .revoked-block):focus-visible { outline: 2px solid var(--selected-border); outline-offset: 1px; }
+/* a search word inside the hidden text: the drawer or line says so */
+:is(.old-drawer, .revoked-block).search-hit:not(.open) {background: var(--mark-yellow); box-shadow: 0 0 0 2px var(--mark-yellow); }
+
 
 /* Diff toggle: a grey chip "⇄ comparar", as the other chips (the word via
    CSS, out of the searchable text); in the norma's color while open */
@@ -746,6 +806,8 @@ body {
 #cards-container.compact .card-artigo > p,
 #cards-container.compact .card-artigo > .art-para,
 #cards-container.compact .old-version,
+#cards-container.compact .old-drawer,
+#cards-container.compact .revoked-block,
 #cards-container.compact .footnote-box { display: none; }
 
 #cards-container.compact .law-badge {

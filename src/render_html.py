@@ -134,18 +134,20 @@ class HTMLRenderer:
             badge = html.escape(art.law_prefix)
             parts.append(f'    <span class="law-badge">{badge}</span>')
 
+        # The paragraphs in card order: (unit, old version?, path, child?).
         # Old caputs from full-article rewrites (in DOCX order), with their children
+        rows: list[tuple[DocumentUnit, bool, str, bool]] = []
         v_ctx = ["", "", "", ""]
         for v in art.all_versions:
             if v.unit_type == UnitType.ARTIGO:
                 v_ctx = ["", "", "", ""]
-                parts.append(self._render_old_version(v))
+                rows.append((v, True, "", False))
             else:
-                parts.append(self._render_old_version(v, path=self._update_path_ctx(v, v_ctx)))
+                rows.append((v, True, self._update_path_ctx(v, v_ctx), False))
 
         # Current caput
         if art.caput:
-            parts.append(self._render_unit_as_p(art.caput, is_caput=True))
+            rows.append((art.caput, False, "", False))
 
         # Children in document order (old versions interleaved)
         path_ctx = ["", "", "", ""]  # [para, inciso, alinea, sub]
@@ -153,11 +155,21 @@ class HTMLRenderer:
         for child in art.children:
             all_path = self._update_path_ctx(child, all_ctx)
             if child.is_old_version:
-                parts.append(self._render_old_version(child, is_child=True, path=all_path))
+                rows.append((child, True, all_path, True))
             else:
-                path = self._update_path_ctx(child, path_ctx)
+                rows.append((child, False, self._update_path_ctx(child, path_ctx), True))
+
+        olds = self._plan_old_versions([(r[1], r[2]) for r in rows], [r[0] for r in rows], indent=True)
+        for i, (unit, is_old, path, is_child) in enumerate(rows):
+            if is_old:
+                before, cls, attrs = olds[i]
+                parts.extend(before)
+                parts.append(self._render_old_version(unit, is_child=is_child, path=path, cls=cls, attrs=attrs))
+            elif not is_child:
+                parts.append(self._render_unit_as_p(unit, is_caput=True))
+            else:
                 parts.append(self._render_unit_as_p(
-                    child, is_caput=False, path=path,
+                    unit, is_caput=False, path=path,
                     art_number=art.art_number,
                 ))
 
@@ -203,13 +215,19 @@ class HTMLRenderer:
         parts.append(f'    <span class="law-badge">{PREC}</span>')
         cap = art.caput
         parts.append(f"    <p>{self._render_unit_id(cap)}{self._footnote_refs(cap)}</p>{self._footnote_boxes(cap)}")
+        # the item number ("6)", "6 -", "6.") pairs a struck wording with the new one
+        items = []
         for child in art.children:
-            # the item number ("6)", "6 -", "6.") pairs a struck wording with the new one (diff)
             m = re.match(r"\s*(\d{1,3})\s*[).\-–—]", child.full_text)
-            item = f' data-item="{m.group(1)}"' if m else ""
+            items.append(m.group(1) if m else None)
+        olds = self._plan_old_versions([(c.is_old_version, it) for c, it in zip(art.children, items)],
+                                       art.children)
+        for i, (child, num) in enumerate(zip(art.children, items)):
+            item = f' data-item="{num}"' if num else ""
             if child.is_old_version:
-                old = self._render_old_version(child)
-                parts.append(old.replace('<p class="old-version"', f'<p class="old-version"{item}', 1))
+                before, cls, attrs = olds[i]
+                parts.extend(before)
+                parts.append(self._render_old_version(child, cls=cls, attrs=item + attrs))
                 continue
             marks = self._rem_by_unit.get(id(child), ())
             body = (self._render_runs_with_marks(child.runs, 0, marks) if marks
@@ -635,8 +653,115 @@ class HTMLRenderer:
             parts.append(text)
         return "".join(parts)
 
-    def _render_old_version(self, unit: DocumentUnit, is_child: bool = False, path: str = "") -> str:
-        """Renderiza uma versão antiga (strikethrough + amendment note)."""
+    def _plan_old_versions(self, rows: list[tuple[bool, Optional[str]]], units: list[DocumentUnit],
+                           indent: bool = False) -> dict[int, tuple[list[str], str, str]]:
+        """The struck paragraphs of a card, hidden until asked for (style.css).
+
+        rows: (old version?, key) in card order; the key pairs an old wording with the
+        current one of the same provision (its path, "" for the caput; a precedent's
+        item number; None pairs with nothing). An old wording with a current one after
+        it is a redação anterior: a drawer before the first ("▸ 2 redações anteriores")
+        opens them all. One without is revoked: each run of them becomes one line
+        ("Parágrafo único (com 10 incisos) — revogado"). The drawer or line and its
+        paragraphs share data-old (a number in the card). indent: the keys are paths,
+        and the drawer, the line and the paragraphs go in as far as their provision
+        (--ind, its depth: the caput 0, a § or inciso 1, an alínea 2...).
+
+        Returns, per old row: (lines to put before it, its classes, its attributes).
+        """
+        groups: dict[int, list[int]] = {}   # index of the current wording -> its old ones
+        revoked: list[int] = []
+        for i, (is_old, key) in enumerate(rows):
+            if not is_old:
+                continue
+            succ = next((j for j in range(i + 1, len(rows)) if key is not None
+                         and not rows[j][0] and rows[j][1] == key), None)
+            if succ is None:
+                revoked.append(i)
+            else:
+                groups.setdefault(succ, []).append(i)
+        def ind(i: int) -> str:
+            d = len(rows[i][1].split(",")) if indent and rows[i][1] else 0
+            return f' style="--ind:{d}"' if d else ""
+        plan = {i: ([], "", "") for i, (is_old, _) in enumerate(rows) if is_old}
+        n = 0
+        for succ, olds in sorted(groups.items(), key=lambda g: g[1][0]):
+            n += 1
+            many = len(olds) > 1
+            label = f"{len(olds)} redações anteriores" if many else "redação anterior"
+            plan[olds[0]][0].append(
+                f'    <div class="old-drawer" data-old="{n}"{ind(succ)} role="button" tabindex="0"'
+                f' aria-expanded="false" data-label="{label}"></div>')
+            for k, i in enumerate(olds):
+                cls = " old-first" + (" old-many" if many else "") if k == 0 else ""
+                plan[i] = (plan[i][0], cls, f' data-old="{n}"{ind(i)}')
+        runs: list[list[int]] = []
+        for i in revoked:
+            if runs and runs[-1][-1] == i - 1:
+                runs[-1].append(i)
+            else:
+                runs.append([i])
+        for run in runs:
+            n += 1
+            top = min(run, key=lambda i: len((rows[i][1] or "").split(",")))
+            label, tops = self._revoked_label([units[i] for i in run], [rows[i][1] or "" for i in run])
+            note = self._revoked_note(units[run[0]])
+            note_html = f'<span class="rb-note" data-label="{html.escape(note)}"></span>' if note else ""
+            plan[run[0]][0].append(
+                f'    <div class="revoked-block" data-old="{n}"{ind(top)} role="button" tabindex="0"'
+                f' aria-expanded="false">'
+                f'<span class="rb-id" data-label="{html.escape(label)}"></span>'
+                f'<span class="rb-word" data-label="{"revogados" if tops > 1 else "revogado"}"></span>'
+                f'{note_html}</div>')
+            for k, i in enumerate(run):
+                plan[i] = (plan[i][0], " old-revoked" + (" old-first" if k == 0 else ""), f' data-old="{n}"{ind(i)}')
+        return plan
+
+    @staticmethod
+    def _revoked_label(units: list[DocumentUnit], paths: list[str]) -> tuple[str, int]:
+        """What a run of revoked provisions is called on its line: the topmost ones
+        ("§§ 5º a 10", "I e II") and how many below them ("(com 6 alíneas)"); and how
+        many topmost."""
+        items = [(u.identifier.strip() or "Texto", len(p.split(",")) if p else 0) for u, p in zip(units, paths)]
+        top = min(d for _, d in items)
+        tops = [i for i, d in items if d == top]
+        kids = [i for i, d in items if d > top]
+        if len(tops) == 1:
+            label = tops[0]
+        elif len(tops) == 2:
+            label = f"{tops[0]} e {tops[1]}"
+        else:
+            label = f"{tops[0]} a {tops[-1]}"
+        if len(tops) > 1 and all(t.startswith("§") for t in tops):
+            label = "§§ " + re.sub(r"§\s*", "", label)
+        if kids:
+            k = kids[0]
+            one, many = (("inciso", "incisos") if re.fullmatch(r"[IVXLC]+", k)
+                         else ("alínea", "alíneas") if re.fullmatch(r"[a-z]\)?", k)
+                         else ("item", "itens") if re.match(r"\d", k)
+                         else ("subdivisão", "subdivisões"))
+            label += f" (com {len(kids)} {one if len(kids) == 1 else many})"
+        return label, len(tops)
+
+    @staticmethod
+    def _revoked_note(unit: DocumentUnit) -> str:
+        """The note that revoked it ("(Revogado pela Resolução …)"), else its last note."""
+        full = unit.full_text
+        spans = note_tail_spans(full)
+        tail = re.sub(r"[\s\xa0]+", " ", full[min(a for a, _ in spans):] if spans else "").strip()
+        if unit.amendment_note and unit.amendment_note not in full:
+            tail = (tail + " " + unit.amendment_note).strip()
+        m = re.search(r"\([^()]*revog[^()]*\)", tail, re.I)
+        if m:
+            return m.group(0)
+        last = re.findall(r"\([^()]*(?:\([^()]*\)[^()]*)*\)", tail)
+        return last[-1] if last else ""
+
+    def _render_old_version(self, unit: DocumentUnit, is_child: bool = False, path: str = "",
+                            cls: str = "", attrs: str = "") -> str:
+        """Renderiza uma versão antiga (strikethrough + amendment note).
+
+        cls, attrs: what _plan_old_versions gives it (hidden until its drawer opens)."""
         # The final notes ("(Redação dada...) (Revogado...).") are part of the text:
         # mark them there, as one span without the strikethrough
         full = unit.full_text
@@ -657,8 +782,8 @@ class HTMLRenderer:
         ident_attr = f' data-ident="{ident}"' if ident else ""
         if path:
             ident_attr += f' data-path="{html.escape(path)}"'
-        cls = "old-version art-para" if is_child else "old-version"
-        return f'    <p class="{cls}"{ident_attr}>{text}{note}</p>'
+        base = "old-version art-para" if is_child else "old-version"
+        return f'    <p class="{base}{cls}"{attrs}{ident_attr}>{text}{note}</p>'
 
 
 def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None,

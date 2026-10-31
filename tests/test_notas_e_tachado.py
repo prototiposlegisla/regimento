@@ -349,3 +349,49 @@ class TestVersaoAntigaIdentENotas:
         fn = Footnote(number=1, is_private=True,
                       paragraphs=[FootnotePara(runs=[]), FootnotePara(runs=[TextRun("Nota para o Regimento B.")])])
         assert "</strong> Nota para o Regimento B." in HTMLRenderer()._render_footnote(fn)
+
+
+# ── Tachado escondido ───────────────────────────────────────────────────
+
+class TestTachadoEscondido:
+    """render_html._plan_old_versions: a redação anterior atrás de uma gaveta, os revogados seguidos numa linha."""
+
+    @staticmethod
+    def _unit(ut, ident, text, old=False):
+        return DocumentUnit(ut, ident, "x", is_old_version=old, runs=[TextRun(text, strike=old)])
+
+    def test_redacoes_anteriores_numa_gaveta_antes_da_primeira(self):
+        units = [self._unit(UnitType.PARAGRAFO_NUM, "§ 1º", "§ 1º - antigo;", True),
+                 self._unit(UnitType.PARAGRAFO_NUM, "§ 1º", "§ 1º - mais novo;", True),
+                 self._unit(UnitType.PARAGRAFO_NUM, "§ 1º", "§ 1º - vigente.")]
+        plan = HTMLRenderer()._plan_old_versions([(True, "§ 1º"), (True, "§ 1º"), (False, "§ 1º")], units)
+        assert plan[0][0] == ['    <div class="old-drawer" data-old="1" role="button" tabindex="0"'
+                              ' aria-expanded="false" data-label="2 redações anteriores"></div>']
+        assert plan[0][1:] == (" old-first old-many", ' data-old="1"')
+        assert plan[1] == ([], "", ' data-old="1"')
+
+    def test_gaveta_e_redacoes_no_recuo_do_dispositivo(self):
+        units = [self._unit(UnitType.ALINEA, "a)", "a) antiga;", True), self._unit(UnitType.ALINEA, "a)", "a) vigente;")]
+        plan = HTMLRenderer()._plan_old_versions([(True, "I,a"), (False, "I,a")], units, indent=True)
+        assert ' data-old="1" style="--ind:2" role="button"' in plan[0][0][0]
+        assert plan[0][2] == ' data-old="1" style="--ind:2"'
+
+    def test_revogados_seguidos_numa_linha(self):
+        nota = "(Revogado pela Resolução 8 de 30 de junho de 2001)"
+        units = [self._unit(UnitType.PARAGRAFO_UNICO, "Parágrafo único", "Parágrafo único - texto: " + nota, True)]
+        units += [self._unit(UnitType.INCISO, n, f"{n} - texto; {nota}", True) for n in ("I", "II", "III")]
+        units.append(self._unit(UnitType.PARAGRAFO_NUM, "§ 2º", "§ 2º - vigente."))
+        rows = [(True, "§ú"), (True, "§ú,I"), (True, "§ú,II"), (True, "§ú,III"), (False, "§ 2º")]
+        plan = HTMLRenderer()._plan_old_versions(rows, units, indent=True)
+        linha = plan[0][0][0]
+        assert 'class="revoked-block" data-old="1" style="--ind:1"' in linha
+        assert plan[1][2] == ' data-old="1" style="--ind:2"'
+        assert 'data-label="Parágrafo único (com 3 incisos)"' in linha
+        assert 'data-label="revogado"' in linha
+        assert f'data-label="{nota}"' in linha
+        assert [plan[i][1] for i in range(4)] == [" old-revoked old-first"] + [" old-revoked"] * 3
+        assert all(plan[i][0] == [] for i in range(1, 4))
+
+    def test_rotulo_de_varios_paragrafos(self):
+        units = [self._unit(UnitType.PARAGRAFO_NUM, f"§ {n}º", "x", True) for n in (5, 6, 7)]
+        assert HTMLRenderer._revoked_label(units, ["§ 5º", "§ 6º", "§ 7º"]) == ("§§ 5º a 7º", 3)

@@ -12,12 +12,16 @@
   const IDX_BAND_PX = 12, IDX_SUM_PX = 18, IDX_OPEN_PX = 2;
   const IDX_ROW_PX = 7, IDX_HEAD_TOP_PX = 3, IDX_HEAD_LINE_PX = 16, IDX_SUB_LINE_PX = 26.4;
   const CARD_EST_CHAR_PX = 7.75;
+  // what hides the struck paragraphs: a drawer's line, a revoked run's line(s)
+  const OLD_DRAWER_PX = 23, REVOKED_BLOCK_PX = 4, REVOKED_LINE_PX = 26;
   function cardBlockCoef(el) {
     const cl = el.classList;
     if (cl.contains('art-compact-label') || cl.contains('footnote-box')) return null;   // hidden
     if (cl.contains('law-badge')) return null;   // takes no height of its own
     if (el.tagName === 'BR') return [48, 0];
-    if (cl.contains('old-version')) return [-6, 30];
+    if (cl.contains('old-version')) return null;   // hidden until its drawer opens
+    if (cl.contains('old-drawer')) return [OLD_DRAWER_PX, 0];
+    if (cl.contains('revoked-block')) return [REVOKED_BLOCK_PX, REVOKED_LINE_PX];
     if (cl.contains('idx-backlinks')) return null;   // indexBandHeight
     if (cl.contains('rem-backlinks')) return [18, 0];
     if (cl.contains('art-summary')) return [17, 0];      // the band at the top

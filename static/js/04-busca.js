@@ -160,6 +160,7 @@
       weakHighlight.clear();
     }
     weakRanges = new Set();
+    clearHiddenOldHits();
     // Put back the exact text nodes that <mark>s replaced
     for (const [textNode, first, last] of markedTextNodes) {
       const parent = first.parentNode;
@@ -308,6 +309,8 @@
       if (!spans) continue;
       if (!includeFootnotes && tn.parentElement.closest('.footnote-box')) continue;
       if (tn.parentElement.closest('.indent-path, .rem-box')) continue;
+      const old = tn.parentElement.closest('.old-version');
+      if (old) markHiddenOldHit(old);
       found.push([tn, spans]);
     }
     if (!found.length) return;

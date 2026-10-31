@@ -22,6 +22,7 @@
     if (!card) return null;
     revealCard(card);
     const p = ref.path ? remUnitP(card, ref.path) : null;
+    revealOld(p);
     scrollToReadingLine(p || card);
     selectCard(card, true);
     if (p) remFlash(p);
@@ -234,6 +235,7 @@
     let target = card;
     if (leg) {
       const p = entry.path ? remUnitP(card, entry.path) : remCaputP(card);
+      revealOld(p);
       const ref = p && p.querySelector('.leg-ref');
       const box = ref && card.querySelector(`.leg-box[data-note="${ref.dataset.note}"]`);
       if (box) box.classList.add('open');

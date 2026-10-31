@@ -528,6 +528,7 @@
       updateResultsVisibility();
     }
     if (unit && unit.classList.contains('footnote-box')) unit.classList.add('open');
+    revealOld(unit);
     if (unit && unit.getClientRects().length) scrollToReadingLine(unit);
     else scrollToFirstMark(card);
     selectCard(card, true);

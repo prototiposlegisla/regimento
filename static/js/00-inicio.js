@@ -86,6 +86,7 @@
 
   // ===== DOM REFS =====
   const $cards = document.getElementById('cards-container');
+  const $layers = document.getElementById('layers');   // what floats over them (base.html)
   const $searchInput = document.getElementById('search-input');
   const $btnFilter = document.getElementById('btn-filter');
   const $btnClearSearch = document.getElementById('btn-clear-search');

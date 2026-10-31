@@ -20,11 +20,11 @@
   const $header = document.getElementById('header');
   const $remPop = document.createElement('div');
   $remPop.id = 'rem-pop';
-  document.body.appendChild($remPop);
+  $layers.appendChild($remPop);
   const $remReturn = document.createElement('button');
   $remReturn.id = 'rem-return';
   $remReturn.type = 'button';
-  document.body.appendChild($remReturn);
+  $layers.appendChild($remReturn);
   let remHideTimer = null, remShowTimer = null, remReturnTo = null, remPopTrigger = null;
   // Kind of correlate, as read from the origin and from the target side
   const REM_TIPO = {

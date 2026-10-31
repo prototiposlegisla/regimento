@@ -62,6 +62,13 @@
 {{CARDS}}
 </div>
 
+<!-- Everything that floats over the cards, in a box of its own: shown or
+     hidden straight among <body>'s children, each would have the browser
+     send the whole page's accessibility tree again (~1 s on a PC, seconds on
+     a phone), whenever an accessibility service is on: a screen reader, but
+     also a password manager. The script's own (rem-pop…) go in it too -->
+<div id="layers">
+
 <!-- FLOATING MARKER NAV (dynamically populated) -->
 <div id="marker-nav"></div>
 <div id="marker-tooltip"></div>
@@ -115,6 +122,8 @@
 
 <!-- ZOOM INDICATOR -->
 <div id="zoom-indicator"></div>
+
+</div>
 
 {{DATA}}
 <script>

@@ -47,7 +47,7 @@
       + '<span class="res-law-tag">x</span>Art. 1<span class="res-sum"> — x</span></button>'
       + '<button class="res-entry"><span class="res-label">x</span> <span class="res-text">x <mark>x</mark>'
       + '</span></button><button class="res-expand">x</button></div>';
-    document.body.appendChild(warm);
+    $layers.appendChild(warm);
     void warm.offsetHeight;
     warm.remove();
   });

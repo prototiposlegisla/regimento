@@ -4,34 +4,66 @@
   // ?medir in the address: the index's first opening timed on this device,
   // shown in the info tab (a phone's numbers, to set against those of an
   // emulated one). When ☰ was touched, when the panel was on the screen,
-  // when its list was, and the long tasks meanwhile
-  const firstOpen = /[?&]medir\b/.test(location.search) ? { long: [] } : null;
+  // when its list was; the long tasks and frames meanwhile, and what took
+  // the time: the style and layout pending at the tap, those of the opening
+  // (both done at once here, to be timed apart), the scripts, the rendering
+  const firstOpen = /[?&]medir\b/.test(location.search) ? { long: [], frames: [], laps: {} } : null;
   if (firstOpen) {
     $btnIndex.addEventListener('pointerdown', e => { if (!firstOpen.tap) firstOpen.tap = e.timeStamp; });
-    try {
-      new PerformanceObserver(l => { for (const e of l.getEntries()) firstOpen.long.push([e.startTime, e.duration]); })
-        .observe({ type: 'longtask', buffered: true });
-    } catch (e) {}
+    const watch = (type, list) => {
+      try { new PerformanceObserver(l => list.push(...l.getEntries())).observe({ type, buffered: true }); } catch (e) {}
+    };
+    watch('longtask', firstOpen.long);
+    watch('long-animation-frame', firstOpen.frames);
+  }
+  let lapAt = 0;
+  function firstOpenLap(name) {
+    const now = performance.now();
+    if (name) firstOpen.laps[name] = now - lapAt;
+    lapAt = now;
   }
   function firstOpenHtml() {
     const f = firstOpen;
     if (!f || !f.list) return '';
-    const s = ms => (ms / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' s';
+    const s = n => (n / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' s';
+    const ms = n => Math.round(n).toLocaleString('pt-BR') + ' ms';
+    const at = t => (t < f.tap ? '−' : '+') + s(Math.abs(t - f.tap));
+    const near = e => e.startTime + e.duration > f.tap - 1000 && e.startTime < f.list;
     const nav = performance.getEntriesByType('navigation')[0];
-    const long = f.long.filter(([t, d]) => t + d > f.tap - 1000 && t < f.list)
-      .map(([t, d]) => (t < f.tap ? '−' : '+') + s(Math.abs(t - f.tap)) + ' (' + Math.round(d) + ' ms)');
+    const long = f.long.filter(near).map(e => at(e.startTime) + ' (' + ms(e.duration) + ')');
+    const frames = f.frames.filter(near).map(e => {
+      const end = e.startTime + e.duration;
+      const scripts = (e.scripts || []).filter(x => x.duration >= 5).map(x => (x.invoker || x.invokerType || '?')
+        + ' ' + ms(x.duration) + (x.forcedStyleAndLayoutDuration >= 5 ? ' (estilo/layout forçado ' + ms(x.forcedStyleAndLayoutDuration) + ')' : ''));
+      return at(e.startTime) + ' ' + ms(e.duration) + ': '
+        + (scripts.length ? 'scripts ' + scripts.join('; ') + '; ' : '')
+        + (e.renderStart ? 'antes do estilo ' + ms((e.styleAndLayoutStart || end) - e.renderStart)
+          + ', estilo/layout/pintura ' + ms(end - (e.styleAndLayoutStart || e.renderStart)) : 'sem quadro');
+    });
+    const laps = Object.entries(f.laps).map(([k, v]) => k + ' ' + ms(v)).join(', ');
     return '<p class="info-medida">Primeira abertura do índice: toque aos ' + s(f.tap)
       + (nav && nav.loadEventEnd ? ' (página carregada aos ' + s(nav.loadEventEnd) + ')' : '')
       + '; painel na tela ' + s(f.frame - f.tap) + ' depois; lista ' + s(f.list - f.tap) + ' depois. '
-      + 'Tarefas longas de 1 s antes do toque até a lista: ' + (long.join(', ') || 'nenhuma') + '.</p>';
+      + 'Tarefas longas de 1 s antes do toque até a lista: ' + (long.join(', ') || 'nenhuma') + '. '
+      + 'No toque: ' + laps + '. '
+      + 'Quadros longos: ' + (!(PerformanceObserver.supportedEntryTypes || []).includes('long-animation-frame')
+        ? 'o navegador não informa' : frames.join(' | ') || 'nenhum') + '. ' + escapeHtml(navigator.userAgent) + '</p>';
   }
 
   function openIndex() {
-    if (firstOpen && !firstOpen.frame) {
-      firstOpen.tap = firstOpen.tap || performance.now();
+    const timed = firstOpen && !firstOpen.frame;
+    if (timed) {
+      firstOpenLap();
+      firstOpen.tap = firstOpen.tap || lapAt;
       requestAnimationFrame(() => { firstOpen.frame = performance.now(); });
+      // (what the frame would do anyway, done here to be timed apart)
+      getComputedStyle(document.body).color;
+      firstOpenLap('estilo pendente');
+      void document.body.offsetHeight;
+      firstOpenLap('layout pendente');
     }
     takeStep('panel');
+    if (timed) firstOpenLap('passo do Voltar');
     // The results drawer (opened by a search, below the header) gives way;
     // the panel links back to it
     if (resultsDrawerOpen) {
@@ -48,6 +80,13 @@
     sysTitle = null;
     renderIndexSoon();
     if (window.innerWidth > 768) $indexSearch.focus();
+    if (timed) {
+      firstOpenLap('script da abertura');
+      getComputedStyle($indexPanel).transform;
+      firstOpenLap('estilo da abertura');
+      void $indexPanel.offsetHeight;
+      firstOpenLap('layout da abertura');
+    }
   }
 
   // The closed panel stays in the page, off to the side: shut once out of
@@ -648,7 +687,7 @@
   let sysHoverTimer = 0;
   const $sysTip = document.createElement('div');
   $sysTip.id = 'sys-tip';
-  document.body.appendChild($sysTip);
+  $layers.appendChild($sysTip);
   $indexContent.addEventListener('mouseover', e => {
     if (currentIndexTab !== 'systematic') return;
     const seg = e.target.closest('.sys-bar > i');

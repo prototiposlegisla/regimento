@@ -152,6 +152,19 @@ def test_medir_mostra_a_primeira_abertura_na_aba_de_informacoes(abrir, site):
     assert re.match(r"Primeira abertura do índice: toque aos [\d,]+ s .*painel na tela [\d,]+ s depois; lista [\d,]+ s depois", texto), texto
 
 
+def test_o_que_flutua_fica_fora_dos_filhos_do_body(abrir):
+    """Mostrado ou escondido direto no <body>, faria o navegador reenviar a árvore de acessibilidade
+    da página inteira (~1 s num PC) sempre que há um serviço de acessibilidade ligado."""
+    pg = abrir(permissions=["clipboard-read", "clipboard-write"])
+    pg.click("#btn-index")
+    pg.click("#index-close")
+    pg.locator("#search-input").fill("quórum")
+    _marcar_o_primeiro(pg)
+    pg.click("#marker-copy-btn")
+    filhos = pg.evaluate("[...document.body.children].filter(e => e.tagName !== 'SCRIPT').map(e => e.id)")
+    assert filhos == ["header", "breadcrumb-bar", "reading-line", "cards-container", "layers"], filhos
+
+
 def test_deslizar_para_a_esquerda_fecha_o_painel(abrir):
     pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
     pg.click("#btn-index")

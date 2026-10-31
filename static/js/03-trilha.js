@@ -286,7 +286,7 @@
   // bar at the top shows how far into the document the reading is.
   const $readProgress = document.createElement('div');
   $readProgress.id = 'read-progress';
-  document.body.appendChild($readProgress);
+  $layers.appendChild($readProgress);
   let lastScrollY = window.scrollY;
   window.addEventListener('scroll', () => {
     if (!PHONE.matches) return;

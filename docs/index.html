@@ -1091,7 +1091,7 @@ mark.weak {
   font: 500 14px var(--font-ui); color: #6b7380;
 }
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
-#index-panel[data-tab="subject"] { width: min(500px, 94vw); }
+#index-panel:is([data-tab="subject"], [data-tab="info"]) { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
 #index-header {
   padding: 12px;
@@ -1186,7 +1186,12 @@ mark.weak {
   margin: 18px 0 6px;
   color: #333;
 }
-.info-content h3:first-child { margin-top: 4px; }
+.info-content h3:first-child, .info-content .info-versao + h3 { margin-top: 4px; }
+/* when the page was built, and from which commit (build.py, _versao_html) */
+.info-content p.info-versao {
+  display: inline-block; margin: 0 0 10px; padding: 3px 10px; border-radius: 999px;
+  background: #eef0f3; color: #5a626e; font: 500 12px/1.6 var(--font-ui);
+}
 .info-content p {
   font-size: 14px;
   color: #555;
@@ -18288,7 +18293,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 16:24 · e1b52ff<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette

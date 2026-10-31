@@ -70,7 +70,7 @@ html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
   src: url(fonts/merriweather-sans-latin.woff2) format("woff2");
 }
 /* Only on the headings: Cinzel (roman capitals) on the ribbons, EB Garamond
-   on the norma's cover */
+   on the norma's cover (its italic on the cover's act and date) */
 @font-face {
   font-family: "Cinzel"; font-style: normal; font-weight: 400 900; font-display: swap;
   src: url(fonts/cinzel-latin.woff2) format("woff2");
@@ -78,6 +78,10 @@ html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
 @font-face {
   font-family: "EB Garamond"; font-style: normal; font-weight: 400 800; font-display: swap;
   src: url(fonts/eb-garamond-latin.woff2) format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond"; font-style: italic; font-weight: 400 800; font-display: swap;
+  src: url(fonts/eb-garamond-italic-latin.woff2) format("woff2");
 }
 /* Until those come (swap), the text is in a system font sized to take the
    same room — size-adjust measured on the site's own text, 31/10/2026 —, so
@@ -552,28 +556,50 @@ body {
   color: color-mix(in srgb, var(--lv-t) 90%, transparent);
 }
 
-/* The norma's cover: a gem in its color, a shine at the top, its monogram
-   large and faint behind, and a line naming it (data-mono, data-sub) */
+/* The norma's cover: a divider in a binder. A sheet of paper with a tab
+   on top holding its letters (data-mono), each norma's tab further along
+   the edge (RI first, LOM second…), as in a vade-mécum; under the name the
+   act and its date in italics (data-ato) and a small note, with the count
+   of articles (data-nota, on an empty <i> that gives a third pseudo-
+   element). Chosen 31/10/2026 in dist/prototipo-capa. */
 .card-titulo.nivel-norma {
-  overflow: hidden; border: 0; color: #fff; text-align: left;
+  --aba: calc(30px * var(--zoom-scale)); --aba-i: 0; --papel: #fffdf8;
+  display: grid; justify-items: start; align-content: start; text-align: left;
+  border: 0; border-radius: 0; overflow: hidden; box-shadow: none;
   background:
-    radial-gradient(120% 140% at 0% 0%, rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
-    linear-gradient(120deg, color-mix(in srgb, var(--nc) 70%, #000) 0%, var(--nc) 60%, color-mix(in srgb, var(--nc) 75%, #fff) 100%);
-  box-shadow: 0 16px 30px -18px color-mix(in srgb, var(--nc) 80%, #000), inset 0 1px 0 rgba(255,255,255,.3);
-  padding: calc(24px * var(--zoom-scale)) calc(22px * var(--zoom-scale));
-  margin: calc(24px * var(--zoom-scale)) 0 calc(16px * var(--zoom-scale));
-  font: 500 calc(2rem * var(--zoom-scale))/1.15 var(--font-capa); text-transform: none; letter-spacing: .01em;
-  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+    linear-gradient(var(--nc) 0 0) 0 var(--aba) / 100% calc(3px * var(--zoom-scale)) no-repeat,
+    linear-gradient(color-mix(in srgb, var(--nc) 14%, var(--papel)) 0 0) 0 var(--aba) / calc(7px * var(--zoom-scale)) 100% no-repeat,
+    linear-gradient(var(--papel) 0 0) 0 var(--aba) / 100% 100% no-repeat;
+  filter: drop-shadow(0 1px 1px rgba(20,30,45,.1)) drop-shadow(0 8px 10px rgba(20,30,45,.14));
+  padding: 0 0 calc(24px * var(--zoom-scale)) calc(28px * var(--zoom-scale));
+  margin: calc(26px * var(--zoom-scale)) 0 calc(16px * var(--zoom-scale));
+  font: 500 calc(2.3rem * var(--zoom-scale))/1.08 var(--font-capa); text-transform: none; letter-spacing: .005em;
+  color: color-mix(in srgb, var(--nc) 28%, #191a1f);
 }
+.card-titulo.nivel-norma[data-nrm="LOM"]  { --aba-i: 1; }
+.card-titulo.nivel-norma[data-nrm="CE"]   { --aba-i: 2; }
+.card-titulo.nivel-norma[data-nrm="CF"]   { --aba-i: 3; }
+.card-titulo.nivel-norma[data-nrm="PREC"] { --aba-i: 4; }
 .card-titulo.nivel-norma::before {
-  content: attr(data-mono); position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  font: 700 calc(4.6rem * var(--zoom-scale))/1 var(--font-capa); letter-spacing: -.04em;
-  color: rgba(255,255,255,.13); text-shadow: none; pointer-events: none;
+  content: attr(data-mono); box-sizing: border-box; height: var(--aba); min-width: 19%;
+  margin: 0 0 calc(18px * var(--zoom-scale)) calc(var(--aba-i) * 19% + 6px - 28px * var(--zoom-scale));
+  padding: 0 calc(16px * var(--zoom-scale));
+  border-radius: calc(8px * var(--zoom-scale)) calc(8px * var(--zoom-scale)) 0 0; text-align: center;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 70%), var(--nc);
+  font: 700 calc(.82rem * var(--zoom-scale))/var(--aba) var(--font-fita); letter-spacing: .16em; color: #fff;
 }
 .card-titulo.nivel-norma::after {
-  content: attr(data-sub); display: block; margin-top: 8px; max-width: 78%;
-  font: 500 calc(.72rem * var(--zoom-scale))/1.5 var(--font-ui); letter-spacing: .08em; text-transform: uppercase;
-  color: rgba(255,255,255,.78); text-shadow: none;
+  content: attr(data-ato); order: 1; margin-top: calc(8px * var(--zoom-scale)); padding-right: calc(20px * var(--zoom-scale));
+  font: italic 400 calc(1.04rem * var(--zoom-scale))/1.4 var(--font-capa); color: #4c4f57;
+}
+.capa-nota {
+  order: 2; margin-top: calc(10px * var(--zoom-scale));
+  font: 600 calc(.6rem * var(--zoom-scale))/1.4 var(--font-ui); letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(35,37,44,.55);
+}
+.capa-nota::before { content: attr(data-nota); }
+@media (max-width: 600px) {
+  .card-titulo.nivel-norma { font-size: calc(1.95rem * var(--zoom-scale)); }
 }
 
 /* The norm's text with serifs; what is interface in it (chips, labels) without */

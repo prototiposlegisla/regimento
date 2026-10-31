@@ -17,15 +17,24 @@ from .models import (
 )
 
 
-# Capa de cada norma (pelo prefixo dos seus artigos): o monograma ao fundo e
-# a linha de identificação sob o nome
+# Capa de cada norma (pelo prefixo dos seus artigos), uma folha de fichário:
+# a sigla na aba, o ato e a data sob o nome, e uma observação miúda à qual o
+# render junta o número de artigos. Sem o nome de quem edita a norma (a
+# Câmara, o Município…), que faria a capa parecer papel oficial
 CAPA_NORMA = {
-    "": ("RI", "Câmara Municipal de São Paulo · Resolução nº 2, de 26 de abril de 1991"),
-    "LOM": ("LOM", "Município de São Paulo · promulgada em 4 de abril de 1990"),
-    "CE": ("CE", "Estado de São Paulo · promulgada em 5 de outubro de 1989 · dispositivos selecionados"),
-    "CF": ("CF", "República Federativa do Brasil · promulgada em 5 de outubro de 1988 · dispositivos selecionados"),
-    PREC: ("PR", "Câmara Municipal de São Paulo · decisões e interpretações da Presidência (RI, art. 313)"),
+    "": ("RI", "Resolução nº 2, de 26 de abril de 1991", ""),
+    "LOM": ("LOM", "Promulgada em 4 de abril de 1990", ""),
+    "CE": ("CE", "Promulgada em 5 de outubro de 1989", "Dispositivos selecionados"),
+    "CF": ("CF", "Promulgada em 5 de outubro de 1988", "Dispositivos selecionados"),
+    PREC: ("PR", "Decisões e interpretações da Presidência", "RI, art. 313"),
 }
+
+
+def capa_contagem(norma: str, n: int) -> str:
+    """'411 artigos', '20 precedentes' (no singular quando é um)."""
+    nome = ("precedente", "precedentes") if norma == PREC else ("artigo", "artigos")
+    return f"{n} {nome[n != 1]}"
+
 
 # O tipo de cada dispositivo, que dá a cor do seu número (o artigo sem classe)
 UNIT_ID_KIND = {
@@ -54,6 +63,8 @@ class HTMLRenderer:
         # Notas dos correlatos, cada uma uma vez: o selo está nos dois lados e leva só o número
         self.notas: list[str] = []
         self._nota_n: dict[str, int] = {}
+        # Artigos de cada norma (pelo prefixo), contados em render(), para a capa
+        self._artigos_de: dict[str, int] = {}
 
     def render(self, doc: ParsedDocument) -> str:
         """Renderiza todos os elementos do documento."""
@@ -65,6 +76,11 @@ class HTMLRenderer:
                 norma = el.law_prefix
             elif isinstance(el, SectionHeading):
                 norma_de[id(el)] = norma
+        # e quantos artigos cada norma tem, para a capa
+        self._artigos_de = {}
+        for el in doc.elements:
+            if isinstance(el, ArticleBlock):
+                self._artigos_de[el.law_prefix] = self._artigos_de.get(el.law_prefix, 0) + 1
         parts: list[str] = []
         for el in doc.elements:
             if isinstance(el, SectionHeading):
@@ -80,11 +96,17 @@ class HTMLRenderer:
         section = html.escape(h.data_section)
         nivel = self._heading_nivel(h)
         # a norma (como o data-law dos artigos; o Regimento sem) e, na capa,
-        # o monograma e a linha de identificação
+        # a sigla da aba, o ato e a observação; a observação vai num <i> vazio
+        # (o texto vem do CSS), que dá à capa um terceiro pseudo-elemento sem
+        # mudar o seu texto
         attrs = f' data-nrm="{html.escape(norma)}"' if norma else ""
         if nivel == "nivel-norma" and norma in CAPA_NORMA:
-            mono, sub = CAPA_NORMA[norma]
-            attrs += f' data-mono="{html.escape(mono)}" data-sub="{html.escape(sub)}"'
+            mono, ato, obs = CAPA_NORMA[norma]
+            n = self._artigos_de.get(norma, 0)
+            nota = " · ".join(x for x in (obs, capa_contagem(norma, n) if n else "") if x)
+            attrs += f' data-mono="{html.escape(mono)}" data-ato="{html.escape(ato)}"'
+            if nota:
+                text += f'<i class="capa-nota" aria-hidden="true" data-nota="{html.escape(nota)}"></i>'
         return (
             f'  <div class="card card-titulo {nivel}" data-section="{section}"{attrs}>'
             f"{text}</div>"

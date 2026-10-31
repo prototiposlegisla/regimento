@@ -46,13 +46,15 @@
   // A heading is a ribbon, further in at each level (both margins, and its
   // 28px paddings): "TÍTULO I" on a line, then the name (after the <br>) on
   // lines of roman capitals (Cinzel), the small first line ("TÍTULO I")
-  // a little taller than the others. A norma's cover: its name in large
-  // letters, then the line naming it (data-sub) at 78% of the width. Fitted
-  // 30/10/2026 (14 of 574 headings a line off).
+  // a little taller than the others. Fitted 30/10/2026 (14 of 574 headings
+  // a line off). A norma's cover: its tab, the name in large letters (a
+  // little smaller on a phone), the act in italics (data-ato) and the note
+  // (.capa-nota), one line.
   let cardEstTitle = null;
   const TITLE_CHAR_PX = 11.8, TITLE_LINE_PX = 21.4, TITLE_FIRST_PX = 23.6;
   const TITLE_INSET = { 'nivel-capitulo': 28, 'nivel-secao': 56, 'nivel-subsecao': 84 };
-  const COVER_CHAR_PX = 13.5, COVER_LINE_PX = 35.6, COVER_SUB_CHAR_PX = 7, COVER_SUB_LINE_PX = 16.7;
+  const COVER_TOP_PX = 48, COVER_CHAR_PX = 15.5, COVER_LINE_PX = 39.7, COVER_ATO_CHAR_PX = 7.2, COVER_ATO_LINE_PX = 23.3,
+    COVER_ATO_TOP_PX = 8, COVER_NOTA_PX = 21.4, COVER_PHONE = 1.95 / 2.3;
 
   // The index band's height, open: its table's rows, the subject wrapped in
   // its column and the sub-subjects packed in lines beside it, as the browser
@@ -147,7 +149,7 @@
           if (n.nodeName === 'BR') segs.push(0);
           else segs[segs.length - 1] += n.textContent.trim().length;
         }
-        if (card.classList.contains('nivel-norma')) return { cover: segs[0], sub: (card.dataset.sub || '').length };
+        if (card.classList.contains('nivel-norma')) return { cover: segs[0], ato: (card.dataset.ato || '').length, nota: !!card.querySelector('.capa-nota') };
         const level = [...card.classList].find(c => c in TITLE_INSET);
         return { segs, inset: TITLE_INSET[level] || 0 };
       });
@@ -186,7 +188,8 @@
       if (set[i] !== v) ALL_CARDS[i].style.setProperty(prop, (set[i] = v) + 'px');
     };
     const titleWidth = $cards.clientWidth - 24;
-    const coverWidth = titleWidth - 44 * z;
+    const coverWidth = titleWidth - 28 * z;
+    const coverFont = matchMedia('(max-width: 600px)').matches ? COVER_PHONE : 1;
     const perLine = (width, charPx) => Math.max(10, width / (charPx * z));
     ALL_CARDS.forEach((card, i) => {
       const t = cardEstTitle[i];
@@ -200,9 +203,10 @@
         return;
       }
       if (t) {
-        const name = Math.max(1, Math.ceil(t.cover / perLine(coverWidth, COVER_CHAR_PX)));
-        const sub = t.sub ? 8 + COVER_SUB_LINE_PX * z * Math.ceil(t.sub / perLine(coverWidth * .78, COVER_SUB_CHAR_PX)) : 0;
-        setEst(i, '--card-h', cardEstSet, Math.round(name * COVER_LINE_PX * z + sub));
+        const name = Math.max(1, Math.ceil(t.cover / perLine(coverWidth, COVER_CHAR_PX * coverFont)));
+        const ato = t.ato ? COVER_ATO_TOP_PX + COVER_ATO_LINE_PX * Math.ceil(t.ato / perLine(coverWidth - 20 * z, COVER_ATO_CHAR_PX)) : 0;
+        setEst(i, '--card-h', cardEstSet,
+          Math.round((COVER_TOP_PX + name * COVER_LINE_PX * coverFont + ato + (t.nota ? COVER_NOTA_PX : 0)) * z));
         return;
       }
       const nc = cardEstCompact[i];

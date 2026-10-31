@@ -42,8 +42,11 @@
     warm.remove();
   });
 
-  // The systematic index's tree too, so the panel's first opening doesn't pay for it
+  // The systematic index's tree too, so the panel's first opening doesn't pay
+  // for it; and the lists of the other two tabs, so their first one doesn't
   whenIdle(() => sysTreeBuild());
+  whenIdle(() => warmIndexTab('references'));
+  whenIdle(() => warmIndexTab('subject'));
 
   // Build the search text cache in idle time, so the first search doesn't pay for it
   let textCacheWarmed = 0;

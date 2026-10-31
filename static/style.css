@@ -1050,6 +1050,9 @@ mark.weak {
 /* closed and out of sight (setPanelOpen): its lines out of reach of Tab
    and of a screen reader, their layout kept for the next opening */
 #index-panel.shut { content-visibility: hidden; }
+/* a tab chosen, its list on the way (indexTabClick) */
+#index-panel.loading { cursor: progress; }
+#index-panel.loading #index-content { opacity: .45; }
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
 #index-panel[data-tab="subject"] { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
@@ -1494,6 +1497,9 @@ mark.weak {
 .q-grid > .q-item {
   margin: 0; padding: 9px 10px; border: 1px solid #e3e6ea; border-radius: 8px; background: #fff;
 }
+/* Hundreds of them in the Referências tab: only those near the view are laid
+   out (as the remissivo's entries; the median card's height) */
+#index-content .q-grid > .q-item { content-visibility: auto; contain-intrinsic-size: auto 115px; }
 .q-grid > .q-item:hover { border-color: #9aa3af; box-shadow: 0 2px 8px -4px rgba(20,30,45,.3); }
 .q-empty { color: #888; font-size: 13px; padding: 8px 0; }
 .q-item {
@@ -2308,7 +2314,9 @@ button.q-label:hover { color: #2c6fa6; }
     transform: translateY(-1px);
     box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
   }
-  .q-grid > * { animation: pop-in .25s ease-out backwards; }
+  /* the first cards of each grid (all of them at once, hundreds, would be
+     drawn one by one as the tab opens) */
+  .q-grid > :nth-child(-n+8) { animation: pop-in .25s ease-out backwards; }
   .sys-bar > i { transition: transform .15s, opacity .15s; }
   .sys-bar > i:hover { transform: scaleY(1.45); }
 }

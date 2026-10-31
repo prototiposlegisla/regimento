@@ -107,6 +107,20 @@ def test_no_celular_o_x_cabe_no_painel(abrir, largura):
     assert not _aberto(pg)
 
 
+def test_aba_responde_ao_toque_antes_de_desenhar_a_lista(abrir):
+    pg = abrir()
+    pg.click("#btn-index")
+    for aba, marca in (("references", ".q-grid"), ("subject", ".subj-entry"), ("systematic", ".sys-tit")):
+        logo = pg.evaluate("""aba => {
+          document.querySelector(`.index-tab[data-tab="${aba}"]`).click();
+          return [document.querySelector('.index-tab.active').dataset.tab,
+                  document.getElementById('index-panel').classList.contains('loading')];
+        }""", aba)
+        assert logo == [aba, True]
+        pg.wait_for_function("!document.getElementById('index-panel').classList.contains('loading')")
+        assert pg.locator(f"#index-content {marca}").count() > 0, aba
+
+
 def test_deslizar_para_a_esquerda_fecha_o_painel(abrir):
     pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
     pg.click("#btn-index")

@@ -151,7 +151,7 @@
       const link = document.createElement('button');
       link.className = 'q-toc-link';
       link.innerHTML = escapeHtml(sec.title) + '<small>' + items.length + '</small>';
-      link.addEventListener('click', () => head.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+      link.addEventListener('click', () => goToQuickHead(head));
       toc.appendChild(link);
       heads.push([head, link]);
       // the fichas by group ("Fases da sessão", "Listas de hipóteses"), each with its subtitle
@@ -191,6 +191,28 @@
     };
     $indexContent.addEventListener('scroll', mark, { passive: true });
     requestAnimationFrame(mark);
+  }
+
+  // A section of the consulta rápida, from its link. The cards not yet drawn
+  // have an estimated height (style.css), and those drawn on the way change
+  // it: far, a jump; near, a glide; then held on the section for a few frames
+  function goToQuickHead(head) {
+    const hold = () => {
+      let frames = 0;
+      (function again() {
+        if (!head.isConnected) return;
+        head.scrollIntoView({ block: 'start', behavior: 'instant' });
+        if (++frames < 12) requestAnimationFrame(again);
+      })();
+    };
+    const dist = Math.abs(head.getBoundingClientRect().top - $indexContent.getBoundingClientRect().top);
+    // (no glide, no scrollend: the hold right away)
+    if (dist > FAR_SCROLL_SCREENS * $indexContent.clientHeight || dist < 80 || !('onscrollend' in window)) {
+      hold();
+      return;
+    }
+    $indexContent.addEventListener('scrollend', hold, { once: true });
+    head.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
 
   // "Art. 105, XII", "Art. 4-C ADT, I"

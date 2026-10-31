@@ -90,13 +90,23 @@
     $indexSearchWrapper.style.display = name === 'info' ? 'none' : '';
   }
 
-  document.querySelectorAll('.index-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      setIndexTab(tab.dataset.tab);
+  // The tab marked and the list it leaves dimmed at once; its own list drawn
+  // once that is on the screen: a long one (the first time, on a phone) does
+  // not leave the tap unanswered. Another rendering meanwhile cancels it.
+  let tabRender = 0;
+  function indexTabClick(name) {
+    setIndexTab(name);
+    $indexPanel.classList.add('loading');
+    const mine = ++tabRender;
+    requestAnimationFrame(() => setTimeout(() => {
+      if (mine !== tabRender) return;
       renderIndex();
       $indexContent.scrollTop = 0;   // (not where the last tab was)
       if (currentIndexTab === 'systematic') syncSystematicToScroll();
-    });
+    }, 0));
+  }
+  document.querySelectorAll('.index-tab').forEach(tab => {
+    tab.addEventListener('click', () => indexTabClick(tab.dataset.tab));
   });
 
   $btnInfoTab.addEventListener('click', () => {
@@ -145,8 +155,24 @@
   // built once (per category) and put back on each opening, not rebuilt
   const indexDomCache = new Map();
 
+  // In idle time after the load (19-inicio-da-pagina.js): a tab's list built
+  // in the closed panel and kept, so its first opening only lays it out. Not
+  // with the panel open or a filter in it, nor once kept
+  function warmIndexTab(name) {
+    const key = name === 'subject' ? 'subject' : 'references:' + currentRefCategory;
+    if ($indexPanel.classList.contains('open') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
+    const was = currentIndexTab, wasWidth = $indexPanel.dataset.tab;
+    currentIndexTab = name;
+    renderIndex();
+    currentIndexTab = was;
+    if (wasWidth === undefined) delete $indexPanel.dataset.tab;
+    else $indexPanel.dataset.tab = wasWidth;
+  }
+
   function renderIndex() {
     indexRenders++;
+    tabRender++;
+    $indexPanel.classList.remove('loading');
     clearTimeout(indexFilterTimer);
     indexFill = null;
     // one letter would match nearly every entry: not a filter (as in the search bar)

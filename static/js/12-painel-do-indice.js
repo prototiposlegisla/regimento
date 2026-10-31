@@ -7,14 +7,24 @@
   // when its list was; the long tasks and frames meanwhile, and what took
   // the time: the style and layout pending at the tap, those of the opening
   // (both done at once here, to be timed apart), the scripts, the rendering
-  const firstOpen = /[?&]medir\b/.test(location.search) ? { long: [], frames: [], laps: {} } : null;
+  // Also the events of the tap, each when handled, and when the focus moved.
+  // ?medir&sem=foco: the tap doesn't move the focus to ☰; &sem=historico:
+  // the opening takes no step for Voltar (each, to see whether the pause goes)
+  const firstOpen = /[?&]medir\b/.test(location.search)
+    ? { long: [], frames: [], events: [], focus: [], laps: {}, without: new URLSearchParams(location.search).get('sem') || '' }
+    : null;
   if (firstOpen) {
     $btnIndex.addEventListener('pointerdown', e => { if (!firstOpen.tap) firstOpen.tap = e.timeStamp; });
-    const watch = (type, list) => {
-      try { new PerformanceObserver(l => list.push(...l.getEntries())).observe({ type, buffered: true }); } catch (e) {}
+    if (firstOpen.without === 'foco') $btnIndex.addEventListener('mousedown', e => e.preventDefault());
+    document.addEventListener('focusin', e => {
+      if (firstOpen.focus.length < 4) firstOpen.focus.push([e.target.id || e.target.tagName, performance.now()]);
+    });
+    const watch = (type, list, opts) => {
+      try { new PerformanceObserver(l => list.push(...l.getEntries())).observe({ type, buffered: true, ...opts }); } catch (e) {}
     };
     watch('longtask', firstOpen.long);
     watch('long-animation-frame', firstOpen.frames);
+    watch('event', firstOpen.events, { durationThreshold: 16 });
   }
   let lapAt = 0;
   function firstOpenLap(name) {
@@ -41,13 +51,23 @@
           + ', estilo/layout/pintura ' + ms(end - (e.styleAndLayoutStart || e.renderStart)) : 'sem quadro');
     });
     const laps = Object.entries(f.laps).map(([k, v]) => k + ' ' + ms(v)).join(', ');
-    return '<p class="info-medida">Primeira abertura do índice: toque aos ' + s(f.tap)
+    // each event's handling: from when it began to be handled to when it ended
+    const events = f.events.filter(e => e.startTime >= f.tap - 50 && e.startTime < f.list && e.processingStart
+        && /^(pointerdown|touchstart|pointerup|touchend|mousedown|mouseup|click)$/.test(e.name))
+      .map(e => e.name + ' ' + at(e.processingStart) + (e.processingEnd - e.processingStart >= 5 ? '…' + at(e.processingEnd) : ''));
+    const focus = f.focus.filter(([, t]) => t >= f.tap - 50 && t < f.list).map(([id, t]) => id + ' ' + at(t));
+    const again = ['', 'foco', 'historico'].map(w => '<a href="?medir' + (w ? '&sem=' + w : '') + '">'
+      + (w ? 'sem ' + w.replace('historico', 'histórico') : 'normal') + '</a>').join(' · ');
+    return '<p class="info-medida">Primeira abertura do índice' + (f.without ? ' (sem ' + escapeHtml(f.without) + ')' : '')
+      + ': toque aos ' + s(f.tap)
       + (nav && nav.loadEventEnd ? ' (página carregada aos ' + s(nav.loadEventEnd) + ')' : '')
       + '; painel na tela ' + s(f.frame - f.tap) + ' depois; lista ' + s(f.list - f.tap) + ' depois. '
       + 'Tarefas longas de 1 s antes do toque até a lista: ' + (long.join(', ') || 'nenhuma') + '. '
       + 'No toque: ' + laps + '. '
+      + 'Eventos: ' + (events.join(', ') || 'nenhum longo') + '. Foco: ' + (focus.join(', ') || 'não mudou') + '. '
       + 'Quadros longos: ' + (!(PerformanceObserver.supportedEntryTypes || []).includes('long-animation-frame')
-        ? 'o navegador não informa' : frames.join(' | ') || 'nenhum') + '. ' + escapeHtml(navigator.userAgent) + '</p>';
+        ? 'o navegador não informa' : frames.join(' | ') || 'nenhum') + '. ' + escapeHtml(navigator.userAgent)
+      + '. Medir de novo: ' + again + '</p>';
   }
 
   function openIndex() {
@@ -62,7 +82,7 @@
       void document.body.offsetHeight;
       firstOpenLap('layout pendente');
     }
-    takeStep('panel');
+    if (!(firstOpen && firstOpen.without === 'historico')) takeStep('panel');
     if (timed) firstOpenLap('passo do Voltar');
     // The results drawer (opened by a search, below the header) gives way;
     // the panel links back to it

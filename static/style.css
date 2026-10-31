@@ -510,11 +510,33 @@ body {
 .card-titulo.nivel-secao    { --lv: var(--nivel-secao);    --lv-t: var(--nivel-secao-texto); }
 .card-titulo.nivel-subsecao { --lv: var(--nivel-subsecao); --lv-t: #fff; }
 
+/* By each end, a column of lozenges counts the level (título 1, capítulo 2,
+   seção 3, subseção 4): a ribbon alone between two articles has no other
+   to measure its width against (chosen 31/10/2026) */
+.card-titulo.nivel-titulo {
+  --los-n: 1;
+  --los: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10' fill='%23fff' fill-opacity='.62'%3E%3Cpath d='M4 .5 8 5 4 9.5 0 5z'/%3E%3C/svg%3E");
+}
+.card-titulo.nivel-capitulo {
+  --los-n: 2;
+  --los: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' fill='%23fff' fill-opacity='.62'%3E%3Cpath d='M4 .5 8 5 4 9.5 0 5zm0 10 4 4.5-4 4.5-4-4.5z'/%3E%3C/svg%3E");
+}
+.card-titulo.nivel-secao {
+  --los-n: 3;
+  --los: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 30' fill='%232e2410' fill-opacity='.4'%3E%3Cpath d='M4 .5 8 5 4 9.5 0 5zm0 10 4 4.5-4 4.5-4-4.5zm0 10 4 4.5-4 4.5-4-4.5z'/%3E%3C/svg%3E");
+}
+.card-titulo.nivel-subsecao {
+  --los-n: 4;
+  --los: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 40' fill='%23fff' fill-opacity='.62'%3E%3Cpath d='M4 .5 8 5 4 9.5 0 5zm0 10 4 4.5-4 4.5-4-4.5zm0 10 4 4.5-4 4.5-4-4.5zm0 10 4 4.5-4 4.5-4-4.5z'/%3E%3C/svg%3E");
+}
+
 /* A ladder of ribbons: each level further in, its ends cut like a pennant,
    so the hierarchy reads in the margin. Two voices in roman capitals
    (Cinzel): "TÍTULO I" small and spaced, the name larger. */
 .card-titulo:not(.nivel-norma) {
-  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%), var(--lv);
+  --los-at: calc(15px * var(--zoom-scale)) center / calc(8px * var(--zoom-scale)) calc(10px * var(--los-n, 1) * var(--zoom-scale)) no-repeat;
+  background: var(--los, none) left var(--los-at), var(--los, none) right var(--los-at),
+    linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%), var(--lv);
   color: var(--lv-t);
   border: 0; border-radius: 0; box-shadow: none;
   clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 50%, 100% 100%, 0 100%, 12px 50%);

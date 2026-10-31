@@ -273,11 +273,11 @@
     const el = document.createElement(go ? 'button' : 'div');
     el.className = cls + (go ? '' : ' res-inert');
     el.innerHTML = html;
-    if (go) el.addEventListener('click', e => goToIndexResult(e, go));
+    if (go) el.addEventListener('click', e => goToIndexResult(e, go, el));
     return el;
   }
 
-  function goToIndexResult(event, go) {
+  function goToIndexResult(event, go, button) {
     takeStep();
     const fromDrawer = resultsDrawerOpen;
     if (resultsDrawerOpen) {
@@ -287,14 +287,16 @@
     const target = go() || selectedCard;
     // As in goToResult: after a click or tap, the keys scroll the page
     // (keyboard activation keeps the focus on the sidebar list, which keeps
-    // its indexes' part when the search runs again)
-    if (target && (fromDrawer || (event && event.detail > 0))) {
+    // its indexes' part when the search runs again — unless the result went
+    // with a cleared search)
+    if (target && (fromDrawer || (event && event.detail > 0) || !button.isConnected)) {
       if (!target.hasAttribute('tabindex')) target.tabIndex = -1;
       target.focus({ preventScroll: true });
     }
   }
 
-  // A section of the sistemático: "TÍTULO III › CAPÍTULO II — DAS COMISSÕES PERMANENTES (art. 46–79)"
+  // A section of the sistemático: "TÍTULO III › CAPÍTULO II — DAS COMISSÕES PERMANENTES (art. 46–79)".
+  // Searched for only to get there: going clears the search (Voltar brings it back).
   function buildSysResult(hit) {
     const { node, ctx } = hit;
     let html = ctx.length ? '<span class="res-ctx">' + escapeHtml(ctx.join(' › ')) + ' › </span>' : '';
@@ -303,7 +305,10 @@
       html += ' <span class="res-sum">' + escapeHtml(node.art_range) + '</span>';
     }
     const group = indexGroup();
-    group.appendChild(indexButton('res-head', html, () => navigateToSection(node.section_id)));
+    group.appendChild(indexButton('res-head', html, () => {
+      clearSearchBar();
+      return navigateToSection(node.section_id);
+    }));
     return group;
   }
 

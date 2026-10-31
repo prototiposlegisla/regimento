@@ -362,6 +362,22 @@ def _conferir_links(doc, report: ValidationReport) -> None:
                                f"{el.law_name or 'Regimento Interno'}, Art. {el.art_number}")
 
 
+def _versao_html() -> str:
+    """A linha de versão no topo da aba de informações: quando a página foi gerada e de que commit
+    do código, para quem a abre (no celular, com cache) saber se é a mais recente."""
+    from datetime import datetime
+    from html import escape
+
+    agora = datetime.now()
+    try:
+        r = _git("rev-parse", "--short", "HEAD")
+        commit = r.stdout.strip() if r.returncode == 0 else ""
+    except OSError:
+        commit = ""
+    texto = f"Versão de {agora:%d/%m/%Y}, {agora:%H:%M}" + (f" · {commit}" if commit else "")
+    return f'<p class="info-versao">{escape(texto)}</p>'
+
+
 def _build_once(
     *,
     args: argparse.Namespace,
@@ -512,7 +528,7 @@ def _build_once(
         info_html = ""
     # e a parte escrita pelo build: até onde vai cada norma, atalhos da busca, marcadores (src/ajuda.py)
     from src.ajuda import html_da_ajuda
-    info_html = "\n".join(p for p in (info_html, html_da_ajuda(doc)) if p)
+    info_html = "\n".join(p for p in (_versao_html(), info_html, html_da_ajuda(doc)) if p)
 
     # ── 6. Build systematic index ──────────────────────────────────────
     print("[6/8] Gerando índice sistemático...")

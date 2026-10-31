@@ -1069,7 +1069,7 @@ mark.weak {
   font: 500 14px var(--font-ui); color: #6b7380;
 }
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
-#index-panel[data-tab="subject"] { width: min(500px, 94vw); }
+#index-panel:is([data-tab="subject"], [data-tab="info"]) { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
 #index-header {
   padding: 12px;
@@ -1164,7 +1164,12 @@ mark.weak {
   margin: 18px 0 6px;
   color: #333;
 }
-.info-content h3:first-child { margin-top: 4px; }
+.info-content h3:first-child, .info-content .info-versao + h3 { margin-top: 4px; }
+/* when the page was built, and from which commit (build.py, _versao_html) */
+.info-content p.info-versao {
+  display: inline-block; margin: 0 0 10px; padding: 3px 10px; border-radius: 999px;
+  background: #eef0f3; color: #5a626e; font: 500 12px/1.6 var(--font-ui);
+}
 .info-content p {
   font-size: 14px;
   color: #555;

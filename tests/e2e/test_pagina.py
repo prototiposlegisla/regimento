@@ -121,6 +121,13 @@ def test_aba_responde_ao_toque_antes_de_desenhar_a_lista(abrir):
         assert pg.locator(f"#index-content {marca}").count() > 0, aba
 
 
+def test_aba_de_informacoes_mostra_a_versao(abrir):
+    pg = abrir()
+    pg.click("#btn-index")
+    pg.click("#btn-info-tab")
+    assert re.match(r"Versão de \d\d/\d\d/\d{4}, \d\d:\d\d", pg.locator(".info-versao").inner_text())
+
+
 def test_deslizar_para_a_esquerda_fecha_o_painel(abrir):
     pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
     pg.click("#btn-index")

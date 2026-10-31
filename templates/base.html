@@ -36,6 +36,18 @@
     this.classList.add('pending');
     window.earlyIndex.asked = e.timeStamp || performance.now();   // (when: ?medir, 12-painel-do-indice.js)
   });
+  // A finger's tap on a button doesn't put the focus on it (as on an iPhone):
+  // on an Android phone the page's first focus on a button froze it for 2.5 s
+  // (the browser's own work, measured with ?medir&sem=foco), the ☰'s first
+  // opening above all. A field being typed in loses it, as before (the
+  // keyboard closes); Tab still goes to the buttons
+  document.addEventListener('mousedown', function (e) {
+    if (!(e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents)
+        || !e.target.closest || !e.target.closest('button, [role="button"]')) return;
+    e.preventDefault();
+    var typing = document.activeElement;
+    if (typing && typing.matches('input, textarea')) typing.blur();
+  }, true);
   </script>
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: r43 vai ao Art. 43 do RI, l43 ao da LOM)" autocomplete="off" enterkeyhint="search">

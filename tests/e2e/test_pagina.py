@@ -165,6 +165,27 @@ def test_o_que_flutua_fica_fora_dos_filhos_do_body(abrir):
     assert filhos == ["header", "breadcrumb-bar", "reading-line", "cards-container", "layers"], filhos
 
 
+def test_toque_num_botao_nao_lhe_da_o_foco(abrir):
+    """Num Android, o 1º foco da página num botão a travava 2,5 s (medido com ?medir&sem=foco)."""
+    pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
+    pg.tap("#btn-index")
+    pg.wait_for_selector("#index-content .sys-tit")
+    assert pg.evaluate("document.activeElement.tagName") == "BODY"
+    pg.tap("#index-close")
+    # o campo em que se digita perde o foco, como antes (o teclado fecha)
+    pg.tap("#search-input")
+    pg.keyboard.type("quórum")
+    pg.wait_for_function(r"/\d+ \/ \d+/.test(document.getElementById('search-counter').textContent)")
+    pg.tap("#search-next")
+    assert pg.evaluate("document.activeElement.tagName") == "BODY"
+
+
+def test_clique_do_mouse_num_botao_ainda_lhe_da_o_foco(abrir):
+    pg = abrir()
+    pg.click("#btn-compact")
+    assert pg.evaluate("document.activeElement.id") == "btn-compact"
+
+
 def test_deslizar_para_a_esquerda_fecha_o_painel(abrir):
     pg = abrir(largura=412, altura=915, is_mobile=True, has_touch=True)
     pg.click("#btn-index")

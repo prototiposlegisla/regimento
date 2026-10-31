@@ -1072,6 +1072,9 @@ mark.weak {
 /* closed and out of sight (setPanelOpen): its lines out of reach of Tab
    and of a screen reader, their layout kept for the next opening */
 #index-panel.shut { content-visibility: hidden; }
+/* a tab chosen, its list on the way (indexTabClick) */
+#index-panel.loading { cursor: progress; }
+#index-panel.loading #index-content { opacity: .45; }
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
 #index-panel[data-tab="subject"] { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
@@ -1516,6 +1519,9 @@ mark.weak {
 .q-grid > .q-item {
   margin: 0; padding: 9px 10px; border: 1px solid #e3e6ea; border-radius: 8px; background: #fff;
 }
+/* Hundreds of them in the Referências tab: only those near the view are laid
+   out (as the remissivo's entries; the median card's height) */
+#index-content .q-grid > .q-item { content-visibility: auto; contain-intrinsic-size: auto 115px; }
 .q-grid > .q-item:hover { border-color: #9aa3af; box-shadow: 0 2px 8px -4px rgba(20,30,45,.3); }
 .q-empty { color: #888; font-size: 13px; padding: 8px 0; }
 .q-item {
@@ -2330,7 +2336,9 @@ button.q-label:hover { color: #2c6fa6; }
     transform: translateY(-1px);
     box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
   }
-  .q-grid > * { animation: pop-in .25s ease-out backwards; }
+  /* the first cards of each grid (all of them at once, hundreds, would be
+     drawn one by one as the tab opens) */
+  .q-grid > :nth-child(-n+8) { animation: pop-in .25s ease-out backwards; }
   .sys-bar > i { transition: transform .15s, opacity .15s; }
   .sys-bar > i:hover { transform: scaleY(1.45); }
 }
@@ -21089,7 +21097,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       const link = document.createElement('button');
       link.className = 'q-toc-link';
       link.innerHTML = escapeHtml(sec.title) + '<small>' + items.length + '</small>';
-      link.addEventListener('click', () => head.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+      link.addEventListener('click', () => goToQuickHead(head));
       toc.appendChild(link);
       heads.push([head, link]);
       // the fichas by group ("Fases da sessão", "Listas de hipóteses"), each with its subtitle
@@ -21129,6 +21137,28 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     };
     $indexContent.addEventListener('scroll', mark, { passive: true });
     requestAnimationFrame(mark);
+  }
+
+  // A section of the consulta rápida, from its link. The cards not yet drawn
+  // have an estimated height (style.css), and those drawn on the way change
+  // it: far, a jump; near, a glide; then held on the section for a few frames
+  function goToQuickHead(head) {
+    const hold = () => {
+      let frames = 0;
+      (function again() {
+        if (!head.isConnected) return;
+        head.scrollIntoView({ block: 'start', behavior: 'instant' });
+        if (++frames < 12) requestAnimationFrame(again);
+      })();
+    };
+    const dist = Math.abs(head.getBoundingClientRect().top - $indexContent.getBoundingClientRect().top);
+    // (no glide, no scrollend: the hold right away)
+    if (dist > FAR_SCROLL_SCREENS * $indexContent.clientHeight || dist < 80 || !('onscrollend' in window)) {
+      hold();
+      return;
+    }
+    $indexContent.addEventListener('scrollend', hold, { once: true });
+    head.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
 
   // "Art. 105, XII", "Art. 4-C ADT, I"
@@ -22563,13 +22593,23 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     $indexSearchWrapper.style.display = name === 'info' ? 'none' : '';
   }
 
-  document.querySelectorAll('.index-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      setIndexTab(tab.dataset.tab);
+  // The tab marked and the list it leaves dimmed at once; its own list drawn
+  // once that is on the screen: a long one (the first time, on a phone) does
+  // not leave the tap unanswered. Another rendering meanwhile cancels it.
+  let tabRender = 0;
+  function indexTabClick(name) {
+    setIndexTab(name);
+    $indexPanel.classList.add('loading');
+    const mine = ++tabRender;
+    requestAnimationFrame(() => setTimeout(() => {
+      if (mine !== tabRender) return;
       renderIndex();
       $indexContent.scrollTop = 0;   // (not where the last tab was)
       if (currentIndexTab === 'systematic') syncSystematicToScroll();
-    });
+    }, 0));
+  }
+  document.querySelectorAll('.index-tab').forEach(tab => {
+    tab.addEventListener('click', () => indexTabClick(tab.dataset.tab));
   });
 
   $btnInfoTab.addEventListener('click', () => {
@@ -22618,8 +22658,24 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // built once (per category) and put back on each opening, not rebuilt
   const indexDomCache = new Map();
 
+  // In idle time after the load (19-inicio-da-pagina.js): a tab's list built
+  // in the closed panel and kept, so its first opening only lays it out. Not
+  // with the panel open or a filter in it, nor once kept
+  function warmIndexTab(name) {
+    const key = name === 'subject' ? 'subject' : 'references:' + currentRefCategory;
+    if ($indexPanel.classList.contains('open') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
+    const was = currentIndexTab, wasWidth = $indexPanel.dataset.tab;
+    currentIndexTab = name;
+    renderIndex();
+    currentIndexTab = was;
+    if (wasWidth === undefined) delete $indexPanel.dataset.tab;
+    else $indexPanel.dataset.tab = wasWidth;
+  }
+
   function renderIndex() {
     indexRenders++;
+    tabRender++;
+    $indexPanel.classList.remove('loading');
     clearTimeout(indexFilterTimer);
     indexFill = null;
     // one letter would match nearly every entry: not a filter (as in the search bar)
@@ -24617,8 +24673,11 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     warm.remove();
   });
 
-  // The systematic index's tree too, so the panel's first opening doesn't pay for it
+  // The systematic index's tree too, so the panel's first opening doesn't pay
+  // for it; and the lists of the other two tabs, so their first one doesn't
   whenIdle(() => sysTreeBuild());
+  whenIdle(() => warmIndexTab('references'));
+  whenIdle(() => warmIndexTab('subject'));
 
   // Build the search text cache in idle time, so the first search doesn't pay for it
   let textCacheWarmed = 0;

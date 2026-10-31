@@ -2013,7 +2013,9 @@ button.q-label:hover { color: #2c6fa6; }
   /* No room for it between the chip and the counter */
   #search-input.has-nav::placeholder { color: transparent; }
   #cards-container { padding: 8px; }
-  .card { border-radius: 6px; }
+  /* through the variable, so the bands inside (rubrica, foot) follow the
+     corner; the article keeps its 12px, the band's corner as on the desktop */
+  .card:not(.card-artigo) { --card-radius: 6px; }
   #header { padding: 8px; gap: 6px; }
   #marker-nav { right: 6px; }
   .marker-btn { min-width: 24px; height: 24px; font-size: 10px; padding: 1px 5px; }

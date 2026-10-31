@@ -193,6 +193,23 @@ def test_o_que_se_digitou_antes_do_script_e_buscado(abrir):
     pg.wait_for_function(r"/\d+ \/ \d+/.test(document.getElementById('search-counter').textContent)")
 
 
+def test_toque_no_indice_antes_do_script_abre_o_painel(abrir):
+    """Rede lenta: o ☰ aparece segundos antes do script; o toque responde e é guardado."""
+    antes = """
+      new MutationObserver((_, obs) => {
+        if (!window.earlyIndex) return;
+        const b = document.getElementById('btn-index');
+        b.click();
+        window.marcado = b.classList.contains('pending');
+        obs.disconnect();
+      }).observe(document, { childList: true, subtree: true });"""
+    pg = abrir(antes=antes)
+    pg.wait_for_function("document.getElementById('index-panel').classList.contains('open')")
+    assert pg.evaluate("window.marcado") is True
+    assert pg.evaluate("document.getElementById('btn-index').classList.contains('pending')") is False
+    pg.wait_for_selector("#index-content .sys-tit")
+
+
 def test_faixas_do_indice_so_quando_abertas(abrir):
     pg = abrir()
     assert pg.locator(".idx-row").count() == 0

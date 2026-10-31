@@ -28,6 +28,15 @@
 <!-- HEADER -->
 <div id="header">
   <button id="btn-index" title="Índice" aria-label="Índice" aria-controls="index-panel" aria-expanded="false">☰</button>
+  <script>
+  // The header shows seconds before the page's script runs (it comes after
+  // the cards): a tap on ☰ meanwhile is answered at once and remembered, and
+  // the index opens as soon as the script runs (19-inicio-da-pagina.js)
+  document.getElementById('btn-index').addEventListener('click', window.earlyIndex = function () {
+    this.classList.add('pending');
+    window.earlyIndex.asked = true;
+  });
+  </script>
   <div id="search-wrapper">
     <input id="search-input" type="text" placeholder="Buscar... (ex: r43 vai ao Art. 43 do RI, l43 ao da LOM)" autocomplete="off" enterkeyhint="search">
     <span id="search-chip" hidden><span id="chip-label"></span><button id="chip-remove" type="button" title="Tirar o assunto da busca" aria-label="Tirar o assunto da busca">&times;</button></span>

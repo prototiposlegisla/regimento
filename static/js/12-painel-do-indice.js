@@ -9,11 +9,15 @@
       resultsDrawerOpen = false;
       updateResultsVisibility();
     }
+    // In at once, its list drawn right after (renderIndexSoon); meanwhile
+    // the last one dimmed, or nothing if it was another tab's (one kept from
+    // idle time: 19-inicio-da-pagina.js)
+    if ($indexContent.dataset.of !== currentIndexTab) $indexContent.replaceChildren();
     $indexOverlay.classList.add('open');
     setPanelOpen(true);
     sysNorm = -1;
     sysTitle = null;
-    renderIndex();
+    renderIndexSoon();
     if (window.innerWidth > 768) $indexSearch.focus();
   }
 
@@ -90,20 +94,25 @@
     $indexSearchWrapper.style.display = name === 'info' ? 'none' : '';
   }
 
-  // The tab marked and the list it leaves dimmed at once; its own list drawn
-  // once that is on the screen: a long one (the first time, on a phone) does
-  // not leave the tap unanswered. Another rendering meanwhile cancels it.
+  // The list being left dimmed at once, and the new one drawn once that is
+  // on the screen: a long one (on a phone) does not leave the tap unanswered.
+  // Another rendering meanwhile cancels it.
   let tabRender = 0;
-  function indexTabClick(name) {
-    setIndexTab(name);
+  function renderIndexSoon(then) {
     $indexPanel.classList.add('loading');
     const mine = ++tabRender;
     requestAnimationFrame(() => setTimeout(() => {
       if (mine !== tabRender) return;
       renderIndex();
+      if (then) then();
+    }, 0));
+  }
+  function indexTabClick(name) {
+    setIndexTab(name);
+    renderIndexSoon(() => {
       $indexContent.scrollTop = 0;   // (not where the last tab was)
       if (currentIndexTab === 'systematic') syncSystematicToScroll();
-    }, 0));
+    });
   }
   document.querySelectorAll('.index-tab').forEach(tab => {
     tab.addEventListener('click', () => indexTabClick(tab.dataset.tab));
@@ -182,6 +191,7 @@
       : currentIndexTab === 'subject' ? 'subject'
       : currentIndexTab === 'references' ? 'references:' + currentRefCategory : null;
     if ($indexPanel.dataset.tab !== currentIndexTab) $indexPanel.dataset.tab = currentIndexTab;
+    $indexContent.dataset.of = currentIndexTab;
     $indexContent.classList.remove('sys-two');
     const cached = cacheKey && indexDomCache.get(cacheKey);
     if (cached) {

@@ -41,7 +41,8 @@ def test_dados_grandes_vao_em_blocos_json_que_voltam_intactos(tmp_path):
     assert blocos["data-correlato-notas"] == [traicoeiro, "outra nota"]
     assert blocos["data-consulta-index"] == []
     # nada nos dados fecha o bloco antes da hora: o script da página vem inteiro depois
-    assert html.count("<script>\n") == 1
+    # (o do cabeçalho, recuado, é o que guarda um toque no ☰ antes dele)
+    assert html.count("\n<script>\n") == 1
     assert "pageData('data-subject-index')" in html
     # os blocos vêm antes do script que os lê
-    assert html.index('id="data-correlato-notas"') < html.index("<script>\n")
+    assert html.index('id="data-correlato-notas"') < html.index("\n<script>\n")

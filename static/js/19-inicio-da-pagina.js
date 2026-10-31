@@ -26,6 +26,13 @@
   // On a slow network the bar shows seconds before the script runs: what
   // was typed meanwhile is searched now
   if ($searchInput.value.trim()) $searchInput.dispatchEvent(new Event('input'));
+  // ...and ☰ tapped meanwhile (base.html) opens the index now
+  if (window.earlyIndex) {
+    $btnIndex.removeEventListener('click', window.earlyIndex);
+    $btnIndex.classList.remove('pending');
+    if (window.earlyIndex.asked) openIndex();
+    delete window.earlyIndex;
+  }
 
   // Warm what the first results list needs (law titles, fonts and styles of
   // its entries), so its first build is not a long task

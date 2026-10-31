@@ -175,6 +175,9 @@ body {
   flex-shrink: 0;
 }
 #btn-index:hover { background: #eef0f3; }
+/* tapped before the page's script ran (base.html): it opens once it does */
+#btn-index.pending { cursor: progress; animation: btn-pending .6s ease-in-out infinite alternate; }
+@keyframes btn-pending { to { opacity: .3; } }
 
 #search-wrapper {
   flex: 1;
@@ -1050,9 +1053,21 @@ mark.weak {
 /* closed and out of sight (setPanelOpen): its lines out of reach of Tab
    and of a screen reader, their layout kept for the next opening */
 #index-panel.shut { content-visibility: hidden; }
-/* a tab chosen, its list on the way (indexTabClick) */
+/* a tab chosen (or the panel opened), its list on the way (renderIndexSoon):
+   a bar running under the tabs. Not the list dimmed: thousands of lines
+   painted again, the very frame that answers the tap made slow */
 #index-panel.loading { cursor: progress; }
-#index-panel.loading #index-content { opacity: .45; }
+#index-header { position: relative; }   /* (the panel clips the bar) */
+#index-panel.loading #index-header::after {
+  content: ''; position: absolute; left: 0; bottom: 0; width: 35%; height: 3px;
+  background: var(--amb); border-radius: 2px;
+  animation: index-loading .9s ease-in-out infinite;
+}
+@keyframes index-loading { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+#index-panel.loading #index-content:empty::before {
+  content: 'Carregando…'; display: block; padding: 24px 8px; text-align: center;
+  font: 500 14px var(--font-ui); color: #6b7380;
+}
 #index-panel[data-tab="systematic"] { width: min(680px, 96vw); }
 #index-panel[data-tab="subject"] { width: min(500px, 94vw); }
 #index-panel[data-tab="references"] { width: min(760px, 96vw); }
@@ -2307,16 +2322,15 @@ button.q-label:hover { color: #2c6fa6; }
 @media (prefers-reduced-motion: no-preference) {
   .rem-box, .footnote-box.open { animation: unfold .26s cubic-bezier(.2,.8,.2,1); transform-origin: top center; }
   #rem-pop.visible { animation: pop-in .16s ease-out; }
-  #index-panel { transition: transform .42s cubic-bezier(.3,1.18,.4,1), width .3s ease; }
+  /* (not its width, from tab to tab: each frame would lay its whole list
+     out again, the slowness of a tab's first opening on a phone) */
+  #index-panel { transition: transform .42s cubic-bezier(.3,1.18,.4,1); }
   #index-overlay.open { animation: fade-in .3s ease; }
   .card .idx-back { transition: transform .14s ease, box-shadow .14s ease, background-color .2s, color .2s; }
   .card .rem-imp:hover, .card .idx-back:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
   }
-  /* the first cards of each grid (all of them at once, hundreds, would be
-     drawn one by one as the tab opens) */
-  .q-grid > :nth-child(-n+8) { animation: pop-in .25s ease-out backwards; }
   .sys-bar > i { transition: transform .15s, opacity .15s; }
   .sys-bar > i:hover { transform: scaleY(1.45); }
 }

@@ -1254,6 +1254,8 @@ mark.weak {
   display: inline-block; margin: 0 0 10px; padding: 3px 10px; border-radius: 999px;
   background: #eef0f3; color: #5a626e; font: 500 12px/1.6 var(--font-ui);
 }
+/* ?medir: the index's first opening timed (12-painel-do-indice.js, firstOpenHtml) */
+.info-content p.info-medida { margin: 0 0 12px; color: #5a626e; font: 12px/1.5 var(--font-ui); }
 .info-content p {
   font-size: 14px;
   color: #555;
@@ -2523,9 +2525,9 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // The header shows seconds before the page's script runs (it comes after
   // the cards): a tap on ☰ meanwhile is answered at once and remembered, and
   // the index opens as soon as the script runs (19-inicio-da-pagina.js)
-  document.getElementById('btn-index').addEventListener('click', window.earlyIndex = function () {
+  document.getElementById('btn-index').addEventListener('click', window.earlyIndex = function (e) {
     this.classList.add('pending');
-    window.earlyIndex.asked = true;
+    window.earlyIndex.asked = e.timeStamp || performance.now();   // (when: ?medir, 12-painel-do-indice.js)
   });
   </script>
   <div id="search-wrapper">
@@ -19082,7 +19084,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 17:24 · 1c558ea<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 17:47 · 2faca11<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette
@@ -23340,7 +23342,36 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // ===== INDEX PANEL =====
   let currentIndexTab = 'systematic';
 
+  // ?medir in the address: the index's first opening timed on this device,
+  // shown in the info tab (a phone's numbers, to set against those of an
+  // emulated one). When ☰ was touched, when the panel was on the screen,
+  // when its list was, and the long tasks meanwhile
+  const firstOpen = /[?&]medir\b/.test(location.search) ? { long: [] } : null;
+  if (firstOpen) {
+    $btnIndex.addEventListener('pointerdown', e => { if (!firstOpen.tap) firstOpen.tap = e.timeStamp; });
+    try {
+      new PerformanceObserver(l => { for (const e of l.getEntries()) firstOpen.long.push([e.startTime, e.duration]); })
+        .observe({ type: 'longtask', buffered: true });
+    } catch (e) {}
+  }
+  function firstOpenHtml() {
+    const f = firstOpen;
+    if (!f || !f.list) return '';
+    const s = ms => (ms / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' s';
+    const nav = performance.getEntriesByType('navigation')[0];
+    const long = f.long.filter(([t, d]) => t + d > f.tap - 1000 && t < f.list)
+      .map(([t, d]) => (t < f.tap ? '−' : '+') + s(Math.abs(t - f.tap)) + ' (' + Math.round(d) + ' ms)');
+    return '<p class="info-medida">Primeira abertura do índice: toque aos ' + s(f.tap)
+      + (nav && nav.loadEventEnd ? ' (página carregada aos ' + s(nav.loadEventEnd) + ')' : '')
+      + '; painel na tela ' + s(f.frame - f.tap) + ' depois; lista ' + s(f.list - f.tap) + ' depois. '
+      + 'Tarefas longas de 1 s antes do toque até a lista: ' + (long.join(', ') || 'nenhuma') + '.</p>';
+  }
+
   function openIndex() {
+    if (firstOpen && !firstOpen.frame) {
+      firstOpen.tap = firstOpen.tap || performance.now();
+      requestAnimationFrame(() => { firstOpen.frame = performance.now(); });
+    }
     takeStep('panel');
     // The results drawer (opened by a search, below the header) gives way;
     // the panel links back to it
@@ -23371,7 +23402,13 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     $indexPanel.classList.toggle('open', open);
     clearTimeout(panelShutTimer);
     if (open || now) $indexPanel.classList.toggle('shut', !open);
-    else panelShutTimer = setTimeout(() => $indexPanel.classList.add('shut'), PANEL_SLIDE_MS);
+    else panelShutTimer = setTimeout(() => {
+      $indexPanel.classList.add('shut');
+      // out of sight, the lists of the tabs not yet seen built for their
+      // first opening (warmIndexTab), in idle time
+      whenIdle(() => warmIndexTab('references'));
+      whenIdle(() => warmIndexTab('subject'));
+    }, PANEL_SLIDE_MS);
     $btnIndex.setAttribute('aria-expanded', open);
   }
 
@@ -23444,6 +23481,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
       if (mine !== tabRender) return;
       renderIndex();
       if (then) then();
+      if (firstOpen && !firstOpen.list) requestAnimationFrame(() => { firstOpen.list = performance.now(); });
     }, 0));
   }
   function indexTabClick(name) {
@@ -23503,12 +23541,12 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // built once (per category) and put back on each opening, not rebuilt
   const indexDomCache = new Map();
 
-  // In idle time after the load (19-inicio-da-pagina.js): a tab's list built
-  // in the closed panel and kept, so its first opening only lays it out. Not
-  // with the panel open or a filter in it, nor once kept
+  // In idle time once the panel is closed (setPanelOpen): a tab's list built
+  // in it, out of sight, and kept, so its first opening only lays it out. Not
+  // with the panel on the screen or a filter in it, nor once kept
   function warmIndexTab(name) {
     const key = name === 'subject' ? 'subject' : 'references:' + currentRefCategory;
-    if ($indexPanel.classList.contains('open') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
+    if (!$indexPanel.classList.contains('shut') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
     const was = currentIndexTab, wasWidth = $indexPanel.dataset.tab;
     currentIndexTab = name;
     renderIndex();
@@ -23545,7 +23583,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     $indexContent.innerHTML = '';
 
     if (currentIndexTab === 'info') {
-      $indexContent.innerHTML = '<div class="info-content">' + INFO_HTML + '</div>';
+      $indexContent.innerHTML = '<div class="info-content">' + INFO_HTML.replace('</p>', '</p>' + firstOpenHtml()) + '</div>';
       return;
     } else if (currentIndexTab === 'systematic') {
       renderSystematicIndex(filter);
@@ -25556,7 +25594,10 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   if (window.earlyIndex) {
     $btnIndex.removeEventListener('click', window.earlyIndex);
     $btnIndex.classList.remove('pending');
-    if (window.earlyIndex.asked) openIndex();
+    if (window.earlyIndex.asked) {
+      if (firstOpen) firstOpen.tap = window.earlyIndex.asked;
+      openIndex();
+    }
     delete window.earlyIndex;
   }
 
@@ -25576,10 +25617,10 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   });
 
   // The systematic index's tree too, so the panel's first opening doesn't pay
-  // for it; and the lists of the other two tabs, so their first one doesn't
+  // for it. (Not the lists of the other two tabs: seconds of work on a phone,
+  // just when a first tap on ☰ is likely, which would wait for it unanswered;
+  // they are built once the panel has been opened and closed: setPanelOpen)
   whenIdle(() => sysTreeBuild());
-  whenIdle(() => warmIndexTab('references'));
-  whenIdle(() => warmIndexTab('subject'));
 
   // Build the search text cache in idle time, so the first search doesn't pay for it
   let textCacheWarmed = 0;

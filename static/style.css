@@ -2201,6 +2201,9 @@ button.q-label:hover { color: #2c6fa6; }
   color: #7f8c8d;
 }
 .rem-backlinks::before { content: attr(data-label); margin-right: 2px; }
+/* ("Citado em" and "Precedentes regimentais" to the right, as the summary
+   line of the índice remissivo below) */
+.rem-backlinks:not(.idx-backlinks) { text-align: right; }
 .rem-back {
   display: inline-block;
   margin: 2px 0 2px 4px;
@@ -2240,10 +2243,11 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-backlinks::before { content: none; }
 /* Folded to a line, "▸ 7 assuntos · 12 entradas"; open, "▾ No índice
    remissivo · 7 assuntos · 12 entradas" (the label via CSS, out of the
-   searchable text); a click opens the bands of every card at once, and the
-   choice is remembered (app.js, setIndexOpen) */
+   searchable text), to the right in both, the table below as ever; a click
+   opens the bands of every card at once, and the choice is remembered
+   (app.js, setIndexOpen) */
 .idx-sum {
-  display: block; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
+  display: block; width: 100%; border: 0; background: none; padding: 0; cursor: pointer; text-align: right;
   font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #7e6f4b;
 }
 .idx-sum::before { content: "\25B8\00a0 " attr(data-label); }

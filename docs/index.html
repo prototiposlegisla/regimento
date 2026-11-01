@@ -2223,6 +2223,9 @@ button.q-label:hover { color: #2c6fa6; }
   color: #7f8c8d;
 }
 .rem-backlinks::before { content: attr(data-label); margin-right: 2px; }
+/* ("Citado em" and "Precedentes regimentais" to the right, as the summary
+   line of the índice remissivo below) */
+.rem-backlinks:not(.idx-backlinks) { text-align: right; }
 .rem-back {
   display: inline-block;
   margin: 2px 0 2px 4px;
@@ -2262,10 +2265,11 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-backlinks::before { content: none; }
 /* Folded to a line, "▸ 7 assuntos · 12 entradas"; open, "▾ No índice
    remissivo · 7 assuntos · 12 entradas" (the label via CSS, out of the
-   searchable text); a click opens the bands of every card at once, and the
-   choice is remembered (app.js, setIndexOpen) */
+   searchable text), to the right in both, the table below as ever; a click
+   opens the bands of every card at once, and the choice is remembered
+   (app.js, setIndexOpen) */
 .idx-sum {
-  display: block; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;
+  display: block; width: 100%; border: 0; background: none; padding: 0; cursor: pointer; text-align: right;
   font: 600 calc(.76rem * var(--zoom-scale))/1.5 var(--font-ui); color: #7e6f4b;
 }
 .idx-sum::before { content: "\25B8\00a0 " attr(data-label); }
@@ -19167,7 +19171,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 01/11/2026, 07:02 · d5cc2e2<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 01/11/2026, 08:06 · 861f7f3<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette

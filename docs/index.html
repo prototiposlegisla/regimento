@@ -795,52 +795,34 @@ body {
 }
 .diff-ins { background: #d9f2ea; color: #0f5e48; padding: 1px 3px; border-radius: 3px; }
 
-/* Article summary (rubrica) — a dark band across the top of the card,
-   toward the norma's color at its end */
+/* Article summary (rubrica) — an epigraph over the article, as in a printed
+   code: small capitals in the norma's ink, centred, a hairline under it
+   (chosen 01/11/2026: the dark band in a gradient, with its gloss, white
+   letters and the number in a chip, read as a window's title bar). The
+   number stays in the caput ("Art. 39"); the hosted fonts have no smcp, so
+   the small capitals are synthesized. */
 .art-summary {
   display: block;
-  font-size: calc(.9rem * var(--zoom-scale));
-  color: #fff;
-  font-style: normal;
-  font-weight: 600;
-  letter-spacing: .1px;
-  margin: calc(-16px * var(--zoom-scale)) calc(-16px * var(--zoom-scale)) calc(12px * var(--zoom-scale));
-  line-height: 1.4;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0)),
-    linear-gradient(100deg, var(--rubrica) 0%, var(--rubrica) 35%, color-mix(in srgb, var(--nc) 80%, var(--rubrica)) 100%);
-  padding: calc(7px * var(--zoom-scale)) calc(16px * var(--zoom-scale));
-  border-radius: calc(var(--card-radius) - 1.5px) calc(var(--card-radius) - 1.5px) 0 0;
+  margin: calc(-3px * var(--zoom-scale)) 0 calc(12px * var(--zoom-scale));
+  padding: 0 0 calc(7px * var(--zoom-scale));
+  border-bottom: 1px solid color-mix(in srgb, var(--nc) 32%, transparent);
+  font: 400 calc(.95rem * var(--zoom-scale))/1.4 var(--font-ui);
+  font-variant-caps: small-caps;
+  letter-spacing: .04em;
+  color: color-mix(in srgb, var(--nc) 80%, #000);
+  text-align: center;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
 }
-.card-artigo[data-law] > .art-summary { padding-right: calc(56px * var(--zoom-scale)); }
-/* The article's number at the start of the band, so each card shows from
-   afar which article it is: a float, so the rubrica's first line starts
-   after it, however long the number */
-.card-artigo::before {
-  content: attr(data-art);
-  float: left; position: relative; z-index: 1;
-  height: calc((14px + .9rem * 1.4) * var(--zoom-scale));
-  margin: calc(-16px * var(--zoom-scale)) calc(9px * var(--zoom-scale)) 0 calc(-16px * var(--zoom-scale));
-  padding: 0 calc(8px * var(--zoom-scale));
-  display: flex; align-items: center;
-  border-radius: calc(var(--card-radius) - 1.5px) 0 0 0;
-  background: rgba(255,255,255,.1); border-right: 1px solid rgba(255,255,255,.18);
-  font: 800 calc(.82rem * var(--zoom-scale))/1 var(--font-ui); color: #fff;
-  font-variant-numeric: tabular-nums; pointer-events: none;
-  user-select: none; -webkit-user-select: none;
-}
-#cards-container.compact .card-artigo::before { content: none; }
+.card-artigo[data-law] > .art-summary { padding-right: calc(52px * var(--zoom-scale)); }
 
-/* Law badge, on the rubrica's band */
+/* Law badge, in the corner beside the rubrica */
 .law-badge {
   position: absolute;
-  top: calc(9px * var(--zoom-scale));
-  right: calc(10px * var(--zoom-scale));
-  z-index: 1;   /* over the band, which is positioned too */
-  box-shadow: 0 0 0 1px rgba(255,255,255,.35);
+  top: calc(15px * var(--zoom-scale));
+  right: calc(14px * var(--zoom-scale));
+  z-index: 1;   /* over the rubrica, which is positioned too */
   font-size: calc(.7rem * var(--zoom-scale));
   font-weight: 700;
   background: var(--nc);
@@ -906,11 +888,15 @@ body {
 #cards-container.compact .art-summary {
   display: inline;
   margin: 0;
+  font-family: inherit;
   font-size: calc(1rem * var(--zoom-scale));
+  font-variant-caps: normal;
   color: #222;
   font-style: normal;
   font-weight: 400;
   letter-spacing: normal;
+  text-align: inherit;
+  border: 0;
   background: none;
   padding: 0;
   border-radius: 0;
@@ -942,9 +928,6 @@ mark {
   background: #e6ff5a;
   color: inherit;
   border-radius: 2px;
-}
-.art-summary mark {
-  color: var(--rubrica);
 }
 /* the short words among other words ("prazo de votação"): fainter */
 ::highlight(search-weak) {
@@ -19184,7 +19167,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 31/10/2026, 20:22 · b5ff34e<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 01/11/2026, 07:02 · d5cc2e2<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette
@@ -19312,7 +19295,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
     if (cl.contains('revoked-block')) return [REVOKED_BLOCK_PX, REVOKED_LINE_PX];
     if (cl.contains('idx-backlinks')) return null;   // indexBandHeight
     if (cl.contains('rem-backlinks')) return [18, 0];
-    if (cl.contains('art-summary')) return [17, 0];      // the band at the top
+    if (cl.contains('art-summary')) return [3, 21];      // the rubrica over the text
     return [0, 30];
   }
   function blockTextLength(el) {

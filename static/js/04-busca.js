@@ -178,29 +178,42 @@
     cardTargets = new Map();
   }
 
-  // Text nodes of a card, skipping footnote boxes unless requested and the
-  // indent hints ("7§1I", decoration repeating the dispositivo's path)
-  function cardTextWalker(card, includeFootnotes) {
-    return document.createTreeWalker(card, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
-      acceptNode: n => n.nodeType === Node.TEXT_NODE ? NodeFilter.FILTER_ACCEPT
-        : n.classList.contains('indent-path') || n.classList.contains('rem-box') ? NodeFilter.FILTER_REJECT
-        : (!includeFootnotes && n.classList.contains('footnote-box') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP),
-    });
-  }
-
   // Normalized text per card, [without footnotes, with footnotes]. Built on
   // first use (and warmed when idle); a card's text only changes when a diff
   // panel opens or closes, which calls invalidateCardText.
   const cardTextCache = new Map();
+
+  // A card's text, skipping footnote boxes unless requested, the remissões'
+  // boxes and the indent hints ("7§1I", decoration repeating the
+  // dispositivo's path): the whole text when there's none of them, else its
+  // text nodes with their subtrees jumped over (no filter called back for
+  // each node: ~4x faster than a TreeWalker's acceptNode)
+  function cardText(card, includeFootnotes) {
+    const skip = card.querySelectorAll(includeFootnotes ? '.indent-path, .rem-box'
+      : '.indent-path, .rem-box, .footnote-box');
+    if (!skip.length) return card.textContent;
+    const skipped = new Set(skip);
+    const walker = document.createTreeWalker(card, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+    let text = '';
+    let n = walker.nextNode();
+    while (n) {
+      if (n.nodeType === Node.TEXT_NODE) text += n.data;
+      else if (skipped.has(n)) {
+        // past its subtree: its next sibling, or its nearest ancestor's
+        while (!(n = walker.nextSibling()) && walker.parentNode());
+        continue;
+      }
+      n = walker.nextNode();
+    }
+    return text;
+  }
 
   function getCardText(card, includeFootnotes) {
     let entry = cardTextCache.get(card);
     if (!entry) cardTextCache.set(card, entry = [null, null]);
     const i = includeFootnotes ? 1 : 0;
     if (entry[i] === null) {
-      let text = '';
-      const walker = cardTextWalker(card, includeFootnotes);
-      while (walker.nextNode()) text += walker.currentNode.data;
+      let text = cardText(card, includeFootnotes);
       // the right form of the official text's typos (data-busca): the search finds the
       // provision by the right word, and the reader still sees the faithful text
       if (card.dataset.busca) text += ' \u0000 ' + card.dataset.busca;
@@ -267,12 +280,15 @@
   // snippets go to them.
   const SHORT_WORDS = new Set(['a', 'o', 'e', 'as', 'os', 'ao', 'aos', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
     'para', 'por', 'pelo', 'pela', 'com', 'um', 'uma', 'que', 'se']);
-  const WHOLE_WORD = p => '(?<![\\p{L}\\p{N}])' + p + '(?![\\p{L}\\p{N}])';
+  // (the letters and digits spelled out, the Latin ones and º ª: \p{L} with
+  // the "u" flag made each search's expressions slower to build and to run)
+  const WORD_CHAR = '[0-9A-Za-z\\u00aa\\u00ba\\u00c0-\\u00d6\\u00d8-\\u00f6\\u00f8-\\u024f]';
+  const WHOLE_WORD = p => '(?<!' + WORD_CHAR + ')' + p + '(?!' + WORD_CHAR + ')';
   const wholeWordRes = new Map();
   function hasWord(text, w) {
     if (!SHORT_WORDS.has(w)) return text.includes(w);
     let re = wholeWordRes.get(w);
-    if (!re) wholeWordRes.set(w, re = new RegExp(WHOLE_WORD(w), 'u'));
+    if (!re) wholeWordRes.set(w, re = new RegExp(WHOLE_WORD(w)));
     return re.test(text);
   }
 
@@ -283,7 +299,7 @@
       ...phrases.map(p => esc(p).replace(/ +/g, '[\\s\\xa0]+')),
       ...words.map(t => SHORT_WORDS.has(t) ? WHOLE_WORD(esc(t)) : esc(t))
     ];
-    const regex = new RegExp('(' + allPatterns.join('|') + ')', 'giu');
+    const regex = new RegExp('(' + allPatterns.join('|') + ')', 'gi');
     // the short words that get the fainter mark (none if the query has only them)
     regex.weak = new Set(words.some(w => !SHORT_WORDS.has(w))
       ? words.filter(w => SHORT_WORDS.has(w) && !phrases.includes(w)) : []);

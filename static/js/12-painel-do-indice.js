@@ -367,7 +367,13 @@
     'Estado', 'União', 'Distrito Federal', 'República', 'Tribunal de Contas', 'Poder Legislativo', 'Poder Executivo',
     'Poder Judiciário', 'Ministério Público', 'Defensoria Pública', 'Congresso Nacional', 'Senado Federal',
     'Constituição', 'Ordem do Dia', 'Expediente', 'Subprefeituras', 'Orçamento', 'Líderes', 'Vice-Líderes'];
-  const SYS_PROPER_RE = SYS_PROPER.map(p => [new RegExp('(^|[^\\p{L}])' + p.toLowerCase() + '(?![\\p{L}])', 'gu'), p]);
+  // One expression for all of them (the longer first), with the letters
+  // spelled out: 40 of them with \p{L} cost ~0.5 s on their first run on a
+  // slow phone (V8 compiling the Unicode classes), the one ~10 ms
+  const SYS_LETTER = 'a-zà-öø-ÿ';
+  const SYS_PROPER_OF = new Map(SYS_PROPER.map(p => [p.toLowerCase(), p]));
+  const SYS_PROPER_RE = new RegExp('(^|[^' + SYS_LETTER + '])('
+    + [...SYS_PROPER_OF.keys()].sort((a, b) => b.length - a.length).join('|') + ')(?![' + SYS_LETTER + '])', 'g');
   const sysWide = window.matchMedia('(min-width: 720px)');
   let sysTree = null;    // [norma node]; node: {title, id, level, tag, name, kids, parent, arts, first, last, art?, law?}
   let sysNorm = -1;      // the norma shown (-1: the reader's)
@@ -379,10 +385,9 @@
   });
 
   function sysCase(name) {
-    const letters = name.replace(/[^\p{L}]/gu, '');
-    if (!letters || letters !== letters.toUpperCase()) return name;
-    let s = name.toLowerCase();
-    for (const [re, p] of SYS_PROPER_RE) s = s.replace(re, (m, a) => a + p);
+    // (all in capitals: no small letter, and some capital)
+    if (name !== name.toUpperCase() || name === name.toLowerCase()) return name;
+    const s = name.toLowerCase().replace(SYS_PROPER_RE, (m, a, w) => a + SYS_PROPER_OF.get(w));
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 

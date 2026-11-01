@@ -375,14 +375,22 @@
   // "vantagens" or "cargo"): those of the sub-subjects under it ("vantagens:
   // adicional", "cargo em comissão") and of its "vide", as the index shows
   // around it.
+  // (each sub-subject's normalized name, once: the band of every article
+  // asks for each of its subject's sub-subjects, ~0.15 s on a slow phone)
+  const subKeys = new WeakMap();
+  function subKey(c) {
+    let k = subKeys.get(c);
+    if (k === undefined) subKeys.set(c, k = normIndexText(c.sub_subject));
+    return k;
+  }
   function subjectRefs(entry, sub, seen = new Set()) {
     const key = normIndexText(sub);
     const children = entry.children || [];
-    const ch = children.find(c => normIndexText(c.sub_subject) === key);
+    const ch = children.find(c => subKey(c) === key);
     if (ch && ch.refs.length) return ch.refs;
     const refs = [];
     for (const c of children) {
-      const k = normIndexText(c.sub_subject);
+      const k = subKey(c);
       if (k !== key && (k.startsWith(key + ':') || k.startsWith(key + ' '))) refs.push(...c.refs);
     }
     for (const vide of (ch && ch.vides) || []) {

@@ -296,3 +296,29 @@ def test_metadados_de_compartilhamento(abrir, site):
     for nome in ("img/compartilhar.png", "img/icone-180.png"):
         r = pg.request.get(f"{base}/{nome}")
         assert r.status == 200 and r.headers["content-type"] == "image/png", nome
+
+
+def test_clique_num_artigo_no_modo_compacto_sai_dele_com_o_artigo_na_linha_de_leitura(abrir):
+    pg = abrir()
+    pg.click("#btn-compact")
+    pg.mouse.wheel(0, 3000)
+    pg.wait_for_timeout(300)
+    # um artigo na metade de baixo da tela, longe da linha de leitura
+    alvo = pg.evaluate("""() => {
+      const h = innerHeight;
+      const c = [...document.querySelectorAll('#cards-container .card-artigo')].find(c => {
+        const r = c.getBoundingClientRect(); return r.top > h * .6 && r.bottom < h * .9; });
+      c.querySelector('.art-summary').click();
+      return [c.dataset.law || 'RI', c.dataset.art];
+    }""")
+    assert "compact" not in pg.get_attribute("#cards-container", "class")
+    assert selecionado(pg) == tuple(alvo)
+    topo = pg.evaluate("document.querySelector('.card.selected').getBoundingClientRect().top")
+    assert abs(topo - 860 * .25) < 2
+
+
+def test_clique_no_numero_do_artigo_no_modo_compacto_marca_sem_sair(abrir):
+    pg = abrir()
+    pg.click("#btn-compact")
+    pg.locator("#cards-container .card-artigo .art-compact-label").nth(3).click()
+    assert "compact" in pg.get_attribute("#cards-container", "class")

@@ -943,6 +943,7 @@ body {
 #cards-container.compact .card-artigo {
   padding: calc(8px * var(--zoom-scale)) calc(12px * var(--zoom-scale));
   line-height: 1.3;
+  cursor: pointer;   /* a click opens the article (16-zoom-e-compacto.js) */
 }
 /* The articles between two ribbons one sheet of contents: no gap, a
    hairline between the lines, the rubrica in the text's serif (chosen in

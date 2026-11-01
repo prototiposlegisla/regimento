@@ -111,6 +111,18 @@
 
   $btnCompact.addEventListener('click', () => setCompactMode(!compactMode));
 
+  // Compact mode is for running down the list after an article: a click on
+  // one (not on its label, which marks it) leaves the mode with that article
+  // on the reading line, ready to read
+  $cards.addEventListener('click', (e) => {
+    if (!compactMode) return;
+    const card = e.target.closest('.card-artigo');
+    if (!card || e.target.closest('.art-compact-label, .unit-id')) return;
+    if (String(getSelection())) return;   // dragged to select the rubrica
+    selectCard(card, true);
+    setCompactMode(false);
+  });
+
   // The index bands at the cards' feet: folded to their line, or all open.
   // The card clicked stays where it was on the screen.
   function setIndexOpen(on, anchor) {

@@ -1,8 +1,8 @@
-"""A parte da aba de informações que o build escreve: até onde vai o texto de cada norma e como usar a busca.
+"""A parte da aba de informações que o build escreve: até onde vai o texto de cada norma.
 
-Fica no código, e não em informacoes.docx, para não desatualizar: a última alteração de cada norma sai das
-notas de redação do próprio DOCX, e os atalhos acompanham a busca (static/js/04-busca.js, classifyQuery). O texto
-livre do usuário continua em informacoes.docx, antes desta parte.
+Fica no código, e não em informacoes.md, para não desatualizar: a última alteração de cada norma sai das
+notas de redação do próprio DOCX. O resto da aba (o que é o site, as fontes, como usar cada recurso) está em
+informacoes.md, antes desta parte.
 """
 
 from __future__ import annotations
@@ -56,25 +56,11 @@ def ultimas_alteracoes(doc: ParsedDocument) -> list[tuple[str, str]]:
 
 
 def html_da_ajuda(doc: ParsedDocument) -> str:
-    """O HTML da parte da aba de informações escrita pelo build."""
+    """O HTML da parte da aba de informações escrita pelo build: uma sanfona, como as do texto."""
     linhas = "<br>".join(f"{html.escape(norma)}: {html.escape(alt)}" for norma, alt in ultimas_alteracoes(doc))
-    partes = []
-    if linhas:
-        partes += ["<h3>Texto atualizado até</h3>",
-                   "<p>A alteração mais recente incorporada em cada norma:</p>",
-                   f"<p>{linhas}</p>"]
-    partes += [
-        "<h3>Busca</h3>",
-        "<p><b>r43</b> vai ao art. 43 do Regimento; <b>l43</b>, ao da Lei Orgânica "
-        "(também r183a, l229b, radt1, ladt15a).</p>",
-        "<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata "
-        "(\"prazo de votação\"). Acentos não importam.</p>",
-        "<p><b>n</b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.</p>",
-        "<p><b>Enter</b> vai ao próximo resultado e <b>Shift+Enter</b> ao anterior; <b>Ctrl+F</b> leva à busca; "
-        "<b>Esc</b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.</p>",
-        "<h3>Marcadores</h3>",
-        "<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. "
-        "Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto "
-        "deles. Ficam guardados só neste navegador.</p>",
-    ]
-    return "\n".join(partes)
+    if not linhas:
+        return ""
+    return "\n".join(['<details class="info-sec"><summary>Texto atualizado até</summary>',
+                      "<p>A alteração mais recente incorporada em cada norma:</p>",
+                      f"<p>{linhas}</p>",
+                      "</details>"])

@@ -1319,6 +1319,26 @@ mark.weak {
   color: #3b3d42;
   margin: 0 0 8px;
 }
+/* The sections of informacoes.md (and "Texto atualizado até"): folded,
+   their headings in the h3's small capitals on a hairline, each with an
+   arrow that turns when it opens (asked 01/11/2026) */
+.info-content .info-sec > summary {
+  list-style: none; cursor: pointer; margin: 6px 0 0; padding: 7px 0 5px;
+  border-bottom: 1px solid color-mix(in srgb, var(--amb) 30%, transparent);
+  font: 400 15.5px/1.3 var(--font-ui); font-variant-caps: small-caps; letter-spacing: .05em; color: var(--tinta-amb);
+}
+.info-content .info-sec > summary::-webkit-details-marker { display: none; }
+.info-content .info-sec > summary::before {
+  content: "▸"; display: inline-block; width: 1.1em; transition: transform .15s;
+  font-variant-caps: normal; color: var(--sepia);
+}
+.info-content .info-sec[open] > summary::before { transform: rotate(90deg); }
+.info-content .info-sec > summary:hover { color: color-mix(in srgb, var(--tinta-amb) 80%, #000); }
+.info-content .info-sec > summary:focus-visible { outline: 2px solid var(--tinta-amb); outline-offset: 2px; }
+.info-content .info-sec[open] > summary { margin-bottom: 10px; }
+.info-content .info-sec:first-of-type > summary { margin-top: 18px; }
+.info-content ul { margin: 0 0 10px; padding-left: 1.3em; font: 14px/1.6 var(--font-text); color: #3b3d42; }
+.info-content li { margin: 0 0 3px; }
 
 #index-search-wrapper {
   position: relative;

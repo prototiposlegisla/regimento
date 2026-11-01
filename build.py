@@ -513,7 +513,7 @@ def _build_once(
         print(f"      → legislação correlata: {len(leg['groups'])} normas, "
               f"{sum(1 for g in leg['groups'] for e in g['entries'] if e.get('art_ref'))} ligações a dispositivos")
 
-    # ── 5. Parse informacoes DOCX ─────────────────────────────────────
+    # ── 5. Parse informacoes (informacoes.md) ─────────────────────────
     print("[5/8] Parseando informações...")
     from src.parse_informacoes import parse_informacoes
 
@@ -522,11 +522,11 @@ def _build_once(
         info_html = parse_informacoes(info_path)
         print(f"      → {len(info_html)} caracteres de HTML")
     else:
-        print("      → DOCX de informações não encontrado, aba vazia")
-        report.add("fontes", "aviso", "informacoes.docx não encontrado: a aba de informações sai sem o seu texto",
+        print("      → texto de informações não encontrado, aba vazia")
+        report.add("fontes", "aviso", f"{info_path.name} não encontrado: a aba de informações sai sem o seu texto",
                    str(info_path))
         info_html = ""
-    # e a parte escrita pelo build: até onde vai cada norma, atalhos da busca, marcadores (src/ajuda.py)
+    # e a parte escrita pelo build: até onde vai cada norma (src/ajuda.py)
     from src.ajuda import html_da_ajuda
     info_html = "\n".join(p for p in (_versao_html(), info_html, html_da_ajuda(doc)) if p)
 
@@ -724,7 +724,7 @@ def _build_canonico(args: argparse.Namespace) -> None:
 
 # O código que entra na página: publicar com mudança não commitada nele põe no ar um código que não
 # está no histórico (as memórias registram três contornos à mão, trocando o app.js pelo do HEAD)
-CODIGO_DA_PAGINA = ["build.py", "validate.py", "src", "static", "templates", "*.toml"]
+CODIGO_DA_PAGINA = ["build.py", "validate.py", "src", "static", "templates", "*.toml", "informacoes.md"]
 # O que o --push commita: a página e as fontes e imagens copiadas ao lado dela
 SAIDA_PUBLICADA = ["docs/index.html", "docs/fonts", "docs/img"]
 
@@ -787,7 +787,8 @@ def main() -> int:
     # Defaults: config.local.toml → fallback local
     default_docx = sources.get("docx", str(BASE_DIR / "regimentoInterno.docx"))
     default_xlsx = sources.get("xlsx", str(BASE_DIR / "remissivo.xlsx"))
-    default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.docx"))
+    # O texto da aba i fica no repositório, ao lado do código que ele descreve (um .docx ainda serve)
+    default_info = sources.get("informacoes", str(BASE_DIR / "informacoes.md"))
     # Remissões implícitas (correlatos entre normas): ao lado do DOCX, salvo indicação
     default_remissoes = sources.get("remissoes", str(Path(default_docx).parent / "remissoes.xlsx"))
     # Consulta rápida (prazos, quóruns...), o mesmo yaml da folha impressa: idem
@@ -816,7 +817,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--informacoes", default=default_info,
-        help="Caminho do DOCX de informações",
+        help="Texto da aba de informações (.md ou .docx)",
     )
     parser.add_argument(
         "--output", default=str(BASE_DIR / "docs" / "index.html"),

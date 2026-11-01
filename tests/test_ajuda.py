@@ -42,8 +42,12 @@ def test_norma_sem_alteracao_fica_de_fora():
     assert ultimas_alteracoes(doc) == []
 
 
-def test_ajuda_tem_os_atalhos_e_nao_o_prefixo_antigo():
+def test_ajuda_e_uma_sanfona_com_a_ultima_alteracao():
     h = html_da_ajuda(doc_exemplo())
-    assert "<b>r43</b>" in h and "<b>l43</b>" in h and "n vereador" in h
-    assert "a123" not in h
-    assert "Resolução nº 8/2026" in h
+    assert h.startswith('<details class="info-sec"><summary>Texto atualizado até</summary>')
+    assert "Resolução nº 8/2026" in h and h.endswith("</details>")
+
+
+def test_ajuda_sem_alteracao_fica_vazia():
+    doc = ParsedDocument(elements=[artigo("Constituição Estadual", "1", "Texto sem nota.", "CE")])
+    assert html_da_ajuda(doc) == ""

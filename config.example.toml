@@ -5,7 +5,7 @@
 docx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/regimentoInterno.docx"
 xlsx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/remissivo.xlsx"
 # consulta = ".../FontesAtual/consulta-rapida.yaml"   (padrão: ao lado do docx, como remissoes.xlsx)
-informacoes = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/informacoes.docx"
+# informacoes = ".../informacoes.docx"   (padrão: informacoes.md, no repositório)
 
 [output]
 private = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Regimento arquivo/index.html"

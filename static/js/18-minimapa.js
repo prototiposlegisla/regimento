@@ -61,9 +61,53 @@
       ctx.fillStyle = getMinimapColor(card);
       ctx.fillRect(pad, y, barW, ch);
     }
+    placeMinimapTabs(titles.filter(t => t[2].classList.contains('nivel-norma')), h);
 
     minimapHeadings = headings;
     updateMinimapViewport();
+  }
+
+  // A thumb tab per norma out of the minimap's edge, at its cover, as on a
+  // dictionary's fore-edge; a click goes to the cover (chosen in the fitting
+  // room of the harmony, 01/11/2026). Its own mouse is not the minimap's:
+  // no jump, no drag, no tooltip
+  let minimapTabs = null;
+  function placeMinimapTabs(covers, h) {
+    if (!minimapTabs) {
+      minimapTabs = document.createElement('div');
+      minimapTabs.className = 'mm-tabs';
+      $minimap.appendChild(minimapTabs);
+      for (const type of ['mousedown', 'click', 'mousemove']) {
+        minimapTabs.addEventListener(type, e => {
+          e.stopPropagation();
+          $minimapTooltip.style.display = 'none';
+          $minimapHighlight.style.display = 'none';
+        });
+      }
+    }
+    const shown = new Set();
+    for (const [y, , cover] of covers) {
+      const nrm = cover.dataset.nrm || 'RI';
+      let tab = minimapTabs.querySelector('[data-nrm="' + nrm + '"]');
+      if (!tab) {
+        tab = document.createElement('button');
+        tab.type = 'button';
+        tab.className = 'mm-tab';
+        tab.dataset.nrm = nrm;
+        tab.textContent = nrm;
+        tab.addEventListener('click', () => {
+          const top = tab.cover.getBoundingClientRect().top + window.scrollY;
+          scrollToY(top - getReadingLineY(), 'smooth');
+        });
+        minimapTabs.appendChild(tab);
+      }
+      tab.cover = cover;
+      tab.title = cover.textContent.trim();
+      tab.hidden = false;
+      tab.style.top = Math.max(0, Math.min(h - 40, y)) + 'px';
+      shown.add(tab);
+    }
+    for (const tab of minimapTabs.children) if (!shown.has(tab)) tab.hidden = true;
   }
 
   function updateMinimapViewport() {

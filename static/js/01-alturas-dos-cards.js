@@ -50,6 +50,9 @@
   // 1.3em (--card-hc): their characters, per article card (titles keep theirs)
   let cardEstCompact = null;
   const COMPACT_LINE_EM = 1.3;
+  // (the rubrica in the text's serif at .95em since 01/11/2026: narrower
+  // characters than the full card's; fitted at 390 and 1280)
+  const COMPACT_CHAR_PX = 7.1;
   // A heading is a ribbon, further in at each level (both margins, and its
   // 28px paddings): "TÍTULO I" on a line, then the name (after the <br>) on
   // lines of roman capitals (Cinzel), the small first line ("TÍTULO I")
@@ -189,7 +192,7 @@
       bandWidth = bandCard.parentNode.clientWidth - parseFloat(c.paddingLeft) - parseFloat(c.paddingRight);
     }
     const charsPerLine = Math.max(10, textWidth / (CARD_EST_CHAR_PX * z));
-    const compactPerLine = Math.max(10, (textWidth + 8 * z) / (CARD_EST_CHAR_PX * z));
+    const compactPerLine = Math.max(10, (textWidth + 8 * z) / (COMPACT_CHAR_PX * z));
     // Each card restyled costs: only the estimate the mode uses, and only if it changed
     const setEst = (i, prop, set, v) => {
       if (set[i] !== v) ALL_CARDS[i].style.setProperty(prop, (set[i] = v) + 'px');

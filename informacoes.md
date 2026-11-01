@@ -21,7 +21,7 @@ Cada norma tem uma cor, a mesma em todo o site: na capa, no selo dos artigos, na
 
 ### Aviso
 
-É uma ferramenta experimental, feita por iniciativa pessoal, e não substitui o texto oficial. Na dúvida, confira no Diário Oficial ou na fonte oficial de cada norma (veja Fontes, logo abaixo).
+É uma ferramenta não oficial, feita por iniciativa pessoal, e não substitui o texto publicado no Diário Oficial. Na dúvida, confira lá ou na fonte oficial de cada norma (veja Fontes, logo abaixo).
 
 O texto segue a fonte oficial à risca, inclusive nos erros de digitação que ela tem. A busca, porém, encontra o dispositivo também pela palavra escrita do jeito certo. Até onde vai a atualização de cada norma está no fim desta aba, em "Texto atualizado até".
 

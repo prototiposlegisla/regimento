@@ -2,8 +2,7 @@
 <html lang="pt-BR"><head><meta charset="UTF-8">
 <!-- The link's preview (1200×630), in the page's own dress: the cover of a
      norma as a divider in a binder (paper, tabs in each norma's color with
-     the ribbons' guilloché, EB Garamond, small capitals), a guilloché
-     rosette on the sheet. _gerar.py puts --guilhoche from style.css on <html>. -->
+     the ribbons' guilloché, EB Garamond, small capitals). _gerar.py puts --guilhoche from style.css on <html>. -->
 <style>
 @font-face { font-family: "EB Garamond"; font-weight: 400 800; src: url(../fonts/eb-garamond-latin.woff2) format("woff2"); }
 @font-face { font-family: "EB Garamond"; font-style: italic; font-weight: 400 800; src: url(../fonts/eb-garamond-italic-latin.woff2) format("woff2"); }
@@ -13,7 +12,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { width: 1200px; height: 630px; overflow: hidden; position: relative;
   background: radial-gradient(ellipse 70% 80% at 50% 40%, #eef1f5, #d9dee7); }
-.folha { position: absolute; left: 84px; right: 84px; top: 98px; bottom: 76px;
+.folha { position: absolute; left: 84px; right: 84px; top: 98px; bottom: 44px;
   background:
     linear-gradient(#4a5f86 0 0) 0 0 / 100% 4px no-repeat,
     linear-gradient(color-mix(in srgb, #4a5f86 14%, #fffdf8) 0 0) 0 0 / 11px 100% no-repeat,
@@ -23,20 +22,16 @@ body { width: 1200px; height: 630px; overflow: hidden; position: relative;
 .abas span { width: 216px; height: 46px; border-radius: 11px 11px 0 0; text-align: center;
   background: var(--guilhoche), var(--c); background-blend-mode: soft-light, normal;
   font: 700 19px/46px "Cinzel", serif; letter-spacing: .18em; color: #fff; }
-.texto { position: absolute; left: 150px; top: 178px; width: 620px; }
-h1 { font: 500 86px/1 "EB Garamond", serif; letter-spacing: -.005em; color: #2b2f3e; white-space: nowrap; }
+.texto { position: absolute; left: 150px; top: 190px; width: 900px; }
+h1 { font: 500 96px/1 "EB Garamond", serif; letter-spacing: -.005em; color: #2b2f3e; white-space: nowrap; }
 .de { margin-top: 12px; font: italic 400 35px/1.25 "EB Garamond", serif; color: #4c4f57; }
-.fio { margin: 30px 0 26px; height: 1px; background: #ddd6c6; }
+.fio { width: 640px; margin: 32px 0 28px; height: 1px; background: #ddd6c6; }
 .sub { font: 400 22px/1.55 "Merriweather", serif; color: #3a3d45; }
 .nota { margin-top: 20px; font: 600 14px/1.4 "Merriweather Sans", sans-serif; letter-spacing: .18em; text-transform: uppercase; color: rgba(35,37,44,.55); }
-.roseta { position: absolute; left: 852px; top: 198px; width: 260px; height: 260px; }
-.aviso { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center;
-  font: italic 400 20px/1.3 "Merriweather Sans", sans-serif; color: #7a7468; }
 </style></head>
 <body>
 <div class="abas"><span style="--c:#4a5f86">RI</span><span style="--c:#5f7a3e">LOM</span><span style="--c:#2b6f74">CE</span><span style="--c:#9a6b2c">CF</span></div>
 <div class="folha"></div>
-<svg class="roseta" viewBox="-130 -130 260 260" fill="none"><text y="17" text-anchor="middle" fill="#4a5f86" style="font: 500 52px 'EB Garamond', serif">§</text></svg>
 <div class="texto">
   <h1>Regimento Interno</h1>
   <p class="de">da Câmara Municipal de São Paulo</p>
@@ -44,28 +39,4 @@ h1 { font: 500 86px/1 "EB Garamond", serif; letter-spacing: -.005em; color: #2b2
   <p class="sub">Ligado à Lei Orgânica do Município e às Constituições Estadual e Federal</p>
   <p class="nota">Índice remissivo · Consulta rápida · Busca</p>
 </div>
-<p class="aviso">Ferramenta não oficial</p>
-<script>
-// A guilloché rosette, as on a certificate: rings of closed curves
-// r(θ) = r0 + a·sin(kθ + φ), each ring a rope of n curves turned a little
-// further, in each norma's ink
-const NS = "http://www.w3.org/2000/svg", svg = document.querySelector(".roseta");
-function anel(r0, a, k, n, cor, w) {
-  for (let j = 0; j < n; j++) {
-    const fi = j * 2 * Math.PI / n, pts = [];
-    for (let i = 0; i <= 720; i++) {
-      const t = i * 2 * Math.PI / 720, r = r0 + a * Math.sin(k * t + fi);
-      pts.push((r * Math.cos(t)).toFixed(2) + "," + (r * Math.sin(t)).toFixed(2));
-    }
-    const p = document.createElementNS(NS, "polyline");
-    p.setAttribute("points", pts.join(" "));
-    p.setAttribute("stroke", cor); p.setAttribute("stroke-width", w);
-    svg.appendChild(p);
-  }
-}
-const tinta = "rgba(74,95,134,.6)";
-anel(102, 17, 15, 8, tinta, .8);
-anel(72, 14, 11, 7, "rgba(154,107,44,.65)", .8);
-anel(42, 10, 7, 6, tinta, .8);
-</script>
 </body></html>

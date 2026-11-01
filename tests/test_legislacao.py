@@ -36,7 +36,7 @@ def _doc():
 class TestLegislacaoCorrelata:
     def test_selo_e_caixa_no_dispositivo(self):
         html = HTMLRenderer().render(_doc())
-        assert ('<sup class="footnote-ref leg-ref" data-note="L2" data-label="Legislação correlata"></sup></p>'
+        assert ('<br class="rem-br"><sup class="footnote-ref leg-ref" data-note="L2" data-label="Legislação correlata"></sup></p>'
                 in html)
         assert 'data-note="L1" data-label="Legislação correlata (2)"' in html
         assert (f'<div class="footnote-box leg-box" data-note="L2">' in html

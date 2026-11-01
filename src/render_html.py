@@ -236,7 +236,8 @@ class HTMLRenderer:
             parts.append(f'    <span class="art-summary">{html.escape(art.summary)}</span>')
         parts.append(f'    <span class="law-badge">{PREC}</span>')
         cap = art.caput
-        parts.append(f"    <p>{self._render_unit_id(cap)}{self._footnote_refs(cap)}</p>{self._footnote_boxes(cap)}")
+        parts.append(f"    <p>{self._render_unit_id(cap)}{self._linha_de_remissoes(self._footnote_refs(cap))}</p>"
+                     f"{self._footnote_boxes(cap)}")
         # the item number ("6)", "6 -", "6.") pairs a struck wording with the new one
         items = []
         for child in art.children:
@@ -254,11 +255,17 @@ class HTMLRenderer:
             marks = self._rem_by_unit.get(id(child), ())
             body = (self._render_runs_with_marks(child.runs, 0, marks) if marks
                     else self._render_runs_from(child.runs, 0))
-            parts.append(f'    <p class="prec-para"{item}>{body}{self._footnote_refs(child)}</p>'
+            parts.append(f'    <p class="prec-para"{item}>{body}{self._linha_de_remissoes(self._footnote_refs(child))}</p>'
                          f'{self._footnote_boxes(child)}')
         parts.extend(self._render_backlinks(art))
         parts.append("  </div>")
         return "\n".join(parts)
+
+    @staticmethod
+    def _linha_de_remissoes(selos: str) -> str:
+        """Os selos do dispositivo (correlatos, legislação correlata) numa linha própria, abaixo do texto, como
+        as remissões de um código anotado: uma quebra antes deles (o CSS a esconde no modo compacto)."""
+        return f'<br class="rem-br">{selos}' if selos else ""
 
     def _footnote_refs(self, unit: DocumentUnit) -> str:
         """References to the unit's notes, inline: the legislação correlata badge, then the footnotes."""
@@ -347,9 +354,7 @@ class HTMLRenderer:
         inner = indent_html + self._render_unit_id(unit, path=path)
         inner += " — "
         inner += self._render_runs_after_identifier(unit, self._rem_by_unit.get(id(unit), ()))
-        inner += self._render_correlatos(unit)
-
-        inner += self._footnote_refs(unit)
+        inner += self._linha_de_remissoes(self._render_correlatos(unit) + self._footnote_refs(unit))
         return f"    <p{cls_style}>{inner}</p>{self._footnote_boxes(unit)}"
 
     def _render_unit_id(self, unit: DocumentUnit, path: str = "") -> str:
@@ -467,9 +472,10 @@ class HTMLRenderer:
             parts.append("</span>")
         return "".join(parts)
 
-    # Label of the implicit remissão's badge, seen from each side: (origin, target)
-    CHIP_PREFIX = {"eq": ("≈", "≈"), "det": ("detalha", "detalhado em"), "fund": ("↑", "↓"), "div": ("≠", "≠"),
-                   "sim": ("⇄", "⇄"), "exc": ("regra geral:", "exceção:")}
+    # Label of the implicit remissão's badge, seen from each side: (origin, target), in an
+    # annotator's words, not signs (provador das remissões, 01/11/2026)
+    CHIP_PREFIX = {"eq": ("idem", "idem"), "det": ("detalha", "detalhado em"), "fund": ("fund.", "aplic."),
+                   "div": ("dif.", "dif."), "sim": ("cf.", "cf."), "exc": ("regra geral:", "exceção:")}
 
     def _render_correlatos(self, unit: DocumentUnit) -> str:
         """Selos das remissões implícitas do dispositivo (rótulo e nota em atributos: fora da busca). Correlatos do

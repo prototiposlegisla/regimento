@@ -100,7 +100,7 @@
   // A copy of a paragraph for the preview, without the page's controls
   function remClone(p) {
     const c = p.cloneNode(true);
-    c.querySelectorAll('.footnote-ref, .footnote-box, .indent-path, .diff-toggle, .rem-backlinks, .rem-imp')
+    c.querySelectorAll('.footnote-ref, .footnote-box, .indent-path, .diff-toggle, .rem-backlinks, .rem-imp, .rem-br')
       .forEach(n => n.remove());
     c.querySelectorAll('.unit-id').forEach(u => {
       u.classList.replace('unit-id', 'rem-uid');

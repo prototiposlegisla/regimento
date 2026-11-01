@@ -12,6 +12,11 @@
   const IDX_BAND_PX = 12, IDX_SUM_PX = 18, IDX_OPEN_PX = 2;
   const IDX_ROW_PX = 7, IDX_HEAD_TOP_PX = 3, IDX_HEAD_LINE_PX = 16, IDX_SUB_LINE_PX = 26.4;
   const CARD_EST_CHAR_PX = 7.75;
+  // a provision's remissões (correlates, legislação correlata), on lines of
+  // their own under its text: a fixed part and their lines, at their own
+  // width per character (fitted 01/11/2026 against the layout at 1280 and
+  // 390 px: median error 5.9% and 4.4% per card, the total within 0.1%)
+  const CHIP_BLOCK_PX = 11, CHIP_LINE_PX = 18, CHIP_CHAR_K = 1.24;
   // what hides the struck paragraphs: a drawer's line, a revoked run's line(s)
   const OLD_DRAWER_PX = 23, REVOKED_BLOCK_PX = 4, REVOKED_LINE_PX = 26;
   function cardBlockCoef(el) {
@@ -27,14 +32,16 @@
     if (cl.contains('art-summary')) return [3, 21];      // the rubrica over the text
     return [0, 30];
   }
+  // [characters of the text, of its remissões' line]
   function blockTextLength(el) {
-    let n = el.textContent.length;
-    for (const r of el.querySelectorAll('[data-label]')) {   // chips drawn by ::before
-      n += r.dataset.label.length + 3;
+    let n = el.textContent.length, chips = 0;
+    for (const r of el.querySelectorAll('[data-label]')) {   // labels drawn by ::before
+      if (r.matches('.rem-imp, .leg-ref')) chips += r.dataset.label.length + 3;
+      else n += r.dataset.label.length + 3;
     }
-    return n;
+    return [n, chips];
   }
-  // Per card, [fixed px, px per line, characters] of each block: read once
+  // Per card, [fixed px, px per line, characters, remissões' characters] of each block: read once
   // (the text does not change), so a pinch zoom only redoes the arithmetic
   let cardEstBlocks = null;
   let cardEstBand = null;   // the index band at the foot (indexBandHeight)
@@ -157,7 +164,7 @@
         const blocks = [];
         for (const el of card.children) {
           const coef = cardBlockCoef(el);
-          if (coef) blocks.push([coef[0], coef[1], coef[1] ? blockTextLength(el) : 0]);
+          if (coef) blocks.push([coef[0], coef[1], ...(coef[1] ? blockTextLength(el) : [0, 0])]);
         }
         return blocks;
       });
@@ -216,7 +223,10 @@
         return;
       }
       let h = CARD_EST_BASE;
-      for (const [fixed, perLine, n] of cardEstBlocks[i]) h += fixed + perLine * Math.ceil(n / charsPerLine);
+      for (const [fixed, perLine, n, chips] of cardEstBlocks[i]) {
+        h += fixed + perLine * Math.ceil(n / charsPerLine);
+        if (chips) h += CHIP_BLOCK_PX + CHIP_LINE_PX * Math.ceil(chips * CHIP_CHAR_K / charsPerLine);
+      }
       if (cardEstBand[i]) h += indexBandHeight(cardEstBand[i], bandWidth);
       // contain-intrinsic-size is the content height: padding and border come on top
       setEst(i, '--card-h', cardEstSet, Math.round(Math.max(4, (h - 32) * z - 3)));

@@ -970,20 +970,11 @@ mark.weak {
   position: relative;
 }
 .footnote-box.open { display: block; }
-/* Legislação correlata (notas "L"): a reference shown as a badge; label via CSS */
-.footnote-ref.leg-ref {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0 7px;
-  border-radius: 10px;
-  font-size: .78em;
-  font-weight: 400;
-  line-height: 1.6;
-  vertical-align: 1px;
-  background: #fef5e7; color: #935116; border: 1px solid #f5cba7;
-}
+/* Legislação correlata (notas "L"): a reference on the line of the remissões,
+   drawn as they are (REMISSÕES, below); label via CSS */
+.footnote-ref.leg-ref { --c: #935116; }
 .footnote-ref.leg-ref::before { content: attr(data-label); }
-.leg-box { --c: #935116; background: #fff; }   /* the color of its badge */
+.leg-box { --c: #935116; background: #fff; }   /* the color of its reference */
 .leg-list { margin: 4px 0 0; padding-left: 1.2em; }
 .leg-list li + li { margin-top: 4px; }
 #cards-container.compact .leg-ref { display: none; }
@@ -2195,22 +2186,16 @@ button.q-label:hover { color: #2c6fa6; }
 
 /* ===== REMISSÕES ===== */
 /* explicit: the cited text itself opens a preview of the cited provision */
+/* (a fine dotted rule in the norma's color, firm under the mouse; chosen in
+   the fitting room of the remissões, 01/11/2026) */
 .rem-exp {
-  text-decoration: underline dotted var(--c);
-  text-decoration-thickness: 2px;
+  text-decoration: underline dotted 1px var(--c);
   text-underline-offset: 3px;
   cursor: pointer;
 }
+.rem-exp:hover { text-decoration: underline 1px var(--c); }
 .rem-exp a { color: inherit; text-decoration: inherit; }   /* the citation's original link */
 .rem-exp:focus-visible { outline: 2px solid var(--c); outline-offset: 1px; border-radius: 2px; }
-.rem-exp::after {
-  content: "\2197";            /* ↗, out of the text (not searchable) */
-  content: "\2197" / "";       /* and not read as part of the name */
-  font-size: .7em;
-  color: var(--c);
-  margin-left: 1px;
-  vertical-align: super;
-}
 /* "Citado em:" at the end of the card; labels via CSS, out of the searchable text */
 .rem-backlinks {
   margin-top: calc(6px * var(--zoom-scale));
@@ -2221,18 +2206,7 @@ button.q-label:hover { color: #2c6fa6; }
 /* ("Citado em" and "Precedentes regimentais" to the right, as the summary
    line of the índice remissivo below) */
 .rem-backlinks:not(.idx-backlinks) { text-align: right; }
-.rem-back {
-  display: inline-block;
-  margin: 2px 0 2px 4px;
-  padding: 0 7px;
-  border-radius: 10px;
-  line-height: 1.6;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  background: color-mix(in srgb, var(--c) 9%, #fff); color: color-mix(in srgb, var(--c) 88%, #000);
-  border: 1px solid color-mix(in srgb, var(--c) 28%, #fff);
-}
+/* (drawn as the correlates, below: letters, not badges) */
 .rem-back::before { content: attr(data-label); }
 #cards-container.compact .rem-backlinks { display: none; }
 /* "No índice remissivo:" — the subjects that cite the article; labels via CSS */
@@ -2317,25 +2291,28 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-list .idx-sub { margin: 7px 0 1px; font-weight: 600; font-size: .92em; color: #6e5a2b; }
 .idx-list .idx-vides { font-size: .9em; font-style: italic; color: #888; }
 .rem-foot .idx-count { color: #7f8c8d; }
-/* implicit: a badge at the end of the provision, on both sides; label via CSS */
-.rem-imp {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0 7px;
-  border-radius: 10px;
-  font-size: .78em;
-  line-height: 1.6;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  vertical-align: 1px;
-  background: color-mix(in srgb, var(--c) 9%, #fff); color: color-mix(in srgb, var(--c) 88%, #000);
-  border: 1px solid color-mix(in srgb, var(--c) 28%, #fff);
+/* implicit: on both sides, on a line of its own under the provision, as the
+   remissões of an annotated code (chosen in their fitting room, 01/11/2026):
+   small letters, no badge, a hand (☞) before the first and ";" between them;
+   the legislação correlata on the same line, and "Citado em" drawn alike.
+   The build puts a <br class="rem-br"> before each run of them; labels via CSS.
+   Their ink (--tinta): the norma's, asleep grey (FINISHING) */
+.rem-imp, .footnote-ref.leg-ref, .rem-back {
+  --tinta-on: color-mix(in srgb, var(--c) 86%, #000);
+  --tinta: var(--tinta-on);
+  display: inline-block; vertical-align: baseline;
+  margin: 0 .55em 0 0; padding: 0; border: 0;
+  font: 400 .78em/1.5 var(--font-ui); color: var(--tinta);
+  cursor: pointer; user-select: none; -webkit-user-select: none;
 }
+.rem-backlinks > .rem-back { font-size: 1em; margin: 0 0 0 .4em; }   /* (its line is small already) */
+.rem-br + :is(.rem-imp, .footnote-ref.leg-ref)::before { content: "\261E\2002" attr(data-label); }
+:is(.rem-imp, .footnote-ref.leg-ref, .rem-back):has(+ :is(.rem-imp, .footnote-ref.leg-ref, .rem-back))::after { content: ";"; }
+#cards-container.compact .rem-br { display: none; }
 .rem-imp::before { content: attr(data-label); }
 .rem-imp:focus-visible { outline: 2px solid var(--c); outline-offset: 1px; }
-.rem-imp.t-div  { font-weight: 600; }   /* the kind is in the label (≈ ↑ ≠ ⇄); a divergence, in bold too */
-.rem-imp[data-status="proposta"] { border-style: dashed; opacity: .85; }
+.rem-imp.t-div  { font-weight: 700; }   /* the kind is in the label (cf., idem, fund.…); a divergence, in bold too */
+.rem-imp[data-status="proposta"] { text-decoration: underline dashed 1px; text-underline-offset: 3px; opacity: .85; }
 /* The color of a remissão (--c): the norma it points to, as in the prefix of
    its data-ref ("LOM:42"; none, the Regimento), for the chip, the citation and
    "Citado em"; the box and the preview take their trigger's (app.js: data-nrm),
@@ -2347,10 +2324,7 @@ button.q-label:hover { color: #2c6fa6; }
 :is(.rem-imp, .rem-exp, .rem-back)[data-ref^="PREC:"], :is(.rem-box, #rem-pop)[data-nrm="PREC"] { --c: var(--n-prec); }
 .t-idx:is(.rem-box, #rem-pop) { --c: #8a7a52; }   /* an entry of the índice remissivo */
 /* the chip whose box is open */
-.rem-imp.rem-open {
-  background: var(--c); border-color: var(--c); color: #fff;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 25%, transparent);
-}
+.rem-imp.rem-open { background: color-mix(in srgb, var(--c) 15%, transparent); border-radius: 2px; }
 .rem-exp.rem-open { background: color-mix(in srgb, var(--c) 14%, transparent); border-radius: 3px; }
 #cards-container.compact .rem-imp { display: none; }
 
@@ -2456,18 +2430,16 @@ button.q-label:hover { color: #2c6fa6; }
 
 /* ===== FINISHING (chosen in the visual fitting room, 29/10/2026) ===== */
 /* Sleeping chips: grey while reading; the paragraph under the mouse gives
-   them their kind's color (on touch, the one tapped) */
+   them their norma's color (on touch, the one tapped) */
 .card :is(p, .art-para):not(:hover) > .rem-imp:not(.rem-open),
 .card :is(p, .art-para):not(:hover) > .footnote-ref.leg-ref,
 .card .rem-backlinks:not(:hover) > .rem-back:not(.rem-open) {
-  background: #f3f4f6; border-color: #e1e4e8; color: #8a919b;
+  --tinta: #8a919b;
 }
-.card .rem-imp, .card .footnote-ref.leg-ref, .card .rem-back {
-  transition: transform .14s ease, box-shadow .14s ease, background-color .25s, border-color .25s, color .25s;
-}
+.card .rem-imp, .card .footnote-ref.leg-ref, .card .rem-back { transition: background-color .25s, color .25s; }
 
 /* Movement: what opens unfolds, the index panel slides in with a spring,
-   chips rise under the mouse */
+   the index's chips rise under the mouse */
 @keyframes unfold { from { opacity: 0; transform: translateY(-8px) scaleY(.96); } }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes pop-in { from { opacity: 0; transform: translateY(4px) scale(.98); } }
@@ -2479,7 +2451,7 @@ button.q-label:hover { color: #2c6fa6; }
   #index-panel { transition: transform .42s cubic-bezier(.3,1.18,.4,1); }
   #index-overlay.open { animation: fade-in .3s ease; }
   .card .idx-back { transition: transform .14s ease, box-shadow .14s ease, background-color .2s, color .2s; }
-  .card .rem-imp:hover, .card .idx-back:hover {
+  .card .idx-back:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 9px -4px color-mix(in srgb, var(--c, #8a7a52) 75%, transparent);
   }
@@ -2496,21 +2468,22 @@ button.q-label:hover { color: #2c6fa6; }
 }
 
 /* The wording notes at the end of a provision ("(Redação dada…)",
-   "(Vide…)", "(Revogado…)") as small grey tags: metadata, not the norma's
-   text; the same in the current text, the old versions and the previews.
+   "(Vide…)", "(Revogado…)") in small grey italics, as a printed code has
+   them (chosen in the fitting room of the remissões, 01/11/2026): metadata,
+   not the norma's text; the same in the current text, the old versions and
+   the previews.
    A block of their own in the line, or the justified text would spread
    their words apart (and the old version's line-through stops at them). */
 .amendment-note {
   display: inline-block; max-width: 100%; text-align: left;
-  padding: 0 6px; border-radius: 4px; margin-left: 2px;
-  background: #f0f2f5; color: #5b6573; text-decoration: none; font-style: normal;
-  font: 500 .74em/1.9 var(--font-ui); letter-spacing: .01em; vertical-align: 1px;
+  margin-left: .35em; color: #6f7682; text-decoration: none;
+  font: italic 400 .8em/1.6 var(--font-text); vertical-align: 1px;
 }
 .amendment-note { hyphens: manual; -webkit-hyphens: manual; }
 .amendment-note.longa { display: inline; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .amendment-note a[href] { color: inherit; text-decoration: none; }
 .amendment-note .amendment-note { display: inline; padding: 0; margin: 0; background: none; font: inherit; vertical-align: baseline; }
-a.amendment-note:hover { color: #1f4f8a; background: #e3e8ef; }
+a.amendment-note:hover { color: #1f4f8a; }
 .amendment-note a[href]:hover { color: #1f4f8a; text-decoration: underline; }
 /* Links to the official texts, wherever the site shows a text (cards,
    previews, notes): the text's own ink, a thin underline and ↗; blue only

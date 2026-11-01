@@ -245,7 +245,7 @@ class TestImplicitas:
         renderer = HTMLRenderer(res)
         html = renderer.render(doc)
         assert ('class="rem rem-imp t-div" tabindex="0" role="button" data-ref="LOM:18,III" data-tipo="div"'
-                ' data-side="src" data-n="0" data-label="≠ LOM 18, III"') in html
+                ' data-side="src" data-n="0" data-label="dif. LOM 18, III"') in html
         assert 'data-ref="369" data-tipo="div" data-side="tgt" data-n="0"' in html
         # a nota vai uma vez só, para os dois selos
         assert renderer.notas == ["O RI diz 60 dias; a LOM diz 120."]

@@ -24,7 +24,7 @@
     if (cl.contains('revoked-block')) return [REVOKED_BLOCK_PX, REVOKED_LINE_PX];
     if (cl.contains('idx-backlinks')) return null;   // indexBandHeight
     if (cl.contains('rem-backlinks')) return [18, 0];
-    if (cl.contains('art-summary')) return [17, 0];      // the band at the top
+    if (cl.contains('art-summary')) return [3, 21];      // the rubrica over the text
     return [0, 30];
   }
   function blockTextLength(el) {

@@ -258,13 +258,15 @@
   // The remissivo and the referências unfiltered are thousands of entries:
   // built once (per category) and put back on each opening, not rebuilt
   const indexDomCache = new Map();
+  let refsWaiting = false;   // the Referências tab waits for its data (renderIndex)
 
   // In idle time once the panel is closed (setPanelOpen): a tab's list built
   // in it, out of sight, and kept, so its first opening only lays it out. Not
   // with the panel on the screen or a filter in it, nor once kept
   function warmIndexTab(name) {
     const key = name === 'subject' ? 'subject' : 'references:' + currentRefCategory;
-    if (!$indexPanel.classList.contains('shut') || $indexSearch.value.trim() || indexDomCache.has(key)) return;
+    if (!$indexPanel.classList.contains('shut') || $indexSearch.value.trim() || indexDomCache.has(key)
+      || !lateDataReady()) return;
     const was = currentIndexTab, wasWidth = $indexPanel.dataset.tab;
     currentIndexTab = name;
     renderIndex();
@@ -288,6 +290,17 @@
     if ($indexPanel.dataset.tab !== currentIndexTab) $indexPanel.dataset.tab = currentIndexTab;
     $indexContent.dataset.of = currentIndexTab;
     $indexContent.classList.remove('sys-two');
+    // Its data come after the script (00-inicio.js): until then "Carregando…"
+    // (style.css), and the list once they arrive
+    if (currentIndexTab === 'references' && !lateDataReady()) {
+      $indexContent.replaceChildren();
+      $indexPanel.classList.add('loading');
+      if (!refsWaiting) {
+        refsWaiting = true;
+        whenLateData(() => { if (currentIndexTab === 'references') renderIndex(); });
+      }
+      return;
+    }
     const cached = cacheKey && indexDomCache.get(cacheKey);
     if (cached) {
       // still in the panel (closed and reopened): left as they are; put back,

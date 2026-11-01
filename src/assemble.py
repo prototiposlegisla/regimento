@@ -49,8 +49,14 @@ def assemble(
     # The big data as JSON blocks the script reads when needed (pageData in
     # static/js): parsing JSON is much faster than parsing it as script literals.
     # "</" and "<!--" escaped, so nothing in the data ends its block early.
+    # Before the script only what it reads as it starts (the remissivo: the
+    # cards' index bands); the rest after it, so on a slow network the page
+    # answers before they arrive (−2 s on a slow 4G, 01/11/2026): the script
+    # waits for them where it needs them (lateDataReady in static/js)
     blocks = {
         "data-subject-index": subject_index,
+    }
+    late_blocks = {
         "data-referencias-index": referencias_index,
         "data-consulta-index": consulta_index,
         "data-correlato-notas": list(correlato_notas),
@@ -60,6 +66,7 @@ def assemble(
         return f'<script type="application/json" id="{block_id}">{text}</script>'
 
     data_html = "\n".join(json_block(block_id, data) for block_id, data in blocks.items())
+    late_data_html = "\n".join(json_block(block_id, data) for block_id, data in late_blocks.items())
 
     js = inject(js, "/*__INFO_HTML__*/\"\"", info_html)
 
@@ -67,6 +74,7 @@ def assemble(
     final = template.replace("{{CSS}}", css)
     final = final.replace("{{CARDS}}", cards_html)
     final = final.replace("{{DATA}}", data_html)
+    final = final.replace("{{LATE_DATA}}", late_data_html)
     final = final.replace("{{JS}}", js)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

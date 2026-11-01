@@ -4,16 +4,27 @@
   // ===== DATA (injected by build.py) =====
   const SYSTEMATIC_INDEX = /*__SYSTEMATIC_INDEX__*/[];
 
-  // The big ones come as JSON blocks before this script (<script
-  // type="application/json">), read when first needed: JSON parses much
-  // faster than a script's literals, and most of it is not needed to show
-  // the page
-  function pageData(id) {
+  // The big ones come as JSON blocks (<script type="application/json">),
+  // read when first needed: JSON parses much faster than a script's
+  // literals, and most of it is not needed to show the page. Only the
+  // remissivo comes before this script; the rest after it (assemble.py), so
+  // on a slow network the page answers before they arrive: until then they
+  // read as empty (and are read again later), and what needs them waits
+  // (whenLateData)
+  // (a block after the script is in the document, half read, while the
+  // page still loads: until the document is parsed it isn't touched)
+  const lateDataReady = () => document.readyState !== 'loading';
+  function whenLateData(fn) {
+    if (lateDataReady()) fn();
+    else document.addEventListener('DOMContentLoaded', () => fn(), { once: true });
+  }
+  function pageData(id, late = true) {
     let value;
-    return () => value || (value = JSON.parse(document.getElementById(id).textContent));
+    return () => value
+      || (late && !lateDataReady() ? [] : (value = JSON.parse(document.getElementById(id).textContent)));
   }
 
-  const SUBJECT_INDEX = pageData('data-subject-index')();   // the cards' index chips need it
+  const SUBJECT_INDEX = pageData('data-subject-index', false)();   // the cards' index chips need it
 
   const referenciasIndex = pageData('data-referencias-index');
 

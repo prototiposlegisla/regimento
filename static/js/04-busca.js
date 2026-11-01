@@ -469,7 +469,27 @@
       const indexKey = JSON.stringify([phrases, words]);
       // the query as typed (without quotes nor the "n " prefix), for the fichas' search terms
       const typed = normIndexText((includeFootnotes ? term.replace(/^\s*n\s+/i, '') : term).replace(/"/g, ' ')).trim();
-      if (!indexMatches || indexMatches.key !== indexKey) indexMatches = searchIndexes(phrases, words, regex, indexKey, typed);
+      if (!indexMatches || indexMatches.key !== indexKey) {
+        indexMatches = searchIndexes(phrases, words, regex, indexKey, typed);
+        // Searched while the referências and the consulta were still on their
+        // way (a slow network): their part comes in once they arrive, where
+        // the reader is (unless another search came meanwhile)
+        if (!lateDataReady()) {
+          const partial = indexMatches;
+          whenLateData(() => {
+            if (indexMatches !== partial) return;
+            if (!searchMatches.length) {   // (nothing to jump to: the counter and the nav redone)
+              indexMatches = null;
+              doSearch(currentSearch);
+              return;
+            }
+            indexMatches = searchIndexes(phrases, words, regex, indexKey, typed);
+            clearResultsList();
+            updateResultsVisibility();
+            updateSearchCounter();
+          });
+        }
+      }
     } else {
       indexMatches = null;
     }

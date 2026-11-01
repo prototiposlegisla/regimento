@@ -83,7 +83,10 @@
                      text: own + FIELD_SEP + normIndexText(sec.terms) + FIELD_SEP + terms });
       }
     }
-    return indexItems = { sys, subj, refs, quick };
+    // (kept only whole: before the referências and the consulta arrive, they're missing)
+    const items = { sys, subj, refs, quick };
+    if (lateDataReady()) indexItems = items;
+    return items;
   }
 
   // The indexes' entries with every phrase and word (as parseSearchTerms

@@ -43,6 +43,10 @@ def test_dados_grandes_vao_em_blocos_json_que_voltam_intactos(tmp_path):
     # nada nos dados fecha o bloco antes da hora: o script da página vem inteiro depois
     # (o do cabeçalho, recuado, é o que guarda um toque no ☰ antes dele)
     assert html.count("\n<script>\n") == 1
-    assert "pageData('data-subject-index')" in html
-    # os blocos vêm antes do script que os lê
-    assert html.index('id="data-correlato-notas"') < html.index("\n<script>\n")
+    assert "pageData('data-subject-index', false)" in html
+    # o remissivo (lido ao começar) vem antes do script; os lidos sob demanda depois,
+    # para a página responder antes de eles chegarem numa rede lenta
+    script = html.index("\n<script>\n")
+    assert html.index('id="data-subject-index"') < script
+    for late in ("data-referencias-index", "data-consulta-index", "data-correlato-notas"):
+        assert html.index(f'id="{late}"') > script

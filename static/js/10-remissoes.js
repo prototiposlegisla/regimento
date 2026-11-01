@@ -198,7 +198,9 @@
         pr.textContent = 'proposta, ainda não revisada';
         n.appendChild(pr);
       }
-      if (trigger.dataset.n) n.appendChild(document.createTextNode(correlatoNotas()[+trigger.dataset.n]));
+      // (the notes come after the script: a tap before they arrive shows none)
+      const nota = trigger.dataset.n && correlatoNotas()[+trigger.dataset.n];
+      if (nota) n.appendChild(document.createTextNode(nota));
       wrap.appendChild(n);
     }
     for (const g of groups) {

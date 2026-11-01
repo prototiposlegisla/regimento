@@ -658,6 +658,12 @@ body {
   color: rgba(35,37,44,.55);
 }
 .capa-nota::before { content: attr(data-nota); }
+/* A plain line above the first cover, outside the cards: the page is not
+   the official text (asked 01/11/2026) */
+#aviso {
+  margin: calc(4px * var(--zoom-scale)) 0 0; text-align: center; text-wrap: balance;
+  font: italic 400 calc(.78rem * var(--zoom-scale))/1.5 var(--font-ui); color: var(--sepia);
+}
 @media (max-width: 600px) {
   .card-titulo.nivel-norma { font-size: calc(1.95rem * var(--zoom-scale)); }
 }
@@ -2691,6 +2697,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
 
 <!-- CARDS -->
 <div id="cards-container">
+<p id="aviso">Ferramenta experimental. Confira o texto oficial no Diário Oficial.</p>
   <div class="card card-titulo nivel-norma" data-section="norma1" data-mono="RI" data-ato="Resolução nº 2, de 26 de abril de 1991">Regimento Interno<i class="capa-nota" aria-hidden="true" data-nota="411 artigos"></i></div>
 
   <div class="card card-titulo nivel-titulo" data-section="tit1">TÍTULO I<br>DA CÂMARA MUNICIPAL</div>
@@ -19232,7 +19239,7 @@ html[data-nrm="PREC"] body::after { content: "PR"; }
   // Notes of the correlates, each once; a badge carries its index (data-n)
   const correlatoNotas = pageData('data-correlato-notas');
 
-  const INFO_HTML = "<p class=\"info-versao\">Versão de 01/11/2026, 14:51 · b9b540f<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
+  const INFO_HTML = "<p class=\"info-versao\">Versão de 01/11/2026, 14:56 · f2153fa<\/p>\n<p>Aceito sugestões! Kauê Negrão<\/p>\n<p>Esse é um Regimento referenciado.<\/p>\n<h3>Texto atualizado até<\/h3>\n<p>A alteração mais recente incorporada em cada norma:<\/p>\n<p>Regimento Interno: Resolução nº 8/2026<br>Lei Orgânica: Emenda à Lei Orgânica nº 44/2025<br>Constituição Estadual (artigos selecionados): Emenda Constitucional nº 55/2024<br>Constituição Federal (artigos selecionados): Emenda Constitucional nº 141/2026<br>Precedentes regimentais: até o nº 1/2026<\/p>\n<h3>Busca<\/h3>\n<p><b>r43<\/b> vai ao art. 43 do Regimento; <b>l43<\/b>, ao da Lei Orgânica (também r183a, l229b, radt1, ladt15a).<\/p>\n<p>Com várias palavras, o artigo precisa ter todas; entre aspas, a frase exata (\"prazo de votação\"). Acentos não importam.<\/p>\n<p><b>n<\/b> e um espaço antes dos termos incluem as notas de rodapé: n vereador.<\/p>\n<p><b>Enter<\/b> vai ao próximo resultado e <b>Shift+Enter<\/b> ao anterior; <b>Ctrl+F<\/b> leva à busca; <b>Esc<\/b> fecha o índice ou a lista de resultados e, sem nada aberto, limpa a busca.<\/p>\n<h3>Marcadores<\/h3>\n<p>Clique no número de um dispositivo (Art. 5º, § 1º, II, a…) para marcá-lo; outro clique desmarca. Os botões que aparecem ao lado levam a cada marcado, buscam só nos artigos marcados e copiam o texto deles. Ficam guardados só neste navegador.<\/p>";
 
   // ===== MINIMAP / TOOLTIP COLORS =====
   // The level colors come from style.css (:root --nivel-*), so a new palette

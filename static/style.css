@@ -498,7 +498,9 @@ body {
    of its own: the breadcrumb already says where the reading is (chosen
    30/10/2026, after a halo in blue and trials in the norma's color) */
 
-.card.filtered-out { display: none; }
+/* (important: cards with a display of their own, like the norma's cover in
+   grid, come later in this file with the same weight) */
+.card.filtered-out { display: none !important; }
 
 /* Cards far from the screen are neither laid out nor painted: load and zoom
    stop redoing the layout of the whole ~500k px page. Until drawn once, an

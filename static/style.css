@@ -636,6 +636,12 @@ body {
   color: rgba(35,37,44,.55);
 }
 .capa-nota::before { content: attr(data-nota); }
+/* A plain line above the first cover, outside the cards: the page is not
+   the official text (asked 01/11/2026) */
+#aviso {
+  margin: calc(4px * var(--zoom-scale)) 0 0; text-align: center; text-wrap: balance;
+  font: italic 400 calc(.78rem * var(--zoom-scale))/1.5 var(--font-ui); color: var(--sepia);
+}
 @media (max-width: 600px) {
   .card-titulo.nivel-norma { font-size: calc(1.95rem * var(--zoom-scale)); }
 }

@@ -460,9 +460,10 @@
 
   if (HOVER) {
     $cards.addEventListener('mouseover', e => {
-      // (in a box, only the lines of an index entry's: they preview their dispositivo)
+      // (in a box too: a citation in its text, or a line of an index entry's,
+      // previews its dispositivo, and a click still opens the box inside the box)
       const t = e.target.closest('.rem-exp, .rem-imp, .rem-back, .idx-back, .rem-box .idx-line');
-      if (!t || (t.closest('.rem-box') && !t.classList.contains('idx-line'))) return;
+      if (!t) return;
       if (e.relatedTarget && t.contains(e.relatedTarget)) return;   // moving inside the trigger
       clearTimeout(remHideTimer); clearTimeout(remShowTimer);
       if (!t.classList.contains('rem-back') && remBoxOpen(t)) return;  // its box is already open

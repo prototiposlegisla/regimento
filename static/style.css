@@ -1716,6 +1716,10 @@ mark.weak {
   position: sticky; top: -8px; z-index: 4;
   margin: -4px -12px 8px; padding: 8px 12px; background: #fff; border-bottom: 1px solid #e3e6ea;
 }
+/* In the Referências tab, the white cards on ivory paper, one apart from the
+   other (02/11/2026) */
+#index-content:has(> .q-toc) { background: #efe8d8; }
+#index-content:has(> .q-toc) .q-toc { background: #efe8d8; border-bottom-color: var(--fio-claro); }
 .q-toc-link { flex: none; white-space: nowrap; }
 .q-toc-link.on { background: var(--rubrica); border-color: var(--rubrica); color: #fff; }
 .q-toc-link small { margin-left: 3px; font-weight: 500; opacity: .65; }

@@ -187,9 +187,10 @@
   // ===== COPY THE MARKED PROVISIONS =====
   // The text of the marked provisions, ready to paste in a working text: first the
   // citation ("conforme disposto nos arts. 6º, II e 13, II, c, do Regimento Interno:"), then,
-  // per article, in the page's order: the marked provisions whole; the ones above
-  // them (the article, the inciso of an alínea) by their identifier alone; "[...]"
-  // on a line of its own where provisions are left out. A marked provision with
+  // per article, in the page's order: the marked provisions whole; the chain above
+  // them (the caput, the § of an inciso, the inciso of an alínea) with its text, as
+  // in a citation's preview; "[...]" on a line of its own where provisions are left
+  // out. A marked provision with
   // nothing marked under it comes with all of its own (the caput alone: the whole
   // article), as when it's cited.
   const COPY_ICON = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">'
@@ -301,7 +302,7 @@
       if (gap && lines.length) lines.push('[...]');
       gap = false;
       const ident = ownText(u.p);
-      const text = whole.has(u) ? copyUnitText(u.p) : '';
+      const text = copyUnitText(u.p);
       lines.push(text ? ident + ' — ' + text : u.path ? ident + ' —' : ident);
     }
     return lines;

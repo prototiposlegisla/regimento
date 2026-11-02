@@ -227,6 +227,29 @@ def test_marcar_e_copiar(abrir):
     assert pg.evaluate("navigator.clipboard.readText()").startswith("conforme disposto no art. ")
 
 
+def test_copiar_marcados_na_ordem_hierarquica(abrir):
+    """CF, CE, LOM, RI e precedentes, de cima para baixo na hierarquia, qualquer que seja a
+    ordem da página."""
+    pg = abrir(permissions=["clipboard-read", "clipboard-write"])
+    uids = pg.evaluate("""() => ['RI', 'LOM', 'CE', 'CF', 'PREC'].map(law => document.querySelector(
+      law === 'RI' ? '.card-artigo:not([data-law]) .unit-id' : `.card-artigo[data-law="${law}"] .unit-id`
+    ).dataset.uid)""")
+    pg.evaluate("uids => localStorage.setItem('regimento-markers-v2', JSON.stringify("
+                "uids.map(uid => ({ uid, colorIdx: 0 }))))", uids)
+    pg.reload()
+    pg.wait_for_function("!window.earlyIndex")
+    pg.click("#marker-copy-btn")
+    pg.wait_for_function("document.getElementById('marker-copy-btn').classList.contains('copied')")
+    texto = pg.evaluate("navigator.clipboard.readText()")
+    nomes = ["Constituição Federal", "Constituição do Estado", "Lei Orgânica", "Regimento Interno",
+             "Precedente Regimental"]
+    frase = texto.splitlines()[0]
+    assert [frase.index(n) for n in nomes] == sorted(frase.index(n) for n in nomes), frase
+    normas = ["Constituição Federal", "Constituição do Estado de São Paulo",
+              "Lei Orgânica do Município", "Regimento Interno"]
+    assert [linha for linha in texto.splitlines() if linha in normas] == normas, texto
+
+
 def test_marcar_com_o_armazenamento_recusado(abrir):
     """Navegador que recusa gravar (cota, modo privado, política): marca só nesta visita."""
     pg = abrir(antes="Storage.prototype.setItem = function () {"

@@ -187,7 +187,8 @@
   // ===== COPY THE MARKED PROVISIONS =====
   // The text of the marked provisions, ready to paste in a working text: first the
   // citation ("conforme disposto nos arts. 6º, II e 13, II, c, do Regimento Interno:"), then,
-  // per article, in the page's order: the marked provisions whole; the chain above
+  // per article, the norms from the top of the hierarchy down (CF, CE, LOM, RI,
+  // precedents) and each one in the page's order: the marked provisions whole; the chain above
   // them (the caput, the § of an inciso, the inciso of an alínea) with its text, as
   // in a citation's preview; "[...]" on a line of its own where provisions are left
   // out. A marked provision with
@@ -202,6 +203,7 @@
     LOM: ['Lei Orgânica do Município', 'da'], CE: ['Constituição do Estado de São Paulo', 'da'],
     CF: ['Constituição Federal', 'da'],
   };
+  const COPY_ORDER = ['CF', 'CE', 'LOM', 'RI', 'ADT', 'PREC'];
   // "a", "a e b", "a, b e c"; "a e b, e c" when an item before the last has its own "e"
   const joinE = items => items.length < 2 ? items.join('')
     : items.slice(0, -1).join(', ') + (items.slice(0, -1).some(x => x.includes(' e ')) ? ', e ' : ' e ')
@@ -215,8 +217,12 @@
       const card = el && el.closest('.card-artigo');
       if (card && !cards.includes(card)) cards.push(card);
     }
-    cards.sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     const lawOf = card => card.dataset.law || (card.dataset.art.startsWith('ADT') ? 'ADT' : 'RI');
+    // the norms from the top of the hierarchy down (CF, CE, LOM, RI, its ADT, the
+    // precedents); within a norm, the page's order
+    const rank = card => COPY_ORDER.indexOf(lawOf(card));
+    cards.sort((a, b) => rank(a) - rank(b)
+      || (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
     // more than one norm: each one's name before its articles
     const named = new Set(cards.map(lawOf).filter(l => COPY_LAWS[l])).size > 1;
     const lines = [];

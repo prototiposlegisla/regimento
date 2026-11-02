@@ -159,6 +159,8 @@ def test_o_que_flutua_fica_fora_dos_filhos_do_body(abrir):
     pg.click("#btn-index")
     pg.click("#index-close")
     pg.locator("#search-input").fill("quórum")
+    # a busca filtra os cards: espera o filtro, e marca-se o 1º que sobrou (antes, uma corrida)
+    pg.wait_for_function(r"/\d+ \/ \d+/.test(document.getElementById('search-counter').textContent)")
     _marcar_o_primeiro(pg)
     pg.click("#marker-copy-btn")
     filhos = pg.evaluate("[...document.body.children].filter(e => e.tagName !== 'SCRIPT').map(e => e.id)")
@@ -210,7 +212,7 @@ def test_voltar_fecha_o_painel(abrir):
 
 
 def _marcar_o_primeiro(pg) -> str:
-    uid = pg.evaluate("document.querySelector('.card-artigo .unit-id').dataset.uid")
+    uid = pg.evaluate("document.querySelector('.card-artigo:not(.filtered-out) .unit-id').dataset.uid")
     alvo = pg.locator(f'.unit-id[data-uid="{uid}"]')
     alvo.scroll_into_view_if_needed()
     alvo.click()

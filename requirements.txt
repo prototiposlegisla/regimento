@@ -4,3 +4,4 @@ pyyaml>=6.0
 fonttools[woff]>=4.40
 rjsmin>=1.2
 rcssmin>=1.1
+# opcional: playwright (pytest -m e2e; static/img/_gerar.py e _texturas.py), depois "playwright install chromium"

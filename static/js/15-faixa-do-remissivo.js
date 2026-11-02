@@ -7,10 +7,19 @@
   // a trigger as the correlates' (.rem): hover previews the entry's
   // dispositivos, click opens them in a box in the band, and the box's foot
   // puts the subject in the search bar, starting at this article.
-  // Folded (the usual), a band is only its line: its table is built when the
-  // bands open (fillIndexBands), a quarter of the page's elements spared.
+  // Folded (the usual), a band is only its line, written in the page with its
+  // counts (render_html.py, the same reckoning as here): its table is built
+  // when the bands open (fillIndexBands), from the remissivo, which comes
+  // after the script (a slow network: the page answers ~0.6 s sooner); a
+  // quarter of the page's elements spared.
+  const indexBands = Array.from($cards.querySelectorAll('.idx-backlinks'));
+  let indexBandsFilled = false;
 
-  function renderIndexBacklinks() {
+  // Each band's table, once; false while the remissivo is on its way
+  function fillIndexBands() {
+    if (indexBandsFilled) return true;
+    if (!lateDataReady()) return false;
+    indexBandsFilled = true;
     const byArt = new Map();   // "LOM:42" → [{label, refs, entry, child}]
     const add = (label, own, refs, entry, child = null) => {
       const items = new Map();
@@ -23,48 +32,13 @@
         byArt.get(key).push(it);
       }
     };
-    for (const entry of SUBJECT_INDEX) {
+    for (const entry of subjectIndex()) {
       if (entry.refs) add(entry.subject, entry.refs, collectAllRefs(entry), entry);
       for (const ch of entry.children || []) {
         add(entry.subject + ' — ' + ch.sub_subject, ch.refs, subjectRefs(entry, ch.sub_subject), entry, ch);
       }
     }
     const collator = new Intl.Collator('pt-BR');   // (localeCompare builds one per call)
-    for (const card of ARTICLE_CARDS) {
-      const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
-      if (!items) continue;
-      items.sort((a, b) => collator.compare(a.label, b.label));
-      // by subject, in alphabetical order (easier to find one)
-      const groups = new Map();
-      for (const it of items) {
-        const head = it.child ? it.entry.subject : it.label;
-        if (!groups.has(head)) groups.set(head, { self: null, subs: [] });
-        if (it.child) groups.get(head).subs.push(it);
-        else groups.get(head).self = it;
-      }
-      const band = document.createElement('div');
-      band.className = 'rem-backlinks idx-backlinks';
-      band.setAttribute('aria-label', 'No índice remissivo');
-      const nEntries = items.length;
-      const sum = document.createElement('button');
-      sum.type = 'button';
-      sum.className = 'idx-sum';
-      sum.setAttribute('aria-expanded', String(idxOpen));
-      // only the counts; "No índice remissivo · " is put before them by CSS when open
-      sum.dataset.label = groups.size + (groups.size === 1 ? ' assunto · ' : ' assuntos · ')
-        + nEntries + (nEntries === 1 ? ' entrada' : ' entradas');
-      sum.setAttribute('aria-label', 'Índice remissivo · ' + sum.dataset.label);
-      band.appendChild(sum);
-      band.idxGroups = [...groups].sort((a, b) => collator.compare(a[0], b[0]));
-      indexBands.push(band);
-      card.appendChild(band);
-    }
-    if (idxOpen) fillIndexBands();
-  }
-  const indexBands = [];
-
-  // Each band's table, once: a row per subject, its sub-subjects beside it
-  function fillIndexBands() {
     const chip = (it, cls, show) => {
       const c = document.createElement('span');
       c.className = 'rem idx-back ' + cls;
@@ -76,9 +50,20 @@
       c.idxEntry = it;
       return c;
     };
+    // a row per subject, its sub-subjects beside it; all in alphabetical order
     for (const band of indexBands) {
-      if (!band.idxGroups) continue;
-      for (const [head, g] of band.idxGroups) {
+      const card = band.parentNode;
+      const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
+      if (!items) continue;
+      items.sort((a, b) => collator.compare(a.label, b.label));
+      const groups = new Map();
+      for (const it of items) {
+        const head = it.child ? it.entry.subject : it.label;
+        if (!groups.has(head)) groups.set(head, { self: null, subs: [] });
+        if (it.child) groups.get(head).subs.push(it);
+        else groups.get(head).self = it;
+      }
+      for (const [head, g] of [...groups].sort((a, b) => collator.compare(a[0], b[0]))) {
         const row = document.createElement('div');
         row.className = 'idx-row';
         if (g.self) row.appendChild(chip(g.self, 'idx-head'));
@@ -91,8 +76,8 @@
         for (const it of g.subs) row.appendChild(chip(it, 'idx-sub', it.child.sub_subject));
         band.appendChild(row);
       }
-      band.idxGroups = null;
     }
+    return true;
   }
 
   // The entry's box: its dispositivos with their dicas, as the index lists

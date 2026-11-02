@@ -1,41 +1,56 @@
   // ===== INIT =====
   try {
     const savedZoom = localStorage.getItem('regimento-zoom');
-    if (savedZoom) setZoom(parseFloat(savedZoom), true);
+    if (savedZoom) setZoom(parseFloat(savedZoom), 'load');
   } catch (e) {}
   try {
-    if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true);
+    if (localStorage.getItem('regimento-compact') === '1') setCompactMode(true, 'load');
   } catch (e) {}
   try {
     idxOpen = localStorage.getItem('regimento-indice-aberto') === '1';
     $cards.classList.toggle('idx-open', idxOpen);
   } catch (e) {}
-  renderIndexBacklinks();
-  // After everything that adds blocks to the cards (the saved zoom above
-  // already estimated without the backlinks)
-  cardEstBlocks = null;
-  estimateCardHeights();
-  loadMarkers();
-  applyMarkers();
-  renderMarkerNav();
-  updateSelection();
-  updateBreadcrumb();
-  initDiffToggles();
-  scheduleMinimap();
-  if (window.innerWidth > 768) $searchInput.focus();
-  // On a slow network the bar shows seconds before the script runs: what
-  // was typed meanwhile is searched now
-  if ($searchInput.value.trim()) $searchInput.dispatchEvent(new Event('input'));
-  // ...and ☰ tapped meanwhile (base.html) opens the index now
-  if (window.earlyIndex) {
-    $btnIndex.removeEventListener('click', window.earlyIndex);
-    $btnIndex.classList.remove('pending');
-    if (window.earlyIndex.asked) {
-      if (firstOpen) firstOpen.tap = window.earlyIndex.asked;
-      openIndex();
-    }
-    delete window.earlyIndex;
+  // The index bands kept open: their tables once the remissivo comes
+  if (idxOpen) {
+    for (const b of $cards.querySelectorAll('.idx-sum')) b.setAttribute('aria-expanded', 'true');
+    if (!fillIndexBands()) whenIndexBandsFilled();
   }
+  // Read before anything waits (below): a marker set meanwhile would save
+  // the list without the ones kept
+  loadMarkers();
+  if (window.innerWidth > 768) $searchInput.focus();
+
+  // The rest in turns, the browser free between them to draw and answer (a
+  // slow phone: its longest task 1.5 → 0.8 s). A tap on ☰ meanwhile is
+  // still the header's (base.html; the panel's own listener leaves it alone
+  // while window.earlyIndex is there): handed over at the end
+  const pause = () => window.scheduler && scheduler.yield ? scheduler.yield() : new Promise(r => setTimeout(r, 0));
+  (async () => {
+    // (the saved zoom and compact mode above leave it to here)
+    estimateCardHeights();
+    await pause();
+    applyMarkers();
+    renderMarkerNav();
+    await pause();
+    updateSelection();
+    updateBreadcrumb();
+    await pause();
+    initDiffToggles();
+    scheduleMinimap();
+    // On a slow network the bar shows seconds before the script runs: what
+    // was typed meanwhile is searched now
+    if ($searchInput.value.trim()) $searchInput.dispatchEvent(new Event('input'));
+    // ...and ☰ tapped meanwhile (base.html) opens the index now
+    if (window.earlyIndex) {
+      $btnIndex.removeEventListener('click', window.earlyIndex);
+      $btnIndex.classList.remove('pending');
+      if (window.earlyIndex.asked) {
+        if (firstOpen) firstOpen.tap = window.earlyIndex.asked;
+        openIndex();
+      }
+      delete window.earlyIndex;
+    }
+  })();
 
   // Warm what the first results list needs (law titles, fonts and styles of
   // its entries), so its first build is not a long task

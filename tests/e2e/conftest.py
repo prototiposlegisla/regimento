@@ -69,7 +69,7 @@ def abrir(navegador, site):
         pg = c.new_page()
         pg.on("pageerror", lambda e: erros.append(str(e)))
         pg.goto(site, wait_until="load", timeout=60_000)
-        pg.wait_for_selector(".idx-sum", state="attached", timeout=30_000)   # o init rodou
+        pg.wait_for_function("!window.earlyIndex", timeout=30_000)   # o início da página terminou
         return pg
 
     yield _abrir

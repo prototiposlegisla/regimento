@@ -419,7 +419,6 @@
     clearHighlights();
     const cards = getAllCards();
     const hiddenBefore = cards.filter(c => c.classList.contains('filtered-out'));
-    cards.forEach(c => c.classList.remove('filtered-out'));
 
     const opening = scopeOpening;
     const startCard = scopeStartCard;
@@ -437,9 +436,10 @@
 
     const text = query.kind === 'text';
     if (!text && !scope) {
+      for (const c of hiddenBefore) c.classList.remove('filtered-out');
       if (navTarget) goToArticle(navTarget);
       resetSearchNav();
-      if (query.kind !== 'nav' && hiddenBefore.some(c => !c.classList.contains('filtered-out'))) refreshScrollState();
+      if (query.kind !== 'nav' && hiddenBefore.length) refreshScrollState();
       return;
     }
 
@@ -494,15 +494,20 @@
       indexMatches = null;
     }
 
+    // Only the cards whose state changes get their class touched: each one
+    // touched is restyled (all of the page, at each new search)
+    const hide = new Set();
     if (searchFilter) {
       const matchedSet = new Set(matched);
       for (const card of cards) {
-        if (card.classList.contains('filtered-out')) continue;
-        if (card.classList.contains('card-titulo') || !matchedSet.has(card)) {
-          card.classList.add('filtered-out');
-        }
+        if (card.classList.contains('card-titulo') || !matchedSet.has(card)) hide.add(card);
       }
-      showContextHeadings();
+      showContextHeadings(hide);
+    }
+    const wasHidden = new Set(hiddenBefore);
+    for (const card of cards) {
+      const off = hide.has(card);
+      if (off !== wasHidden.has(card)) card.classList.toggle('filtered-out', off);
     }
 
     searchMatches = matched;

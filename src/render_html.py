@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import html
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from .parse_docx import note_tail_spans
 from .remissoes import EXIBIVEIS, law_of
@@ -48,8 +48,10 @@ class HTMLRenderer:
     """Gera HTML dos cards com a mesma estrutura do index.html original."""
 
     def __init__(self, remissoes: Optional["Resultado"] = None, busca: Optional[dict[tuple[str, str], str]] = None,
-                 cf_ce: Optional[set[tuple[str, str]]] = None):
+                 cf_ce: Optional[set[tuple[str, str]]] = None, subject_index: Sequence[dict] = ()):
         self.footnote_counter = 0
+        # A faixa do índice remissivo ao pé de cada artigo citado nele: só a linha com as contagens
+        self._faixas = contagens_do_remissivo(subject_index)
         # Pares CF × CE de texto igual (remissoes_cf_ce.toml): os dois correlatos do mesmo dispositivo viram um selo
         self._cf_ce = cf_ce or set()
         # Forma certa dos erros do texto oficial, que a busca lê junto com o texto do card (data-busca)
@@ -221,6 +223,9 @@ class HTMLRenderer:
         if precs:
             out.append(f'    <div class="rem-backlinks rem-precs" data-label="Precedentes regimentais:">'
                        f'{items(precs, lambda o: prec_label(o.art))}</div>')
+        faixa = self._faixas.get((art.law_prefix or "", art.art_number))
+        if faixa:
+            out.append(f'    {faixa}')
         return out
 
     def _render_precedent(self, art: ArticleBlock) -> str:
@@ -814,11 +819,39 @@ class HTMLRenderer:
         return f'    <p class="{base}{cls}"{attrs}{ident_attr}>{text}{note}</p>'
 
 
+def contagens_do_remissivo(subject_index: Sequence[dict]) -> dict[tuple[str, str], str]:
+    """A faixa do índice remissivo, fechada, de cada artigo citado nele, por (prefixo da norma, artigo): a linha
+    "N assuntos · M entradas" (o rótulo pelo CSS). As tabelas da faixa o script monta quando ela abre
+    (15-faixa-do-remissivo.js, fillIndexBands), com a mesma conta: uma entrada por assunto ou subassunto que cita
+    o artigo (uma vez, por mais dispositivos dele que cite), agrupadas pelo assunto."""
+    por_artigo: dict[tuple[str, str], tuple[set[str], list[int]]] = {}
+
+    def conta(assunto: str, refs) -> None:
+        for chave in {(r.get("law_prefix") or "", r["art"]) for r in refs}:
+            assuntos, entradas = por_artigo.setdefault(chave, (set(), [0]))
+            assuntos.add(assunto)
+            entradas[0] += 1
+
+    for entrada in subject_index:
+        conta(entrada["subject"], entrada.get("refs") or ())
+        for filho in entrada.get("children") or ():
+            conta(entrada["subject"], filho.get("refs") or ())
+    faixas = {}
+    for chave, (assuntos, (n,)) in por_artigo.items():
+        rotulo = (f"{len(assuntos)} {'assunto' if len(assuntos) == 1 else 'assuntos'} · "
+                  f"{n} {'entrada' if n == 1 else 'entradas'}")
+        faixas[chave] = ('<div class="rem-backlinks idx-backlinks" aria-label="No índice remissivo">'
+                         f'<button type="button" class="idx-sum" aria-expanded="false" data-label="{rotulo}"'
+                         f' aria-label="Índice remissivo · {rotulo}"></button></div>')
+    return faixas
+
+
 def render_cards(doc: ParsedDocument, remissoes: Optional["Resultado"] = None,
                  busca: Optional[dict[tuple[str, str], str]] = None,
-                 cf_ce: Optional[set[tuple[str, str]]] = None) -> tuple[str, list[str]]:
+                 cf_ce: Optional[set[tuple[str, str]]] = None,
+                 subject_index: Sequence[dict] = ()) -> tuple[str, list[str]]:
     """(HTML dos cards, notas dos correlatos que os selos citam por número); busca: as formas certas dos erros do
     texto oficial por (norma, artigo), para o atributo data-busca do card; cf_ce: os pares CF × CE de texto igual,
-    cujos correlatos saem num selo só."""
-    renderer = HTMLRenderer(remissoes, busca, cf_ce)
+    cujos correlatos saem num selo só; subject_index: o índice remissivo (to_list), para a faixa ao pé dos artigos."""
+    renderer = HTMLRenderer(remissoes, busca, cf_ce, subject_index)
     return renderer.render(doc), renderer.notas

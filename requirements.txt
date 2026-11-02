@@ -1,3 +1,6 @@
 openpyxl>=3.1.0
 pytest>=7.0
 pyyaml>=6.0
+fonttools[woff]>=4.40
+rjsmin>=1.2
+rcssmin>=1.1

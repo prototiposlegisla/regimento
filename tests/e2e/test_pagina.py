@@ -143,7 +143,7 @@ def test_outras_abas_so_se_preparam_depois_de_fechar_o_painel(abrir):
 def test_medir_mostra_a_primeira_abertura_na_aba_de_informacoes(abrir, site):
     pg = abrir()
     pg.goto(site + "?medir", wait_until="load")
-    pg.wait_for_selector(".idx-sum", state="attached")
+    pg.wait_for_function("!window.earlyIndex")
     pg.click("#btn-index")
     pg.wait_for_selector("#index-content .sys-tit")
     pg.wait_for_timeout(100)
@@ -287,6 +287,22 @@ def test_faixas_do_indice_so_quando_abertas(abrir):
     pg.reload(wait_until="load")
     pg.wait_for_selector(".idx-row", state="attached")
     assert pg.evaluate("document.getElementById('cards-container').classList.contains('idx-open')")
+
+
+def test_contagens_da_faixa_escritas_no_build_batem_com_a_tabela(abrir):
+    """A linha da faixa vem pronta no HTML (render_html.py); a tabela, o script monta com a mesma conta."""
+    pg = abrir()
+    soma = pg.locator(".card-artigo .idx-sum").first
+    soma.scroll_into_view_if_needed()
+    soma.click()
+    pg.wait_for_selector(".idx-row", state="attached")
+    erradas = pg.evaluate("""() => [...document.querySelectorAll('.idx-backlinks')].filter(b => {
+        const [assuntos, entradas] = b.querySelector('.idx-sum').dataset.label.match(/[0-9]+/g).map(Number);
+        return b.querySelectorAll(':scope > .idx-row').length !== assuntos
+          || b.querySelectorAll('.idx-back').length !== entradas;
+      }).map(b => b.parentNode.dataset.art + ' ' + b.querySelector('.idx-sum').dataset.label)""")
+    assert pg.locator(".idx-backlinks").count() > 500
+    assert erradas == []
 
 
 def test_metadados_de_compartilhamento(abrir, site):

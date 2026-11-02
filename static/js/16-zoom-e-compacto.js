@@ -2,17 +2,21 @@
   let initialPinchDist = null;
   let initialZoom = 1;
 
-  function setZoom(scale, now) {
+  function setZoom(scale, atLoad) {
     // a saved value gone bad, or a pinch with both fingers on one point,
     // would make every size NaN (the text 0 px, until the site's data is cleared)
     if (!Number.isFinite(scale) || scale <= 0) return;
-    preserveScroll(() => {
+    const apply = () => {
       zoomScale = Math.max(0.4, Math.min(2.5, scale));
       document.documentElement.style.setProperty('--zoom-scale', zoomScale);
-      if (now) estimateCardHeights();
-    });
-    // the estimates once the zoom settles (now: at load, before the first layout)
-    forgetCardHeights(!now);
+    };
+    // At load, the scale alone: the start estimates the heights once, after
+    // everything that adds to the cards (19-inicio-da-pagina.js)
+    if (atLoad) apply();
+    else {
+      preserveScroll(apply);
+      forgetCardHeights(true);   // the estimates once the zoom settles
+    }
 
     $zoomIndicator.textContent = Math.round(zoomScale * 100) + '%';
     $zoomIndicator.classList.add('show');
@@ -75,11 +79,12 @@
   const $btnCompact = document.getElementById('btn-compact');
   let compactMode = false;
 
-  function setCompactMode(on) {
+  function setCompactMode(on, atLoad) {
     cancelScrollCorrection();
     const card = selectedCard;
     compactMode = on;
-    estimateCardHeights();   // the mode's own estimates (style.css)
+    // the mode's own estimates (style.css); at load, the start makes them
+    if (!atLoad) estimateCardHeights();
     // The dozens of short articles drawn around the screen would all be laid
     // out whole at once: let the browser decide afresh which ones to draw
     const drawn = on ? [] : [...cardsShown];
@@ -129,7 +134,7 @@
     cancelScrollCorrection();
     const topBefore = anchor ? anchor.getBoundingClientRect().top : null;
     idxOpen = on;
-    if (on) fillIndexBands();
+    if (on && !fillIndexBands()) whenIndexBandsFilled();
     estimateCardHeights();
     $cards.classList.toggle('idx-open', on);
     for (const b of $cards.querySelectorAll('.idx-sum')) b.setAttribute('aria-expanded', String(on));
@@ -139,6 +144,19 @@
     if (searchMatches.length) updateSearchTicks();
     scheduleMinimap();
     try { localStorage.setItem('regimento-indice-aberto', on ? '1' : '0'); } catch (e) {}
+  }
+  // Open before the remissivo came (a slow network; or kept open, at load):
+  // the tables once it comes, the heights estimated again
+  let bandsWaiting = false;
+  function whenIndexBandsFilled() {
+    if (bandsWaiting) return;
+    bandsWaiting = true;
+    whenLateData(() => {
+      if (!idxOpen || !fillIndexBands()) return;
+      preserveScroll(estimateCardHeights);
+      forgetCardHeights();
+      scheduleMinimap();
+    });
   }
   $cards.addEventListener('click', e => {
     const b = e.target.closest('.idx-sum');

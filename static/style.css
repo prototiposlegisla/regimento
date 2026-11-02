@@ -48,11 +48,25 @@
   --tinta-amb: color-mix(in srgb, var(--amb) 78%, #000);
   --sombra-papel: 0 1px 2px rgba(40,30,10,.08), 0 10px 22px -14px rgba(20,30,45,.45);
 }
-html[data-nrm="LOM"]  { --amb: var(--n-lom);  --bg: var(--n-lom-bg); }
-html[data-nrm="CE"]   { --amb: var(--n-ce);   --bg: var(--n-ce-bg); }
-html[data-nrm="CF"]   { --amb: var(--n-cf);   --bg: var(--n-cf-bg); }
-html[data-nrm="PREC"] { --amb: var(--n-prec); --bg: var(--n-prec-bg); }
-.card { --nc: var(--n-ri); }
+/* Crossing into another norma changes these on the interface's boxes only
+   (by id), not on <html>: an inherited variable changed at the root has
+   the browser restyle all of the page (~3,400 elements, ~340 ms on a slow
+   phone), even where a card sets it again; here, ~70. The window's own
+   colors (body, its corners and initials) are set directly, below. Inside
+   the cards, the accent is the card's own norma (--nc) */
+html[data-nrm="LOM"] :is(#header, #breadcrumb-bar, #reading-line, #layers) {
+  --amb: var(--n-lom); --bg: var(--n-lom-bg); --selected-border: var(--n-lom); --tinta-amb: color-mix(in srgb, var(--n-lom) 78%, #000);
+}
+html[data-nrm="CE"] :is(#header, #breadcrumb-bar, #reading-line, #layers) {
+  --amb: var(--n-ce); --bg: var(--n-ce-bg); --selected-border: var(--n-ce); --tinta-amb: color-mix(in srgb, var(--n-ce) 78%, #000);
+}
+html[data-nrm="CF"] :is(#header, #breadcrumb-bar, #reading-line, #layers) {
+  --amb: var(--n-cf); --bg: var(--n-cf-bg); --selected-border: var(--n-cf); --tinta-amb: color-mix(in srgb, var(--n-cf) 78%, #000);
+}
+html[data-nrm="PREC"] :is(#header, #breadcrumb-bar, #reading-line, #layers) {
+  --amb: var(--n-prec); --bg: var(--n-prec-bg); --selected-border: var(--n-prec); --tinta-amb: color-mix(in srgb, var(--n-prec) 78%, #000);
+}
+.card { --nc: var(--n-ri); --amb: var(--nc); --selected-border: var(--nc); --tinta-amb: color-mix(in srgb, var(--nc) 78%, #000); }
 .card:is([data-law="LOM"], [data-nrm="LOM"])   { --nc: var(--n-lom); }
 .card:is([data-law="CE"], [data-nrm="CE"])     { --nc: var(--n-ce); }
 .card:is([data-law="CF"], [data-nrm="CF"])     { --nc: var(--n-cf); }
@@ -2611,6 +2625,17 @@ a.amendment-note:hover { color: #1f4f8a; }
    focus ring, the top buttons answer the mouse */
 ::selection { background: color-mix(in srgb, var(--amb) 26%, #fff); color: inherit; }
 html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--amb) 55%, #aab) transparent; }
+/* The page's own bar takes the norma's color only where there is a mouse
+   (a phone's bar ignores it): changed on <html>, it restyles every element
+   of the page (even with body setting it again); the boxes' bars take it
+   from their --amb */
+@media (hover: hover) and (pointer: fine) {
+  html[data-nrm="LOM"] { scrollbar-color: color-mix(in srgb, var(--n-lom) 55%, #aab) transparent; }
+  html[data-nrm="CE"] { scrollbar-color: color-mix(in srgb, var(--n-ce) 55%, #aab) transparent; }
+  html[data-nrm="CF"] { scrollbar-color: color-mix(in srgb, var(--n-cf) 55%, #aab) transparent; }
+  html[data-nrm="PREC"] { scrollbar-color: color-mix(in srgb, var(--n-prec) 55%, #aab) transparent; }
+}
+:is(#header, #breadcrumb-bar, #reading-line, #layers) { scrollbar-color: color-mix(in srgb, var(--amb) 55%, #aab) transparent; }
 :focus-visible { outline: 2px solid color-mix(in srgb, var(--selected-border) 70%, transparent); outline-offset: 2px; }
 :is(#btn-index, #btn-compact) { transition: background-color .12s; }
 #search-input::placeholder, #index-search::placeholder { font-family: var(--font-text); font-style: italic; font-size: 13.5px; color: #8a8478; }
@@ -2627,10 +2652,18 @@ body::after {
   font: 900 34vh/1 var(--font-text); letter-spacing: -.05em;
   color: color-mix(in srgb, var(--amb) 13%, transparent);
 }
-html[data-nrm="LOM"] body::after { content: "LOM"; }
-html[data-nrm="CE"] body::after { content: "CE"; }
-html[data-nrm="CF"] body::after { content: "CF"; }
-html[data-nrm="PREC"] body::after { content: "PR"; }
+html[data-nrm="LOM"] body { background-color: var(--n-lom-bg); }
+html[data-nrm="LOM"] body::before { background: radial-gradient(ellipse 75% 85% at 50% 42%, transparent 50%, color-mix(in srgb, var(--n-lom) 16%, transparent) 100%); }
+html[data-nrm="LOM"] body::after { content: "LOM"; color: color-mix(in srgb, var(--n-lom) 13%, transparent); }
+html[data-nrm="CE"] body { background-color: var(--n-ce-bg); }
+html[data-nrm="CE"] body::before { background: radial-gradient(ellipse 75% 85% at 50% 42%, transparent 50%, color-mix(in srgb, var(--n-ce) 16%, transparent) 100%); }
+html[data-nrm="CE"] body::after { content: "CE"; color: color-mix(in srgb, var(--n-ce) 13%, transparent); }
+html[data-nrm="CF"] body { background-color: var(--n-cf-bg); }
+html[data-nrm="CF"] body::before { background: radial-gradient(ellipse 75% 85% at 50% 42%, transparent 50%, color-mix(in srgb, var(--n-cf) 16%, transparent) 100%); }
+html[data-nrm="CF"] body::after { content: "CF"; color: color-mix(in srgb, var(--n-cf) 13%, transparent); }
+html[data-nrm="PREC"] body { background-color: var(--n-prec-bg); }
+html[data-nrm="PREC"] body::before { background: radial-gradient(ellipse 75% 85% at 50% 42%, transparent 50%, color-mix(in srgb, var(--n-prec) 16%, transparent) 100%); }
+html[data-nrm="PREC"] body::after { content: "PR"; color: color-mix(in srgb, var(--n-prec) 13%, transparent); }
 @media print { body::before, body::after { content: none; } }
 
 /* A far jump (app.js, farJump): a trail runs down the minimap from where

@@ -549,7 +549,7 @@ def _build_once(
         for par in tomllib.loads(arq_cf_ce.read_text(encoding="utf-8")).get("igual", []):
             norm = lambda r: (lambda law, art, path: (f"{law}:" if law != "RI" else "") + art + (f",{path}" if path else ""))(*_parse_ref(r))
             cf_ce.add((norm(par["cf"]), norm(par["ce"])))
-    cards_html, correlato_notas = render_cards(doc, remissoes, busca_erros, cf_ce)
+    cards_html, correlato_notas = render_cards(doc, remissoes, busca_erros, cf_ce, subject_list)
     print(f"      → {len(cards_html)} caracteres de HTML")
 
     # ── 8. Assemble ────────────────────────────────────────────────────

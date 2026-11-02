@@ -145,6 +145,7 @@
 
   setPanelOpen(false, true);
   $btnIndex.addEventListener('click', () => {
+    if (window.earlyIndex) return;   // the page still starting: the header's (19-inicio-da-pagina.js)
     if ($indexPanel.classList.contains('open')) closeIndex();
     else openIndex();
   });
@@ -258,7 +259,7 @@
   // The remissivo and the referências unfiltered are thousands of entries:
   // built once (per category) and put back on each opening, not rebuilt
   const indexDomCache = new Map();
-  let refsWaiting = false;   // the Referências tab waits for its data (renderIndex)
+  let tabWaiting = false;   // the Remissivo or Referências tab waits for its data (renderIndex)
 
   // In idle time once the panel is closed (setPanelOpen): a tab's list built
   // in it, out of sight, and kept, so its first opening only lays it out. Not
@@ -292,12 +293,13 @@
     $indexContent.classList.remove('sys-two');
     // Its data come after the script (00-inicio.js): until then "Carregando…"
     // (style.css), and the list once they arrive
-    if (currentIndexTab === 'references' && !lateDataReady()) {
+    const waits = tab => tab === 'subject' || tab === 'references';
+    if (waits(currentIndexTab) && !lateDataReady()) {
       $indexContent.replaceChildren();
       $indexPanel.classList.add('loading');
-      if (!refsWaiting) {
-        refsWaiting = true;
-        whenLateData(() => { if (currentIndexTab === 'references') renderIndex(); });
+      if (!tabWaiting) {
+        tabWaiting = true;
+        whenLateData(() => { if (waits(currentIndexTab) && $indexPanel.classList.contains('open')) renderIndex(); });
       }
       return;
     }
@@ -932,8 +934,9 @@
   let subjectsSorted = null;
   function sortedSubjects() {
     if (!subjectsSorted) {
+      if (!lateDataReady()) return [];   // (on its way: the tab and the search wait for it)
       const collator = new Intl.Collator('pt-BR');
-      subjectsSorted = SUBJECT_INDEX.slice().sort((a, b) => collator.compare(a.subject, b.subject));
+      subjectsSorted = subjectIndex().slice().sort((a, b) => collator.compare(a.subject, b.subject));
     }
     return subjectsSorted;
   }
@@ -1207,11 +1210,14 @@
     }
   }
 
-  function showContextHeadings() {
+  function showContextHeadings(hidden = null) {
     // For each visible article, show its ancestor heading cards for context.
     // Single pass in document order keeping the current heading of each level;
     // a heading resets the levels below it, so headings from other branches
-    // (e.g. a capítulo from a previous título) are never picked up.
+    // (e.g. a capítulo from a previous título) are never picked up. With
+    // `hidden`, the set of the cards to hide is changed instead of the cards.
+    const isHidden = hidden ? card => hidden.has(card) : card => card.classList.contains('filtered-out');
+    const show = hidden ? card => hidden.delete(card) : card => card.classList.remove('filtered-out');
     const hierarchy = ['norma', 'tit', 'cap', 'sec', 'subsec'];
     const current = [null, null, null, null, null];
     for (const card of getAllCards()) {
@@ -1220,9 +1226,9 @@
         if (idx < 0) continue;
         current[idx] = card;
         for (let i = idx + 1; i < hierarchy.length; i++) current[i] = null;
-      } else if (card.classList.contains('card-artigo') && !card.classList.contains('filtered-out')) {
+      } else if (card.classList.contains('card-artigo') && !isHidden(card)) {
         for (const heading of current) {
-          if (heading) heading.classList.remove('filtered-out');
+          if (heading) show(heading);
         }
       }
     }

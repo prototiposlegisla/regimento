@@ -20,10 +20,21 @@
     return stripAccents(s.toLowerCase()).replace(/\s+/g, ' ');
   }
 
+  // (by expressions, not a <template> each: ~1,100 entries at the first
+  // search; their HTML is the build's, simple tags and a few entities)
+  const HTML_ENTITY = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+  let entityBox = null;
+  function htmlEntity(m, e) {
+    if (e[0] === '#') return String.fromCodePoint(e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : +e.slice(1));
+    const known = HTML_ENTITY[e.toLowerCase()];
+    if (known) return known;
+    entityBox = entityBox || document.createElement('textarea');
+    entityBox.innerHTML = m;
+    return entityBox.value;
+  }
   function htmlToText(html) {
-    const t = document.createElement('template');
-    t.innerHTML = html;
-    return t.content.textContent.replace(/\s+/g, ' ').trim();
+    return html.replace(/<[^>]*>/g, '').replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, htmlEntity)
+      .replace(/\s+/g, ' ').trim();
   }
 
   // Fields matched together are joined by a character no term has: words
@@ -366,9 +377,9 @@
   // "ASSUNTO|subassunto"), and its articles
   let subjectsByKey = null;
   function findVide(vide, seen = new Set([vide])) {
-    if (!subjectsByKey) subjectsByKey = new Map(SUBJECT_INDEX.map(e => [normIndexText(e.subject), e]));
+    if (!subjectsByKey && lateDataReady()) subjectsByKey = new Map(subjectIndex().map(e => [normIndexText(e.subject), e]));
     const [subject, sub] = vide.split('|').map(s => s.trim());
-    const entry = subjectsByKey.get(normIndexText(subject));
+    const entry = subjectsByKey && subjectsByKey.get(normIndexText(subject));
     if (!entry) return { label: sub ? subject + ' — ' + sub : subject, refs: [] };
     if (!sub) return { label: entry.subject, refs: collectAllRefs(entry) };
     return { label: entry.subject + ' — ' + sub, refs: subjectRefs(entry, sub, seen) };

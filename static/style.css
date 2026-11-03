@@ -1831,13 +1831,20 @@ button.q-label:hover { color: #2c6fa6; }
   animation: detail-flash .4s ease-out;
   background-color: #fff3bf;
 }
-/* A paragraph's yellow reaches a little to the left of the text; the whole
-   article's card keeps its own padding and corners (or the number and the
-   rubrica, which reach out to the card's edge, are cut off) */
+/* A paragraph's yellow reaches a little to the left of the text, by a
+   shadow (a padding would take the place of the inciso's or alínea's
+   indentation, and a negative margin would pull the gutter's ancestry and
+   guides out of line with the paragraphs around it); the whole article's
+   card keeps its own padding and corners (or the number and the rubrica,
+   which reach out to the card's edge, are cut off) */
+@keyframes detail-flash-p {
+  from { background-color: #ffe066; box-shadow: calc(-4px * var(--zoom-scale)) 0 0 #ffe066; }
+  to   { background-color: #fff3bf; box-shadow: calc(-4px * var(--zoom-scale)) 0 0 #fff3bf; }
+}
 .detail-highlight:not(.card) {
+  animation-name: detail-flash-p;
   border-radius: 4px;
-  margin-left: calc(-4px * var(--zoom-scale));
-  padding-left: calc(4px * var(--zoom-scale));
+  box-shadow: calc(-4px * var(--zoom-scale)) 0 0 #fff3bf;
 }
 
 /* ===== ZOOM INDICATOR ===== */

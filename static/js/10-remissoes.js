@@ -8,7 +8,7 @@
   // the page's correlatoNotas: the badge is on both sides, the note only once). The preview is
   // built from the target's card in this same page, so it always shows the
   // wording in force. Hover (desktop) shows a floating preview; click/tap or
-  // Enter pins a box under the provision.
+  // Enter pins a box under the provision (a "Citado em", under its line).
   const HOVER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   // Official texts, for "fonte oficial" (anchors artN exist on these pages)
   const REM_SOURCES = {
@@ -302,12 +302,12 @@
     return true;
   }
   // An entry of the index opens its box inside the band at the card's foot;
-  // anything else, right under its provision
+  // a "Citado em", under its line; anything else, right under its provision
   function remBoxOpen(trigger) {
     const key = remKey(trigger);
     const band = trigger.closest('.idx-backlinks');
     if (band) return [...band.querySelectorAll(':scope > .rem-box')].find(b => b.dataset.for === key) || null;
-    const p = trigger.closest('p');
+    const p = trigger.closest('p') || trigger.closest('.rem-backlinks');
     for (let box = p && p.nextElementSibling; box && box.classList.contains('rem-box'); box = box.nextElementSibling) {
       if (box.dataset.for === key) return box;
     }
@@ -426,7 +426,6 @@
     if (e.target.closest('a[href]') && (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0)) return;
     e.preventDefault(); e.stopPropagation();
     hideRemPop();
-    if (t.classList.contains('rem-back')) { remGoTo(parseRemRef(t.dataset.ref), t); return; }
     toggleRemBox(t);
   }, true);
   $cards.addEventListener('keydown', e => {
@@ -435,8 +434,7 @@
     if (!t) return;
     e.preventDefault();
     hideRemPop();
-    if (t.classList.contains('rem-back')) remGoTo(parseRemRef(t.dataset.ref), t);
-    else toggleRemBox(t);
+    toggleRemBox(t);
   });
   // Esc closes the preview, or the box the focus is in, before clearing the search
   document.addEventListener('keydown', e => {
@@ -444,7 +442,7 @@
     const active = document.activeElement;
     let box = null;
     if (active && active.classList && (active.classList.contains('rem-exp') || active.classList.contains('rem-imp')
-        || active.classList.contains('idx-back'))) {
+        || active.classList.contains('rem-back') || active.classList.contains('idx-back'))) {
       box = remBoxOpen(active);
     }
     if (!box && active && active.closest) box = active.closest('.rem-box');
@@ -466,7 +464,7 @@
       if (!t) return;
       if (e.relatedTarget && t.contains(e.relatedTarget)) return;   // moving inside the trigger
       clearTimeout(remHideTimer); clearTimeout(remShowTimer);
-      if (!t.classList.contains('rem-back') && remBoxOpen(t)) return;  // its box is already open
+      if (remBoxOpen(t)) return;  // its box is already open
       remShowTimer = setTimeout(() => showRemPop(t), 250);
     });
     $cards.addEventListener('mouseout', e => {

@@ -74,7 +74,7 @@ Legislação correlata: na mesma linha ☞, "Legislação correlata" lista as le
 
 No índice remissivo: os assuntos do índice que citam o artigo. Fechada, a linha mostra só as contagens; um clique abre a tabela, com cada assunto e seus subassuntos. Esse clique abre (ou fecha) a tabela em todos os artigos de uma vez, e a escolha fica lembrada. Um clique num assunto abre a caixa da entrada: todos os dispositivos que ela cita, em todas as normas, cada um com uma dica curta do que diz sobre o assunto, e os deste artigo destacados. No pé da caixa, "Filtrar por esta entrada do índice" põe o assunto na barra de busca.
 
-Citado em: os dispositivos que citam este artigo, o caminho inverso das remissões.
+Citado em: os dispositivos que citam este artigo, o caminho inverso das remissões. Como nas citações do texto, passar o mouse mostra uma prévia, e um clique (ou toque) abre a caixa logo abaixo, com o dispositivo que cita e o botão "Ir para".
 
 Precedentes regimentais: os precedentes que aplicam ou interpretam o artigo.
 

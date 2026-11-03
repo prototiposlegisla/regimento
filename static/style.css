@@ -2057,7 +2057,8 @@ button.q-label:hover { color: #2c6fa6; }
   position: fixed;
   z-index: 160;
   flex-direction: column;
-  background: #fff;
+  /* ivory paper, each result a white card on it, as the Referências tab (03/11/2026) */
+  background: #efe8d8;
   font-size: 13px;
   contain: strict;
 }
@@ -2068,7 +2069,7 @@ button.q-label:hover { color: #2c6fa6; }
   align-items: center;
   gap: 2px 8px;
   padding: 10px 10px 10px 14px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--fio-claro);
   flex-shrink: 0;
 }
 #results-title { flex: 1; font-weight: 700; font-size: 14px; }
@@ -2099,7 +2100,6 @@ button.q-label:hover { color: #2c6fa6; }
 
 .res-law {
   margin: 10px 4px 6px;
-  padding: 3px 8px;
   background: var(--nc);
   color: #fff;
   border-radius: 4px;
@@ -2111,13 +2111,16 @@ button.q-label:hover { color: #2c6fa6; }
 .res-law:first-child { margin-top: 2px; }
 
 .res-group {
-  border-left: 3px solid transparent;
-  border-radius: 6px;
-  padding: 3px 4px 5px;
-  margin-bottom: 2px;
+  border: 1px solid var(--fio-claro);
+  border-radius: 3px;
+  padding: 3px 4px 4px;
+  margin-bottom: 5px;
+  background: #fff;
+  box-shadow: 0 1px 1px rgba(40,30,10,.05);
 }
 .res-group.current {
-  border-left-color: var(--selected-border);
+  border-color: var(--selected-border);
+  box-shadow: inset 2px 0 0 var(--selected-border);
   background: color-mix(in srgb, var(--selected-border) 8%, #fff);
 }
 
@@ -2155,7 +2158,6 @@ button.q-label:hover { color: #2c6fa6; }
 /* The indexes' results, above the cards' */
 .res-idx {
   margin: 10px 4px 6px;
-  padding: 3px 8px;
   background: #e3edf7;
   color: #1f4e79;
   border-radius: 4px;
@@ -2164,7 +2166,22 @@ button.q-label:hover { color: #2c6fa6; }
   text-transform: uppercase;
   letter-spacing: .3px;
 }
-.res-idx:first-child { margin-top: 2px; }
+.res-idx-sec:first-child > .res-idx { margin-top: 2px; }
+/* The headings of the laws and of the indexes fold what's under them */
+.res-fold {
+  display: block; width: 100%; padding: 3px 8px;
+  border: 0; border-radius: inherit; background: none; cursor: pointer;
+  font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; text-align: left;
+}
+/* (a drawn triangle: the list's font has no ▸) */
+.res-fold::before {
+  content: ""; display: inline-block; margin: 0 .6em 0 1px; vertical-align: .05em;
+  border-left: .45em solid currentColor; border-block: .3em solid transparent;
+  transition: transform .15s;
+}
+.res-fold[aria-expanded="true"]::before { transform: rotate(90deg); }
+.res-fold:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+.res-idx-sec.folded > :not(.res-idx), .res-group.res-folded { display: none; }
 .res-idx-group .res-head { font-weight: 600; }
 .res-ctx, .res-refs { font-weight: 400; color: #666; font-size: 12px; }
 /* A subject's articles, one per line; a long rubrica wraps under itself */
@@ -2217,9 +2234,8 @@ button.q-label:hover { color: #2c6fa6; }
 }
 #results-list .res-law-tag mark { color: #222; }
 @media (forced-colors: active) {
-  .res-group { border-left-color: Canvas; }
   .res-group.current {
-    border-left-color: Highlight;
+    border-color: Highlight;
     outline: 2px solid Highlight;
     outline-offset: -2px;
   }

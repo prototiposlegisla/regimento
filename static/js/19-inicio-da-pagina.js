@@ -58,7 +58,7 @@
     resultLawTitle(ALL_CARDS[0]);
     const warm = document.createElement('div');
     warm.style.cssText = 'position:absolute;left:-9999px;top:0;width:300px;visibility:hidden';
-    warm.innerHTML = '<div class="res-law">x</div><div class="res-group"><button class="res-head">'
+    warm.innerHTML = '<div class="res-law"><button class="res-fold" aria-expanded="true">x</button></div><div class="res-group"><button class="res-head">'
       + '<span class="res-law-tag">x</span>Art. 1<span class="res-sum"> — x</span></button>'
       + '<button class="res-entry"><span class="res-label">x</span> <span class="res-text">x <mark>x</mark>'
       + '</span></button><button class="res-expand">x</button></div>';

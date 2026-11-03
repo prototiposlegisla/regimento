@@ -88,7 +88,7 @@ O contador (3 / 40) mostra em qual resultado se está. Enter vai ao próximo, Sh
 
 O funil ao lado da barra liga e desliga o filtro: ligado, só ficam na tela os artigos com resultado; desligado, todos ficam, com os resultados marcados.
 
-Lista de resultados: no computador de tela larga, fica numa coluna ao lado; no celular, abre tocando no contador. Ela mostra cada dispositivo encontrado com o trecho em volta da palavra, agrupado por artigo. No topo da lista vêm os resultados dos índices: entradas da consulta rápida (um prazo, um quórum), seções do índice sistemático, assuntos do remissivo e leis da legislação correlata. Assim, "prazo vista" traz logo o prazo do pedido de vista, e "veto" traz o assunto VETO do remissivo.
+Lista de resultados: no computador de tela larga, fica numa coluna ao lado; no celular, abre tocando no contador. Ela mostra cada dispositivo encontrado com o trecho em volta da palavra, agrupado por artigo. No topo da lista vêm os resultados dos índices: entradas da consulta rápida (um prazo, um quórum), seções do índice sistemático, assuntos do remissivo e leis da legislação correlata. Assim, "prazo vista" traz logo o prazo do pedido de vista, e "veto" traz o assunto VETO do remissivo. Cada grupo da lista (cada índice e cada norma) abre e fecha tocando no seu título: vêm abertos o índice sistemático e as normas; os demais mostram só o nome e quantos resultados têm.
 
 No computador, a borda direita da tela mostra um traço por resultado, na altura em que ele está no documento. Passar o mouse num traço mostra onde ele fica; um clique leva até ele.
 

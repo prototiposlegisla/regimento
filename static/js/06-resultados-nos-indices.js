@@ -202,22 +202,45 @@
   }
 
   // The indexes' part of the list, in one element at its top (kept when the
-  // list is rebuilt for the same indexMatches: see buildResultsList)
+  // list is rebuilt for the same indexMatches: see buildResultsList). Each
+  // index folds under its title; only the systematic one comes open (or,
+  // with nothing else to show, the first)
   function appendIndexResults() {
     indexPart = document.createElement('div');
     indexPart.className = 'res-idx-part';
     indexPartFor = indexMatches;
-    for (const sec of indexMatches.sections) {
-      const head = document.createElement('div');
-      head.className = 'res-idx';
-      head.setAttribute('role', 'heading');
-      head.setAttribute('aria-level', '3');
-      head.textContent = sec.title + ' · ' + sec.hits.length;
-      indexPart.appendChild(head);
-      const more = appendWithMore(indexPart, sec.hits, sec.shown || INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');
+    const sections = indexMatches.sections;
+    const alone = !searchMatches.length && !sections.some(sec => sec.build === buildSysResult);
+    for (const sec of sections) {
+      const box = document.createElement('div');
+      box.className = 'res-idx-sec';
+      const open = sec.build === buildSysResult || (alone && sec === sections[0]);
+      box.appendChild(foldHead('res-idx', sec.title + ' · ' + sec.hits.length, open, open => box.classList.toggle('folded', !open)));
+      box.classList.toggle('folded', !open);
+      const more = appendWithMore(box, sec.hits, sec.shown || INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');
       if (more) more.setAttribute('aria-label', more.textContent + ' ' + sec.where);
+      indexPart.appendChild(box);
     }
     $resultsList.appendChild(indexPart);
+  }
+
+  // A heading of the list that folds what's under it: toggle(open) on a click
+  function foldHead(cls, text, open, toggle) {
+    const head = document.createElement('div');
+    head.className = cls;
+    head.setAttribute('role', 'heading');
+    head.setAttribute('aria-level', '3');
+    const button = document.createElement('button');
+    button.className = 'res-fold';
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    button.textContent = text;
+    button.addEventListener('click', () => {
+      const now = button.getAttribute('aria-expanded') !== 'true';
+      button.setAttribute('aria-expanded', now ? 'true' : 'false');
+      toggle(now);
+    });
+    head.appendChild(button);
+    return head;
   }
 
   // Appends build(item) of the first `shown` items to parent, the rest behind
@@ -245,7 +268,8 @@
         if (!next) {
           const last = added[added.length - 1];
           next = Array.from($resultsList.querySelectorAll('button')).find(b =>
-            b !== more && last.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+            b !== more && last.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
+            && b.getClientRects().length);
         }
       }
       more.remove();

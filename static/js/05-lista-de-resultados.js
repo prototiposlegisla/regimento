@@ -44,6 +44,10 @@
   const filledGroups = new WeakSet();
   let resultsAppended = 0;          // searchMatches with a group in the list so far
   let resultsLaw = null;            // law of the last appended group
+  let resultsLawHead = null;        // and its heading in the list
+  let resultsLawCounts = null;      // law title → its matches
+  let foldedLaws = new Set();       // titles of the laws folded in the list,
+  let foldedLawsFor = null;         // for this search
   let cardLawTitles = null;         // card → title of its law
   let currentResultGroup = null;
   let revealGroup = null;           // group kept in view until revealUntil
@@ -78,7 +82,9 @@
 
   function observeLastResultGroup() {
     resultsMoreObserver.disconnect();
-    const last = $resultsList.lastElementChild;
+    let last = $resultsList.lastElementChild;
+    // a folded law's groups are not laid out: its heading stands for them
+    if (last && last.classList.contains('res-folded')) last = resultsLawHead;
     if (last && resultsAppended < searchMatches.length) resultsMoreObserver.observe(last);
   }
 
@@ -212,7 +218,18 @@
     const scrollTop = $resultsList.scrollTop;
     clearResultsList(keepIndex);
     resultsBuiltFor = searchMatches;
-    resultsLaw = null;
+    resultsLaw = resultsLawHead = null;
+    // The laws come open; folded, they stay so while the list is rebuilt for
+    // the same search
+    if (foldedLawsFor !== currentSearch) {
+      foldedLaws = new Set();
+      foldedLawsFor = currentSearch;
+    }
+    resultsLawCounts = new Map();
+    for (const card of searchMatches) {
+      const title = resultLawTitle(card);
+      resultsLawCounts.set(title, (resultsLawCounts.get(title) || 0) + 1);
+    }
     if (!keepIndex) $resultsList.scrollTop = 0;
 
     let hits = 0;
@@ -272,22 +289,33 @@
       const lawTitle = resultLawTitle(card);
       if (lawTitle !== resultsLaw) {
         resultsLaw = lawTitle;
+        resultsLawHead = null;
         if (lawTitle) {
-          const sep = document.createElement('div');
-          sep.className = 'res-law';
+          const sep = foldHead('res-law', lawTitle + ' · ' + resultsLawCounts.get(lawTitle), !foldedLaws.has(lawTitle),
+            open => foldLaw(sep, lawTitle, !open));
           sep.dataset.nrm = card.dataset.law || 'RI';
-          sep.setAttribute('role', 'heading');
-          sep.setAttribute('aria-level', '3');
-          sep.textContent = lawTitle;
           frag.appendChild(sep);
+          resultsLawHead = sep;
         }
       }
       const group = buildResultGroup(card);
+      if (resultsLawHead && foldedLaws.has(lawTitle)) group.classList.add('res-folded');
       resultGroups.set(card, group);
       frag.appendChild(group);
       resultsFillObserver.observe(group);
     }
     $resultsList.appendChild(frag);
+  }
+
+  // Folds (or opens) the groups under a law's heading in the list
+  function foldLaw(head, title, fold) {
+    if (fold) foldedLaws.add(title);
+    else foldedLaws.delete(title);
+    for (let g = head.nextElementSibling; g && !g.classList.contains('res-law'); g = g.nextElementSibling) {
+      g.classList.toggle('res-folded', fold);
+    }
+    // the next law's groups come near: append them
+    observeLastResultGroup();
   }
 
   // Title of the law (norma heading) an article belongs to
@@ -589,6 +617,8 @@
       return;
     }
     revealPending = false;
+    // In a law the user folded: left there
+    if (group.classList.contains('res-folded')) return;
     // Groups above it that the observer fills later would push it out of view:
     // fill them now, and keep it in view for a while
     fillResultGroup(groupCards.get(group));

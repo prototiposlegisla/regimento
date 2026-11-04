@@ -2398,13 +2398,14 @@ button.q-label:hover { color: #2c6fa6; }
 .idx-head::before { content: attr(data-label); }
 .idx-row > .idx-head {
   float: left; width: 200px; margin: 3px 0 0 -214px; text-align: right; line-height: 1.4;
-  font-size: .78em; font-weight: 700; letter-spacing: .09em; color: #7e6f4b;
+  font-size: .78em; font-weight: 700; letter-spacing: .09em; color: #7e6f4b; overflow-wrap: anywhere;
 }
 @media (max-width: 600px) {
-  .idx-row { padding-left: 116px; }
-  .idx-row > .idx-head { width: 104px; margin-left: -116px; }
+  /* (the column grows with the zoom, as its letters do, up to what leaves the entries room) */
+  .idx-row { --idx-col: min(calc(104px * var(--zoom-scale)), 38vw); padding-left: calc(var(--idx-col) + 12px); }
+  .idx-row > .idx-head { width: var(--idx-col); margin-left: calc(-12px - var(--idx-col)); }
 }
-.idx-row > .idx-sub { margin: 2px 4px 2px 0; background: #efe8d6; border-color: transparent; color: #5f4f26; }
+.idx-row > .idx-sub { margin: 2px 4px 2px 0; background: #efe8d6; border-color: transparent; color: #5f4f26; text-wrap: pretty; overflow-wrap: anywhere; }
 .idx-row > .idx-sub:hover { background: #e6dcc2; }
 .idx-row > .idx-geral { font-style: italic; }
 .idx-backlinks > .rem-box { clear: both; }

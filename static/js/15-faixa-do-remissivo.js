@@ -16,6 +16,20 @@
   const indexBands = Array.from($cards.querySelectorAll('.idx-backlinks'));
   let indexBandsFilled = false;
 
+  // A word too long for the subject's narrow column on a phone (15+ letters)
+  // may break once, at the syllable nearest its middle
+  // (vowel | consonant + vowel); shorter ones go whole to the next line
+  function idxSoftHyphen(label) {
+    return label.replace(/[A-ZÀ-Ý]{15,}/g, w => {
+      let best = 0;
+      for (const m of w.matchAll(/[AEIOUÁÉÍÓÚÂÊÔÃÕÀ](?=[^AEIOUÁÉÍÓÚÂÊÔÃÕÀ][AEIOUÁÉÍÓÚÂÊÔÃÕÀ])/g)) {
+        const k = m.index + 1;
+        if (Math.abs(k - w.length / 2) < Math.abs(best - w.length / 2)) best = k;
+      }
+      return best ? w.slice(0, best) + '\u00ad' + w.slice(best) : w;
+    });
+  }
+
   // Each band's table, once; false while the remissivo is on its way
   function fillIndexBands() {
     if (indexBandsFilled) return true;
@@ -47,7 +61,7 @@
       c.setAttribute('role', 'button');
       c.setAttribute('aria-expanded', 'false');
       c.dataset.label = it.label;
-      c.dataset.show = show + ' (' + it.refs.length + ')';
+      c.dataset.show = show + ' (' + it.refs.length + ')';
       c.idxEntry = it;
       return c;
     };
@@ -69,7 +83,7 @@
         row.className = 'idx-row';
         const h = document.createElement('span');
         h.className = 'idx-head';
-        h.dataset.label = head;
+        h.dataset.label = idxSoftHyphen(head);
         row.appendChild(h);
         if (g.self) row.appendChild(chip(g.self, 'idx-sub idx-geral', 'Geral'));
         for (const it of g.subs) row.appendChild(chip(it, 'idx-sub', it.child.sub_subject));

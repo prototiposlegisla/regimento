@@ -2362,7 +2362,7 @@ button.q-label:hover { color: #2c6fa6; }
   -webkit-user-select: none;
   background: #f6f2e8; color: #6e5a2b; border: 1px solid #e8dfc8;
 }
-.idx-back::before { content: attr(data-label); }
+.idx-back::before { content: attr(data-show); }
 /* ...at the foot of the card, on a band of its own */
 .card > .idx-backlinks {
   margin: calc(12px * var(--zoom-scale)) calc(-16px * var(--zoom-scale)) calc(-16px * var(--zoom-scale));
@@ -2386,9 +2386,11 @@ button.q-label:hover { color: #2c6fa6; }
 #cards-container.idx-open .idx-sum { margin-bottom: 4px; }
 #cards-container.idx-open .idx-sum::before { content: "\25BE\00a0 No \00edndice remissivo \00b7  " attr(data-label); }
 #cards-container:not(.idx-open) .idx-backlinks > :not(.idx-sum) { display: none; }
-/* Open, a table as a book's index: each subject (an entry itself, or just
-   its name) in a column on the left, small and spaced, aligned to the
-   right; its sub-subjects beside it; a dotted rule between the subjects */
+/* Open, a table as a book's index: the left column names, small and spaced,
+   aligned to the right; the right one opens: only what's in it is a pill
+   with its count of dispositivos ("Geral", in italics, when the subject
+   itself cites the article, then its sub-subjects); a dotted rule between
+   the subjects */
 .idx-row {
   display: flow-root; margin: 0; padding: 3px 0 3px 214px; border-top: 1px dotted #ddd2b6;
 }
@@ -2398,29 +2400,19 @@ button.q-label:hover { color: #2c6fa6; }
   float: left; width: 200px; margin: 3px 0 0 -214px; text-align: right; line-height: 1.4;
   font-size: .78em; font-weight: 700; letter-spacing: .09em; color: #7e6f4b;
 }
-.idx-row > .idx-back.idx-head {
-  background: none; border: 0; border-radius: 3px; padding: 0;
-  text-decoration: underline dotted #b8a77a; text-underline-offset: 3px; line-height: 1.6;
-}
 @media (max-width: 600px) {
   .idx-row { padding-left: 116px; }
   .idx-row > .idx-head { width: 104px; margin-left: -116px; }
 }
-.idx-back.idx-sub::before { content: attr(data-show); }
 .idx-row > .idx-sub { margin: 2px 4px 2px 0; background: #efe8d6; border-color: transparent; color: #5f4f26; }
 .idx-row > .idx-sub:hover { background: #e6dcc2; }
+.idx-row > .idx-geral { font-style: italic; }
 .idx-backlinks > .rem-box { clear: both; }
-/* the entry whose box is open (white on its brown, the subject too), and
-   its box: the dispositivos with their dicas */
-.idx-row > .idx-sub.rem-open, .idx-row > .idx-sub.rem-open:hover,
-.idx-row > .idx-head.rem-open::before {
+/* the entry whose box is open (white on its brown), and its box: the
+   dispositivos with their dicas */
+.idx-row > .idx-sub.rem-open, .idx-row > .idx-sub.rem-open:hover {
   background: #8a7a52; border-color: #8a7a52; color: #fff;
   box-shadow: 0 0 0 3px color-mix(in srgb, #8a7a52 25%, transparent);
-}
-/* (the subject: only its words, not the whole column) */
-.idx-row > .idx-head.rem-open { text-decoration: none; }
-.idx-row > .idx-head.rem-open::before {
-  padding: 1px 5px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone;
 }
 .rem-head .rem-law.IDX.IDX { background: #efe7d2; color: #5f4f26; }
 .idx-backlinks > .rem-box, .idx-list { color: #2b2b2b; }

@@ -1,10 +1,11 @@
   // ===== NO ÍNDICE REMISSIVO =====
   // At the end of each article, the subjects of the remissivo that cite it (or
-  // one of its provisions), grouped: each subject (bold) with its sub-subjects
-  // beside it, the groups running one after the other (38% of the entries
-  // repeated the subject of another in the same card). Labels via CSS, out of
-  // the searchable text. All in alphabetical order. Each entry is
-  // a trigger as the correlates' (.rem): hover previews the entry's
+  // one of its provisions), grouped: each subject (bold) names its row, and
+  // only the entries beside it open: its sub-subjects, after "Geral" if the
+  // subject itself cites the article (38% of the entries repeated the subject
+  // of another in the same card). Each entry says how many dispositivos it
+  // has. Labels via CSS, out of the searchable text. All in alphabetical order.
+  // Each entry is a trigger as the correlates' (.rem): hover previews the entry's
   // dispositivos, click opens them in a box in the band, and the box's foot
   // puts the subject in the search bar, starting at this article.
   // Folded (the usual), a band is only its line, written in the page with its
@@ -46,11 +47,11 @@
       c.setAttribute('role', 'button');
       c.setAttribute('aria-expanded', 'false');
       c.dataset.label = it.label;
-      if (show) c.dataset.show = show;
+      c.dataset.show = show + ' (' + it.refs.length + ')';
       c.idxEntry = it;
       return c;
     };
-    // a row per subject, its sub-subjects beside it; all in alphabetical order
+    // a row per subject, its entries beside it; all in alphabetical order
     for (const band of indexBands) {
       const card = band.parentNode;
       const items = byArt.get((card.dataset.law || '') + ':' + card.dataset.art);
@@ -66,13 +67,11 @@
       for (const [head, g] of [...groups].sort((a, b) => collator.compare(a[0], b[0]))) {
         const row = document.createElement('div');
         row.className = 'idx-row';
-        if (g.self) row.appendChild(chip(g.self, 'idx-head'));
-        else {
-          const h = document.createElement('span');
-          h.className = 'idx-head';
-          h.dataset.label = head;
-          row.appendChild(h);
-        }
+        const h = document.createElement('span');
+        h.className = 'idx-head';
+        h.dataset.label = head;
+        row.appendChild(h);
+        if (g.self) row.appendChild(chip(g.self, 'idx-sub idx-geral', 'Geral'));
         for (const it of g.subs) row.appendChild(chip(it, 'idx-sub', it.child.sub_subject));
         band.appendChild(row);
       }

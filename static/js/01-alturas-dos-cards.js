@@ -75,7 +75,8 @@
   const idxWidths = new Map();
   const idxCanvas = document.createElement('canvas').getContext('2d');
   function idxMeasure() {
-    const row = $cards.querySelector('.idx-row'), sub = $cards.querySelector('.idx-row > .idx-sub');
+    // ("Geral" is in italics: not the font of the others)
+    const row = $cards.querySelector('.idx-row'), sub = $cards.querySelector('.idx-row > .idx-sub:not(.idx-geral)');
     if (!row || !sub) return null;
     const px = v => parseFloat(v) || 0;
     // the font and what the box adds to the text's width (the subject's

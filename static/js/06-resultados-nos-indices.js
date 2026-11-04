@@ -103,7 +103,7 @@
   // The indexes' entries with every phrase and word (as parseSearchTerms
   // returns them): {sections: [{title, hits, build}], count, regex, key}
   function searchIndexes(phrases, words, regex, key, typed) {
-    const has = text => phrases.every(p => text.includes(p)) && words.every(w => text.includes(w));
+    const has = text => phrases.every(p => hasPhrase(text, p)) && words.every(w => text.includes(w));
     const { sys, subj, refs, quick } = getIndexItems();
 
     // Those with more of the terms in their own text (or in their search terms,
@@ -131,11 +131,12 @@
       : new RegExp('(^|[^a-z0-9])(' + stem(w) + '[a-z]{0,3}|' + w + ')($|[^a-z0-9])'));
     const wordIn = (k, text) => stemRes[k] ? stemRes[k].test(text) : text.includes(words[k]);
     const isTema = it => it.sec.key === 'temas';
-    const byStem = text => phrases.every(p => text.includes(p)) && words.every((w, k) => wordIn(k, text));
+    const byStem = text => phrases.every(p => hasPhrase(text, p)) && words.every((w, k) => wordIn(k, text));
+    const termIn = (k, text) => k < phrases.length ? hasPhrase(text, terms[k]) : text.includes(terms[k]);
     // in a ficha's name a word counts only from a word's start ("lei" is not in "Eleição")
     // (and so does a word of up to 3 letters in any name: "PL" is not in "Plano Diretor")
     const inLabel = (it, k) => k >= phrases.length && (isTema(it) || words[k - phrases.length].length <= 3)
-      ? wordIn(k - phrases.length, it.label) : it.label.includes(terms[k]);
+      ? wordIn(k - phrases.length, it.label) : termIn(k, it.label);
     // a connective of the query needs not be in the name: "prazo do parecer" names "Prazos de parecer das Comissões"
     const CONNECTIVES = new Set(['a', 'o', 'e', 'as', 'os', 'ao', 'aos', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
       'para', 'por', 'pelo', 'pela', 'com', 'um', 'uma']);
@@ -150,7 +151,7 @@
     const termedBy = queryRe ? quick.filter(it => isTema(it) && queryRe.test(it.terms)).length : 0;
     const temaTermed = it => isTema(it) && queryRe && (terms.length > 1 || termedBy <= 2) && queryRe.test(it.terms) ? 1 : 0;
     const quickHits = quick.filter(it => has(it.text) || (isTema(it) && byStem(it.text)))
-      .map((it, i) => ({ it, i, score: terms.reduce((n, t, k) => n + (inLabel(it, k) ? 2 : it.own.includes(t) || it.terms.includes(t) ? 1 : 0), 0) + temaNamed(it) + temaTermed(it) }))
+      .map((it, i) => ({ it, i, score: terms.reduce((n, t, k) => n + (inLabel(it, k) ? 2 : termIn(k, it.own) || termIn(k, it.terms) ? 1 : 0), 0) + temaNamed(it) + temaTermed(it) }))
       .sort((a, b) => b.score - a.score || (b.score > terms.length ? a.it.label.length - b.it.label.length : 0) || a.i - b.i);
 
     const sysHits = sys.filter(it => has(it.text));

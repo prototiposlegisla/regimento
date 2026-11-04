@@ -282,7 +282,8 @@
     'para', 'por', 'pelo', 'pela', 'com', 'um', 'uma', 'que', 'se']);
   // (the letters and digits spelled out, the Latin ones and º ª: \p{L} with
   // the "u" flag made each search's expressions slower to build and to run)
-  const WORD_CHAR = '[0-9A-Za-z\\u00aa\\u00ba\\u00c0-\\u00d6\\u00d8-\\u00f6\\u00f8-\\u024f]';
+  const LETTER_OR_DIGIT = '0-9A-Za-z\\u00c0-\\u00d6\\u00d8-\\u00f6\\u00f8-\\u024f';
+  const WORD_CHAR = '[' + LETTER_OR_DIGIT + '\\u00aa\\u00ba]';
   const WHOLE_WORD = p => '(?<!' + WORD_CHAR + ')' + p + '(?!' + WORD_CHAR + ')';
   const wholeWordRes = new Map();
   function hasWord(text, w) {
@@ -292,11 +293,23 @@
     return re.test(text);
   }
 
+  // What's in quotes counts only as whole words: "residência" is not in
+  // presidência nor in residencial, "art. 4" is not in art. 43 (it is in art. 4º)
+  const WHOLE_PHRASE = p => '(?<!' + WORD_CHAR + ')' + p + '(?![' + LETTER_OR_DIGIT + '])';
+  const escapeRegex = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const phraseRes = new Map();
+  function hasPhrase(text, p) {
+    if (!text.includes(p)) return false;
+    let re = phraseRes.get(p);
+    if (!re) phraseRes.set(p, re = new RegExp(WHOLE_PHRASE(escapeRegex(p))));
+    return re.test(text);
+  }
+
   function buildHighlightRegex(phrases, words) {
-    const esc = t => accentInsensitivePattern(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const esc = t => accentInsensitivePattern(escapeRegex(t));
     // Phrases first (longer matches take priority in alternation)
     const allPatterns = [
-      ...phrases.map(p => esc(p).replace(/ +/g, '[\\s\\xa0]+')),
+      ...phrases.map(p => WHOLE_PHRASE(esc(p).replace(/ +/g, '[\\s\\xa0]+'))),
       ...words.map(t => SHORT_WORDS.has(t) ? WHOLE_WORD(esc(t)) : esc(t))
     ];
     const regex = new RegExp('(' + allPatterns.join('|') + ')', 'gi');
@@ -451,7 +464,7 @@
       matched = [];
       for (const card of articleCards) {
         const cardText = getCardText(card, includeFootnotes);
-        if (phrases.every(p => cardText.includes(p)) && words.every(t => hasWord(cardText, t))) {
+        if (phrases.every(p => hasPhrase(cardText, p)) && words.every(t => hasWord(cardText, t))) {
           matched.push(card);
           highlightText(card, regex, includeFootnotes);
           // Open footnote boxes that contain highlights

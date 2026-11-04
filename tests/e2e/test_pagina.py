@@ -47,6 +47,45 @@ def test_busca_sem_resultado_nao_quebra(abrir):
     assert not re.match(r"\d+ / ", contador(pg))
 
 
+def _lista(pg, termo) -> str:
+    """O texto da lista de resultados da busca por `termo`."""
+    pg.locator("#search-input").fill(termo)
+    pg.locator("#search-input").press("Enter")
+    pg.wait_for_timeout(700)
+    return pg.locator("#results-list").text_content()
+
+
+def test_entre_aspas_conta_so_a_palavra_inteira(abrir):
+    pg = abrir()
+    sem_aspas = _lista(pg, "residência")
+    assert "Art. 3 —" in sem_aspas      # só "presidência"
+    com_aspas = _lista(pg, '"residência"')
+    assert "Art. 126 —" in com_aspas and "Art. 67 —" in com_aspas
+    assert "Art. 3 —" not in com_aspas
+    assert "Art. 149 —" not in com_aspas     # LOM 149: só "residencial"
+    # o destaque acompanha: nenhuma marca em presidência
+    marcas = pg.evaluate("""() => { const s = new Set();
+      for (const h of CSS.highlights.values()) for (const r of h)
+        s.add(r.startContainer.data.slice(r.startOffset, r.endOffset).toLowerCase());
+      return [...s]; }""")
+    assert marcas == ["residência"]
+
+
+def test_entre_aspas_um_numero_nao_casa_com_outro(abrir):
+    pg = abrir()
+    lista = _lista(pg, '"art. 4"')
+    assert "Art. 4 —" in lista          # Art. 4°: o sinal depois do número não faz dele outro
+    assert "Art. 43 —" not in lista
+
+
+def test_entre_aspas_vale_tambem_nos_indices(abrir):
+    pg = abrir()
+    entradas = lambda lista: int(re.search(r"Índice remissivo · (\d+)", lista, re.I).group(1))
+    com_aspas = _lista(pg, '"residência"')
+    assert "Residência no Município" in com_aspas
+    assert entradas(com_aspas) < entradas(_lista(pg, "residência"))
+
+
 def test_esc_fecha_o_painel_antes_de_limpar_a_busca(abrir):
     pg = abrir()
     pg.locator("#search-input").fill("quórum")

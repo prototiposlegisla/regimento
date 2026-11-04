@@ -80,7 +80,7 @@ Precedentes regimentais: os precedentes que aplicam ou interpretam o artigo.
 
 ### Busca
 
-Digite na barra do topo. Com várias palavras, o artigo precisa ter todas; entre aspas, procura a frase exata ("prazo de votação"). Acentos e maiúsculas não importam. Palavras curtas como "de", "da" e "em" só contam como palavra inteira.
+Digite na barra do topo. Com várias palavras, o artigo precisa ter todas; entre aspas, procura a palavra inteira ou a frase exata ("residência" não acha presidência; "prazo de votação"). Acentos e maiúsculas não importam. Palavras curtas como "de", "da" e "em" só contam como palavra inteira.
 
 Atalhos: r43 vai direto ao art. 43 do Regimento; l43, ao da Lei Orgânica. Também valem r183a, l229b, radt1 e ladt15a, para artigos com letra e disposições transitórias. Começar com "n" e um espaço (n vereador) inclui as notas de rodapé na busca.
 

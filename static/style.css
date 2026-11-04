@@ -1136,6 +1136,69 @@ mark.weak {
 #marker-clear-all:hover { background: #9b2226; border-color: #9b2226; color: #fff; }
 #marker-clear-all.visible { display: flex; }
 
+/* A ribbon being dragged (08-marcadores.js): the others make room for it, and
+   the × stands for it alone (chosen in the fitting room of the markers,
+   04/11/2026) */
+.marker-btn.making-room { transition: transform .14s ease; }
+.marker-btn.lifted { position: relative; z-index: 1; filter: none; transition: none; cursor: grabbing; }
+.marker-btn.over-clear { opacity: .45; }
+#marker-nav.dragging #marker-filter-btn, #marker-nav.dragging #marker-copy-btn { opacity: .25; }
+#marker-nav.dragging #marker-clear-all {
+  position: relative;
+  color: #9b2226;
+  border-color: #9b2226;
+  transform: scale(1.3);
+  transform-origin: right center;
+  transition: transform .12s, background-color .12s;
+}
+#marker-nav.dragging #marker-clear-all::before {
+  content: "solte aqui para remover";
+  position: absolute;
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font: italic 9.5px/1 serif;
+  color: #9b2226;
+  background: var(--marfim);
+  border: 1px solid var(--fio-medio);
+  border-radius: 2px;
+  padding: 3px 5px;
+}
+#marker-nav.dragging #marker-clear-all.drop-here { background: #9b2226; color: #fff; }
+
+/* Taking back a removal: paper with a hairline, as the buttons under the ribbons */
+#marker-undo {
+  position: fixed;
+  z-index: 151;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+  padding: 7px 8px 7px 12px;
+  font-size: 13px;
+  color: #3d3a33;
+  background: var(--marfim);
+  border: 1px solid var(--fio-medio);
+  border-radius: 2px;
+  box-shadow: 0 4px 16px rgba(40,30,10,.28);
+}
+#marker-undo[hidden] { display: none; }
+#marker-undo button {
+  padding: 7px 10px;
+  font-weight: 700;
+  font-size: 12.5px;
+  line-height: 1;
+  color: #1b4f72;
+  background: #fff;
+  border: 1px solid var(--fio-medio);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
 /* ===== MARKER TOOLTIP ===== */
 #marker-tooltip {
   display: none;

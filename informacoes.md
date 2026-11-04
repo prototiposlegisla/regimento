@@ -121,6 +121,8 @@ Com algum dispositivo marcado, aparecem botões no canto da tela:
 - copiar, que copia o texto dos marcados pronto para colar num documento: primeiro a citação ("conforme disposto nos arts. 6º, II e 13, II, c, do Regimento Interno:"), depois o texto de cada dispositivo, com "[...]" onde há trechos omitidos;
 - ×, que remove todos.
 
+Para mudar a ordem dos botões, segure um deles até ele saltar e arraste (com o mouse, basta arrastar). Para remover só aquele, solte-o sobre o ×. Depois de remover um ou todos, inclusive pelo número no texto, um aviso ao pé da tela oferece "Desfazer" por alguns segundos, e o marcador volta ao mesmo lugar. A ordem dos botões não muda a do texto copiado, que segue a hierarquia das normas.
+
 ### Para se orientar
 
 Trilha: no topo da tela fica o caminho até o artigo que está sendo lido (título, capítulo, seção). Um clique (ou toque) abre o caminho inteiro, e cada nível leva ao início dele.

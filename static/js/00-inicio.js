@@ -120,6 +120,7 @@
   const $minimapTooltip = document.getElementById('minimap-tooltip');
   const $minimapHighlight = document.getElementById('minimap-highlight');
   const $markerTooltip = document.getElementById('marker-tooltip');
+  const $markerUndo = document.getElementById('marker-undo');
   const $footnoteTooltip = document.getElementById('footnote-tooltip');
 
   // Cards never get added or removed after load: query them once.

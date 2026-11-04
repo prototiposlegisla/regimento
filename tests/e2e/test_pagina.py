@@ -291,6 +291,192 @@ def test_copiar_marcados_na_ordem_hierarquica(abrir):
     assert [linha for linha in texto.splitlines() if linha in normas] == normas, texto
 
 
+def _marcados(pg) -> list[str]:
+    return pg.evaluate("JSON.parse(localStorage.getItem('regimento-markers-v2') || '[]').map(m => m.uid)")
+
+
+def _com_marcados(pg, n: int = 4) -> list[str]:
+    """O caput dos n primeiros artigos do RI marcado, cada um numa cor."""
+    uids = pg.evaluate("n => [...document.querySelectorAll('.card-artigo:not([data-law])')].slice(0, n)"
+                       ".map(c => c.querySelector('.unit-id').dataset.uid)", n)
+    pg.evaluate("uids => localStorage.setItem('regimento-markers-v2', JSON.stringify("
+                "uids.map((uid, colorIdx) => ({ uid, colorIdx }))))", uids)
+    pg.reload()
+    pg.wait_for_function("!window.earlyIndex")
+    assert pg.locator("#marker-nav .marker-btn").count() == n
+    return uids
+
+
+def _centro(pg, seletor: str) -> tuple[float, float]:
+    r = pg.locator(seletor).first.bounding_box()
+    return r["x"] + r["width"] / 2, r["y"] + r["height"] / 2
+
+
+def _fita(i: int) -> str:
+    return f"#marker-nav .marker-btn >> nth={i}"
+
+
+def _arrasta_com_o_mouse(pg, de: str, para: str) -> None:
+    x0, y0 = _centro(pg, de)
+    x1, y1 = _centro(pg, para)
+    pg.mouse.move(x0, y0)
+    pg.mouse.down()
+    pg.mouse.move(x1, y1, steps=10)
+    pg.mouse.up()
+
+
+class _Dedo:
+    """Toque de verdade (CDP): passa pelos gestos do Chrome, então o preventDefault e a rolagem contam."""
+
+    def __init__(self, pg):
+        self.pg = pg
+        self.cdp = pg.context.new_cdp_session(pg)
+
+    def _toque(self, tipo: str, pontos: list) -> None:
+        self.cdp.send("Input.dispatchTouchEvent", {"type": tipo, "touchPoints": [{"x": x, "y": y} for x, y in pontos]})
+
+    def baixa(self, x: float, y: float) -> None:
+        self._toque("touchStart", [(x, y)])
+
+    def move(self, x0: float, y0: float, x1: float, y1: float, passos: int = 12) -> None:
+        for i in range(1, passos + 1):
+            self._toque("touchMove", [(x0 + (x1 - x0) * i / passos, y0 + (y1 - y0) * i / passos)])
+            self.pg.wait_for_timeout(16)
+
+    def sobe(self) -> None:
+        self._toque("touchEnd", [])
+
+
+def _celular(abrir):
+    return abrir(largura=384, altura=780, has_touch=True, is_mobile=True)
+
+
+def test_arrastar_a_fita_com_o_mouse_muda_a_ordem_e_fica_salvo(abrir):
+    pg = abrir()
+    a, b, c, d = _com_marcados(pg)
+    _arrasta_com_o_mouse(pg, _fita(0), _fita(2))
+    fitas = "[...document.querySelectorAll('.marker-btn')].map(e => e.dataset.uid)"
+    assert _marcados(pg) == [b, c, a, d]
+    assert pg.evaluate(fitas) == [b, c, a, d]
+    pg.reload()
+    pg.wait_for_function("!window.earlyIndex")
+    assert pg.evaluate(fitas) == [b, c, a, d]
+
+
+def test_soltar_no_x_remove_so_aquela_e_desfazer_a_devolve_no_lugar(abrir):
+    pg = abrir()
+    a, b, c, d = _com_marcados(pg)
+    _arrasta_com_o_mouse(pg, _fita(1), "#marker-clear-all")
+    assert _marcados(pg) == [a, c, d]
+    assert "removido" in pg.inner_text("#marker-undo")
+    pg.click("#marker-undo button")
+    assert _marcados(pg) == [a, b, c, d]
+    assert pg.evaluate("JSON.parse(localStorage.getItem('regimento-markers-v2'))[1].colorIdx") == 1
+    assert not pg.locator("#marker-undo").is_visible()
+
+
+def test_apagar_todos_e_desmarcar_no_texto_tambem_se_desfazem(abrir):
+    pg = abrir()
+    uids = _com_marcados(pg)
+    pg.click("#marker-clear-all")
+    assert _marcados(pg) == []
+    assert "4 marcadores removidos" in pg.inner_text("#marker-undo")
+    pg.click("#marker-undo button")
+    assert _marcados(pg) == uids
+    alvo = pg.locator(f'.unit-id[data-uid="{uids[1]}"]')
+    alvo.scroll_into_view_if_needed()
+    alvo.click()
+    assert uids[1] not in _marcados(pg)
+    pg.click("#marker-undo button")
+    assert _marcados(pg) == uids
+
+
+def test_marcar_de_novo_tira_o_desfazer_para_nao_voltar_a_uma_lista_velha(abrir):
+    pg = abrir()
+    uids = _com_marcados(pg)
+    pg.click("#marker-clear-all")
+    assert pg.locator("#marker-undo").is_visible()
+    alvo = pg.locator(f'.unit-id[data-uid="{uids[0]}"]')
+    alvo.scroll_into_view_if_needed()
+    alvo.click()
+    assert not pg.locator("#marker-undo").is_visible()
+
+
+def test_desfazer_devolve_marcados_a_barra_de_busca(abrir):
+    pg = abrir()
+    _com_marcados(pg, 2)
+    pg.click("#marker-filter-btn")
+    assert pg.locator("#search-chip").is_visible()
+    pg.click("#marker-clear-all")
+    assert not pg.locator("#search-chip").is_visible()
+    pg.click("#marker-undo button")
+    assert pg.locator("#search-chip").is_visible()
+
+
+def test_com_o_dedo_segurar_e_arrastar_reordena_sem_rolar(abrir):
+    pg = _celular(abrir)
+    a, b, c, d = _com_marcados(pg)
+    dedo = _Dedo(pg)
+    pg.evaluate("scrollTo(0, 3000)")
+    pg.wait_for_timeout(300)
+    rolagem = pg.evaluate("scrollY")
+    x, y = _centro(pg, _fita(0))
+    _, y2 = _centro(pg, _fita(2))
+    dedo.baixa(x, y)
+    pg.wait_for_timeout(500)
+    assert pg.locator(_fita(0)).evaluate("e => e.classList.contains('lifted')")
+    dedo.move(x, y, x, y2)
+    dedo.sobe()
+    pg.wait_for_timeout(200)
+    assert _marcados(pg) == [b, c, a, d]
+    assert pg.evaluate("scrollY") == rolagem
+
+
+def test_com_o_dedo_segurar_e_soltar_parado_nao_muda_nada(abrir):
+    pg = _celular(abrir)
+    uids = _com_marcados(pg)
+    dedo = _Dedo(pg)
+    x, y = _centro(pg, _fita(0))
+    dedo.baixa(x, y)
+    pg.wait_for_timeout(700)
+    assert pg.locator("#marker-tooltip").is_visible()
+    dedo.sobe()
+    pg.wait_for_timeout(300)
+    assert _marcados(pg) == uids
+    assert not pg.locator("#marker-tooltip").is_visible()
+
+
+def test_com_o_dedo_sem_segurar_a_fita_rola_a_pagina(abrir):
+    pg = _celular(abrir)
+    uids = _com_marcados(pg)
+    dedo = _Dedo(pg)
+    pg.evaluate("scrollTo(0, 3000)")
+    pg.wait_for_timeout(300)
+    rolagem = pg.evaluate("scrollY")
+    x, y = _centro(pg, _fita(1))
+    dedo.baixa(x, y)
+    dedo.move(x, y, x, y - 250)
+    dedo.sobe()
+    pg.wait_for_timeout(800)
+    assert pg.evaluate("scrollY") != rolagem
+    assert _marcados(pg) == uids
+
+
+def test_com_o_dedo_o_toque_curto_ainda_leva_ao_dispositivo(abrir):
+    pg = _celular(abrir)
+    _com_marcados(pg)
+    dedo = _Dedo(pg)
+    pg.evaluate("scrollTo(0, 30000)")
+    pg.wait_for_timeout(300)
+    rolagem = pg.evaluate("scrollY")
+    x, y = _centro(pg, _fita(0))
+    dedo.baixa(x, y)
+    pg.wait_for_timeout(40)
+    dedo.sobe()
+    pg.wait_for_timeout(800)
+    assert pg.evaluate("scrollY") < rolagem
+
+
 def test_marcar_com_o_armazenamento_recusado(abrir):
     """Navegador que recusa gravar (cota, modo privado, política): marca só nesta visita."""
     pg = abrir(antes="Storage.prototype.setItem = function () {"

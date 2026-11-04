@@ -31,12 +31,16 @@
   }
 
   function toggleMarker(uid) {
-    const existing = findMarker(uid);
-    if (existing) {
-      markersList = markersList.filter(m => m.uid !== uid);
-    } else {
-      markersList.push({ uid, colorIdx: getNextColorIdx() });
+    if (findMarker(uid)) {
+      removeMarkers([uid]);
+      return;
     }
+    hideMarkerUndo();
+    markersList.push({ uid, colorIdx: getNextColorIdx() });
+    commitMarkers();
+  }
+
+  function commitMarkers() {
     saveMarkers();
     applyMarkers();
     // In the bar, the marked articles follow (the last one unmarked, it goes)
@@ -48,15 +52,44 @@
     renderMarkerNav();
   }
 
+  // Removed, with a few seconds to take it back: in the same place (the order
+  // is the user's now, and marking it again would put it last), the same color
+  function removeMarkers(uids) {
+    const before = markersList;
+    const inBar = scope !== null && scope.kind === 'markers';
+    const ribbon = $markerNav.querySelector(`.marker-btn[data-uid="${uids[0]}"]`);
+    const text = uids.length > 1 ? uids.length + ' marcadores removidos'
+      : 'Marcador ' + (ribbon ? ribbon.textContent : uids[0]) + ' removido';
+    markersList = before.filter(m => !uids.includes(m.uid));
+    commitMarkers();
+    $markerUndo.firstElementChild.textContent = text;
+    $markerUndo.hidden = false;
+    clearTimeout(markerUndoTimer);
+    markerUndoTimer = setTimeout(hideMarkerUndo, 6000);
+    markerUndo = () => {
+      markersList = before;
+      if (inBar && !scope) showChip({ kind: 'markers', label: 'Marcados' });
+      commitMarkers();
+    };
+  }
+
+  // (kept only while nothing else changed the list: it would bring back an old one)
+  function hideMarkerUndo() {
+    clearTimeout(markerUndoTimer);
+    markerUndo = null;
+    $markerUndo.hidden = true;
+  }
+
+  let markerUndo = null;
+  let markerUndoTimer = null;
+  $markerUndo.lastElementChild.addEventListener('click', () => {
+    const undo = markerUndo;
+    hideMarkerUndo();
+    if (undo) undo();
+  });
+
   function clearAllMarkers() {
-    markersList = [];
-    saveMarkers();
-    applyMarkers();
-    if (scope && scope.kind === 'markers') {
-      closeScope();
-      preserveScroll(() => doSearch(currentSearch));
-    }
-    renderMarkerNav();
+    removeMarkers(markersList.map(m => m.uid));
   }
 
   // The funnel of the markers: the marked articles in the search bar, or out of it
@@ -95,6 +128,8 @@
 
   function renderMarkerNav() {
     hideMarkerTooltip();
+    if (markerDrag) { clearTimeout(markerDrag.timer); markerDrag = null; }
+    $markerNav.classList.remove('dragging');
     $markerNav.innerHTML = '';
 
     for (const marker of markersList) {
@@ -127,6 +162,7 @@
 
       const btn = document.createElement('button');
       btn.className = 'marker-btn';
+      btn.dataset.uid = marker.uid;
       btn.style.background = palette.bg;
       btn.style.color = palette.text;
       btn.textContent = label;
@@ -144,7 +180,10 @@
       });
       // Tooltip listeners
       ((uid, pal) => {
-        btn.addEventListener('mouseenter', () => showMarkerTooltip(btn, uid, pal));
+        // (after a touch the browser still sends a made-up mouse, that would open it and leave it open)
+        btn.addEventListener('mouseenter', () => {
+          if (!markerDrag && Date.now() - markerTouchAt > 800) showMarkerTooltip(btn, uid, pal);
+        });
         btn.addEventListener('mouseleave', () => hideMarkerTooltip());
         // passive: a touch never waits for the script to start scrolling
         btn.addEventListener('touchstart', () => {
@@ -183,6 +222,143 @@
       $markerNav.appendChild(clearBtn);
     }
   }
+
+  // ===== DRAGGING A RIBBON =====
+  // Held for a moment, a ribbon lifts and goes where it's dragged, the others
+  // making room; let go on the × (which stands for it during the drag), it's
+  // removed. A short touch still goes to the provision, and a finger that moves
+  // at once still scrolls the page. With a mouse, dragging is enough.
+  // Touch events, not pointer ones: only a touchmove can hold back the scroll
+  // after the hold (the browser cancels a pointer as the scroll starts).
+  const MARKER_HOLD_MS = 350;
+  let markerDrag = null;
+  let markerDragEnded = 0;
+  let markerTouchAt = 0;
+
+  // The ribbon touched; in the cut of its V or the gap between two, the nearest
+  function ribbonAt(target, y) {
+    const ribbon = target.closest('.marker-btn');
+    if (ribbon || target !== $markerNav) return ribbon;
+    let nearest = null, best = 12;
+    for (const b of $markerNav.querySelectorAll('.marker-btn')) {
+      const r = b.getBoundingClientRect();
+      const d = Math.abs(y - (r.top + r.height / 2)) - r.height / 2;
+      if (d < best) { best = d; nearest = b; }
+    }
+    return nearest;
+  }
+
+  function pressMarker(target, x, y, touch) {
+    const ribbon = ribbonAt(target, y);
+    if (!ribbon) return false;
+    markerDrag = { ribbon, x, y, touch, lifted: false, timer: touch ? setTimeout(liftMarker, MARKER_HOLD_MS) : null };
+    return true;
+  }
+
+  function liftMarker() {
+    const d = markerDrag;
+    d.lifted = true;
+    d.ribbons = [...$markerNav.querySelectorAll('.marker-btn')];
+    d.from = d.to = d.ribbons.indexOf(d.ribbon);
+    d.pitch = d.ribbon.offsetHeight + parseFloat(getComputedStyle($markerNav).rowGap);
+    // (measured before it grows: the place to let go doesn't move under the finger)
+    const clear = document.getElementById('marker-clear-all').getBoundingClientRect();
+    d.dropTop = clear.top - 16;
+    d.dropBottom = clear.bottom + 26;
+    $markerNav.classList.add('dragging');
+    d.ribbons.forEach(b => b.classList.add(b === d.ribbon ? 'lifted' : 'making-room'));
+    placeLifted(d, 0);
+    if (navigator.vibrate) navigator.vibrate(12);
+  }
+
+  function placeLifted(d, dy) {
+    d.ribbon.style.transform = `translate(-6px, ${dy}px) scale(1.14)`;
+  }
+
+  function moveMarker(x, y, e) {
+    const d = markerDrag;
+    if (!d) return;
+    if (!d.lifted) {
+      if (Math.hypot(x - d.x, y - d.y) <= (d.touch ? 10 : 5)) return;
+      // A finger on its way, before the hold: the page scrolls
+      if (d.touch) {
+        clearTimeout(d.timer);
+        markerDrag = null;
+        return;
+      }
+      hideMarkerTooltip();
+      liftMarker();
+    }
+    if (e.cancelable) e.preventDefault();
+    const dy = y - d.y;
+    d.overClear = y >= d.dropTop && y <= d.dropBottom;
+    document.getElementById('marker-clear-all').classList.toggle('drop-here', d.overClear);
+    d.ribbon.classList.toggle('over-clear', d.overClear);
+    d.to = d.overClear ? d.from
+      : Math.max(0, Math.min(d.ribbons.length - 1, d.from + Math.round(dy / d.pitch)));
+    d.ribbons.forEach((b, i) => {
+      if (b === d.ribbon) return;
+      const shift = i > d.from && i <= d.to ? -d.pitch : i < d.from && i >= d.to ? d.pitch : 0;
+      b.style.transform = shift ? `translateY(${shift}px)` : '';
+    });
+    placeLifted(d, dy);
+  }
+
+  function endMarkerDrag(cancelled) {
+    const d = markerDrag;
+    if (!d) return;
+    clearTimeout(d.timer);
+    markerDrag = null;
+    if (!d.lifted) return;
+    markerDragEnded = Date.now();
+    if (!cancelled && d.overClear) {
+      removeMarkers([d.ribbon.dataset.uid]);
+    } else {
+      if (!cancelled && d.to !== d.from) {
+        hideMarkerUndo();
+        markersList.splice(d.to, 0, markersList.splice(d.from, 1)[0]);
+        saveMarkers();
+      }
+      renderMarkerNav();
+    }
+  }
+
+  $markerNav.addEventListener('touchstart', e => {
+    markerTouchAt = Date.now();
+    if (e.touches.length > 1) endMarkerDrag(true);
+    else pressMarker(e.target, e.touches[0].clientX, e.touches[0].clientY, true);
+  }, { passive: true });
+  // not passive: after the hold, it's what holds back the scroll
+  $markerNav.addEventListener('touchmove', e => {
+    moveMarker(e.touches[0].clientX, e.touches[0].clientY, e);
+  }, { passive: false });
+  $markerNav.addEventListener('touchend', () => {
+    markerTouchAt = Date.now();
+    endMarkerDrag(false);
+  });
+  $markerNav.addEventListener('touchcancel', () => endMarkerDrag(true));
+  $markerNav.addEventListener('mousedown', e => {
+    if (e.button !== 0 || Date.now() - markerTouchAt < 800) return;
+    if (!pressMarker(e.target, e.clientX, e.clientY, false)) return;
+    e.preventDefault();
+    const move = ev => moveMarker(ev.clientX, ev.clientY, ev);
+    addEventListener('mousemove', move);
+    addEventListener('mouseup', () => {
+      removeEventListener('mousemove', move);
+      endMarkerDrag(false);
+    }, { once: true });
+  });
+  // The hold isn't a request for the browser's menu
+  $markerNav.addEventListener('contextmenu', e => {
+    if (markerDrag || Date.now() - markerTouchAt < 800) e.preventDefault();
+  });
+  // The click that closes a drag doesn't go anywhere
+  $markerNav.addEventListener('click', e => {
+    if (Date.now() - markerDragEnded < 120) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }, true);
 
   // ===== COPY THE MARKED PROVISIONS =====
   // The text of the marked provisions, ready to paste in a working text: first the

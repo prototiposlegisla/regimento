@@ -178,6 +178,54 @@ body {
   text-size-adjust: none;
 }
 
+/* ===== THE STRIP ABOVE THE HEADER ===== */
+/* The pill between the two sites, as in the Pesquisa: the site's paper
+   (ivory, hairline, short shadow), the chosen side in the wine of the Título
+   bands, the message in the italic of the #aviso (mockup of 05/11/2026). */
+#site-strip {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+  padding: 8px 12px 0;
+}
+#site-strip .site-switch { grid-column: 2; }
+#site-strip .msg {
+  grid-column: 3; justify-self: end; white-space: nowrap;
+  font: italic 400 .78rem/1.5 var(--font-ui); color: var(--sepia);
+}
+.site-switch {
+  position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; flex-shrink: 0;
+  background: var(--marfim); border: 1px solid var(--fio-medio); border-radius: 999px; padding: 2px;
+  box-shadow: var(--sombra-papel);
+}
+.site-switch .thumb {
+  position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px);
+  border-radius: 999px; background: var(--nivel-titulo); box-shadow: 0 1px 2px rgba(40,30,10,.25);
+  transition: transform .26s cubic-bezier(.3,.7,.3,1);
+}
+.site-switch[data-cur="rg"] .thumb { transform: translateX(100%); }
+.site-switch .opt {
+  position: relative; display: block; text-align: center; text-decoration: none; white-space: nowrap;
+  font-size: 12.5px; font-weight: 700; padding: 3px 14px; border-radius: 999px; color: var(--sepia);
+  transition: color .26s, background-color .15s;
+}
+.site-switch[data-cur="rg"] .opt-ps:hover { background: var(--marfim-2); color: var(--tinta-amb); }
+.site-switch[data-cur="ps"] .opt-ps,
+.site-switch[data-cur="rg"] .opt-rg { color: #fff; }
+@media (max-width: 600px) {
+  #site-strip { display: flex; justify-content: space-between; gap: 8px; padding: 7px 8px 0; }
+  #site-strip .msg { font-size: 11px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .site-switch .opt { font-size: 11px; padding: 3px 9px; }
+}
+@media (max-width: 350px) { #site-strip .msg-name { display: none; } }   /* one line, always */
+@media print { #site-strip { display: none; } }
+
+/* What hangs from the header's line goes lower while the strip shows. The
+   script writes the distance on each of them, on scroll: not inherited, so
+   it restyles nothing else. They move by translate (it adds to their own
+   transforms and keeps their height: the minimap's is its scale); the two
+   whose bottom must stay on the screen move by top (rules further down). */
+@property --strip-gap { syntax: '<length>'; inherits: false; initial-value: 0px; }
+#minimap, #search-ticks, #breadcrumb-bar, #zoom-indicator { translate: 0 var(--strip-gap, 0px); }
+
 /* ===== HEADER ===== */
 #header {
   position: sticky;
@@ -2322,7 +2370,7 @@ button.q-label:hover { color: #2c6fa6; }
   }
   body.results-open #results-panel {
     display: flex;
-    top: calc(var(--header-h) + 12px);
+    top: calc(var(--header-h) + var(--strip-gap, 0px) + 12px);
     bottom: 12px;
     left: 12px;
     width: var(--results-w);
@@ -2347,14 +2395,14 @@ button.q-label:hover { color: #2c6fa6; }
   /* Below the header: the search bar stays visible and usable */
   body.results-drawer-open #results-panel {
     display: flex;
-    top: var(--header-h);
+    top: calc(var(--header-h) + var(--strip-gap, 0px));
     left: 0;
     bottom: 0;
     width: min(380px, 90vw);
     z-index: 500;
     box-shadow: 2px 0 12px rgba(0,0,0,.2);
   }
-  body.results-drawer-open #index-overlay { top: var(--header-h); }
+  body.results-drawer-open #index-overlay { top: calc(var(--header-h) + var(--strip-gap, 0px)); }
 }
 
 @media print {

@@ -11,8 +11,8 @@
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Regimento Interno referenciado — Câmara Municipal de São Paulo">
 <meta property="og:description" content="Regimento Interno da Câmara Municipal de São Paulo ligado à Lei Orgânica e às Constituições Estadual e Federal, com índice remissivo, consulta rápida e busca.">
-<meta property="og:url" content="https://prototiposlegisla.github.io/regimento/">
-<meta property="og:image" content="https://prototiposlegisla.github.io/regimento/img/compartilhar.png">
+<meta property="og:url" content="https://regimento.leisp.com.br/">
+<meta property="og:image" content="https://regimento.leisp.com.br/img/compartilhar.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Folha de rosto do Regimento Interno da Câmara Municipal de São Paulo, com abas RI, LOM, CE e CF">
@@ -24,6 +24,32 @@
 </style>
 </head>
 <body>
+
+<!-- THE STRIP ABOVE THE HEADER: the pill between the two sites. It scrolls
+     away; while it shows, what hangs from the header goes lower (03-trilha.js) -->
+<nav id="site-strip" aria-label="Escolher o site">
+  <div class="site-switch" data-cur="rg">
+    <span class="thumb" aria-hidden="true"></span>
+    <a class="opt opt-ps" href="https://leisp.com.br/">Pesquisa</a>
+    <span class="opt opt-rg" aria-current="page">Regimento</span>
+  </div>
+  <div class="msg">Aceito sugestões! <span class="msg-name">Kauê Negrão</span></div>
+  <script>
+  // The pill slides, then the other site opens. Back from it the browser may
+  // bring this page whole from its memory, so the pill comes back too
+  (function () {
+    var sw = document.querySelector('#site-strip .site-switch');
+    sw.querySelector('a').addEventListener('click', function (e) {
+      if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+      e.preventDefault();
+      var href = this.href;
+      sw.dataset.cur = 'ps';
+      setTimeout(function () { location.href = href; }, 260);
+    });
+    addEventListener('pageshow', function () { sw.dataset.cur = 'rg'; });
+  })();
+  </script>
+</nav>
 
 <!-- HEADER -->
 <div id="header">
@@ -43,7 +69,7 @@
   // keyboard closes); Tab still goes to the buttons
   document.addEventListener('mousedown', function (e) {
     if (!(e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents)
-        || !e.target.closest || !e.target.closest('button, [role="button"]')) return;
+        || !e.target.closest || !e.target.closest('button, [role="button"], #site-strip a')) return;
     e.preventDefault();
     var typing = document.activeElement;
     if (typing && typing.matches('input, textarea')) typing.blur();

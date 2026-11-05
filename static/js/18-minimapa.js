@@ -104,7 +104,8 @@
       tab.cover = cover;
       tab.title = cover.textContent.trim();
       tab.hidden = false;
-      tab.style.top = Math.max(0, Math.min(h - 40, y)) + 'px';
+      // (the strip above the header can push the map that much off the screen's bottom)
+      tab.style.top = Math.max(0, Math.min(h - 40 - stripH, y)) + 'px';
       shown.add(tab);
     }
     for (const tab of minimapTabs.children) if (!shown.has(tab)) tab.hidden = true;

@@ -280,6 +280,25 @@
     ALL_CARDS.forEach(card => firstDraws.observe(card));
   }
 
+  // The strip above the header scrolls away; while it shows, the header is
+  // lower and what hangs from its line goes with it (style.css, --strip-gap).
+  // Each gets the distance for itself: on :root it would restyle the whole
+  // page on every scroll.
+  const $siteStrip = document.getElementById('site-strip');
+  const BELOW_HEADER = ['minimap', 'search-ticks', 'breadcrumb-bar', 'zoom-indicator', 'results-panel', 'index-overlay']
+    .map(id => document.getElementById(id));
+  let stripH = $siteStrip.offsetHeight;
+  let stripGap = -1;
+  function followStrip() {
+    const gap = Math.max(0, Math.round(stripH - window.scrollY));
+    if (gap === stripGap) return;
+    stripGap = gap;
+    for (const el of BELOW_HEADER) el.style.setProperty('--strip-gap', gap + 'px');
+  }
+  new ResizeObserver(() => { stripH = $siteStrip.offsetHeight; followStrip(); }).observe($siteStrip);
+  window.addEventListener('scroll', followStrip, { passive: true });
+  followStrip();
+
   // On a phone, the header goes away while reading down and comes back on
   // the way up (or at the top); it stays while the search, its results or
   // the index are in use, and through jumps (a search, a remissão). A thin

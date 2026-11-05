@@ -203,7 +203,42 @@ def test_o_que_flutua_fica_fora_dos_filhos_do_body(abrir):
     _marcar_o_primeiro(pg)
     pg.click("#marker-copy-btn")
     filhos = pg.evaluate("[...document.body.children].filter(e => e.tagName !== 'SCRIPT').map(e => e.id)")
-    assert filhos == ["header", "breadcrumb-bar", "reading-line", "cards-container", "layers"], filhos
+    assert filhos == ["site-strip", "header", "breadcrumb-bar", "reading-line", "cards-container", "layers"], filhos
+
+
+def test_a_faixa_dos_sites_some_ao_rolar_e_o_minimapa_acompanha(abrir):
+    """Com a faixa na tela a barra de busca fica mais abaixo; sem acompanhar, cobriria a dedeira do RI."""
+    pg = abrir()
+    pg.wait_for_selector("#minimap .mm-tab")
+    medir = ("() => ({barra: document.getElementById('header').getBoundingClientRect(),"
+             " mapa: document.getElementById('minimap').getBoundingClientRect().top,"
+             " faixa: document.getElementById('site-strip').getBoundingClientRect().bottom})")
+    def conferir():
+        m = pg.evaluate(medir)
+        assert abs(m["mapa"] - m["barra"]["bottom"]) <= 1, m
+        return m
+    m = conferir()
+    assert m["barra"]["top"] == m["faixa"] > 0
+    pg.evaluate("window.scrollTo({top: 15, behavior: 'instant'})")
+    pg.wait_for_function("document.getElementById('minimap').style.getPropertyValue('--strip-gap') !== ''")
+    pg.wait_for_timeout(100)
+    conferir()
+    pg.evaluate("window.scrollTo({top: 2000, behavior: 'instant'})")
+    pg.wait_for_function("document.getElementById('minimap').style.getPropertyValue('--strip-gap') === '0px'")
+    m = conferir()
+    assert m["barra"]["top"] == 0 and m["faixa"] <= 0
+
+
+@pytest.mark.parametrize("largura", [360, 320])
+def test_a_pilula_cabe_numa_linha_no_celular_e_leva_ao_pesquisa(abrir, largura):
+    pg = abrir(largura=largura, altura=800, is_mobile=True, has_touch=True)
+    faixa = pg.evaluate("""() => {
+        const f = document.getElementById('site-strip');
+        return {altura: f.offsetHeight, cabe: f.scrollWidth <= f.clientWidth,
+                esquerda: f.querySelector('.site-switch').getBoundingClientRect().left};
+    }""")
+    assert faixa["altura"] < 40 and faixa["cabe"] and faixa["esquerda"] < 20, faixa
+    assert pg.locator("#site-strip a").get_attribute("href") == "https://leisp.com.br/"
 
 
 def test_toque_num_botao_nao_lhe_da_o_foco(abrir):

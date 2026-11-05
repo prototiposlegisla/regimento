@@ -35,14 +35,15 @@
   </div>
   <div class="msg">Aceito sugestões! <span class="msg-name">Kauê Negrão</span></div>
   <script>
-  // The pill slides, then the other site opens. Back from it the browser may
-  // bring this page whole from its memory, so the pill comes back too
+  // A click anywhere on the pill, the chosen side too: it slides, then the
+  // other site opens. Back from it the browser may bring this page whole from
+  // its memory, so the pill comes back too
   (function () {
     var sw = document.querySelector('#site-strip .site-switch');
-    sw.querySelector('a').addEventListener('click', function (e) {
+    sw.addEventListener('click', function (e) {
       if (e.ctrlKey || e.metaKey || e.shiftKey) return;
       e.preventDefault();
-      var href = this.href;
+      var href = sw.querySelector('a').href;
       sw.dataset.cur = 'ps';
       setTimeout(function () { location.href = href; }, 260);
     });

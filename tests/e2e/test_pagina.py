@@ -229,6 +229,15 @@ def test_a_faixa_dos_sites_some_ao_rolar_e_o_minimapa_acompanha(abrir):
     assert m["barra"]["top"] == 0 and m["faixa"] <= 0
 
 
+@pytest.mark.parametrize("lado", [".opt-rg", ".opt-ps"])
+def test_clicar_em_qualquer_lado_da_pilula_troca_de_site(abrir, lado):
+    """O lado já escolhido também troca: é nele que o dedo costuma cair."""
+    pg = abrir()
+    pg.context.route("https://leisp.com.br/**", lambda r: r.fulfill(body="<h1>Pesquisa</h1>", content_type="text/html"))
+    pg.click(f"#site-strip {lado}")
+    pg.wait_for_url("https://leisp.com.br/**", timeout=5000)
+
+
 @pytest.mark.parametrize("largura", [360, 320])
 def test_a_pilula_cabe_numa_linha_no_celular_e_leva_ao_pesquisa(abrir, largura):
     pg = abrir(largura=largura, altura=800, is_mobile=True, has_touch=True)

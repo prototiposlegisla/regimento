@@ -193,6 +193,7 @@ body {
 }
 .site-switch {
   position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; flex-shrink: 0;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
   background: var(--marfim); border: 1px solid var(--fio-medio); border-radius: 999px; padding: 2px;
   box-shadow: var(--sombra-papel);
 }

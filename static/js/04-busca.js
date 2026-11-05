@@ -438,7 +438,8 @@
     scopeOpening = false;
     scopeStartCard = null;
     const query = classifyQuery(term);
-    $btnClearSearch.style.display = query.kind === 'empty' && !scope ? 'none' : 'flex';
+    // (a chip alone has its own ×, and the phone's bar needs the room)
+    $btnClearSearch.style.display = query.kind === 'empty' ? 'none' : 'flex';
 
     let navTarget = null;
     if (query.kind === 'nav') {

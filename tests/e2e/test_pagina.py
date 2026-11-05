@@ -351,6 +351,44 @@ def _celular(abrir):
     return abrir(largura=384, altura=780, has_touch=True, is_mobile=True)
 
 
+def _sobreposicoes_na_barra(pg):
+    """Os pares de elementos visíveis da barra de busca que se encostam por cima, da esquerda à direita."""
+    return pg.evaluate("""() => {
+      const caixas = ['search-chip', 'search-input', 'search-counter', 'search-prev', 'search-next',
+                      'btn-clear-search', 'btn-filter']
+        .map(id => [id, document.getElementById(id).getBoundingClientRect()])
+        .filter(([, b]) => b.width)
+        .sort((a, b) => a[1].left - b[1].left);
+      const fim = document.getElementById('search-wrapper').getBoundingClientRect().right;
+      const ruins = caixas.slice(1)
+        .filter(([, b], i) => b.left < caixas[i][1].right - .5)
+        .map(([id], i) => caixas[i][0] + ' × ' + id);
+      if (caixas[caixas.length - 1][1].right > fim + .5) ruins.push('passou da barra');
+      return ruins;
+    }""")
+
+
+def test_barra_de_busca_nao_embola_no_celular(abrir):
+    pg = abrir(largura=360, altura=780, has_touch=True, is_mobile=True)
+    campo = pg.locator("#search-input")
+    campo.fill("Representação presidencial")   # (contador "n no índice")
+    pg.wait_for_function("document.getElementById('search-counter').offsetWidth")
+    assert _sobreposicoes_na_barra(pg) == []
+    campo.fill("comissão")                     # (contador e setas)
+    pg.wait_for_function(r"/\d+ \/ \d+/.test(document.getElementById('search-counter').textContent)")
+    assert _sobreposicoes_na_barra(pg) == []
+    campo.fill("")
+    _com_marcados(pg, 2)
+    pg.click("#marker-filter-btn")
+    pg.evaluate("document.getElementById('chip-label').textContent = 'Comissão Parlamentar de Inquérito'")
+    assert pg.locator("#search-chip").is_visible()
+    assert _sobreposicoes_na_barra(pg) == []
+    campo.fill("nominal")
+    pg.wait_for_function("document.getElementById('btn-clear-search').offsetWidth")
+    assert _sobreposicoes_na_barra(pg) == []
+    assert campo.bounding_box()["width"] >= 56
+
+
 def test_arrastar_a_fita_com_o_mouse_muda_a_ordem_e_fica_salvo(abrir):
     pg = abrir()
     a, b, c, d = _com_marcados(pg)

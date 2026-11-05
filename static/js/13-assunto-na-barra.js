@@ -76,7 +76,7 @@
     $searchChip.title = subject ? 'Índice remissivo: ' + chip.label : 'Artigos marcados';
     $searchChip.hidden = false;
     $resultsTitle.textContent = subject ? 'Remissivo: ' + chip.label : 'Artigos marcados';
-    updateChipSpace();
+    updatePlaceholder();
     markScopeUnits();
     renderMarkerNav();
   }
@@ -92,7 +92,7 @@
     scope = null;
     $searchChip.hidden = true;
     $resultsTitle.textContent = 'Resultados';
-    updateChipSpace();
+    updatePlaceholder();
     clearScopeUnits();
     if (markers) renderMarkerNav();
   }
@@ -102,10 +102,8 @@
     preserveScroll(() => doSearch($searchInput.value.trim()));
   }
 
-  // The input's text starts after the chip
   const SEARCH_PLACEHOLDER = $searchInput.placeholder;
-  function updateChipSpace() {
-    $searchInput.style.paddingLeft = scope ? ($searchChip.offsetWidth + 10) + 'px' : '';
+  function updatePlaceholder() {
     $searchInput.placeholder = !scope ? SEARCH_PLACEHOLDER
       : scope.kind === 'markers' ? 'Buscar nos marcados...' : 'Buscar neste assunto...';
   }
@@ -116,6 +114,4 @@
     removeScope();
     $searchInput.focus({ preventScroll: true });
   });
-  // Its width is a share of the bar's
-  window.addEventListener('resize', () => { if (scope) updateChipSpace(); });
 

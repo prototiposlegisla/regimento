@@ -208,38 +208,43 @@ body {
 #btn-index.pending { cursor: progress; animation: btn-pending .6s ease-in-out infinite alternate; }
 @keyframes btn-pending { to { opacity: .3; } }
 
-#search-wrapper {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
 /* A line to write on, as on a printed form: no box, a hairline under it
    that thickens in the norma's color in focus; what is typed in the text's
-   serif (chosen in the fitting room of the harmony, 01/11/2026) */
-#search-input {
-  width: 100%;
-  padding: 8px 36px 8px 4px;
-  border: 0;
+   serif (chosen in the fitting room of the harmony, 01/11/2026). Chip, input
+   and buttons side by side on that line: the text ends where the counter
+   begins, however wide the counter is. */
+#search-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
   border-bottom: 1px solid color-mix(in srgb, var(--amb) 55%, #8b8678);
+}
+#search-wrapper:has(#search-input:focus) { border-bottom-color: var(--selected-border); box-shadow: 0 1px 0 var(--selected-border); }
+
+#search-input {
+  flex: 1 1 0;
+  min-width: 26px;
+  padding: 8px 4px;
+  border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
   font-family: var(--font-text);
   font-size: 14.5px;
   outline: none;
-  transition: padding-right .15s;
 }
-#search-input.has-nav { padding-right: 130px; }
-#search-input:focus { border-bottom-color: var(--selected-border); box-shadow: 0 1px 0 var(--selected-border); }
+#search-input:not(:placeholder-shown) { min-width: 56px; }   /* what is typed, before the chip's name */
 
-/* A subject of the remissivo, or the marked articles, in the search bar;
-   app.js gives the input room for it. A subject has the color of its
-   dispositivos in the cards; the markers, the color of their funnel. */
+/* A subject of the remissivo, or the marked articles, in the search bar,
+   before the input (it comes after it in the page). A subject has the color
+   of its dispositivos in the cards; the markers, the color of their funnel. */
 #search-chip {
-  position: absolute;
-  left: 4px;
+  order: -1;
+  flex: 0 1 auto;
+  min-width: 44px;
+  margin: 0 2px 0 4px;
   max-width: 45%;
   height: 28px;
   padding: 0 2px 0 10px;
@@ -264,8 +269,8 @@ body {
 #chip-remove:hover { background: rgba(0,0,0,.08); }
 
 #btn-filter {
-  position: absolute;
-  right: 4px;
+  position: relative;
+  flex-shrink: 0;
   width: 28px; height: 28px;
   border: none; background: none; cursor: pointer;
   border-radius: 2px; color: #a19a8c;
@@ -275,8 +280,9 @@ body {
 #btn-filter.active { color: var(--selected-border); box-shadow: inset 0 -2px 0 var(--selected-border); }
 
 #btn-clear-search {
-  position: absolute;
-  right: 34px;
+  position: relative;
+  flex-shrink: 0;
+  margin-right: 2px;
   width: 24px; height: 24px;
   border: none; background: none; cursor: pointer;
   font-size: 16px; color: #999;
@@ -286,8 +292,7 @@ body {
 
 #search-nav {
   display: none;
-  position: absolute;
-  right: 58px;
+  flex-shrink: 0;
   align-items: center;
   gap: 2px;
 }
@@ -314,9 +319,8 @@ body {
    the arrows a little larger and further apart. Each area stops short of its
    neighbor's look: the × never takes a tap meant for "›". */
 @media (pointer: coarse) {
-  #search-nav { gap: 6px; right: 62px; }
+  #search-nav { gap: 6px; margin-right: 4px; }
   .search-arrow { width: 28px; height: 28px; }
-  #search-input.has-nav { padding-right: 150px; }
   .search-arrow, #chip-remove { position: relative; }
   :is(.search-arrow, #btn-clear-search, #btn-filter, #chip-remove)::before {
     content: ""; position: absolute; inset: -8px -3px;

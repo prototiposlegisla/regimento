@@ -131,6 +131,8 @@ Minimapa (computador): a faixa estreita à direita é o documento inteiro em min
 
 No celular, a barra do topo some enquanto se lê para baixo e volta ao rolar para cima. Um fio no alto da tela mostra quanto do documento já foi percorrido.
 
+Guia de rolagem (celular): ao rolar rápido com o dedo, surge na borda direita uma aba com a norma e o número do artigo. Arraste-a para correr o documento inteiro: a página acompanha, e ao lado do dedo aparece o caminho até o artigo. A aba some sozinha depois de um instante, e o Voltar desfaz o salto.
+
 Voltar e Avançar: o botão Voltar do navegador (ou o gesto de voltar do celular) desfaz cada salto: ir a um resultado, abrir um assunto, seguir uma remissão, ir a uma seção pelo índice. A tela volta como estava, com a busca e a lista. Avançar refaz. Isso vale enquanto a página está aberta; recarregá-la zera o histórico.
 
 ### Ajustes

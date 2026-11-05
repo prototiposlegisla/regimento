@@ -670,3 +670,123 @@ def test_clique_no_numero_do_artigo_no_modo_compacto_marca_sem_sair(abrir):
     pg.click("#btn-compact")
     pg.locator("#cards-container .card-artigo .art-compact-label").nth(3).click()
     assert "compact" in pg.get_attribute("#cards-container", "class")
+
+
+# Toque por CDP não chega à velocidade de um peteleco (cada passo espera a volta do navegador): com o
+# relógio da página mais lento, a mesma distância conta como rápida
+_RELOGIO_LENTO = "const _agora = performance.now.bind(performance); performance.now = () => _agora() / 4;"
+
+
+def _celular_relogio_lento(abrir):
+    return abrir(antes=_RELOGIO_LENTO, largura=384, altura=780, has_touch=True, is_mobile=True)
+
+
+def _rola_rapido(pg, dedo):
+    dedo.baixa(190, 600)
+    dedo.move(190, 600, 190, 150, passos=6)
+    dedo.sobe()
+    pg.wait_for_timeout(300)
+
+
+def _guia_visivel(pg) -> bool:
+    return pg.evaluate("document.getElementById('scroll-guide').classList.contains('visible')")
+
+
+def _pega_a_guia(pg, dedo) -> tuple[float, float]:
+    """Rola, para a guia surgir, e encosta o dedo nela."""
+    pg.evaluate("scrollTo({top: 300000, behavior: 'instant'})")
+    pg.wait_for_timeout(300)
+    _rola_rapido(pg, dedo)
+    assert _guia_visivel(pg)
+    _, y = _centro(pg, "#sg-grip")
+    x = pg.viewport_size["width"] - 14
+    dedo.baixa(x, y)
+    pg.wait_for_timeout(50)
+    return x, y
+
+
+def test_a_guia_de_rolagem_nao_surge_na_leitura_lenta(abrir):
+    pg = _celular(abrir)
+    dedo = _Dedo(pg)
+    pg.evaluate("scrollTo({top: 300000, behavior: 'instant'})")
+    pg.wait_for_timeout(400)
+    dedo.baixa(190, 500)
+    dedo.move(190, 500, 190, 440, passos=30)
+    pg.wait_for_timeout(100)
+    assert not _guia_visivel(pg)
+    dedo.sobe()
+
+
+def test_a_guia_de_rolagem_surge_no_peteleco_e_some_sozinha(abrir):
+    pg = _celular_relogio_lento(abrir)
+    dedo = _Dedo(pg)
+    pg.evaluate("scrollTo({top: 300000, behavior: 'instant'})")
+    pg.wait_for_timeout(400)
+    _rola_rapido(pg, dedo)
+    assert _guia_visivel(pg)
+    assert pg.locator("#sg-num").inner_text().strip()
+    pg.wait_for_timeout(1900)
+    assert not _guia_visivel(pg)
+
+
+def test_salto_nao_chama_a_guia_de_rolagem(abrir):
+    pg = _celular(abrir)
+    pg.evaluate("scrollTo({top: 300000, behavior: 'instant'})")
+    pg.wait_for_timeout(300)
+    assert not _guia_visivel(pg)
+
+
+def test_arrastar_a_guia_corre_o_documento_proporcionalmente_e_o_voltar_desfaz(abrir):
+    pg = _celular_relogio_lento(abrir)
+    dedo = _Dedo(pg)
+    x, y = _pega_a_guia(pg, dedo)
+    assert pg.locator("#sg-bubble").is_visible()
+    antes = pg.evaluate("scrollY")
+    dedo.move(x, y, x, y + 200)
+    pg.wait_for_timeout(100)
+    depois = pg.evaluate("scrollY")
+    alto = pg.evaluate("document.documentElement.scrollHeight - document.documentElement.clientHeight")
+    # 200 px de um trilho de 780 - 96 - 18
+    assert abs((depois - antes) - alto * 200 / (780 - 96 - 18)) < alto * .01
+    # o balão diz o caminho e o artigo que está na linha de leitura
+    pg.wait_for_timeout(100)
+    alvo = pg.evaluate("""(() => {
+      const c = document.querySelector('.card.selected');
+      return c.classList.contains('card-artigo') ? c.dataset.art : null;
+    })()""")
+    if alvo:
+        assert pg.locator("#sg-num").inner_text().strip() == alvo
+    assert pg.locator("#sg-bubble .sg-path-norma").count() == 1
+    # a barra de busca fica fora do caminho, e as fitas também
+    assert pg.evaluate("document.body.classList.contains('hide-top')")
+    assert "under-guide" in pg.get_attribute("#marker-nav", "class")
+    dedo.sobe()
+    pg.wait_for_timeout(300)
+    assert abs(pg.evaluate("scrollY") - depois) < 1500   # soltou, ficou (sem ímã)
+    assert not pg.locator("#sg-bubble").is_visible()
+    assert _guia_visivel(pg)
+    pg.go_back()
+    pg.wait_for_timeout(300)
+    assert abs(pg.evaluate("scrollY") - antes) < 1500
+
+
+def test_tocar_a_guia_sem_arrastar_nao_muda_nada(abrir):
+    pg = _celular_relogio_lento(abrir)
+    dedo = _Dedo(pg)
+    _pega_a_guia(pg, dedo)
+    antes = pg.evaluate("scrollY")
+    tamanho = pg.evaluate("history.length")
+    dedo.sobe()
+    pg.wait_for_timeout(200)
+    assert pg.evaluate("scrollY") == antes
+    assert pg.evaluate("history.length") == tamanho
+
+
+def test_a_guia_de_rolagem_fica_fora_do_painel_e_do_computador(abrir):
+    pg = _celular(abrir)
+    pg.click("#btn-index")
+    pg.wait_for_selector("#index-panel.open")
+    pg.evaluate("scrollTo({top: 300000, behavior: 'instant'})")
+    assert not _guia_visivel(pg)
+    pc = abrir()
+    assert pc.evaluate("getComputedStyle(document.getElementById('scroll-guide')).display") == "none"

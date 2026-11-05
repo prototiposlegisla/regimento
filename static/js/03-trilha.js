@@ -151,6 +151,12 @@
     return [num, m[2] ? sysCase(m[2]) : ''];
   }
   const BC_LEVEL_WORD = { tit: 'Título', cap: 'Capítulo', sec: 'Seção', subsec: 'Subseção' };
+  // "Título II — Dos Vereadores"
+  function bcHeadingRowText(h) {
+    const [num, name] = bcHeadingParts(h);
+    return h.level === 'norma' ? name
+      : [BC_LEVEL_WORD[h.level] && num ? BC_LEVEL_WORD[h.level] + ' ' + num : num, name].filter(Boolean).join(' — ');
+  }
   function buildPhoneBreadcrumb(bc) {
     const { card, headings } = bc;
     const line = document.createElement('div');
@@ -184,13 +190,11 @@
       scrollToY(top - getReadingLineY(), 'smooth');
     };
     headings.forEach((h, i) => {
-      const [num, name] = bcHeadingParts(h);
       const row = document.createElement('button');
       row.type = 'button';
       row.className = 'bc-row bc-' + h.level;
       row.style.setProperty('--d', i);
-      row.textContent = h.level === 'norma' ? name
-        : [BC_LEVEL_WORD[h.level] && num ? BC_LEVEL_WORD[h.level] + ' ' + num : num, name].filter(Boolean).join(' — ');
+      row.textContent = bcHeadingRowText(h);
       row.addEventListener('click', e => { e.stopPropagation(); go(h.el); });
       list.appendChild(row);
     });
@@ -233,12 +237,14 @@
   function syncToScroll() {
     manualSelect = false;
     const viewport = readMinimapViewport();
+    const guideY = readScrollGuide();
     const best = findSelectionCard();
     const bc = computeBreadcrumb();
     registerNearbyHits();
     if (best && best !== selectedCard) selectCard(best, false);
     applyBreadcrumb(bc);
     applyMinimapViewport(viewport);
+    applyScrollGuide(guideY, best);
     if (best) showNorma(best);
   }
 
@@ -316,6 +322,7 @@
     $readProgress.style.transform = 'scaleX(' + Math.min(1, y / Math.max(1, root.scrollHeight - root.clientHeight)) + ')';
     const busy = resultsDrawerOpen || document.activeElement === $searchInput
       || $indexPanel.classList.contains('open') || $breadcrumb.classList.contains('open') || smoothScrolling;
+    if (guideHeld) return;   // (the scroll guide's drag goes up and down with the bars away)
     if (y <= 80 || busy || dy < -6) document.body.classList.remove('hide-top');
     else if (dy > 6 && dy < window.innerHeight) document.body.classList.add('hide-top');
   }, { passive: true });

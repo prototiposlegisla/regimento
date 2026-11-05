@@ -2140,6 +2140,56 @@ button.q-label:hover { color: #2c6fa6; }
   box-shadow: 0 1px 4px rgba(0,0,0,.15);
 }
 
+/* ===== SCROLL GUIDE ===== */
+/* A paper tab out of the phone's right edge, as on a dictionary (chosen in the
+   fitting room of the scrolling, 05/11/2026); 18b-guia-de-rolagem.js */
+#scroll-guide { display: none; }
+@media (max-width: 600px) {
+  #scroll-guide {
+    --sg-c: var(--n-ri);
+    display: block; position: fixed; inset: 0; z-index: 195; pointer-events: none;
+    opacity: 0; visibility: hidden; transition: opacity .16s ease, visibility 0s linear .16s;
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  #scroll-guide.visible { opacity: 1; visibility: visible; transition: opacity .12s ease; }
+  #sg-grip {
+    position: absolute; top: 0; right: 0; width: 56px; height: 76px;   /* GRIP_H */
+    display: flex; align-items: center; justify-content: flex-end;
+    touch-action: none; will-change: transform;
+  }
+  #scroll-guide.visible #sg-grip { pointer-events: auto; }
+  .sg-tab {
+    min-width: 34px; padding: 7px 5px 6px 6px; background: var(--marfim); border: 1px solid var(--fio-medio); border-right: 0;
+    border-left: 3px solid var(--sg-c); border-radius: 2px 0 0 2px; box-shadow: var(--sombra-papel); transition: transform .12s ease;
+  }
+  #scroll-guide.held .sg-tab { transform: translateX(-3px); box-shadow: -2px 2px 8px rgba(40,30,10,.3); }
+  #sg-norma, #sg-num { display: block; white-space: nowrap; text-align: center; }
+  #sg-norma { font: 700 8.5px/1 var(--font-fita); letter-spacing: .08em; color: var(--sg-c); }
+  #sg-num { font: 700 12.5px/1.1 var(--font-ui); color: #33302a; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  /* where the drag began */
+  #sg-origin { position: absolute; right: 12px; width: 0; height: 0; margin-top: -5px; border: 5px solid transparent; border-left-color: var(--sepia); display: none; }
+  #scroll-guide.away #sg-origin { display: block; }
+  #sg-bubble {
+    position: absolute; top: 0; right: 66px; max-width: min(272px, calc(100vw - 86px)); padding: 7px 10px 8px; display: none;
+    background: var(--marfim); border: 1px solid var(--fio-medio); border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(40,30,10,.1), 0 12px 26px -12px rgba(20,30,45,.55);
+    font: 12.5px/1.35 var(--font-text); color: #33302a; will-change: transform;
+  }
+  #scroll-guide.held #sg-bubble { display: block; }
+  .sg-path { display: block; font: 10.5px/1.35 var(--font-ui); color: #5d5a52; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sg-path-norma { font: 700 9.5px/1.5 var(--font-fita); letter-spacing: .07em; color: var(--sg-c); }
+  .sg-article { display: block; }
+  .sg-path + .sg-article { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--fio-claro); }
+  .sg-article-norma { font: 700 9.5px/1 var(--font-fita); letter-spacing: .07em; color: var(--sg-c); margin-right: 5px; }
+  .sg-article b { font: 700 13.5px/1.2 var(--font-ui); font-variant-numeric: tabular-nums; }
+  .sg-summary {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-style: italic; font-size: 12px; color: #4f4b42; margin-top: 1px;
+  }
+  /* the ribbons give way while the tab goes past them */
+  #marker-nav.under-guide { opacity: .18; pointer-events: none; transition: opacity .12s; }
+}
+
 /* ===== SEARCH RESULTS LIST ===== */
 #search-counter {
   border: none;

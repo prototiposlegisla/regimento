@@ -49,13 +49,13 @@ _LEI = {"RI": "RI", "LOM": "LOM", "LO": "LOM", "CE": "CE", "CF": "CF"}
 
 # ── artigos ─────────────────────────────────────────────────────────────
 
-def parse_arts(texto: str) -> list[tuple[str, str, str]]:
+def parse_arts(texto: str, sobras: list[str] | None = None) -> list[tuple[str, str, str]]:
     """'103 I o · 368' → [(RI, 103, 'I,o'), (RI, 368, '')].
 
     Separadores: '·' e ';' entre referências, cada uma do RI salvo prefixo ('LOM 22 · 117' = LOM 22 e
     RI 117); ',' e '/' entre artigos da mesma norma ('LOM 48, 62 · RI 28'). Intervalo de artigos
     ('10–11', '32–34') vira cada artigo; de dispositivos ('§1º-§2º', 'II-IV', 'g-h'), o primeiro.
-    Para no que não reconhece ('mín. 2').
+    Para no que não reconhece ('mín. 2'); com `sobras`, guarda nela cada trecho em que parou.
     """
     refs: list[tuple[str, str, str]] = []
     texto = re.sub(r"\(revog[^)]*\)", "", texto)
@@ -82,6 +82,8 @@ def parse_arts(texto: str) -> list[tuple[str, str, str]]:
             continue
         m = re.fullmatch(r"(\d+)[º°]?(?:-?([A-Z]))?(?:[–-](\d+)[º°]?)?", toks[0])
         if not m:
+            if sobras is not None:
+                sobras.append(grupo.strip())
             continue
         toks.pop(0)
         base = "ADT" if adt else ""
@@ -89,14 +91,14 @@ def parse_arts(texto: str) -> list[tuple[str, str, str]]:
             refs += [(lei, base + str(n), "") for n in range(int(m.group(1)), int(m.group(3)) + 1)]
             continue
         art = base + m.group(1) + (f"-{m.group(2)}" if m.group(2) else "")
-        par = inc = ali = ""
+        par = inc = ali = num = ""
         i = 0
         while i < len(toks):
             t = toks[i]
             if t == "§" and i + 1 < len(toks):
                 i += 1
                 v = toks[i].split("-")[0]
-                if re.fullmatch(r"[úu]n(ico)?\.?", v):
+                if re.fullmatch(r"[úu](n(ico)?)?\.?", v):       # '§ún', '§único' e também '§ú'
                     par = "§ú"
                 elif re.fullmatch(r"\d+[º°]?", v):
                     par = f"§ {v.rstrip('º°')}º"
@@ -106,12 +108,16 @@ def parse_arts(texto: str) -> list[tuple[str, str, str]]:
                 inc = re.split(r"[-–]", t)[0]
             elif re.fullmatch(r"[a-z](?:[-–][a-z])?", t):
                 ali = t[0]
+            elif ali and not num and re.fullmatch(r"\d+(?:[-–]\d+)?", t):   # item da alínea: '47 III a 1'
+                num = re.split(r"[-–]", t)[0]
             elif t.lower() == "caput":
                 pass
             else:
                 break
             i += 1
-        refs.append((lei, art, ",".join(p for p in (par, inc, ali) if p)))
+        if i < len(toks) and sobras is not None:
+            sobras.append(grupo.strip())
+        refs.append((lei, art, ",".join(p for p in (par, inc, ali, num) if p)))
     return refs
 
 
@@ -212,7 +218,7 @@ def _chave_artigo(art: str) -> tuple:
         return (_ORDEM_NORMA[lei], int(ano), int(n))
     m = re.fullmatch(r"(ADT)?(\d+)(?:-([A-Z]))?", num)
     artigo = (bool(m[1]), int(m[2]), m[3] or "") if m else (True, 9999, num)
-    par = inc = ali = 0
+    par = inc = ali = item = 0
     for p in path.split(","):
         if p == "§ú":
             par = 1
@@ -220,9 +226,11 @@ def _chave_artigo(art: str) -> tuple:
             par = int(re.sub(r"\D", "", p))
         elif _ROMANO.match(p):
             inc = _romano(p)
+        elif p.isdigit():
+            item = int(p)
         elif p:
             ali = ord(p)
-    return (_ORDEM_NORMA.get(lei, 5), *artigo, par, inc, ali)
+    return (_ORDEM_NORMA.get(lei, 5), *artigo, par, inc, ali, item)
 
 
 def _chave_duracao(valor: str) -> tuple:
@@ -487,6 +495,12 @@ def conferir(secoes: list[dict], doc, avisos: list) -> None:
                 sub_ctx = ctx if parte is item else f"{ctx} › {parte['text']}"
                 if art_txt and art_txt != "—" and not refs:
                     avisos.append(("aviso", f"artigo não reconhecido: «{art_txt}»", sub_ctx))
+                elif art_txt and art_txt != "—":
+                    # a leitura parou no meio ('§ú' já parou assim): o botão levaria ao artigo, sem o dispositivo
+                    sobras: list[str] = []
+                    parse_arts(art_txt, sobras)
+                    for trecho in sobras:
+                        avisos.append(("aviso", f"citação lida só em parte: «{trecho}»", sub_ctx))
                 for r in refs:
                     alvo = corpus.resolve(r["law"], r["art"], r.get("path", ""))
                     if alvo.status == ART_INEXISTENTE:

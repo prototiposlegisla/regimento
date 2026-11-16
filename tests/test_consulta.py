@@ -33,6 +33,8 @@ class TestArtigos:
         assert parse_arts("103 I o · 368") == [("RI", "103", "I,o"), ("RI", "368", "")]
         assert parse_arts("63 §4º") == [("RI", "63", "§ 4º")]
         assert parse_arts("177 §ún") == [("RI", "177", "§ú")]
+        assert parse_arts("321 §ú") == [("RI", "321", "§ú")]
+        assert parse_arts("295 §ú I · 167 §2º") == [("RI", "295", "§ú,I"), ("RI", "167", "§ 2º")]
         # a norma vale entre vírgulas; depois de '·', volta ao RI
         assert parse_arts("LOM 48, 62 · RI 28") == [("LOM", "48", ""), ("LOM", "62", ""), ("RI", "28", "")]
         assert parse_arts("LOM 22 · 117") == [("LOM", "22", ""), ("RI", "117", "")]
@@ -43,11 +45,20 @@ class TestArtigos:
         # de dispositivos, o primeiro
         assert parse_arts("38 §1º-§2º") == [("RI", "38", "§ 1º")]
         assert parse_arts("306 V g-h") == [("RI", "306", "V,g")]
+        assert parse_arts("47 III a 1 · 47 V a 3-4") == [("RI", "47", "III,a,1"), ("RI", "47", "V,a,3")]
         assert parse_arts("LOM 41 II-IV; RI 330: mín. 2") == [("LOM", "41", "II"), ("RI", "330", "")]
 
     def test_letrado_e_vazio(self):
         assert parse_arts("183-A §9º") == [("RI", "183-A", "§ 9º")]
         assert parse_arts("—") == []
+
+    def test_sobras_guardam_o_que_nao_foi_lido(self):
+        sobras = []
+        assert parse_arts("LOM 41 II-IV; RI 330: mín. 2 · 63 §4º", sobras) == [("LOM", "41", "II"), ("RI", "330", ""), ("RI", "63", "§ 4º")]
+        assert sobras == ["RI 330: mín. 2"]
+        sobras = []
+        parse_arts("295 §ú I · 47 III a 1 · PREC 2/2001", sobras)
+        assert sobras == []
         assert parse_arts("297/104 (revog.)") == [("RI", "297", ""), ("RI", "104", "")]
 
 

@@ -205,7 +205,8 @@
   // The indexes' part of the list, in one element at its top (kept when the
   // list is rebuilt for the same indexMatches: see buildResultsList). Each
   // index folds under its title; only the systematic one comes open (or,
-  // with nothing else to show, the first)
+  // with nothing else to show, the first), and the consulta rápida when the
+  // search names one of its fichas ("grande expediente", "aparte")
   function appendIndexResults() {
     indexPart = document.createElement('div');
     indexPart.className = 'res-idx-part';
@@ -215,7 +216,7 @@
     for (const sec of sections) {
       const box = document.createElement('div');
       box.className = 'res-idx-sec';
-      const open = sec.build === buildSysResult || (alone && sec === sections[0]);
+      const open = sec.build === buildSysResult || (sec.build === buildQuickResult && indexMatches.named.size > 0) || (alone && sec === sections[0]);
       box.appendChild(foldHead('res-idx', sec.title + ' · ' + sec.hits.length, open, open => box.classList.toggle('folded', !open)));
       box.classList.toggle('folded', !open);
       const more = appendWithMore(box, sec.hits, sec.shown || INDEX_GROUPS_SHOWN, sec.build, ['resultado', 'resultados'], 'res-idx-more');

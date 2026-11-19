@@ -36,6 +36,7 @@ KNOWN_TEXT_ERRORS: set[tuple[str, str, str]] = {
     ("Lei Orgânica", "200", "estabelecid. .o"),
     ("Lei Orgânica", "221", ".s.rtigos"),
     ("Regimento Interno", "156", "160 ,§ 6°"),
+    ("Precedentes Regimentais", "1/2020", "apoiamento ;"),
     ("Constituição Estadual", "74", "Estado , o Defensor"),   # espaço antes do trecho tachado (ADI 6517), como na ALESP
 }
 

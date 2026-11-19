@@ -53,6 +53,22 @@
     return el;
   }
 
+  // A text with its grifos (hl: [start, end, start, end…], the yaml's ==…==)
+  // in <b class="q-g">; mark() on each piece, so a search match stays marked
+  // inside or outside a grifo (one that crosses the edge of a grifo isn't)
+  function quickHl(text, hl, mark) {
+    if (!hl || !hl.length) return mark(text);
+    let out = '';
+    let at = 0;
+    // hl = [start, end, level…]: 0 bold (the answer), 1 pink marker (the key: the subject one looks for), 2 lilac (the trap)
+    for (let i = 0; i < hl.length; i += 3) {
+      if (hl[i] > at) out += mark(text.slice(at, hl[i]));
+      out += '<b class="q-g' + (hl[i + 2] ? ' q-g' + hl[i + 2] : '') + '">' + mark(text.slice(hl[i], hl[i + 1])) + '</b>';
+      at = hl[i + 1];
+    }
+    return at < text.length ? out + mark(text.slice(at)) : out;
+  }
+
   // mark(text) → HTML: the search's matches marked, or just escaped
   function quickItemEl(sec, item, mark, inSearch) {
     const el = document.createElement('div');
@@ -80,15 +96,16 @@
     const first = item.refs[0];
     const label = document.createElement(first ? 'button' : 'div');
     label.className = 'q-label';
-    label.innerHTML = mark(item.label)
+    const hl = item.hl || {};
+    label.innerHTML = quickHl(item.label, hl.label, mark)
       + (item.cf ? ' <span class="q-cf" title="artigo ainda não confirmado">†</span>' : '');
     if (first) label.addEventListener('click', quickGo(() => goToQuickRef(first), inSearch));
     body.appendChild(label);
-    for (const [cls, text] of [['q-text', item.text], ['q-obs', item.obs]]) {
+    for (const [cls, text, grifos] of [['q-text', item.text, hl.text], ['q-obs', item.obs, hl.obs]]) {
       if (!text) continue;
       const div = document.createElement('div');
       div.className = cls;
-      div.innerHTML = mark(text);
+      div.innerHTML = quickHl(text, grifos, mark);
       body.appendChild(div);
     }
     // a rito's steps (numbered by the CSS); a ficha's lines (in the search,
@@ -97,7 +114,7 @@
     if (item.steps) lists.push(['q-steps', item.steps, step => {
       const line = document.createElement('div');
       line.className = 'q-line';
-      line.innerHTML = mark(step);
+      line.innerHTML = quickHl(step, item.hlSteps && item.hlSteps[item.steps.indexOf(step)], mark);
       return line;
     }, ['passo', 'passos']]);
     if (item.list) {
@@ -112,7 +129,7 @@
       lists.push(['q-list', lines, x => {
         const line = document.createElement('div');
         line.className = 'q-line';
-        line.innerHTML = mark(x.text) + (x.tag ? ' <span class="q-tag">' + escapeHtml(x.tag) + '</span>' : '');
+        line.innerHTML = quickHl(x.text, x.hl, mark) + (x.tag ? ' <span class="q-tag">' + escapeHtml(x.tag) + '</span>' : '');
         if (x.refs.length) line.appendChild(quickRefsEl(x.refs, inSearch));
         return line;
       }, ['linha', 'linhas']]);

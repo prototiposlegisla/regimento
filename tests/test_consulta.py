@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.consulta import conferir, destaque, extenso, montar, ordenar, ordenar_yaml, para_o_site, parse_arts
+from src.consulta import conferir, desgrifar, destaque, extenso, montar, ordenar, ordenar_yaml, para_o_site, parse_arts
 from src.models import ArticleBlock, DocumentUnit, ParsedDocument, TextRun, UnitType
 from src.render_markdown import MarkdownRenderer
 
@@ -228,3 +228,40 @@ class TestOrdem:
         secoes = montar({"prazos": [{"prazo": "15 d", "evento": "X", "art": "63"},
                                     {"prazo": "2 d", "evento": "Y", "art": "63 §4º"}]})
         assert [i["label"] for i in secoes[0]["items"]] == ["Y", "X"]
+
+
+class TestGrifos:
+    """No yaml, o trecho importante vai entre '=='; o site recebe o texto limpo e as posições."""
+
+    def test_marcas_saem_do_texto_e_viram_posicoes(self):
+        limpo = desgrifar("==Portas fechadas==; ==*só Vereadores== no ==!recinto==")
+        assert limpo == "Portas fechadas; só Vereadores no recinto"
+        assert [(limpo[a:b], n) for a, b, n in limpo.grifos] == [("Portas fechadas", 0), ("só Vereadores", 1), ("recinto", 2)]
+        assert desgrifar("sem marca") == "sem marca"
+
+    def test_grifos_chegam_ao_site_em_cada_tipo_de_texto(self):
+        secoes = {s["key"]: s for s in montar({
+            "temas": [{"titulo": "Sessão secreta", "itens": ["Instala com ==*1/3 (19)== presente (195)", "Sem grifo (198)"]}],
+            "prazos": [{"prazo": "24 h", "evento": "Convocar ==sessão extraordinária==", "obs": "==salvo== urgência", "art": "184"}],
+            "hipoteses": [{"titulo": "Voto", "chip": "==SÓ 3== matérias", "art": "288", "nota": "demais ==presenciais=="}],
+            "ritos": [{"titulo": "Veto", "passos": ["Câmara envia", "Prefeito ==veta== em 15 d"], "art": "360"}],
+            "retirada_proposicao": [{"fase": "Ordem do Dia", "art": "274", "casos": [{"via": "pedir", "cond": "==sem== parecer"}]}],
+        })}
+        linha, sem = secoes["temas"]["items"][0]["list"]
+        assert (linha["text"], linha["art"], linha["hl"]) == ("Instala com 1/3 (19) presente", "195", [12, 20, 1])
+        assert "hl" not in sem
+        prazo = secoes["prazos"]["items"][0]
+        assert prazo["label"] == "Convocar sessão extraordinária" and prazo["obs"] == "salvo urgência"
+        assert prazo["hl"] == {"label": [9, 30, 0], "obs": [0, 5, 0]}
+        assert secoes["hipoteses"]["items"][0]["hl"] == {"text": [0, 4, 0], "obs": [7, 18, 0]}
+        veto, retirada = secoes["ritos"]["items"]
+        assert veto["steps"][1] == "Prefeito veta em 15 d" and veto["hlSteps"] == [[], [9, 13, 0]]
+        caso = retirada["list"][0]
+        assert caso["text"][caso["hl"][0]:caso["hl"][1]] == "sem"
+
+    def test_conferencia_e_chatbot_veem_o_texto_limpo(self):
+        secoes = montar({"prazos": [{"prazo": "15 d", "evento": "==Parecer== de Comissão", "art": "63"}]})
+        avisos = []
+        conferir(secoes, _doc(), avisos)
+        assert avisos == []
+        assert "==" not in MarkdownRenderer().render_consulta(para_o_site(secoes))

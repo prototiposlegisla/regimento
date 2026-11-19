@@ -856,6 +856,10 @@ def main() -> int:
         help="Mostra também os correlatos e as propostas do índice remissivo com Status 'proposto' "
              "(para revisar no build de teste)",
     )
+    parser.add_argument(
+        "--sem-folhas", action="store_true",
+        help="Não recompila as folhas impressas (Cheatsheet/formatos) quando o yaml da consulta mudou",
+    )
     args = parser.parse_args()
 
     if args.only_public and args.only_private:
@@ -906,6 +910,15 @@ def main() -> int:
             include_private=True,
             label="Markdown B para chatbot (com notas privadas)",
         )
+
+    # Folhas impressas (Typst): as que ficaram para trás do yaml saem de novo, para não divergirem do site
+    if not args.sem_folhas:
+        from src import folhas
+        feitas, problemas = folhas.recompilar(Path(args.consulta), output_cfg.get("folhas") or None)
+        if feitas:
+            print(f"\nFolhas impressas recompiladas: {', '.join(feitas)}")
+        for p in problemas:
+            print(f"\n⚠ Folha impressa não recompilada — {p}")
 
     elapsed_total = time.time() - t_total
     print(f"\n{'═' * 60}")

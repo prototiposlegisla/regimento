@@ -1912,6 +1912,13 @@ button.q-label:hover { color: #2c6fa6; }
 .q-text { color: #333; }
 .q-obs { color: #666; font-size: 12px; }
 .q-ficha .q-obs { font-style: italic; }
+/* grifo (==…== in the yaml): the words the eye should stop at. A marker under the text, since the
+   label of a value's card is already bold; a little heavier where the text is regular */
+.q-g { font-weight: 600; }
+/* 1 = a chave (o assunto que se procura), 2 = a armadilha; sem número, a resposta: só negrito */
+.q-g1 { background: linear-gradient(transparent 55%, rgba(255, 150, 175, .5) 55%); }
+.q-g2 { background: linear-gradient(transparent 55%, rgba(170, 140, 255, .45) 55%); }
+.q-label .q-g { font-weight: inherit; }
 .q-steps { counter-reset: q-step; margin-top: 2px; }
 .q-steps > .q-line { counter-increment: q-step; padding-left: 18px; text-indent: -18px; }
 .q-steps > .q-line::before { content: counter(q-step) ". "; display: inline-block; width: 18px; text-indent: 0; color: #888; }

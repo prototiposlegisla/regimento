@@ -354,10 +354,73 @@ def ordenar_yaml(texto: str) -> str:
 
 # ── montagem ────────────────────────────────────────────────────────────
 
+# Grifo: no yaml, o trecho importante de um texto vai entre "==" ("==Sem apartes==; só Vereadores").
+# Ao carregar, as marcas saem do texto (busca, conferência, ordem e chatbot veem o texto limpo) e as
+# posições ficam guardadas na própria string (Grifado.grifos), de onde `montar` as leva ao site ("hl").
+_GRIFO = re.compile(r"==([*!]?)(.+?)==")
+_NIVEL = {"": 0, "*": 1, "!": 2}   # negrito (a resposta) · chave (o assunto que se procura, marca-texto rosa) · armadilha (lilás)
+
+
+class Grifado(str):
+    """Texto sem as marcas, com (início, fim, nível) de cada trecho grifado."""
+    grifos: tuple[tuple[int, int, int], ...] = ()
+
+
+def desgrifar(texto: str) -> str:
+    """'a ==b== c' → Grifado('a b c') com grifos ((2, 3, 0),); '==*b==' é nível 1 e '==!b==', 2. Sem marcas, o próprio texto."""
+    if "==" not in texto:
+        return texto
+    partes, pos, grifos, fim = [], 0, [], 0
+    for m in _GRIFO.finditer(texto):
+        antes = texto[fim:m.start()]
+        partes += [antes, m.group(2)]
+        pos += len(antes)
+        grifos.append((pos, pos + len(m.group(2)), _NIVEL[m.group(1)]))
+        pos += len(m.group(2))
+        fim = m.end()
+    partes.append(texto[fim:])
+    limpo = Grifado("".join(partes))
+    limpo.grifos = tuple(grifos)
+    return limpo
+
+
+def _desgrifar_tudo(x):
+    if isinstance(x, str):
+        return desgrifar(x)
+    if isinstance(x, list):
+        return [_desgrifar_tudo(v) for v in x]
+    if isinstance(x, dict):
+        return {k: _desgrifar_tudo(v) for k, v in x.items()}
+    return x
+
+
+def _hl(texto, ate: int | None = None, desloca: int = 0) -> list[int]:
+    """Os grifos em lista corrida [ini, fim, nível, ini, fim, nível…]; só os que cabem até `ate`."""
+    return [n for a, b, nivel in getattr(texto, "grifos", ()) if ate is None or b <= ate for n in (a + desloca, b + desloca, nivel)]
+
+
+def _com_hl(item: dict, **campos) -> dict:
+    """Põe em item["hl"] os grifos de cada campo que os tem ({label: [...], obs: [...]})."""
+    hl = {nome: _hl(texto) for nome, texto in campos.items() if _hl(texto)}
+    if hl:
+        item["hl"] = hl
+    return item
+
+
+def _linha(frase) -> dict:
+    """Uma linha de ficha ou de lista: o texto, o artigo do fim e os grifos (item["hl"], lista corrida)."""
+    texto, art = _artigo_ao_fim(str(frase))
+    linha = {"text": texto, "art": art, "refs": _refs_json(art)}
+    hl = _hl(frase, len(texto)) if str(frase).startswith(texto) else []
+    if hl:
+        linha["hl"] = hl
+    return linha
+
+
 def carregar(path: str | Path) -> dict:
     import yaml
     with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+        return _desgrifar_tudo(yaml.safe_load(f) or {})
 
 
 def _refs_json(texto: str) -> list[dict]:
@@ -380,19 +443,17 @@ def montar(dados: dict) -> list[dict]:
     """As seções do yaml no formato do site: [{key, title, kind, terms, items}].
 
     kind "valor": cada item {v, u, label, obs?, art, refs, cf?, terms?}; kind "ficha": {label, text?,
-    obs?, list?, steps?, art, refs, cf?}. A seção "temas" vem primeiro. O que não está no yaml fica fora.
+    obs?, list?, steps?, art, refs, cf?}. Grifos (==…== no yaml): "hl" no item ({label|text|obs: [ini, fim…]}),
+    "hl" em cada linha de lista ([ini, fim, nível…]) e "hlSteps" nos ritos (uma lista por passo). A seção "temas" vem primeiro. O que não está no yaml fica fora.
     As entradas de valor saem em ordem (ORDEM), esteja o yaml em ordem ou não.
     """
-    dados = ordenar(dados)
+    dados = ordenar(_desgrifar_tudo(dados))   # (já vem assim de `carregar`; aqui, para quem monta à mão)
     secoes: list[dict] = []
     # temas: tudo de um assunto numa ficha só (o Grande Expediente: duração, tempo por orador, aparte...),
     # cada fato com o artigo entre parênteses, como nas listas de apartes
     temas = []
     for e in dados.get("temas") or []:
-        lista = []
-        for frase in e.get("itens") or []:
-            texto, art = _artigo_ao_fim(str(frase))
-            lista.append({"text": texto, "art": art, "refs": _refs_json(art)})
+        lista = [_linha(frase) for frase in e.get("itens") or []]
         item = {"label": e.get("titulo", ""), "list": lista, "art": "", "refs": []}
         if e.get("termos"):
             item["terms"] = str(e["termos"])
@@ -413,6 +474,7 @@ def montar(dados: dict) -> list[dict]:
                     "_bruto": "" if e.get("contado") else bruto}
             if campo_o and e.get(campo_o):
                 item["obs"] = str(e[campo_o])
+            _com_hl(item, label=e.get(campo_l, ""), obs=e.get(campo_o, "") if campo_o else "")
             if e.get("cf"):
                 item["cf"] = True
             if e.get("termos"):
@@ -427,6 +489,7 @@ def montar(dados: dict) -> list[dict]:
                 "refs": _refs_json(str(e.get("art", "")))}
         if e.get("nota"):
             item["obs"] = e["nota"]
+        _com_hl(item, text=e.get("chip", ""), obs=e.get("nota", ""))
         if e.get("cf"):
             item["cf"] = True
         if e.get("termos"):
@@ -436,19 +499,19 @@ def montar(dados: dict) -> list[dict]:
         frases = dados.get(key) or []
         if not frases:
             continue
-        lista = []
-        for frase in frases:
-            texto, art = _artigo_ao_fim(str(frase))
-            lista.append({"text": texto, "art": art, "refs": _refs_json(art)})
-        fichas.append({"label": title, "list": lista, "art": "", "refs": [], "terms": termos})
+        fichas.append({"label": title, "list": [_linha(frase) for frase in frases], "art": "", "refs": [],
+                       "terms": termos})
     if fichas:
         secoes.append({"key": "hipoteses", "title": "Hipóteses", "kind": "ficha",
                        "terms": "quando casos hipótese hipóteses cabe", "items": fichas})
 
     ritos = []
     for e in dados.get("ritos") or []:
-        ritos.append({"label": e.get("titulo", ""), "steps": [str(p) for p in e.get("passos") or []],
-                      "art": str(e.get("art", "")), "refs": _refs_json(str(e.get("art", "")))})
+        rito = {"label": e.get("titulo", ""), "steps": [str(p) for p in e.get("passos") or []],
+                "art": str(e.get("art", "")), "refs": _refs_json(str(e.get("art", "")))}
+        if any(_hl(p) for p in e.get("passos") or []):
+            rito["hlSteps"] = [_hl(p) for p in e.get("passos") or []]   # um por passo, na mesma ordem
+        ritos.append(rito)
     retirada = dados.get("retirada_proposicao") or []
     if retirada:
         vias = {"pedir": "basta pedir", "presidente": "Presidente defere", "maioria": "maioria dos membros",
@@ -456,9 +519,13 @@ def montar(dados: dict) -> list[dict]:
         lista = []
         for fase in retirada:
             for caso in fase.get("casos") or []:
-                lista.append({"text": f"{fase.get('fase', '')}: {caso.get('cond', '')}",
-                              "tag": vias.get(caso.get("via"), caso.get("via", "")), "art": str(fase.get("art", "")),
-                              "refs": _refs_json(str(fase.get("art", "")))})
+                linha = {"text": f"{fase.get('fase', '')}: {caso.get('cond', '')}",
+                         "tag": vias.get(caso.get("via"), caso.get("via", "")), "art": str(fase.get("art", "")),
+                         "refs": _refs_json(str(fase.get("art", "")))}
+                hl = _hl(caso.get("cond", ""), desloca=len(str(fase.get("fase", ""))) + 2)
+                if hl:
+                    linha["hl"] = hl
+                lista.append(linha)
         ritos.append({"label": "Retirada de proposição", "list": lista, "art": "274 · 177",
                       "refs": _refs_json("274 · 177"), "terms": "retirar retirada proposição projeto"})
     if ritos:

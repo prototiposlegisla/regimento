@@ -10,3 +10,5 @@ xlsx = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/remissivo.xlsx"
 [output]
 private = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/Regimento arquivo/index.html"
 chatbot = "C:/Users/SEU_USUARIO/OneDrive/CMSP/Regimento/FontesAtual/para o chatbot"
+# folhas = ".../Cheatsheet/formatos"   (padrão: Cheatsheet/formatos ao lado de FontesAtual; o build
+#                                       recompila as folha-*.typ quando o consulta-rapida.yaml muda)

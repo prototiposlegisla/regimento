@@ -120,3 +120,25 @@ def test_folha_sem_marcador_nao_tem_a_letra_mexida(tmp_path):
     typ.write_text('#let base = float(sys.inputs.at("base", default: "5")) * 1pt\n', encoding="utf-8")
     assert folhas.recompilar(consulta, typst=_typst_que_pagina(tmp_path)) == (["folha-a"], [])
     assert 'default: "5"' in typ.read_text(encoding="utf-8")
+
+
+def test_numero_de_folhas_fixo(tmp_path):
+    consulta, formatos = _arvore(tmp_path)
+    typ = formatos / "folha-a.typ"
+    typ.write_text('// auto-folhas: 3\n// auto-base: 3.0 9.0\n#let base = float(sys.inputs.at("base", default: "5")) * 1pt\n',
+                   encoding="utf-8")
+    # a menor letra pediria 2 folhas; com 3 folhas fixas (6 páginas) a maior letra é 6,49 pt
+    assert folhas.recompilar(consulta, typst=_typst_que_pagina(tmp_path)) == (["folha-a (6.49 pt, 3 folhas)"], [])
+
+
+def test_desenho_comum_alterado_refaz_as_folhas(tmp_path):
+    consulta, formatos = _arvore(tmp_path)
+    (formatos / "folha-a.typ").write_text("= a\n", encoding="utf-8")
+    typst = _typst_que_pagina(tmp_path)
+    assert folhas.recompilar(consulta, typst=typst) == (["folha-a"], [])
+    comum = formatos / "_comum.typ"
+    comum.write_text("// desenho\n", encoding="utf-8")
+    depois = (formatos / "folha-a.pdf").stat().st_mtime + 5
+    os.utime(comum, (depois, depois))
+    assert folhas.recompilar(consulta, typst=typst) == (["folha-a"], [])   # e o _comum não vira folha
+    assert not (formatos / "_comum.pdf").exists()

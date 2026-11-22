@@ -9,6 +9,9 @@ Letra automática: a folha que traz a linha `// auto-base: <mín> <máx>` e lê 
 default: "…")` tem a letra escolhida aqui. Com a menor letra vê-se quantas folhas frente e verso o
 conteúdo pede; depois se procura a maior letra que ainda cabe nelas, para não sobrar papel em branco.
 Com `// auto-ar: <mín> <máx>`, o que sobrar na última página vira entrelinha e espaço entre blocos.
+Com `// auto-folhas: <n>`, o número de folhas é esse, e não o que a menor letra pede (a versão em duas
+folhas da folha do teclado). O desenho comum a mais de uma folha fica num `_*.typ`, que não é compilado
+sozinho; mudou ele, todas as folhas são refeitas.
 Os valores achados são regravados nos `default` do .typ, de modo que compilar à mão dá o mesmo PDF.
 Fontes que não são do sistema ficam na pasta `fontes`, ao lado do .typ.
 """
@@ -43,8 +46,9 @@ def achar_typst() -> str | None:
 
 
 def atrasadas(consulta: Path, pasta: Path) -> list[Path]:
-    """Os .typ cujo PDF não existe ou é mais antigo que o yaml ou que o próprio .typ."""
-    yaml_mtime = consulta.stat().st_mtime
+    """Os .typ cujo PDF não existe ou é mais antigo que o yaml, que o próprio .typ ou que um `_*.typ`
+    (o desenho que as folhas importam)."""
+    yaml_mtime = max([consulta.stat().st_mtime] + [p.stat().st_mtime for p in pasta.glob("_*.typ")])
     fora = []
     for typ in sorted(pasta.glob("folha-*.typ")):
         pdf = typ.with_suffix(".pdf")
@@ -54,6 +58,7 @@ def atrasadas(consulta: Path, pasta: Path) -> list[Path]:
 
 
 AUTO = re.compile(r"^//\s*auto-(base|ar):\s*([\d.]+)\s+([\d.]+)", re.M)
+FOLHAS = re.compile(r"^//\s*auto-folhas:\s*(\d+)", re.M)
 PASSO = 0.01
 
 
@@ -120,6 +125,11 @@ def procurar(typst: str, raiz: Path, typ: Path, entradas: dict[str, str] | None 
     if minimo is None:
         return None
     alvo = minimo + minimo % 2          # folhas frente e verso: sempre par
+    fixo = FOLHAS.search(texto)
+    if fixo:
+        if minimo > 2 * int(fixo.group(1)):
+            return None                 # nem com a menor letra cabe nas folhas pedidas
+        alvo = 2 * int(fixo.group(1))
 
     def cabe(n: int | None) -> bool:
         return n is not None and n <= alvo

@@ -461,7 +461,7 @@ def montar(dados: dict) -> list[dict]:
             item["group"] = str(e["grupo"])   # subtítulo na aba Referências ("Fases da sessão", "Listas de hipóteses")
         temas.append(item)
     if temas:
-        secoes.append({"key": "temas", "title": "Por tema", "kind": "ficha", "terms": "tema resumo regras", "items": temas})
+        secoes.append({"key": "temas", "title": "Fichas por área", "kind": "ficha", "terms": "tema resumo regras", "items": temas})
     for key, title, campo_v, campo_l, campo_o, termos in SECOES_VALOR:
         items = []
         for e in dados.get(key) or []:

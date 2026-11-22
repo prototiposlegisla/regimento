@@ -157,7 +157,11 @@
     toc.className = 'q-toc';
     $indexContent.appendChild(toc);
     const heads = [];
-    for (const sec of consultaIndex()) {
+    // the lists of quorums and signatures first, as in the printed sheet, then the fichas by area
+    // (the order of the index itself, which the search's ties follow, stays)
+    const isList = sec => sec.key === 'quoruns' || sec.key === 'quorum_materia' || sec.key === 'subscricao';
+    const all = consultaIndex();
+    for (const sec of all.filter(isList).concat(all.filter(sec => !isList(sec)))) {
       const items = sec.items.filter(item => !filter
         || textMatchesFilter(quickTexts(item).join(' ') + ' ' + sec.terms + ' ' + (item.terms || ''), filter));
       if (!items.length) continue;
@@ -166,13 +170,19 @@
       head.className = 'ref-group-title q-head';
       head.innerHTML = escapeHtml(sec.title) + '<small>' + items.length + noun + '</small>';
       $indexContent.appendChild(head);
-      const link = document.createElement('button');
-      link.className = 'q-toc-link';
-      link.innerHTML = escapeHtml(sec.title) + '<small>' + items.length + '</small>';
-      link.addEventListener('click', () => goToQuickHead(head));
-      toc.appendChild(link);
-      heads.push([head, link]);
-      // the fichas by group ("Fases da sessão", "Listas de hipóteses"), each with its subtitle
+      // a link at the top to each section; the fichas, which are almost all of the consulta since the
+      // reorganization of 22/11/2026 (area → ficha → lines), get one link for each area instead
+      const tocLink = (title, count, target) => {
+        const link = document.createElement('button');
+        link.className = 'q-toc-link';
+        link.innerHTML = escapeHtml(title) + '<small>' + count + '</small>';
+        link.addEventListener('click', () => goToQuickHead(target));
+        toc.appendChild(link);
+        heads.push([target, link]);
+      };
+      const byArea = sec.key === 'temas' && items.some(item => item.group);
+      if (!byArea) tocLink(sec.title, items.length, head);
+      // the fichas by group ("Sessões", "Comissões"), each with its subtitle
       let group = null;
       let grid = null;
       for (const item of items) {
@@ -185,6 +195,7 @@
           sub.className = 'q-subhead';
           sub.textContent = group;
           $indexContent.appendChild(sub);
+          if (byArea) tocLink(group, items.filter(x => (x.group || 'Outros') === group).length, sub);
         }
         if (!grid) {
           grid = document.createElement('div');
@@ -202,11 +213,21 @@
     // the section being read, marked in the links
     const mark = () => {
       if (!toc.isConnected) { $indexContent.removeEventListener('scroll', mark); return; }
-      const top = toc.getBoundingClientRect().bottom + 8;
+      // (the room for a head brought by its link: it stops at its scroll-margin, 52px, and the bar is 42 to 44px tall)
+      const top = toc.getBoundingClientRect().bottom + 14;
       let cur = heads[0];
       for (const h of heads) if (h[0].getBoundingClientRect().top <= top) cur = h;
       for (const [, link] of heads) link.classList.toggle('on', link === cur[1]);
+      // the links are more than fit in the bar (one for each area): the marked one is kept in sight
+      const on = cur[1];
+      if (on !== shown) {
+        shown = on;
+        if (on.offsetLeft < toc.scrollLeft) toc.scrollLeft = on.offsetLeft - 12;
+        else if (on.offsetLeft + on.offsetWidth > toc.scrollLeft + toc.clientWidth)
+          toc.scrollLeft = on.offsetLeft + on.offsetWidth - toc.clientWidth + 12;
+      }
     };
+    let shown = null;
     $indexContent.addEventListener('scroll', mark, { passive: true });
     requestAnimationFrame(mark);
   }
